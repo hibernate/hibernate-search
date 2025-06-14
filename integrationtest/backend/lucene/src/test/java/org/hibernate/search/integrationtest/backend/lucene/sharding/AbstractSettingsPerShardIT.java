@@ -16,17 +16,17 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * A basic test for explicit sharding with explicit routing keys.
  */
-@ParameterizedPerMethod
+@ParameterizedClass(name = "{displayName}-{0}-{2}")
+@MethodSource("params")
 public abstract class AbstractSettingsPerShardIT {
 
 	public static List<? extends Arguments> params() {
@@ -62,9 +62,8 @@ public abstract class AbstractSettingsPerShardIT {
 
 	protected Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	protected void init(String strategy, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
+	protected AbstractSettingsPerShardIT(String strategy,
+			Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			List<String> shardIds) {
 		this.strategy = strategy;
 		this.setupStrategyFunction = setupStrategyFunction;

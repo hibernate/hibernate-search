@@ -40,19 +40,23 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Mincong Huang
  */
-@ParameterizedPerMethod
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MassIndexingJobIT {
 
 	public static List<? extends Arguments> params() {
@@ -75,11 +79,13 @@ class MassIndexingJobIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
-	private EntityManagerFactory emf;
+	private static EntityManagerFactory emf;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(boolean jpaCompliance) {
+	@Parameter(0)
+	static boolean jpaCompliance;
+
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		emf = ormSetupHelper.start()
 				.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
 				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
@@ -87,7 +93,7 @@ class MassIndexingJobIT {
 				.setup();
 	}
 
-	@ParameterizedSetupBeforeTest
+	@BeforeEach
 	void initData() {
 		List<Company> companies = new ArrayList<>();
 		List<Person> people = new ArrayList<>();
@@ -214,7 +220,8 @@ class MassIndexingJobIT {
 	void indexedEmbeddedCollection_idFetchSize_entityFetchSize_mysql() throws InterruptedException {
 		Dialect dialect = emf.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
 				.getJdbcEnvironment().getDialect();
-		assumeTrue( dialect instanceof MySQLDialect && !( dialect instanceof MariaDBDialect ),
+		assumeTrue(
+				dialect instanceof MySQLDialect && !( dialect instanceof MariaDBDialect ),
 				"This test only makes sense on MySQL,"
 						+ " which is the only JDBC driver that accepts (and, in a sense, requires)"
 						+ " passing Integer.MIN_VALUE for the JDBC fetch size"

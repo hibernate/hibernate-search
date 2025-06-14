@@ -38,15 +38,18 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.AssertionAndAssumptionViolationFallThrough;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RealBackendDatabaseMultitenancyIT {
 
 	public static final String TENANT_TEXT_1 = "I'm in the TENANT 1";
@@ -55,10 +58,15 @@ class RealBackendDatabaseMultitenancyIT {
 	@RegisterExtension
 	public static OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
+	@Parameter(0)
 	private Object tenant1;
+	@Parameter(1)
 	private Object tenant2;
+	@Parameter(2)
 	private Object tenant3;
+	@Parameter(3)
 	private TenantIdentifierConverter converter;
+	@Parameter(4)
 	private Class<? extends AbstractIndexedEntityWithTenant> entityWithTenant;
 
 	public static List<? extends Arguments> params() {
@@ -93,17 +101,6 @@ class RealBackendDatabaseMultitenancyIT {
 						IndexedEntityWithUUIDTenant.class
 				)
 		);
-	}
-
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(Object tenant1, Object tenant2, Object tenant3, TenantIdentifierConverter converter,
-			Class<? extends AbstractIndexedEntityWithTenant> entityWithTenant) {
-		this.tenant1 = tenant1;
-		this.tenant2 = tenant2;
-		this.tenant3 = tenant3;
-		this.converter = converter;
-		this.entityWithTenant = entityWithTenant;
 	}
 
 	private OrmSetupHelper.SetupContext preconfigureConverter() {

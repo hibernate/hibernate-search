@@ -33,12 +33,14 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -46,11 +48,15 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test that the outbox polling strategy works fine regardless of how it is
  * referenced in the "coordination strategy" configuration property.
  */
-@ParameterizedPerClass
 @TestForIssue(jiraKey = "HSEARCH-4182")
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OutboxPollingStrategyPropertyValueIT {
 
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
+	@Parameter(0)
+	private static Object strategyPropertyValue;
 
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
@@ -74,9 +80,9 @@ public class OutboxPollingStrategyPropertyValueIT {
 			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
 					.withBackendMock( backendMock );
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(Object strategyPropertyValue) {
+
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
@@ -91,7 +97,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 				.setup();
 	}
 
-	@ParameterizedSetupBeforeTest
+	@BeforeEach
 	void resetFilter() {
 		eventFilter.reset();
 	}
