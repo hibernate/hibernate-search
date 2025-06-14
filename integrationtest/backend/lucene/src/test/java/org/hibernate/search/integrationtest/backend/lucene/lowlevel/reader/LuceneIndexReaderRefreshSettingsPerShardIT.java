@@ -7,6 +7,9 @@ package org.hibernate.search.integrationtest.backend.lucene.lowlevel.reader;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.util.List;
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -14,6 +17,8 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.lucene.sharding.AbstractSettingsPerShardIT;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +35,11 @@ class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettingsPerShar
 	 * - small enough that tests do not take forever to execute
 	 */
 	private static final int NON_ZERO_DELAY = 2000;
+
+	protected LuceneIndexReaderRefreshSettingsPerShardIT(String strategy,
+			Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, List<String> shardIds) {
+		super( strategy, setupStrategyFunction, shardIds );
+	}
 
 	@Test
 	void test() {

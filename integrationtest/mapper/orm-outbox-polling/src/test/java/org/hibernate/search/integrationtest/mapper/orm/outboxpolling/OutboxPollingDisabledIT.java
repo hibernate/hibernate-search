@@ -25,11 +25,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -38,10 +40,12 @@ import org.junit.jupiter.params.provider.MethodSource;
  * disabling Hibernate Search or picking a different coordination strategy
  * will disable the addition of OutboxEvent entities to the Hibernate ORM model.
  */
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OutboxPollingDisabledIT {
 
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
 
 	public static List<? extends Arguments> params() {
 		return List.of(
@@ -60,10 +64,13 @@ public class OutboxPollingDisabledIT {
 			OrmSetupHelper.withCoordinationStrategy( CoordinationStrategyExpectations.defaults() )
 					.withBackendMock( backendMock );
 
+	@Parameter(0)
+	static boolean hibernateSearchEnabled;
+	@Parameter(1)
+	static String coordinationStrategyName;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(boolean hibernateSearchEnabled, String coordinationStrategyName) {
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		if ( hibernateSearchEnabled ) {
 			backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		}

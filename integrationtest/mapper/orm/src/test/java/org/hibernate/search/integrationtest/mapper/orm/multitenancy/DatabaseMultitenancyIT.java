@@ -22,18 +22,22 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearc
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @TestForIssue(jiraKey = "HSEARCH-4034")
 @PortedFromSearch5(original = "org.hibernate.search.test.batchindexing.DatabaseMultitenancyTest")
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DatabaseMultitenancyIT {
 
 	@RegisterExtension
@@ -42,8 +46,10 @@ class DatabaseMultitenancyIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	private Object tenant1;
-	private Object tenant2;
+	@Parameter(0)
+	private static Object tenant1;
+	@Parameter(1)
+	private static Object tenant2;
 
 	public static List<? extends Arguments> params() {
 		return List.of(
@@ -54,12 +60,9 @@ class DatabaseMultitenancyIT {
 		);
 	}
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(Object tenant1, Object tenant2) {
-		this.tenant1 = tenant1;
-		this.tenant2 = tenant2;
 
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		backendMock.expectSchema( Clock.INDEX, b -> b.field( "brand", String.class ) );
 		sessionFactory = ormSetupHelper
 				.start()
@@ -80,10 +83,10 @@ class DatabaseMultitenancyIT {
 			new Clock( 9, "Geochron - Model Designer Series" )
 	};
 
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
 
-	@ParameterizedSetupBeforeTest
-	void setup() {
+	@BeforeEach
+	void setupTest() {
 		// init data:
 		persist( tenant1, METAMEC_MODELS );
 		persist( tenant2, GEOCHRON_MODELS );

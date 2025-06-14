@@ -24,19 +24,32 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResol
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 public final class TestConfigurationProvider
 		implements BeforeAllCallback, AfterAllCallback,
-		BeforeEachCallback, AfterEachCallback {
+		BeforeEachCallback, AfterEachCallback,
+		BeforeClassTemplateInvocationCallback, AfterClassTemplateInvocationCallback {
 
 	private static final String STARTUP_TIMESTAMP = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
 			.format( new Date() );
 
 	private String testId;
+
+	@Override
+	public void afterClassTemplateInvocation(ExtensionContext context) {
+		afterEach( context );
+	}
+
+	@Override
+	public void beforeClassTemplateInvocation(ExtensionContext context) {
+		beforeEach( context );
+	}
 
 	@Override
 	public void afterAll(ExtensionContext context) {

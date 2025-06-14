@@ -19,11 +19,13 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -31,7 +33,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Basic tests of entity loading when executing a search query
  * when only a single type is involved.
  */
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
 	public static List<? extends Arguments> params() {
@@ -48,9 +52,11 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	private SessionFactory sessionFactory;
-	private SingleTypeLoadingModel<T> model;
-	private SingleTypeLoadingMapping mapping;
+	private static SessionFactory sessionFactory;
+	@Parameter(0)
+	private static SingleTypeLoadingModel<?> model;
+	@Parameter(1)
+	private static SingleTypeLoadingMapping mapping;
 
 	@Override
 	protected BackendMock backendMock() {
@@ -62,9 +68,10 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		return sessionFactory;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected SingleTypeLoadingModel<T> model() {
-		return model;
+		return (SingleTypeLoadingModel<T>) model;
 	}
 
 	@Override
@@ -72,12 +79,9 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		return mapping;
 	}
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	public void setup(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		this.model = model;
-		this.mapping = mapping;
 
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		backendMock.expectAnySchema( model.getIndexName() );
 		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) ).setup();
 	}
@@ -149,12 +153,12 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				session -> {}, // No particular session setup
 				o -> {}, // No particular loading option
 				c -> c
-						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 0 ) )
-						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 1 ) )
-						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 2 ) ),
+						.doc( model().getIndexName(), mapping.getDocumentIdForEntityId( 0 ) )
+						.doc( model().getIndexName(), mapping.getDocumentIdForEntityId( 1 ) )
+						.doc( model().getIndexName(), mapping.getDocumentIdForEntityId( 2 ) ),
 				c -> c
-						.entity( model.getIndexedClass(), 0 )
-						.entity( model.getIndexedClass(), 1 ),
+						.entity( model().getIndexedClass(), 0 )
+						.entity( model().getIndexedClass(), 1 ),
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
@@ -180,7 +184,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					 * testLoading() will assert that search results are not initialized.
 					 * NB: "session.getReference" does not load the entity but really creates a proxy.
 					 */
-					T proxy = session.getReference( model.getIndexedClass(), 1 );
+					T proxy = session.getReference( model().getIndexedClass(), 1 );
 					/*
 					 * We need to keep a reference to the proxy, otherwise it will be garbage collected
 					 * and ORM (who only holds a weak reference to it) will forget about it.

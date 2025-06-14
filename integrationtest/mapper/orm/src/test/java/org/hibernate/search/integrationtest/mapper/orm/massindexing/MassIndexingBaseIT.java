@@ -36,22 +36,26 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MassIndexingBaseIT {
 
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
 
 	public static List<? extends Arguments> params() {
 		return Arrays.stream( TenancyMode.values() ).map( Arguments::of ).collect( Collectors.toList() );
@@ -75,13 +79,11 @@ class MassIndexingBaseIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	public TenancyMode tenancyMode;
+	@Parameter(0)
+	public static TenancyMode tenancyMode;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(TenancyMode tenancyMode) {
-		this.tenancyMode = tenancyMode;
-
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		backendMock.resetExpectations();
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start().withPropertyRadical(
 				HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
@@ -101,7 +103,7 @@ class MassIndexingBaseIT {
 		sessionFactory = setupContext.setup();
 	}
 
-	@ParameterizedSetupBeforeTest
+	@BeforeEach
 	public void init() {
 		with( sessionFactory, targetTenantId() ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
