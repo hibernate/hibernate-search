@@ -33,17 +33,19 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityRefe
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
-@ParameterizedPerMethod
+@ParameterizedClass
+@MethodSource("params")
 class IndexIndexingPlanIT {
 
 	private static final String MULTI_TENANCY_LABEL = "Multi-tenancy enabled explicitly";
@@ -66,16 +68,21 @@ class IndexIndexingPlanIT {
 		);
 	}
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
-	private StubSession sessionContext;
+	private static StubSession sessionContext;
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	public void init(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
+	@Parameter(0)
+	static String label;
+	@Parameter(1)
+	static Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction;
+	@Parameter(2)
+	static String tenantId;
+
+	@BeforeEach
+	void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start( setupStrategyFunction ).withIndex( index );
 		if ( MULTI_TENANCY_LABEL.equals( label ) ) {
 			setupContext.withMultiTenancy();

@@ -25,12 +25,14 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 import org.hibernate.stat.Statistics;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -40,7 +42,9 @@ import org.apache.logging.log4j.Level;
  * Test cache lookup as part of entity loading when executing a search query
  * when only a single type is involved.
  */
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
 	public static List<? extends Arguments> params() {
@@ -63,10 +67,13 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy;
-	private SessionFactory sessionFactory;
-	private SingleTypeLoadingModel<T> model;
-	private SingleTypeLoadingMapping mapping;
+	private static SessionFactory sessionFactory;
+	@Parameter(0)
+	private static SingleTypeLoadingModel<?> model;
+	@Parameter(1)
+	private static SingleTypeLoadingMapping mapping;
+	@Parameter(2)
+	private static EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy;
 
 	@Override
 	protected BackendMock backendMock() {
@@ -78,9 +85,10 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		return sessionFactory;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected SingleTypeLoadingModel<T> model() {
-		return model;
+		return (SingleTypeLoadingModel<T>) model;
 	}
 
 	@Override
@@ -88,14 +96,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		return mapping;
 	}
 
-	@ParameterizedSetup
-	@MethodSource("params")
-	void setup(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
-			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
-		this.model = model;
-		this.mapping = mapping;
-		this.defaultCacheLookupStrategy = defaultCacheLookupStrategy;
-
+	@BeforeParameterizedClassInvocation
+	static void setup() {
 		backendMock.expectAnySchema( model.getIndexName() );
 
 		sessionFactory = ormSetupHelper.start().withProperty(

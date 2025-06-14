@@ -5,15 +5,18 @@
 package org.hibernate.search.util.impl.test.extension;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import org.jboss.logging.Logger;
 
 public abstract class AbstractScopeTrackingExtension
-		implements BeforeEachCallback, BeforeAllCallback, AfterAllCallback, AfterEachCallback {
+		implements BeforeEachCallback, BeforeAllCallback, BeforeClassTemplateInvocationCallback, AfterAllCallback,
+		AfterEachCallback, AfterClassTemplateInvocationCallback {
 	private static final Logger log = Logger.getLogger( AbstractScopeTrackingExtension.class.getName() );
 
 	private ExtensionScope scope = ExtensionScope.CLASS;
@@ -63,5 +66,25 @@ public abstract class AbstractScopeTrackingExtension
 	}
 
 	protected void actualAfterEach(ExtensionContext extensionContext) throws Exception {
+	}
+
+	@Override
+	public final void afterClassTemplateInvocation(ExtensionContext context) throws Exception {
+		updateScope( ExtensionScope.PARAMETERIZED_CLASS_SETUP );
+		actualAfterClassTemplateInvocation( context );
+	}
+
+	protected void actualAfterClassTemplateInvocation(ExtensionContext context) throws Exception {
+
+	}
+
+	@Override
+	public final void beforeClassTemplateInvocation(ExtensionContext context) throws Exception {
+		updateScope( ExtensionScope.PARAMETERIZED_CLASS_SETUP );
+		actualBeforeClassTemplateInvocation( context );
+	}
+
+	protected void actualBeforeClassTemplateInvocation(ExtensionContext context) throws Exception {
+
 	}
 }

@@ -10,15 +10,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@ParameterizedPerClass
+@ParameterizedClass
+@MethodSource("params")
 class ParameterizedClassExtensionTest {
 
 	// Arguments for a parameterized class setup.
@@ -43,15 +42,9 @@ class ParameterizedClassExtensionTest {
 	private static int test1ExecutionCount = 0;
 	private static int test2ExecutionCount = 0;
 
-
-	// Setup method that will use the params method to configure the test execution
-	// and will run all the @Test/@ParameterizedTest tests within this class.
-	@ParameterizedSetup
-	@MethodSource("params")
-	void env(String string, int number, boolean bool) {
+	ParameterizedClassExtensionTest(String string, int number, boolean bool) {
 		// configure test class for a set of config arguments
 		context = new Context( string, number, bool );
-		System.err.println( "init" );
 	}
 
 	// A simple test.

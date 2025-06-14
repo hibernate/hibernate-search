@@ -38,8 +38,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 import org.hibernate.search.util.impl.test.extension.ExtensionScope;
 
+import org.junit.jupiter.api.extension.AfterClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -49,6 +51,7 @@ import org.opentest4j.TestAbortedException;
 
 public class BackendMock
 		implements BeforeTestExecutionCallback, AfterEachCallback, BeforeAllCallback, BeforeEachCallback,
+		BeforeClassTemplateInvocationCallback, AfterClassTemplateInvocationCallback,
 		TestExecutionExceptionHandler {
 
 	private final VerifyingStubBackendBehavior backendBehavior =
@@ -64,6 +67,17 @@ public class BackendMock
 	}
 
 	protected BackendMock() {
+	}
+
+	@Override
+	public void afterClassTemplateInvocation(ExtensionContext context) throws Exception {
+
+	}
+
+	@Override
+	public void beforeClassTemplateInvocation(ExtensionContext context) throws Exception {
+		started = true;
+		startingScope = ExtensionScope.PARAMETERIZED_CLASS_SETUP;
 	}
 
 	@Override
