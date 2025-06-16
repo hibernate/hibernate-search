@@ -1467,6 +1467,20 @@
                     Enable the sonatype-oss Snapshots repository, for Hibernate ORM 6+ in particular.
                  -->
                 <repository>
+                    <id>central-snapshots</id>
+                    <name>Maven Central Snapshots</name>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
                     <id>sonatype-oss</id>
                     <name>Maven Central Snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
