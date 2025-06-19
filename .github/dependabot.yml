@@ -111,13 +111,6 @@ updates:
       # we don't want always want to get the latest Weld version:
       - dependency-name: "org.jboss.weld.se:*"
         update-types: ["version-update:semver-major"]
-      # Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
-      # See https://db.apache.org/derby/derby_downloads.html
-      - dependency-name: "org.apache.derby:*"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
-      # This dependency uses classifiers (.jre11, -preview, ...) in its version, and dependabot can't decide which versions are relevant.
-      # See https://github.com/dependabot/dependabot-core/issues/4028
-      - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
       # Sticking to SLF4J 1.x for now since later versions require to upgrade providers
       # (Log4j, ... see https://www.slf4j.org/faq.html#changesInVersion200),
       # and also because we only need this dependency for AWS SDK,
@@ -138,14 +131,8 @@ updates:
       #  with which jboss-logging annotation processor can still work.
       #  To be removed once we update the AP to the one with a fix.
       - dependency-name: "org.codehaus.plexus:*"
-      # Because of https://github.com/awaitility/awaitility/issues/277 :
-      - dependency-name: "org.awaitility:awaitility"
-        versions: [ "4.2.1" ]
       # Enable updates after JDK 21 upgrade (as of jsonassert 1.5.2 it requires JDK 21)
       - dependency-name: "org.skyscreamer:jsonassert"
-      # Because of https://github.com/apache/logging-log4j2/issues/3234
-      - dependency-name: "org.apache.logging.log4j:*"
-        versions: [ "2.24.2" ]
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ "3.42.0" ]
   - package-ecosystem: "docker"
