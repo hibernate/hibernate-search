@@ -132,7 +132,7 @@
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>1.21.1</version.testcontainers>
+        <version.testcontainers>1.21.2</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.18.0</version.org.mockito>
@@ -160,13 +160,13 @@
         <version.com.h2database>2.3.232</version.com.h2database>
         <!-- Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
              See https://db.apache.org/derby/derby_downloads.html -->
-        <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
+        <version.org.apache.derby>10.17.1.0</version.org.apache.derby>
         <version.org.postgresql>42.7.7</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.3</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.3.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.2.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.8.0.25.04</version.com.oracle.database.jdbc>
-        <version.com.microsoft.sqlserver.mssql-jdbc>12.2.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
+        <version.com.microsoft.sqlserver.mssql-jdbc>12.10.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
