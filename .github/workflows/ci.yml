@@ -15,6 +15,7 @@ on:
       - '!4.*'
       - '!5.*'
       - '!6.*'
+      # We don't want to run CI on branches for dependabot, just on the PR.
       - '!dependabot/**'
       - '!wip/**/dependency-update/**'
     tags:
@@ -28,10 +29,11 @@ on:
       - '!4.*'
       - '!5.*'
       - '!6.*'
-      # Ignore dependabot PRs that are not just about build dependencies;
-      # we'll reject such dependant PRs and send a PR ourselves.
+      # Ignore dependabot PRs that are not just about build dependencies or workflows;
+      # we'll reject such PRs and send one ourselves.
       - '!dependabot/**'
       - 'dependabot/maven/build-dependencies-**'
+      - 'dependabot/github_actions/workflow-actions-**'
       - 'dependabot/docker/**/build-containers-**'
       - 'dependabot/docker/**/database-containers-**'
 
