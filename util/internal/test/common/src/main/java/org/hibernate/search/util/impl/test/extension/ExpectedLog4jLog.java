@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.util.impl.test.extension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
@@ -233,5 +234,9 @@ public class ExpectedLog4jLog implements BeforeEachCallback, AfterEachCallback {
 			failingChecker.appendFailure( description, "\n\t" );
 		}
 		return description.toString();
+	}
+
+	public void expectationsMet() {
+		assertThat( currentAppender.getFailingCheckers() ).isEmpty();
 	}
 }
