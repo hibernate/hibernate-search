@@ -266,4 +266,10 @@ public interface OutboxPollingEventsLog {
 	@LogMessage(level = TRACE)
 	@Message(id = ID_OFFSET + 67, value = "Persisted %d outbox events: '%s'")
 	void eventPlanNumberOfPersistedEvents(int size, List<OutboxEvent> events);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 70,
+			value = "Agent '%s': after %d retries, failed to acquire a lock on the following outbox events: %s. " +
+					"Events will be re-processed at a later time.")
+	void eventLockingRetryLimitReached(AgentReference agentReference, int numberOfRetries, Set<UUID> events);
 }
