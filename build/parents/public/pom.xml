@@ -225,15 +225,11 @@
                                 <moduleInfo>
                                     <name>${java.module.name}</name>
                                     <!-- Exports:
-                                             - some impl packages to org.jboss.logging so that it can instantiate
-                                               the generated Log/Messages classes
                                              - all impl packages to org.hibernate.engine so that it can instantiate built-in
                                                beans using reflection (e.g. annotation processors, bridges, binders)
                                              - all non-impl (api, spi) packages to everyone
                                      -->
                                     <exports>
-                                        org.hibernate.search.*.logging.impl to org.jboss.logging, org.hibernate.search.engine;
-                                        org.hibernate.search.*.reporting.impl to org.jboss.logging, org.hibernate.search.engine;
                                         org.hibernate.search.*.impl to org.hibernate.search.engine;
                                         *;
                                     </exports>
