@@ -87,6 +87,22 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY )
 					.build();
 
+	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX =
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX )
+					.asIntegerPositiveOrZero()
+					.withDefault(
+							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX )
+					.build();
+
+	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY =
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY )
+					.asIntegerPositiveOrZero()
+					.withDefault(
+							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY )
+					.build();
+
 	public static Factory factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
 			ConfigurationPropertySource configurationSource) {
 		OutboxEventLoader loader = new OutboxEventLoader( mapping.sessionFactory().getJdbcServices().getDialect() );
@@ -102,8 +118,12 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 		Integer transactionTimeout = TRANSACTION_TIMEOUT.get( configurationSource )
 				.orElse( null );
 
+		int lockEventsMaxRetry = EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX.get( configurationSource );
+		long lockEventsInterval =
+				Duration.ofSeconds( EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY.get( configurationSource ) ).toMillis();
+
 		return new Factory( mapping, clock, tenantId, loader, pollingInterval, pulseInterval, pulseExpiration,
-				batchSize, retryDelay, transactionTimeout );
+				batchSize, retryDelay, transactionTimeout, lockEventsMaxRetry, lockEventsInterval );
 	}
 
 	public static class Factory {
@@ -117,10 +137,13 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 		private final int batchSize;
 		private final int retryDelay;
 		private final Integer transactionTimeout;
+		private final int lockEventsMaxRetry;
+		private final long lockEventsInterval;
 
 		private Factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
 				OutboxEventLoader loader, Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
-				int batchSize, int retryDelay, Integer transactionTimeout) {
+				int batchSize, int retryDelay, Integer transactionTimeout,
+				int lockEventsMaxRetry, long lockEventsInterval) {
 			this.mapping = mapping;
 			this.clock = clock;
 			this.tenantId = tenantId;
@@ -131,6 +154,8 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 			this.batchSize = batchSize;
 			this.retryDelay = retryDelay;
 			this.transactionTimeout = transactionTimeout;
+			this.lockEventsMaxRetry = lockEventsMaxRetry;
+			this.lockEventsInterval = lockEventsInterval;
 		}
 
 		public OutboxPollingEventProcessor create(ScheduledExecutorService scheduledExecutor,
@@ -159,6 +184,8 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 	private final long pollingInterval;
 	private final int batchSize;
 	private final int retryDelay;
+	private final int lockEventsMaxRetry;
+	private final long lockEventsInterval;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
 	private final OutboxPollingEventProcessorClusterLink clusterLink;
@@ -180,6 +207,8 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		this.batchSize = factory.batchSize;
 		this.retryDelay = factory.retryDelay;
+		this.lockEventsMaxRetry = factory.lockEventsMaxRetry;
+		this.lockEventsInterval = factory.lockEventsInterval;
 		this.clusterLink = clusterLink;
 
 		transactionHelper = new TransactionHelper( mapping.sessionFactory(), factory.transactionTimeout );
@@ -317,8 +346,28 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 				// it locked a page instead of just a row.
 				// For more information, see
 				// org.hibernate.search.mapper.orm.outboxpolling.impl.OutboxEventLoader.tryLoadLocking
-				while ( eventUpdater.thereAreStillEventsToProcess() ) {
+				int retryCount = 0;
+				while ( true ) {
+					if ( retryCount > lockEventsMaxRetry ) {
+						OutboxPollingEventsLog.INSTANCE.eventLockingRetryLimitReached( clusterLink.selfReference(),
+								lockEventsMaxRetry, eventUpdater.eventsToProcess() );
+						// not failing to not produce an error log:
+						return CompletableFuture.completedFuture( null );
+					}
 					transactionHelper.inTransaction( session, eventUpdater::process );
+					if ( eventUpdater.thereAreStillEventsToProcess() ) {
+						try {
+							Thread.sleep( lockEventsInterval );
+						}
+						catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
+							return CompletableFuture.failedFuture( e );
+						}
+						retryCount++;
+					}
+					else {
+						break;
+					}
 				}
 
 				return CompletableFuture.completedFuture( null );
