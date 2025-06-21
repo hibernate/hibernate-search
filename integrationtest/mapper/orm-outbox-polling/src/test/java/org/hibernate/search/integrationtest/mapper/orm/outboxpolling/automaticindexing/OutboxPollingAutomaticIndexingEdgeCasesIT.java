@@ -6,32 +6,41 @@ package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.automatici
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
+import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
+import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
+import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import org.awaitility.Awaitility;
 
 /**
  * Extensive tests with edge cases for automatic indexing with the outbox-polling strategy.
@@ -43,6 +52,9 @@ class OutboxPollingAutomaticIndexingEdgeCasesIT {
 
 	@RegisterExtension
 	public static BackendMock backendMock = BackendMock.create();
+
+	@RegisterExtension
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper =
@@ -65,6 +77,8 @@ class OutboxPollingAutomaticIndexingEdgeCasesIT {
 						HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
 				)
+				.withProperty( HibernateOrmMapperOutboxPollingSettings.COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY, 0 )
+				.withProperty( HibernateOrmMapperOutboxPollingSettings.COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX, 1 )
 				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class )
 				.setup();
 	}
@@ -184,6 +198,41 @@ class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	void lockedEventRowRetries() {
+		assumeTrue(
+				sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices().getDialect().supportsSkipLocked(),
+				"This test only make sense if skip locked rows is supported by the underlying DB. " +
+						"Otherwise the locking will trow an exception and the batch will be just reprocessed without a retry of locking events." );
+
+		eventFilter.hideAllEvents();
+		with( sessionFactory ).runInTransaction( session -> {
+			session.persist( new IndexedEntity( 1, "initialValue" ) );
+		} );
+
+		backendMock.expectWorks( IndexedEntity.NAME )
+				.addOrUpdate( "1", b -> b
+						.field( "text", "initialValue" ) );
+
+		with( sessionFactory ).runInTransaction( session -> {
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 1 );
+			session.lock( events.get( 0 ), LockMode.PESSIMISTIC_WRITE );
+
+			// let processor see the events and as that single event is locked it should skip, and reach the max retries:
+			eventFilter.showAllEvents();
+			logged.expectMessage( "after 1 retries, failed to acquire a lock on the following outbox events" )
+					.atLeast( 5 );
+
+			Awaitility.await().timeout( 5, TimeUnit.SECONDS )
+					.untilAsserted( () -> logged.expectationsMet() );
+		} );
+
+		with( sessionFactory ).runInTransaction( session -> {
+			eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
+		} );
+
+	}
 
 	@Entity(name = IndexedEntity.NAME)
 	@Indexed

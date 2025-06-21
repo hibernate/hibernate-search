@@ -125,6 +125,13 @@ public class OutboxEventFilter {
 		} ) );
 	}
 
+	public void awaitUntilNumberOfVisibleEvents(SessionFactory sessionFactory, int count) {
+		await().untilAsserted( () -> with( sessionFactory ).runInTransaction( session -> {
+			List<OutboxEvent> outboxEntries = visibleEventsAllShardsFinder.findOutboxEvents( session, count + 1 );
+			assertThat( outboxEntries ).hasSize( count );
+		} ) );
+	}
+
 	private class FilterById implements OutboxEventPredicate {
 		@Override
 		public String queryPart(String eventAlias) {
