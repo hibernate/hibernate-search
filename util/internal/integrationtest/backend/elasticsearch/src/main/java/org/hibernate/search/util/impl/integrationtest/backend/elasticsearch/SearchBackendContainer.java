@@ -97,7 +97,7 @@ public final class SearchBackendContainer {
 				// but on CI this is sometimes too much, as we also have the Maven JVM
 				// and the JVM that runs tests taking up a significant amount of RAM,
 				// leaving too little for filesystem caches and resulting in freezes:
-				.withEnv( "ES_JAVA_OPTS", "-Xms1g -Xmx1g" )
+				.withEnv( "ES_JAVA_OPTS", "-Xms1500m -Xmx1500m" )
 				// Disable disk-based shard allocation thresholds: on large, relatively full disks (>90% used),
 				// it will lead to index creation to get stuck waiting for other nodes to join the cluster,
 				// which will never happen since we only have one node.
@@ -147,7 +147,7 @@ public final class SearchBackendContainer {
 				// it's not practical for testing, so we disable that.
 				.withEnv( "plugins.security.disabled", "true" )
 				// Limit the RAM usage.
-				.withEnv( "OPENSEARCH_JAVA_OPTS", "-Xms1g -Xmx1g" )
+				.withEnv( "OPENSEARCH_JAVA_OPTS", "-Xms1500m -Xmx1500m" )
 				// ISM floods the logs with errors, and we don't need it.
 				// See https://docs-beta.opensearch.org/im-plugin/ism/settings/
 				.withEnv( "plugins.index_state_management.enabled", "false" )
