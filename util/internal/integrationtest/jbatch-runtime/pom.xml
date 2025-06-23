@@ -35,14 +35,14 @@
             <scope>compile</scope>
         </dependency>
         <!--
-            JBatch requires a database in order to work, and it seems it uses SQL that won't work with H2.
-            Anyway, it uses an embedded Derby instance by default, so we just put the Derby driver in the classpath
-            so it won't complain.
+            JBatch requires a database in order to work. Since we either need to use an embedded Derby or create the schema,
+            we want to keep the setup to a minimum and use only H2.
+            Derby is not used to keep the # of managed dependencies lower.
          -->
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>${version.org.apache.derby}</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${version.com.h2database}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
