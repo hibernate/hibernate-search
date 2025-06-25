@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.data.Range;
@@ -106,18 +105,8 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	}
 
 	@Override
-	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			Collection<? extends Range<? extends Integer>> ranges,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException {
-		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		return new LongMultiValueRangeFacetCounts(
-				absoluteFieldPath, source,
-				facetsCollector,
-				FacetCountsUtils.createLongRangesForIntegralValues( ranges )
-		);
+	public EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends Integer>> ranges) {
+		return FacetCountsUtils.createEffectiveRangesForIntegralValues( ranges );
 	}
 
 	@Override
