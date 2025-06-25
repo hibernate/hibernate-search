@@ -10,6 +10,7 @@ import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.facet.Facets;
@@ -47,10 +48,7 @@ public interface LuceneNumericDomain<E extends Number> {
 			NestedDocsProvider nestedDocsProvider)
 			throws IOException;
 
-	Facets createRangeFacetCounts(String absoluteFieldPath,
-			FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException;
+	EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends E>> ranges);
 
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 

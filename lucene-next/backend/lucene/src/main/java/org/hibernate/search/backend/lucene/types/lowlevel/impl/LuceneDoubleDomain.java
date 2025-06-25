@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMu
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.DoublePoint;
@@ -106,24 +106,9 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			Collection<? extends Range<? extends Double>> ranges,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException {
-		// As we don't need to apply any operation to terms except sometimes a sort,
-		// we can simply rely on raw, long values, whose order is the same as their corresponding double value.
-		// Values are ultimately converted back to the Double equivalent by calling sortedDocValueToTerm.
-		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		return new LongMultiValueRangeFacetCounts(
-				absoluteFieldPath, source,
-				facetsCollector,
-				FacetCountsUtils.createLongRangesForFloatingPointValues(
-						ranges, NumericUtils::doubleToSortableLong,
-						Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY
-				)
-		);
+	public EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends Double>> ranges) {
+		return FacetCountsUtils.createEffectiveRangesForIntegralValues( ranges, NumericUtils::doubleToSortableLong,
+				Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY );
 	}
 
 	@Override

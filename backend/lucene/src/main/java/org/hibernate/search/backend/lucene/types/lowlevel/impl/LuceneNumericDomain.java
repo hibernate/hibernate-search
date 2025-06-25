@@ -47,10 +47,7 @@ public interface LuceneNumericDomain<E extends Number> {
 			NestedDocsProvider nestedDocsProvider)
 			throws IOException;
 
-	Facets createRangeFacetCounts(String absoluteFieldPath,
-			FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException;
+	EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends E>> ranges);
 
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 

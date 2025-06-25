@@ -4,14 +4,16 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
@@ -19,14 +21,9 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
-
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector;
 
 /**
  * @param <F> The type of field values.
@@ -42,6 +39,8 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	private final List<Range<K>> rangesInOrder;
 	private final List<Range<E>> encodedRangesInOrder;
 
+	private CollectorKey<RangeCollector, RangeCollector> collectorKey;
+
 	private LuceneNumericRangeAggregation(Builder<F, E, K> builder) {
 		super( builder );
 		this.codec = builder.codec;
@@ -51,7 +50,15 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	@Override
 	public Extractor<Map<Range<K>, Long>> request(AggregationRequestContext context) {
-		context.requireCollector( FacetsCollectorFactory.INSTANCE );
+		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
+				absoluteFieldPath, nestedDocsProvider
+		);
+
+		var rangeFactory = RangeCollectorFactory.instance( source,
+				codec.getDomain().createEffectiveRanges( encodedRangesInOrder ) );
+		collectorKey = rangeFactory.getCollectorKey();
+		context.requireCollector( rangeFactory );
 
 		return new LuceneNumericRangeAggregationExtractor();
 	}
@@ -74,23 +81,13 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	private class LuceneNumericRangeAggregationExtractor implements Extractor<Map<Range<K>, Long>> {
 
 		@Override
-		public Map<Range<K>, Long> extract(AggregationExtractContext context) throws IOException {
-			LuceneNumericDomain<E> numericDomain = codec.getDomain();
-
-			FacetsCollector facetsCollector = context.getCollectorResults( FacetsCollectorFactory.KEY );
-
-			NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
-
-			Facets facetsCount = numericDomain.createRangeFacetCounts(
-					absoluteFieldPath, facetsCollector, encodedRangesInOrder,
-					nestedDocsProvider
-			);
-
-			FacetResult facetResult = facetsCount.getTopChildren( rangesInOrder.size(), absoluteFieldPath );
+		public Map<Range<K>, Long> extract(AggregationExtractContext context) {
+			RangeCollector rangeCollector = context.getCollectorResults( collectorKey );
+			long[] counts = rangeCollector.counts();
 
 			Map<Range<K>, Long> result = new LinkedHashMap<>();
 			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
-				result.put( rangesInOrder.get( i ), (long) (Integer) facetResult.labelValues[i].value );
+				result.put( rangesInOrder.get( i ), counts[i] );
 			}
 
 			return result;

@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMu
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.data.Range;
 
@@ -107,24 +107,9 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
-	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			Collection<? extends Range<? extends Float>> ranges,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException {
-		// As we don't need to apply any operation to terms except sometimes a sort,
-		// we can simply rely on raw, int values, whose order is the same as their corresponding float value.
-		// Values are ultimately converted back to the Float equivalent by calling sortedDocValueToTerm.
-		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		return new LongMultiValueRangeFacetCounts(
-				absoluteFieldPath, source,
-				facetsCollector,
-				FacetCountsUtils.createLongRangesForFloatingPointValues(
-						ranges, value -> (long) NumericUtils.floatToSortableInt( value ),
-						Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY
-				)
-		);
+	public EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends Float>> ranges) {
+		return FacetCountsUtils.createEffectiveRangesForIntegralValues( ranges, NumericUtils::floatToSortableInt,
+				Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY );
 	}
 
 	@Override
