@@ -56,7 +56,7 @@ public class AggregationExtractContext {
 		return fromDocumentValueConvertContext;
 	}
 
-	public <C extends Collector, T> T getFacets(CollectorKey<C, T> key) {
+	public <C extends Collector, T> T getCollectorResults(CollectorKey<C, T> key) {
 		return multiCollectedResults.get( key );
 	}
 

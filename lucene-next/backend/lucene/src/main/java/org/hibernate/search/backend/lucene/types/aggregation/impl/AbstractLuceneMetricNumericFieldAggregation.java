@@ -73,7 +73,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 		@Override
 		public K extract(AggregationExtractContext context) {
-			Long collector = context.getFacets( collectorKey );
+			Long collector = context.getCollectorResults( collectorKey );
 
 			E e = codec.getDomain().sortedDocValueToTerm( collector );
 			F decode = codec.decode( e );
@@ -111,7 +111,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 		@Override
 		public Double extract(AggregationExtractContext context) {
-			Long collector = context.getFacets( collectorKey );
+			Long collector = context.getCollectorResults( collectorKey );
 
 			return codec.sortedDocValueToDouble( collector );
 		}
@@ -142,7 +142,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		@SuppressWarnings("unchecked")
 		@Override
 		public K extract(AggregationExtractContext context) {
-			Long collector = context.getFacets( collectorKey );
+			Long collector = context.getCollectorResults( collectorKey );
 			return (K) numericDomain.sortedDocValueToTerm( collector );
 		}
 
