@@ -77,7 +77,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		public Map<Range<K>, Long> extract(AggregationExtractContext context) throws IOException {
 			LuceneNumericDomain<E> numericDomain = codec.getDomain();
 
-			FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
+			FacetsCollector facetsCollector = context.getCollectorResults( FacetsCollectorFactory.KEY );
 
 			NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
 
