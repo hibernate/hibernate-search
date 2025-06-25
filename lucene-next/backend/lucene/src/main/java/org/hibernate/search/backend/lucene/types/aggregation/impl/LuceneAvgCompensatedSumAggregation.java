@@ -41,8 +41,8 @@ public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
 
 	@Override
 	E extractEncoded(AggregationExtractContext context, LuceneNumericDomain<E> numericDomain) {
-		Double sum = context.getFacets( compensatedSumCollectorKey );
-		Long counts = context.getFacets( collectorKey );
+		Double sum = context.getCollectorResults( compensatedSumCollectorKey );
+		Long counts = context.getCollectorResults( collectorKey );
 		double avg = ( sum / counts );
 		return numericDomain.doubleToTerm( avg );
 	}

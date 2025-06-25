@@ -61,8 +61,8 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 		@Override
 		public K extract(AggregationExtractContext context) {
-			Long collector = context.getFacets( collectorKey );
-			Long counts = context.getFacets( countCollectorKey );
+			Long collector = context.getCollectorResults( collectorKey );
+			Long counts = context.getCollectorResults( countCollectorKey );
 			Double avg = ( (double) collector / counts );
 			collector = NumberUtils.toLong( avg );
 
@@ -106,8 +106,8 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 		@Override
 		public Double extract(AggregationExtractContext context) {
-			double collector = codec.sortedDocValueToDouble( context.getFacets( collectorKey ) );
-			Long counts = context.getFacets( countCollectorKey );
+			double collector = codec.sortedDocValueToDouble( context.getCollectorResults( collectorKey ) );
+			Long counts = context.getCollectorResults( countCollectorKey );
 			return ( collector / counts );
 		}
 
@@ -141,8 +141,8 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 		@Override
 		public E extract(AggregationExtractContext context) {
-			Long collector = context.getFacets( collectorKey );
-			Long counts = context.getFacets( countCollectorKey );
+			Long collector = context.getCollectorResults( collectorKey );
+			Long counts = context.getCollectorResults( countCollectorKey );
 			Double avg = ( (double) collector / counts );
 			collector = NumberUtils.toLong( avg );
 			return codec.getDomain().sortedDocValueToTerm( collector );

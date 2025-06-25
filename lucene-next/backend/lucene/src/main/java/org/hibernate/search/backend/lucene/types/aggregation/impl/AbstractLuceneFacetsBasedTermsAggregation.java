@@ -110,7 +110,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V>
 		abstract V termToFieldValue(T key);
 
 		private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
-			FacetsCollector facetsCollector = context.getFacets( FacetsCollectorFactory.KEY );
+			FacetsCollector facetsCollector = context.getCollectorResults( FacetsCollectorFactory.KEY );
 
 			NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
 
