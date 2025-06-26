@@ -196,7 +196,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		}
 	}
 
-	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Double>
+	public static class Builder extends AbstractBuilder<Double>
 			implements DistanceToFieldProjectionBuilder {
 
 		private final LuceneFieldCodec<GeoPoint, ?> codec;

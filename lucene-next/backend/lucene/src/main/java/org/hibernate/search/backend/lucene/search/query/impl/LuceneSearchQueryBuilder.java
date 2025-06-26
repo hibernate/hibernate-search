@@ -42,7 +42,6 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -214,7 +213,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 		Query filter = scope.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
-			luceneQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
+			luceneQueryBuilder.add( filter, Occur.FILTER );
 		}
 
 		Query definitiveLuceneQuery = luceneQueryBuilder.build();

@@ -86,7 +86,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 	/**
 	 * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
 	 */
-	private class ValueFieldExtractor<A> implements LuceneSearchProjection.Extractor<A, P> {
+	private class ValueFieldExtractor<A> implements Extractor<A, P> {
 
 		private final String contextAbsoluteFieldPath;
 		private final ProjectionCollector<T, V, A, P> collector;
@@ -193,7 +193,7 @@ public class LuceneFieldProjection<F, V, P, T> extends AbstractLuceneProjection<
 		}
 	}
 
-	private static class Builder<F, V, T> extends AbstractLuceneProjection.AbstractBuilder<V>
+	private static class Builder<F, V, T> extends AbstractBuilder<V>
 			implements FieldProjectionBuilder<V> {
 
 		private final Function<IndexableField, T> decodeFunction;

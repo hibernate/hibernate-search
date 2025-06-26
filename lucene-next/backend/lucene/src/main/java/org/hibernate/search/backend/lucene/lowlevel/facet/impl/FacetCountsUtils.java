@@ -7,7 +7,7 @@ package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 import java.util.Collection;
 import java.util.function.ToLongFunction;
 
-import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
