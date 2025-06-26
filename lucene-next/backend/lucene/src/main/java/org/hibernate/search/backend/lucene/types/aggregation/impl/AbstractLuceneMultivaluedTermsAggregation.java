@@ -5,15 +5,12 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -23,9 +20,6 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.index.IndexReader;
 
 /**
@@ -34,16 +28,16 @@ import org.apache.lucene.index.IndexReader;
  * @param <K> The type of keys in the returned map. It can be {@code F}
  * or a different type if value converters are used.
  */
-public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V>
+public abstract class AbstractLuceneMultivaluedTermsAggregation<F, T, K, V>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
-	private final ProjectionConverter<V, ? extends K> fromFieldValueConverter;
+	protected final ProjectionConverter<V, ? extends K> fromFieldValueConverter;
 
-	private final BucketOrder order;
-	private final int maxTermCount;
-	private final int minDocCount;
+	protected final BucketOrder order;
+	protected final int maxTermCount;
+	protected final int minDocCount;
 
-	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K, V> builder) {
+	AbstractLuceneMultivaluedTermsAggregation(AbstractBuilder<F, T, K, V> builder) {
 		super( builder );
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
 		this.order = builder.order;
@@ -51,103 +45,40 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V>
 		this.minDocCount = builder.minDocCount;
 	}
 
-	@Override
-	public Extractor<Map<K, Long>> request(AggregationRequestContext context) {
-		context.requireCollector( FacetsCollectorFactory.INSTANCE );
-
-		return extractor( context );
-	}
-
 	protected abstract Extractor<Map<K, Long>> extractor(AggregationRequestContext context);
 
 	protected abstract class AbstractExtractor implements Extractor<Map<K, Long>> {
 		@Override
 		public final Map<K, Long> extract(AggregationExtractContext context) throws IOException {
-			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-
 			List<Bucket<T>> buckets = getTopBuckets( context );
 
-			if ( BucketOrder.COUNT_DESC.equals( order ) && ( minDocCount > 0 || buckets.size() >= maxTermCount ) ) {
-				/*
-				 * Optimization: in this case, minDocCount and sorting can be safely ignored.
-				 * We already have all the buckets we need, and they are already sorted.
-				 */
-				return toMap( convertContext, buckets );
-			}
-
-			if ( minDocCount <= 0 ) {
+			if ( minDocCount == 0 && buckets.size() < maxTermCount ) {
 				Set<T> firstTerms = collectFirstTerms( context.getIndexReader(), order.isTermOrderDescending(), maxTermCount );
-				// If some of the first terms are already in non-zero buckets, ignore them in the next step
 				for ( Bucket<T> bucket : buckets ) {
-					firstTerms.remove( bucket.term );
+					firstTerms.remove( bucket.term() );
 				}
-				// Complete the list of buckets with zero-count terms
-				for ( T term : firstTerms ) {
-					buckets.add( new Bucket<>( term, 0L ) );
-				}
+				firstTerms.forEach( term -> buckets.add( new Bucket<>( term, 0 ) ) );
+				buckets.sort( order.toBucketComparator( getAscendingTermComparator() ) );
 			}
 
-			// Sort the list of buckets and trim it if necessary (there may be more buckets than we want in some cases)
-			buckets.sort( order.toBucketComparator( getAscendingTermComparator() ) );
-			if ( buckets.size() > maxTermCount ) {
-				buckets.subList( maxTermCount, buckets.size() ).clear();
-			}
-
-			return toMap( convertContext, buckets );
+			return toMap( context.fromDocumentValueConvertContext(), buckets );
 		}
-
-		abstract FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-				NestedDocsProvider nestedDocsProvider, int limit)
-				throws IOException;
 
 		abstract Set<T> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 				throws IOException;
 
 		abstract Comparator<T> getAscendingTermComparator();
 
-		abstract T labelToTerm(String label);
-
 		abstract V termToFieldValue(T key);
 
-		private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
-			FacetsCollector facetsCollector = context.getCollectorResults( FacetsCollectorFactory.KEY );
-
-			NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
-
-			/*
-			 * TODO HSEARCH-3666 What if the sort order is by term value?
-			 *  Lucene returns facets in descending count order.
-			 *  If that's what we need, then we can ask Lucene to apply the "maxTermCount" limit directly.
-			 *  This is what we do here.
-			 *  But if we need a different sort, then having to retrieve the "top N" facets by document count
-			 *  becomes clearly sub-optimal: to properly implement this, we would need to retrieve
-			 *  *all* facets, and Lucene would allocate an array of Integer.MAX_VALUE elements.
-			 *  To improve on this, we would need to re-implement the facet collections.
-			 */
-			int limit = maxTermCount;
-			FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, nestedDocsProvider, limit );
-
-			List<Bucket<T>> buckets = new ArrayList<>();
-
-			if ( facetResult != null ) {
-				// Add results for matching documents
-				for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
-					long count = (Integer) labelAndValue.value;
-					if ( count >= minDocCount ) {
-						buckets.add( new Bucket<>( labelToTerm( labelAndValue.label ), count ) );
-					}
-				}
-			}
-
-			return buckets;
-		}
+		abstract List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException;
 
 		private Map<K, Long> toMap(FromDocumentValueConvertContext convertContext, List<Bucket<T>> buckets) {
 			Map<K, Long> result = new LinkedHashMap<>(); // LinkedHashMap to preserve ordering
 			for ( Bucket<T> bucket : buckets ) {
-				V decoded = termToFieldValue( bucket.term );
+				V decoded = termToFieldValue( bucket.term() );
 				K key = fromFieldValueConverter.fromDocumentValue( decoded, convertContext );
-				result.put( key, bucket.count );
+				result.put( key, bucket.count() );
 			}
 			return result;
 		}
@@ -213,7 +144,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V>
 		}
 
 		@Override
-		public abstract AbstractLuceneFacetsBasedTermsAggregation<F, T, K, V> build();
+		public abstract AbstractLuceneMultivaluedTermsAggregation<F, T, K, V> build();
 
 		protected final void order(BucketOrder order) {
 			this.order = order;

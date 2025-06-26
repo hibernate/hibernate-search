@@ -4,5 +4,5 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
-public record Bucket<F>(F term, long count) {
+public record LongBucket(long term, long count) {
 }

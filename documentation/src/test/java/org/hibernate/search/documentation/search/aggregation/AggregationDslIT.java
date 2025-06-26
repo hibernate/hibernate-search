@@ -248,6 +248,18 @@ class AggregationDslIT {
 							entry( Genre.SCIENCE_FICTION, 3L )
 					);
 		} );
+
+		withinSearchSession( searchSession -> {
+			AggregationKey<Map<Double, Long>> countsByGenreKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByGenreKey, f -> f.terms()
+							.field( "price", Double.class )
+							.orderByCountAscending() )
+					.fetch( 20 );
+			Map<Double, Long> countsByGenre = result.aggregation( countsByGenreKey );
+			System.err.println( countsByGenre );
+		} );
 	}
 
 	@Test

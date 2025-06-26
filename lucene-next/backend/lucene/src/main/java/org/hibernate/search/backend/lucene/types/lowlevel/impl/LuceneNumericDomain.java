@@ -10,7 +10,6 @@ import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.facet.Facets;

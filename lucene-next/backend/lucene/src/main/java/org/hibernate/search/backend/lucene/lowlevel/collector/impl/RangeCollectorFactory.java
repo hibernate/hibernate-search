@@ -5,14 +5,14 @@
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 
-public class RangeCollectorFactory
-		implements CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager> {
+public class RangeCollectorFactory<E extends Number>
+		implements CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager<E>> {
 
-	public static CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager> instance(
+	public static <E extends Number> CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager<E>> instance(
 			LongMultiValuesSource valuesSource, EffectiveRange[] ranges) {
-		return new RangeCollectorFactory( valuesSource, ranges );
+		return new RangeCollectorFactory<>( valuesSource, ranges );
 	}
 
 	public final CollectorKey<RangeCollector, RangeCollector> key = CollectorKey.create();
@@ -25,8 +25,8 @@ public class RangeCollectorFactory
 	}
 
 	@Override
-	public RangeCollectorManager createCollectorManager(CollectorExecutionContext context) {
-		return new RangeCollectorManager( valuesSource, ranges );
+	public RangeCollectorManager<E> createCollectorManager(CollectorExecutionContext context) {
+		return new RangeCollectorManager<>( valuesSource, ranges );
 	}
 
 	@Override

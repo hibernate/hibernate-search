@@ -106,7 +106,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	 * @param ctx the ctx
 	 * @param scores the scores
 	 * @return NumericDocValues
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 */
 	public NumericDocValues getRawNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
 		return new RawNumericDocValues( getValues( ctx, scores ) );

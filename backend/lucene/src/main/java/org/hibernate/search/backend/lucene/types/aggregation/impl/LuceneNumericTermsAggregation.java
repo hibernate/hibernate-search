@@ -5,13 +5,21 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.NumericTermsCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.NumericTermsCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -22,14 +30,12 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.util.PriorityQueue;
 
 /**
  * @param <F> The type of field values.
@@ -37,18 +43,32 @@ import org.apache.lucene.search.DocIdSetIterator;
  * or a different type if value converters are used.
  */
 public class LuceneNumericTermsAggregation<F, E extends Number, K, V>
-		extends AbstractLuceneFacetsBasedTermsAggregation<F, E, K, V> {
+		extends AbstractLuceneMultivaluedTermsAggregation<F, E, K, V> {
 
 	private final LuceneNumericDomain<E> numericDomain;
 
 	private final Comparator<E> termComparator;
 	private final Function<E, V> decoder;
+	private CollectorKey<NumericTermsCollector, NumericTermsCollector> collectorKey;
 
 	private LuceneNumericTermsAggregation(Builder<F, E, K, V> builder) {
 		super( builder );
 		this.numericDomain = builder.codec.getDomain();
 		this.termComparator = numericDomain.createComparator();
 		this.decoder = builder.decoder;
+	}
+
+	@Override
+	public Extractor<Map<K, Long>> request(AggregationRequestContext context) {
+		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
+				absoluteFieldPath, nestedDocsProvider
+		);
+		var termsCollectorFactory = NumericTermsCollectorFactory.instance( source );
+		context.requireCollector( termsCollectorFactory );
+		collectorKey = termsCollectorFactory.getCollectorKey();
+
+		return extractor( context );
 	}
 
 	@Override
@@ -73,20 +93,33 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V>
 	}
 
 	private class LuceneNumericTermsAggregationExtractor extends AbstractExtractor {
+
 		@Override
-		FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-				NestedDocsProvider nestedDocsProvider, int limit)
-				throws IOException {
-			Facets facetCounts = numericDomain.createTermsFacetCounts(
-					absoluteFieldPath, facetsCollector, nestedDocsProvider
-			);
-			return facetCounts.getTopChildren( limit, absoluteFieldPath );
+		Comparator<E> getAscendingTermComparator() {
+			return termComparator;
 		}
 
 		@Override
-		SortedSet<E> collectFirstTerms(IndexReader reader, boolean descending, int limit)
+		V termToFieldValue(E key) {
+			return decoder.apply( key );
+		}
+
+		@Override
+		List<Bucket<E>> getTopBuckets(AggregationExtractContext context) {
+			var termsCollector = context.getCollectorResults( collectorKey );
+
+			List<LongBucket> counts = termsCollector.counts( order, maxTermCount, minDocCount );
+			List<Bucket<E>> buckets = new ArrayList<>();
+			for ( LongBucket bucket : counts ) {
+				buckets.add( new Bucket<>( numericDomain.sortedDocValueToTerm( bucket.term() ), bucket.count() ) );
+			}
+			return buckets;
+		}
+
+		@Override
+		Set<E> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 				throws IOException {
-			TreeSet<E> collectedTerms = new TreeSet<>( descending ? termComparator.reversed() : termComparator );
+			SortedSet<E> collectedTerms = new TreeSet<>( descending ? termComparator.reversed() : termComparator );
 			for ( LeafReaderContext leaf : reader.leaves() ) {
 				final LeafReader atomicReader = leaf.reader();
 				SortedNumericDocValues docValues = atomicReader.getSortedNumericDocValues( absoluteFieldPath );
@@ -107,20 +140,6 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V>
 			return collectedTerms;
 		}
 
-		@Override
-		Comparator<E> getAscendingTermComparator() {
-			return termComparator;
-		}
-
-		@Override
-		E labelToTerm(String termAsString) {
-			return numericDomain.sortedDocValueToTerm( Long.parseLong( termAsString ) );
-		}
-
-		@Override
-		V termToFieldValue(E term) {
-			return decoder.apply( term );
-		}
 	}
 
 	private static class TypeSelector<F, E extends Number> extends AbstractTypeSelector<F, E> {
@@ -171,4 +190,17 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V>
 		}
 	}
 
+	private static class HibernateSearchTermsQueue<E> extends PriorityQueue<E> {
+		private final Comparator<E> comparator;
+
+		public HibernateSearchTermsQueue(Comparator<E> comparator, int maxSize) {
+			super( maxSize );
+			this.comparator = comparator;
+		}
+
+		@Override
+		protected boolean lessThan(E t1, E t2) {
+			return comparator.compare( t1, t2 ) > 0;
+		}
+	}
 }

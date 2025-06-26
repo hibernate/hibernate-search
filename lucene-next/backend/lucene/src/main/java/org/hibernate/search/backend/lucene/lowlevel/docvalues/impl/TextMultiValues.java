@@ -7,6 +7,7 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 
 import org.apache.lucene.index.SortedSetDocValues;
+import org.apache.lucene.util.BytesRef;
 
 /**
  * A per-document, unordered sequence of text ordinals.
@@ -46,6 +47,8 @@ public abstract class TextMultiValues {
 	 */
 	public abstract long nextOrd() throws IOException;
 
+	public abstract BytesRef lookupOrd(long ord) throws IOException;
+
 	/**
 	 * Returns the number of unique values.
 	 * @return number of unique values in this SortedDocValues. This is
@@ -74,6 +77,11 @@ public abstract class TextMultiValues {
 
 		@Override
 		public long nextOrd() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public BytesRef lookupOrd(long ord) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -111,6 +119,11 @@ public abstract class TextMultiValues {
 		public long nextOrd() throws IOException {
 			--remaining;
 			return values.nextOrd();
+		}
+
+		@Override
+		public BytesRef lookupOrd(long ord) throws IOException {
+			return values.lookupOrd( ord );
 		}
 
 		@Override

@@ -5,14 +5,19 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TextTermsCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TextTermsCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -21,11 +26,10 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.MultiDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
 
 /**
@@ -33,12 +37,27 @@ import org.apache.lucene.index.SortedSetDocValues;
  * or a different type if value converters are used.
  */
 public class LuceneTextTermsAggregation<K>
-		extends AbstractLuceneFacetsBasedTermsAggregation<String, String, K, String> {
+		extends AbstractLuceneMultivaluedTermsAggregation<String, String, K, String> {
 
 	private static final Comparator<String> STRING_COMPARATOR = Comparator.naturalOrder();
 
+	private CollectorKey<TextTermsCollector, TextTermsCollector> collectorKey;
+
 	private LuceneTextTermsAggregation(Builder<K> builder) {
 		super( builder );
+	}
+
+	@Override
+	public Extractor<Map<K, Long>> request(AggregationRequestContext context) {
+		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
+		JoiningTextMultiValuesSource source = JoiningTextMultiValuesSource.fromField(
+				absoluteFieldPath, nestedDocsProvider
+		);
+		var termsCollectorFactory = TextTermsCollectorFactory.instance( absoluteFieldPath, source );
+		context.requireCollector( termsCollectorFactory );
+		collectorKey = termsCollectorFactory.getCollectorKey();
+
+		return extractor( context );
 	}
 
 	@Override
@@ -47,19 +66,6 @@ public class LuceneTextTermsAggregation<K>
 	}
 
 	private class LuceneTextTermsAggregationExtractor extends AbstractExtractor {
-		@Override
-		FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-				NestedDocsProvider nestedDocsProvider, int limit)
-				throws IOException {
-			JoiningTextMultiValuesSource valueSource = JoiningTextMultiValuesSource.fromField(
-					absoluteFieldPath, nestedDocsProvider
-			);
-			TextMultiValueFacetCounts facetCounts = new TextMultiValueFacetCounts(
-					reader, absoluteFieldPath, valueSource, facetsCollector
-			);
-
-			return facetCounts.getTopChildren( limit, absoluteFieldPath );
-		}
 
 		@Override
 		Set<String> collectFirstTerms(IndexReader reader, boolean descending, int limit)
@@ -95,13 +101,22 @@ public class LuceneTextTermsAggregation<K>
 		}
 
 		@Override
-		String labelToTerm(String label) {
-			return label;
+		String termToFieldValue(String key) {
+			return key;
 		}
 
 		@Override
-		String termToFieldValue(String key) {
-			return key;
+		List<Bucket<String>> getTopBuckets(AggregationExtractContext context) throws IOException {
+			var termsCollector = context.getCollectorResults( collectorKey );
+
+			List<LongBucket> counts = termsCollector.counts( order, maxTermCount, minDocCount );
+
+			var dv = MultiDocValues.getSortedSetValues( context.getIndexReader(), absoluteFieldPath );
+			List<Bucket<String>> buckets = new ArrayList<>();
+			for ( LongBucket bucket : counts ) {
+				buckets.add( new Bucket<>( dv.lookupOrd( bucket.term() ).utf8ToString(), bucket.count() ) );
+			}
+			return buckets;
 		}
 	}
 

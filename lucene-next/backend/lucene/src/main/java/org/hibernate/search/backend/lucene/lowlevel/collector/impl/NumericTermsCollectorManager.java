@@ -7,27 +7,25 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import java.util.Collection;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 
 import org.apache.lucene.search.CollectorManager;
 
-public class RangeCollectorManager<E extends Number> implements CollectorManager<RangeCollector, RangeCollector> {
+public class NumericTermsCollectorManager
+		implements CollectorManager<NumericTermsCollector, NumericTermsCollector> {
 
 	private final LongMultiValuesSource valuesSource;
-	private final EffectiveRange[] ranges;
 
-	public RangeCollectorManager(LongMultiValuesSource valuesSource, EffectiveRange[] ranges) {
+	public NumericTermsCollectorManager(LongMultiValuesSource valuesSource) {
 		this.valuesSource = valuesSource;
-		this.ranges = ranges;
 	}
 
 	@Override
-	public RangeCollector newCollector() {
-		return new RangeCollector( valuesSource, ranges );
+	public NumericTermsCollector newCollector() {
+		return new NumericTermsCollector( valuesSource );
 	}
 
 	@Override
-	public RangeCollector reduce(Collection<RangeCollector> collection) {
+	public NumericTermsCollector reduce(Collection<NumericTermsCollector> collection) {
 		// TODO: actually reduce:
 		return collection.iterator().next();
 	}
