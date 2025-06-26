@@ -115,7 +115,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	}
 
 	public static class Builder<F, E extends Number, K>
-			extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, Long>
+			extends AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;

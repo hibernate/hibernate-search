@@ -131,7 +131,6 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 			this.definition = definition;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void factory(ExtendedSearchPredicateFactory<?, ?> factory) {
 			this.factory = factory.withScopeRoot( NonStaticMetamodelScope.class );

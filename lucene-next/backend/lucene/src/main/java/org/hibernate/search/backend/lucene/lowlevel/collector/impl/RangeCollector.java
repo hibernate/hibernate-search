@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.EffectiveRange;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 
 import com.carrotsearch.hppc.IntArrayList;
 import com.carrotsearch.hppc.IntHashSet;
