@@ -51,11 +51,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-facet</artifactId>
-                <version>${version.org.apache.lucene.next.updatable}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-highlighter</artifactId>
                 <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
