@@ -6,6 +6,7 @@ package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -46,6 +47,10 @@ public class OutboxEventUpdater {
 
 	public boolean thereAreStillEventsToProcess() {
 		return !eventsIds.isEmpty();
+	}
+
+	public Set<UUID> eventsToProcess() {
+		return Collections.unmodifiableSet( eventsIds );
 	}
 
 	public void process() {
