@@ -4,23 +4,17 @@
  */
 package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.comparator.impl.DoubleValuesSourceComparator;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.SortedNumericDocValuesField;
-import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Pruning;
@@ -92,21 +86,8 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException {
-		// As we don't need to apply any operation to terms except sometimes a sort,
-		// we can simply rely on raw, long values, whose order is the same as their corresponding double value.
-		// Values are ultimately converted back to the Double equivalent by calling sortedDocValueToTerm.
-		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		return new LongMultiValueFacetCounts( absoluteFieldPath, source, facetsCollector );
-	}
-
-	@Override
 	public EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends Double>> ranges) {
-		return FacetCountsUtils.createEffectiveRangesForIntegralValues( ranges, NumericUtils::doubleToSortableLong,
+		return EffectiveRange.createEffectiveRangesForIntegralValues( ranges, NumericUtils::doubleToSortableLong,
 				Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY );
 	}
 
