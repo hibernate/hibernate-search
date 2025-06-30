@@ -54,7 +54,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
 	public static class RangeTypeSelector implements RangeAggregationBuilder.TypeSelector {
 		@Override
-		public <V> RangeBuilder<V> type(Class<V> expectedType, ValueModel valueModel) {
+		public <V> RangeBuilder<V, Long> type(Class<V> expectedType, ValueModel valueModel) {
 			return new RangeBuilder<>();
 		}
 	}
@@ -102,7 +102,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		}
 	}
 
-	static class RangeBuilder<K> implements RangeAggregationBuilder<K> {
+	static class RangeBuilder<K, A> implements RangeAggregationBuilder<K, A> {
 
 		@Override
 		public void range(Range<? extends K> range) {
@@ -115,7 +115,12 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		}
 
 		@Override
-		public SearchAggregation<Map<Range<K>, Long>> build() {
+		public <T> RangeAggregationBuilder<K, T> withValue(SearchAggregation<T> aggregation) {
+			return new RangeBuilder<>();
+		}
+
+		@Override
+		public SearchAggregation<Map<Range<K>, A>> build() {
 			return new StubSearchAggregation<>();
 		}
 	}

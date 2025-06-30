@@ -17,12 +17,14 @@ import org.hibernate.search.util.common.data.Range;
  * @param <N> The type of the next step.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  * @param <F> The type of the targeted field.
+ * @param <A> The type of the aggregated value.
  */
 public interface RangeAggregationRangeStep<
 		SR,
-		N extends RangeAggregationRangeMoreStep<SR, ?, ?, PDF, F>,
+		N extends RangeAggregationRangeMoreStep<SR, ?, ?, PDF, F, A>,
 		PDF extends TypedSearchPredicateFactory<SR>,
-		F> {
+		F,
+		A> {
 
 	/**
 	 * Add a bucket for the range {@code [lowerBound, upperBound)} (lower bound included, upper bound excluded),
