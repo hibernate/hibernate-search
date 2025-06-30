@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContextImpl;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
@@ -266,7 +267,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		if ( aggregations != null ) {
 			aggregationExtractors = new LinkedHashMap<>();
 			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( scope, sessionContext, routingKeys, extractionRequirementsBuilder,
+					new AggregationRequestContextImpl( scope, sessionContext, routingKeys, extractionRequirementsBuilder,
 							parameters );
 			for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
 				aggregationExtractors.put( entry.getKey(), entry.getValue().request( aggregationRequestContext ) );

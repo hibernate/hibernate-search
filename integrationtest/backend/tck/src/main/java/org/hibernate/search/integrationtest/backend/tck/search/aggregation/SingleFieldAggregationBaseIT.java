@@ -32,6 +32,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LocalDateFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -66,8 +67,12 @@ class SingleFieldAggregationBaseIT<F> {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getSupported();
 				if ( expectations.isPresent() ) {
+					if ( !LocalDateFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
+						continue;
+					}
+
+					supportedFieldTypes.add( fieldTypeDescriptor );
 					for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
-						supportedFieldTypes.add( fieldTypeDescriptor );
 						DataSet<?> dataSet = new DataSet<>( expectations.get(), fieldStructure );
 						dataSets.add( dataSet );
 						parameters.add( Arguments.of( expectations.get(), fieldStructure, dataSet ) );

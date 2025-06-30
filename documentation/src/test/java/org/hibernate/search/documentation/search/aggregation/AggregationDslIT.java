@@ -250,15 +250,48 @@ class AggregationDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			AggregationKey<Map<Double, Long>> countsByGenreKey = AggregationKey.of( "countsByPrice" );
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
-					.aggregation( countsByGenreKey, f -> f.terms()
+					.aggregation( countsByPriceKey, f -> f.terms()
 							.field( "price", Double.class )
 							.orderByCountAscending() )
 					.fetch( 20 );
-			Map<Double, Long> countsByGenre = result.aggregation( countsByGenreKey );
-			System.err.println( countsByGenre );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+	}
+
+	@Test
+	void range_value() {
+		withinSearchSession( searchSession -> {
+			// tag::range-sum[]
+			AggregationKey<Map<Range<Double>, Double>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 ) // <2>
+									.range( 10.0, 20.0 )
+									.range( 20.0, null ) // <3>
+									.value( f.sum().field( "price", Double.class ).toAggregation() )
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Double> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-sum[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 7.99 ),
+							entry( Range.canonical( 10.0, 20.0 ), 35.98 ),
+							entry( Range.canonical( 20.0, null ), 24.99 )
+					);
 		} );
 	}
 

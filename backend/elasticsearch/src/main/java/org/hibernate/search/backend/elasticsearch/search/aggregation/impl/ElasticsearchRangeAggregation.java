@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
@@ -113,7 +114,7 @@ public class ElasticsearchRangeAggregation<F, K>
 	}
 
 	private static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
-			implements RangeAggregationBuilder<K> {
+			implements RangeAggregationBuilder<K, Long> {
 
 		private final Function<? super K, JsonElement> encoder;
 
@@ -148,6 +149,11 @@ public class ElasticsearchRangeAggregation<F, K>
 			rangeJson.addProperty( "key", String.valueOf( rangesJson.size() ) );
 			rangesInOrder.add( range.map( Function.identity() ) );
 			rangesJson.add( rangeJson );
+		}
+
+		@Override
+		public <T> RangeAggregationBuilder<K, T> withValue(SearchAggregation<T> aggregation) {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
