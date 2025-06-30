@@ -33,9 +33,9 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl<Map<Range<T>, Long
 
 	@Override
 	public AggregationFinalStep<Map<Range<T>, Long>> requestAggregation(TypedSearchAggregationFactory<?> factory) {
-		RangeAggregationRangeStep<?, ?, ?, T> rangeStep = factory
+		RangeAggregationRangeStep<?, ?, ?, T, Long> rangeStep = factory
 				.range().field( getFieldName(), getFacetValueType() );
-		RangeAggregationRangeMoreStep<?, ?, ?, ?, T> rangeMoreStep = null;
+		RangeAggregationRangeMoreStep<?, ?, ?, ?, T, Long> rangeMoreStep = null;
 		for ( FacetRange<T> facetRange : facetRangeList ) {
 			rangeMoreStep = rangeStep.range( facetRange.range() );
 			rangeStep = rangeMoreStep;
