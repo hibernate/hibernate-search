@@ -22,7 +22,7 @@ public class CountValuesAggregationFieldStepImpl<SR, PDF extends TypedSearchPred
 	@Override
 	public CountValuesAggregationOptionsStep<SR, ?, PDF> field(String fieldPath) {
 		SearchFilterableAggregationBuilder<Long> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT );
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT_VALUES );
 		return new CountValuesAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }
