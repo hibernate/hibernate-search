@@ -22,7 +22,7 @@ public class CountDistinctValuesAggregationFieldStepImpl<SR, PDF extends TypedSe
 	@Override
 	public CountDistinctValuesAggregationOptionsStep<SR, ?, PDF> field(String fieldPath) {
 		SearchFilterableAggregationBuilder<Long> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT_DISTINCT );
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT_DISTINCT_VALUES );
 		return new CountDistinctValuesAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }
