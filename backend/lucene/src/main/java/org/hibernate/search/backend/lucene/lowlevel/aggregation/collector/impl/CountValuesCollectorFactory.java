@@ -9,24 +9,24 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFact
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 
-public class CountCollectorFactory
+public class CountValuesCollectorFactory
 		implements
-		CollectorFactory<AggregationFunctionCollector<Count>, Long, AggregationFunctionCollectorManager<Count>> {
+		CollectorFactory<AggregationFunctionCollector<CountValues>, Long, AggregationFunctionCollectorManager<CountValues>> {
 
 	private final JoiningLongMultiValuesSource source;
-	private final CollectorKey<AggregationFunctionCollector<Count>, Long> key = CollectorKey.create();
+	private final CollectorKey<AggregationFunctionCollector<CountValues>, Long> key = CollectorKey.create();
 
-	public CountCollectorFactory(JoiningLongMultiValuesSource source) {
+	public CountValuesCollectorFactory(JoiningLongMultiValuesSource source) {
 		this.source = source;
 	}
 
 	@Override
-	public AggregationFunctionCollectorManager<Count> createCollectorManager(CollectorExecutionContext context) {
-		return new AggregationFunctionCollectorManager<>( source, Count::new );
+	public AggregationFunctionCollectorManager<CountValues> createCollectorManager(CollectorExecutionContext context) {
+		return new AggregationFunctionCollectorManager<>( source, CountValues::new );
 	}
 
 	@Override
-	public CollectorKey<AggregationFunctionCollector<Count>, Long> getCollectorKey() {
+	public CollectorKey<AggregationFunctionCollector<CountValues>, Long> getCollectorKey() {
 		return key;
 	}
 }

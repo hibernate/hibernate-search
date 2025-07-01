@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValuesCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
@@ -25,7 +25,7 @@ public class LuceneCountNumericLongAggregation extends AbstractLuceneMetricNumer
 
 	@Override
 	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
-		CountCollectorFactory collectorFactory = new CountCollectorFactory( source );
+		CountValuesCollectorFactory collectorFactory = new CountValuesCollectorFactory( source );
 		collectorKey = collectorFactory.getCollectorKey();
 		context.requireCollector( collectorFactory );
 	}

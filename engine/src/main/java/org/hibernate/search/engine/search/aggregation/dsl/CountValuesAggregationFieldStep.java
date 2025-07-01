@@ -7,34 +7,34 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.aggregation.CountAggregationFieldReference;
+import org.hibernate.search.engine.search.reference.aggregation.CountValuesAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The initial step in a "count" aggregation definition, where the target field can be set.
+ * The initial step in a "count values" aggregation definition, where the target field can be set.
  *
  * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface CountAggregationFieldStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
+public interface CountValuesAggregationFieldStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
-	 * Target the given field in the count aggregation.
+	 * Target the given field in the count values aggregation.
 	 *
 	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
 	 * @return The next step.
 	 */
-	CountAggregationOptionsStep<SR, ?, PDF> field(String fieldPath);
+	CountValuesAggregationOptionsStep<SR, ?, PDF> field(String fieldPath);
 
 	/**
-	 * Target the given field in the avg aggregation.
+	 * Target the given field in the count values aggregation.
 	 *
 	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-references">definition</a> of the index field to aggregate.
 	 * @return The next step.
 	 */
 	@Incubating
-	default CountAggregationOptionsStep<SR, ?, PDF> field(CountAggregationFieldReference<SR> fieldReference) {
+	default CountValuesAggregationOptionsStep<SR, ?, PDF> field(CountValuesAggregationFieldReference<SR> fieldReference) {
 		return field( fieldReference.absolutePath() );
 	}
 }

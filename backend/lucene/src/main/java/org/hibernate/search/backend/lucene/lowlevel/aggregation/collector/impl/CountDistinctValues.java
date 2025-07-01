@@ -13,7 +13,7 @@ import com.carrotsearch.hppc.LongHashSet;
  * The algorithm to collect distinct elements is inspired by {@code org.apache.lucene.facet.LongValueFacetCounts}
  * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
  */
-public class CountDistinct implements AggregationFunction<CountDistinct> {
+public class CountDistinctValues implements AggregationFunction<CountDistinctValues> {
 
 	private final BitSet counts = new BitSet( 1024 );
 	private final LongHashSet hashCounts = new LongHashSet();
@@ -29,8 +29,8 @@ public class CountDistinct implements AggregationFunction<CountDistinct> {
 	}
 
 	@Override
-	public void merge(AggregationFunction<CountDistinct> sibling) {
-		CountDistinct other = sibling.implementation();
+	public void merge(AggregationFunction<CountDistinctValues> sibling) {
+		CountDistinctValues other = sibling.implementation();
 		counts.or( other.counts );
 		hashCounts.addAll( other.hashCounts );
 	}
@@ -41,7 +41,7 @@ public class CountDistinct implements AggregationFunction<CountDistinct> {
 	}
 
 	@Override
-	public CountDistinct implementation() {
+	public CountDistinctValues implementation() {
 		return this;
 	}
 }

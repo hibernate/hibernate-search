@@ -534,7 +534,7 @@ class AggregationDslIT {
 			AggregationKey<Long> countPricesKey = AggregationKey.of( "countPrices" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countPricesKey, f -> f.count().field( "price" ) ) // <1>
+					.aggregation( countPricesKey, f -> f.countValues().field( "price" ) ) // <1>
 					.fetch( 20 );
 			Long countPrices = result.aggregation( countPricesKey );
 			assertThat( countPrices ).isEqualTo( 3L );
@@ -549,7 +549,7 @@ class AggregationDslIT {
 			AggregationKey<Long> countDistinctPricesKey = AggregationKey.of( "countDistinctPrices" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countDistinctPricesKey, f -> f.countDistinct().field( "price" ) ) // <1>
+					.aggregation( countDistinctPricesKey, f -> f.countDistinctValues().field( "price" ) ) // <1>
 					.fetch( 20 );
 			Long countDistinctPrices = result.aggregation( countDistinctPricesKey );
 			assertThat( countDistinctPrices ).isEqualTo( 3L );
