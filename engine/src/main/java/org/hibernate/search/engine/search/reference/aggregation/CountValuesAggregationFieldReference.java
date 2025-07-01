@@ -7,5 +7,5 @@ package org.hibernate.search.engine.search.reference.aggregation;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
-public interface CountDistinctAggregationFieldReference<SR> extends AggregationFieldReference<SR> {
+public interface CountValuesAggregationFieldReference<SR> extends AggregationFieldReference<SR> {
 }

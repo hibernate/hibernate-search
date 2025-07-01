@@ -390,9 +390,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 <1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
 ====
 
-=== Count metric aggregation
+=== Count values metric aggregation
 
-The `count` aggregation counts the number of documents in which the field is not empty.
+The `count values` aggregation counts the number of non-empty field values.
 
 .Count the number of the science fiction books with prices
 ====
@@ -403,9 +403,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 <1> Define the target field path to which you want to apply the aggregation function. For this function a `Long.class` value is always returned.
 ====
 
-=== Count distinct metric aggregation
+=== Count distinct values metric aggregation
 
-The `count distinct` aggregation counts the number of unique field values.
+The `count distinct values` aggregation counts the number of unique field values.
 
 .Count anytime the price field has a different value among all the science fiction books
 ====
@@ -418,7 +418,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 === Avg metric aggregation
 
-The `avg` aggregation calculates the average value of a given numeric or temporal field among the selected documents.
+The `avg` aggregation calculates the average value of a given numeric or temporal field among the matched documents.
 
 .Compute the average price of all science fiction books
 ====
