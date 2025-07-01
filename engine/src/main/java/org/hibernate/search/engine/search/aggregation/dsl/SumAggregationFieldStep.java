@@ -45,7 +45,7 @@ public interface SumAggregationFieldStep<SR, PDF extends TypedSearchPredicateFac
 	<F> SumAggregationOptionsStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type, ValueModel valueModel);
 
 	/**
-	 * Target the given field in the avg aggregation.
+	 * Target the given field in the sum aggregation.
 	 *
 	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-references">definition</a> of the index field to aggregate.
 	 * @param <F> The type of field values.

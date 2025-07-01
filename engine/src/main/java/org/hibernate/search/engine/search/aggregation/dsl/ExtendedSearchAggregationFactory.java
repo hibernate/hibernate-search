@@ -43,11 +43,25 @@ public interface ExtendedSearchAggregationFactory<
 	@Override
 	MaxAggregationFieldStep<SR, PDF> max();
 
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.1", forRemoval = true)
 	@Override
-	CountAggregationFieldStep<SR, PDF> count();
+	default CountValuesAggregationFieldStep<SR, PDF> count() {
+		return countValues();
+	}
 
 	@Override
-	CountDistinctAggregationFieldStep<SR, PDF> countDistinct();
+	CountValuesAggregationFieldStep<SR, PDF> countValues();
+
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.1", forRemoval = true)
+	@Override
+	default CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinct() {
+		return countDistinctValues();
+	}
+
+	@Override
+	CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinctValues();
 
 	@Override
 	AvgAggregationFieldStep<SR, PDF> avg();

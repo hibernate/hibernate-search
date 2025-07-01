@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl;
 
-public class Count implements AggregationFunction<Count> {
+public class CountValues implements AggregationFunction<CountValues> {
 
 	private long count = 0L;
 
@@ -14,7 +14,7 @@ public class Count implements AggregationFunction<Count> {
 	}
 
 	@Override
-	public void merge(AggregationFunction<Count> sibling) {
+	public void merge(AggregationFunction<CountValues> sibling) {
 		count += sibling.implementation().count;
 	}
 
@@ -24,7 +24,7 @@ public class Count implements AggregationFunction<Count> {
 	}
 
 	@Override
-	public Count implementation() {
+	public CountValues implementation() {
 		return this;
 	}
 }
