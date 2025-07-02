@@ -9,8 +9,9 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.AvgAggregationFieldStep;
-import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CountDistinctValuesAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountDocumentsAggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.MaxAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.MinAggregationFieldStep;
@@ -19,8 +20,9 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 import org.hibernate.search.engine.search.aggregation.dsl.SumAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.AvgAggregationFieldStepImpl;
-import org.hibernate.search.engine.search.aggregation.dsl.impl.CountValuesAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDistinctValuesAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDocumentsAggregationFinalStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.CountValuesAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.MaxAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.MinAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.RangeAggregationFieldStepImpl;
@@ -77,6 +79,11 @@ public abstract class AbstractSearchAggregationFactory<
 	@Override
 	public CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinctValues() {
 		return new CountDistinctValuesAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public CountDocumentsAggregationFinalStep countDocuments() {
+		return new CountDocumentsAggregationFinalStepImpl( dslContext );
 	}
 
 	public AvgAggregationFieldStep<SR, PDF> avg() {

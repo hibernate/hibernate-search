@@ -56,6 +56,9 @@ public class AggregationFunctionCollector<R extends AggregationFunction<?>> impl
 				while ( values.hasNextValue() ) {
 					long value = values.nextValue();
 					aggregationFunction.apply( value );
+					if ( !aggregationFunction.acceptMultipleValues() ) {
+						break;
+					}
 				}
 			}
 		}

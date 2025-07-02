@@ -5,7 +5,7 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CompensatedSumCollectorFactory;
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValuesCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
@@ -34,9 +34,9 @@ public class LuceneAvgCompensatedSumAggregation<F, E extends Number, K>
 		compensatedSumCollectorKey = sumCollectorFactory.getCollectorKey();
 		context.requireCollector( sumCollectorFactory );
 
-		CountCollectorFactory countCollectorFactory = new CountCollectorFactory( source );
-		collectorKey = countCollectorFactory.getCollectorKey();
-		context.requireCollector( countCollectorFactory );
+		CountValuesCollectorFactory countValuesCollectorFactory = new CountValuesCollectorFactory( source );
+		collectorKey = countValuesCollectorFactory.getCollectorKey();
+		context.requireCollector( countValuesCollectorFactory );
 	}
 
 	@Override

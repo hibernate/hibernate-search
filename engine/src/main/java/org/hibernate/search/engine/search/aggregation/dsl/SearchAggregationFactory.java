@@ -154,6 +154,17 @@ public interface SearchAggregationFactory {
 	CountDistinctValuesAggregationFieldStep<?, ?> countDistinctValues();
 
 	/**
+	 * Perform the count documents metric aggregation.
+	 * <p>
+	 * Counts the number of matched documents.
+	 * This aggregation may be useful for building {@link #range()} or {@link #terms()} aggregations.
+	 *
+	 * @return The next step.
+	 */
+	@Incubating
+	CountDocumentsAggregationFinalStep countDocuments();
+
+	/**
 	 * Perform the count distinct values metric aggregation.
 	 * <p>
 	 * Counts the number of unique field values.

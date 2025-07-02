@@ -34,7 +34,8 @@ public interface CountDistinctValuesAggregationFieldStep<SR, PDF extends TypedSe
 	 * @return The next step.
 	 */
 	@Incubating
-	default CountDistinctValuesAggregationOptionsStep<SR, ?, PDF> field(CountValuesAggregationFieldReference<SR> fieldReference) {
+	default CountDistinctValuesAggregationOptionsStep<SR, ?, PDF> field(
+			CountValuesAggregationFieldReference<SR> fieldReference) {
 		return field( fieldReference.absolutePath() );
 	}
 }

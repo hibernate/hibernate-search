@@ -123,6 +123,7 @@ public interface TypedSearchAggregationFactory<SR> extends SearchAggregationFact
 	default CountValuesAggregationFieldStep<SR, ?> count() {
 		return countValues();
 	}
+
 	/**
 	 * Perform the count values metric aggregation.
 	 * <p>
@@ -163,6 +164,18 @@ public interface TypedSearchAggregationFactory<SR> extends SearchAggregationFact
 	@Override
 	@Incubating
 	CountDistinctValuesAggregationFieldStep<SR, ?> countDistinctValues();
+
+	/**
+	 * Perform the count documents metric aggregation.
+	 * <p>
+	 * Counts the number of matched documents.
+	 * This aggregation may be useful for building {@link #range()} or {@link #terms()} aggregations.
+	 *
+	 * @return The next step.
+	 */
+	@Override
+	@Incubating
+	CountDocumentsAggregationFinalStep countDocuments();
 
 	/**
 	 * Perform the avg metric aggregation.

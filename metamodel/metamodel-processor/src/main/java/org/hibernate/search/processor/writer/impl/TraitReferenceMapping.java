@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.reference.aggregation.AvgAggregationFieldReference;
-import org.hibernate.search.engine.search.reference.aggregation.CountValuesAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.CountDistinctValuesAggregationFieldReference;
+import org.hibernate.search.engine.search.reference.aggregation.CountValuesAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.MaxAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.MinAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.RangeAggregationFieldReference;

@@ -21,6 +21,9 @@ import com.carrotsearch.hppc.LongIntMap;
 import com.carrotsearch.hppc.cursors.IntCursor;
 
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.CollectorManager;
+import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
 
@@ -31,11 +34,19 @@ public class RangeCollector extends SimpleCollector {
 	private final IntArrayList[] countsPerBoundaries;
 
 	private final long[] counts;
+	private final Collector[][] collectors;
+	private final CollectorKey<?, ?>[] keys;
+	private final LeafCollector[][] leafCollectors;
+	private final CollectorManager<Collector, ?>[] managers;
 
 	private LongMultiValues values;
 
-	public RangeCollector(LongMultiValuesSource valuesSource, EffectiveRange[] ranges) {
+	public RangeCollector(LongMultiValuesSource valuesSource, EffectiveRange[] ranges, Collector[][] collectors,
+			CollectorKey<?, ?>[] keys, CollectorManager<Collector, ?>[] managers) {
 		this.valuesSource = valuesSource;
+		this.collectors = collectors;
+		this.keys = keys;
+		this.managers = managers;
 
 		// Maps all range inclusive endpoints to int flags; 1
 		// = start of interval, 2 = end of interval.  We need to
@@ -128,11 +139,18 @@ public class RangeCollector extends SimpleCollector {
 		}
 
 		counts = new long[ranges.length];
+		leafCollectors = new LeafCollector[keys.length][];
+		for ( int i = 0; i < leafCollectors.length; i++ ) {
+			leafCollectors[i] = new LeafCollector[ranges.length];
+		}
 	}
 
-	private void incrementCountForLeafWithIndex(int index) {
+	private void processLeafWithIndex(int index, int doc) throws IOException {
 		for ( IntCursor cursor : countsPerBoundaries[index] ) {
 			counts[cursor.value]++;
+			for ( int i = 0; i < keys.length; i++ ) {
+				leafCollectors[i][cursor.value].collect( doc );
+			}
 		}
 	}
 
@@ -169,7 +187,7 @@ public class RangeCollector extends SimpleCollector {
 				// Each document must be counted only once per range.
 				int leafIndex = findLeafIndex( values.nextValue() );
 				if ( uniqueLeafIndicesForDocument.add( leafIndex ) ) {
-					incrementCountForLeafWithIndex( leafIndex );
+					processLeafWithIndex( leafIndex, doc );
 				}
 			}
 		}
@@ -179,6 +197,18 @@ public class RangeCollector extends SimpleCollector {
 		return counts;
 	}
 
+	public Collector[][] collectors() {
+		return collectors;
+	}
+
+	public CollectorKey<?, ?>[] collectorKeys() {
+		return keys;
+	}
+
+	public CollectorManager<Collector, ?>[] managers() {
+		return managers;
+	}
+
 	@Override
 	public ScoreMode scoreMode() {
 		return ScoreMode.COMPLETE_NO_SCORES;
@@ -186,6 +216,11 @@ public class RangeCollector extends SimpleCollector {
 
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
 		values = valuesSource.getValues( context );
+		for ( int i = 0; i < collectors.length; i++ ) {
+			for ( int j = 0; j < collectors[i].length; j++ ) {
+				leafCollectors[i][j] = collectors[i][j].getLeafCollector( context );
+			}
+		}
 	}
 
 	public void finish() throws IOException {

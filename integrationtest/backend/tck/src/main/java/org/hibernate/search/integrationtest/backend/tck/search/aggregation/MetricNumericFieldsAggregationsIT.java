@@ -70,6 +70,7 @@ class MetricNumericFieldsAggregationsIT {
 	private final AggregationKey<Float> avgFloats = AggregationKey.of( "avgFloats" );
 	private final AggregationKey<BigInteger> avgBigIntegers = AggregationKey.of( "avgBigIntegers" );
 	private final AggregationKey<BigDecimal> avgBigDecimals = AggregationKey.of( "avgBigDecimals" );
+	private final AggregationKey<Long> countDocuments = AggregationKey.of( "countDocuments" );
 
 	@BeforeEach
 	void setup() {
@@ -117,6 +118,7 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( avgBigIntegers ) ).isEqualTo( BigInteger.valueOf( 5 ) );
 		assertThat( result.aggregation( avgBigDecimals ).setScale( 2, RoundingMode.CEILING ) )
 				.isEqualTo( BigDecimal.valueOf( 580, 2 ) );
+		assertThat( result.aggregation( countDocuments ) ).isEqualTo( result.total().hitCount() );
 	}
 
 	@Test
@@ -159,6 +161,7 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( avgBigIntegers ) ).isEqualTo( BigInteger.valueOf( 5 ) );
 		assertThat( result.aggregation( avgBigDecimals ).setScale( 2, RoundingMode.CEILING ) )
 				.isEqualTo( BigDecimal.valueOf( 550, 2 ) );
+		assertThat( result.aggregation( countDocuments ) ).isEqualTo( result.total().hitCount() );
 	}
 
 	private SearchQuery<DocumentReference> defineAggregations(
@@ -180,10 +183,10 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( maxIntegers, f -> f.max().field( "integer", Integer.class ) )
 				.aggregation( maxIntegersAsString, f -> f.max().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( maxConverted, f -> f.max().field( "converted", String.class ) )
-				.aggregation( countIntegers, f -> f.count().field( "integer" ) )
-				.aggregation( countConverted, f -> f.count().field( "converted" ) )
-				.aggregation( countDistinctIntegers, f -> f.countDistinct().field( "integer" ) )
-				.aggregation( countDistinctConverted, f -> f.countDistinct().field( "converted" ) )
+				.aggregation( countIntegers, f -> f.countValues().field( "integer" ) )
+				.aggregation( countConverted, f -> f.countValues().field( "converted" ) )
+				.aggregation( countDistinctIntegers, f -> f.countDistinctValues().field( "integer" ) )
+				.aggregation( countDistinctConverted, f -> f.countDistinctValues().field( "converted" ) )
 				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
 				.aggregation( avgIntegersAsString, f -> f.avg().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
@@ -201,6 +204,7 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( avgFloats, f -> f.avg().field( "floatF", Float.class ) )
 				.aggregation( avgBigIntegers, f -> f.avg().field( "bigInteger", BigInteger.class ) )
 				.aggregation( avgBigDecimals, f -> f.avg().field( "bigDecimal", BigDecimal.class ) )
+				.aggregation( countDocuments, f -> f.countDocuments() )
 				.toQuery();
 	}
 
