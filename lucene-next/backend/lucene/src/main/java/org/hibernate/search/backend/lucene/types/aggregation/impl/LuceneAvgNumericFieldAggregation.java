@@ -5,8 +5,8 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.AggregationFunctionCollector;
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.Count;
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValues;
+import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValuesCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.SumCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
@@ -28,7 +28,7 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 	}
 
 	// Supplementary collector used by the avg function
-	protected CollectorKey<AggregationFunctionCollector<Count>, Long> countCollectorKey;
+	protected CollectorKey<AggregationFunctionCollector<CountValues>, Long> countCollectorKey;
 
 	LuceneAvgNumericFieldAggregation(Builder<F, E, K> builder) {
 		super( builder );
@@ -37,11 +37,11 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 	@Override
 	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
 		SumCollectorFactory sumCollectorFactory = new SumCollectorFactory( source );
-		CountCollectorFactory countCollectorFactory = new CountCollectorFactory( source );
+		CountValuesCollectorFactory countValuesCollectorFactory = new CountValuesCollectorFactory( source );
 		collectorKey = sumCollectorFactory.getCollectorKey();
-		countCollectorKey = countCollectorFactory.getCollectorKey();
+		countCollectorKey = countValuesCollectorFactory.getCollectorKey();
 		context.requireCollector( sumCollectorFactory );
-		context.requireCollector( countCollectorFactory );
+		context.requireCollector( countValuesCollectorFactory );
 	}
 
 	private static class LuceneNumericMetricFieldAggregationExtraction<F, E extends Number, K> implements Extractor<K> {

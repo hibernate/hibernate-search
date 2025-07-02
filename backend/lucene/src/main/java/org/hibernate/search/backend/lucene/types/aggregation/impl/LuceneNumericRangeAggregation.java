@@ -163,7 +163,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 		private final Function<K, E> convertAndEncode;
 
-		private LuceneSearchAggregation<V> aggregation;
+		private final LuceneSearchAggregation<V> aggregation;
 		private final List<Range<K>> rangesInOrder;
 		private final List<Range<E>> encodedRangesInOrder;
 
