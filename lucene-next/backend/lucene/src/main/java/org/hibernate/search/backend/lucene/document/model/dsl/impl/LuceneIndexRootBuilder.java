@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObject
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexRoot;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountDocumentAggregation;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
@@ -33,6 +34,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuilder
@@ -55,6 +57,8 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 		this.backendMapperContext = backendMapperContext;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+
+		typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT_DOCUMENTS, LuceneCountDocumentAggregation.factory() );
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCo
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.RootAggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
@@ -112,7 +113,7 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	private Map<AggregationKey<?>, ?> extractAggregations() throws IOException {
-		AggregationExtractContext aggregationExtractContext = new AggregationExtractContext(
+		AggregationExtractContext aggregationExtractContext = new RootAggregationExtractContext(
 				requestContext.getQueryIndexScope(),
 				requestContext.getSessionContext(),
 				indexSearcher.getIndexReader(),

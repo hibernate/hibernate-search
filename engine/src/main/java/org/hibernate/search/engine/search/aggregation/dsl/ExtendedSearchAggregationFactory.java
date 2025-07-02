@@ -64,6 +64,9 @@ public interface ExtendedSearchAggregationFactory<
 	CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinctValues();
 
 	@Override
+	CountDocumentsAggregationFinalStep countDocuments();
+
+	@Override
 	AvgAggregationFieldStep<SR, PDF> avg();
 
 }

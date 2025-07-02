@@ -14,4 +14,8 @@ public interface AggregationFunction<R extends AggregationFunction<?>> {
 
 	R implementation();
 
+	default boolean acceptMultipleValues() {
+		return true;
+	}
+
 }

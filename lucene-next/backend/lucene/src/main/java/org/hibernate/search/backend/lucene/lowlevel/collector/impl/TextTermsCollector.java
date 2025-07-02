@@ -74,7 +74,7 @@ public class TextTermsCollector extends SimpleCollector {
 		List<LongBucket> buckets = new LinkedList<>();
 		while ( pq.size() != 0 ) {
 			LongBucket popped = pq.pop();
-			buckets.addFirst( popped );
+			buckets.add( 0, popped );
 		}
 
 		return buckets;

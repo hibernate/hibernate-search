@@ -19,7 +19,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Query;
 
-public class AggregationExtractContextImpl implements AggregationExtractContext {
+public class RootAggregationExtractContext implements AggregationExtractContext {
 
 	private final LuceneSearchQueryIndexScope<?, ?> queryIndexScope;
 	private final BackendSessionContext sessionContext;
@@ -29,7 +29,7 @@ public class AggregationExtractContextImpl implements AggregationExtractContext 
 	private final Set<String> routingKeys;
 	private final QueryParameters parameters;
 
-	public AggregationExtractContextImpl(LuceneSearchQueryIndexScope<?, ?> queryIndexScope,
+	public RootAggregationExtractContext(LuceneSearchQueryIndexScope<?, ?> queryIndexScope,
 			BackendSessionContext sessionContext,
 			IndexReader indexReader,
 			FromDocumentValueConvertContext fromDocumentValueConvertContext,
