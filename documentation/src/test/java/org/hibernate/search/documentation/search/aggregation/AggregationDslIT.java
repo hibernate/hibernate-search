@@ -269,6 +269,51 @@ class AggregationDslIT {
 	}
 
 	@Test
+	void terms_value() {
+		withinSearchSession( searchSession -> {
+			// tag::terms-sum[]
+			AggregationKey<Map<Double, Double>> sumByPriceKey = AggregationKey.of( "sumByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							sumByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+									.value( f.sum().field( "price", Double.class ) )
+					)
+					.fetch( 20 );
+			Map<Double, Double> sumByPrice = result.aggregation( sumByPriceKey );
+			// end::terms-sum[]
+			assertThat( sumByPrice )
+					.containsExactly(
+							entry( 10.0, 7.99 ),
+							entry( 20.0 , 35.98 ),
+							entry( null , 24.99 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count[]
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+									.value( f.countDocuments() ) // <4>
+					)
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
+					);
+		} );
+	}
+
+	@Test
 	void range_value() {
 		withinSearchSession( searchSession -> {
 			// tag::range-sum[]
@@ -281,7 +326,7 @@ class AggregationDslIT {
 									.range( 0.0, 10.0 ) // <2>
 									.range( 10.0, 20.0 )
 									.range( 20.0, null ) // <3>
-									.value( f.sum().field( "price", Double.class ).toAggregation() )
+									.value( f.sum().field( "price", Double.class ) )
 					)
 					.fetch( 20 );
 			Map<Range<Double>, Double> countsByPrice = result.aggregation( countsByPriceKey );
@@ -291,6 +336,30 @@ class AggregationDslIT {
 							entry( Range.canonical( 0.0, 10.0 ), 7.99 ),
 							entry( Range.canonical( 10.0, 20.0 ), 35.98 ),
 							entry( Range.canonical( 20.0, null ), 24.99 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-count[]
+			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 ) // <2>
+									.range( 10.0, 20.0 )
+									.range( 20.0, null ) // <3>
+									.value( f.countDocuments() ) // <4>
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-count[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
 					);
 		} );
 	}

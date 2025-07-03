@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
  * The context holding all the useful information pertaining to the extraction of data from
  * the response to the Elasticsearch search query.
  */
-class ElasticsearchSearchQueryExtractContext implements AggregationExtractContext {
+public class ElasticsearchSearchQueryExtractContext implements AggregationExtractContext {
 
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 	private final ProjectionHitMapper<?> projectionHitMapper;
@@ -41,7 +41,7 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 		return fromDocumentValueConvertContext;
 	}
 
-	JsonObject getResponseBody() {
+	public JsonObject getResponseBody() {
 		return responseBody;
 	}
 

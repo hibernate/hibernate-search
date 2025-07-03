@@ -58,7 +58,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
-		typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT_DOCUMENTS, LuceneCountDocumentAggregation.factory() );
+		this.typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT_DOCUMENTS, LuceneCountDocumentAggregation.factory() );
 	}
 
 	@Override
