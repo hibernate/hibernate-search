@@ -270,6 +270,41 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY;
 
 	/**
+	 * How many times the event processor must try locking the outbox event database records for processing
+	 * before leaving them to be processed in another batch.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Only applicable when the database supports skipping locked rows when locking.
+	 * <p>
+	 * Expects a positive integer value, such as {@code 10},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX}.
+	 */
+	public static final String COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX =
+			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX;
+
+	/**
+	 * How long the event processor must wait before retrying to lock the outbox event database records.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Only applicable when the database supports skipping locked rows when locking.
+	 * <p>
+	 * Expects a positive integer value in seconds, such as {@code 5},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Use the value {@code 0} to retry locking events as soon as possible, with no delay.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY}.
+	 */
+	public static final String COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY =
+			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY;
+
+	/**
 	 * In the mass indexer, how long to wait for another query to the agent table
 	 * when actively waiting for event processors to suspend themselves, in milliseconds.
 	 * <p>
@@ -516,6 +551,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 				COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT;
 		public static final String COORDINATION_EVENT_PROCESSOR_RETRY_DELAY =
 				COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY;
+		public static final String COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX =
+				COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX;
+		public static final String COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY =
+				COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY;
 		public static final String COORDINATION_MASS_INDEXER_POLLING_INTERVAL =
 				COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_POLLING_INTERVAL;
 		public static final String COORDINATION_MASS_INDEXER_PULSE_INTERVAL =
@@ -564,6 +603,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String EVENT_PROCESSOR_BATCH_SIZE = EVENT_PROCESSOR_PREFIX + "batch_size";
 		public static final String EVENT_PROCESSOR_TRANSACTION_TIMEOUT = EVENT_PROCESSOR_PREFIX + "transaction_timeout";
 		public static final String EVENT_PROCESSOR_RETRY_DELAY = EVENT_PROCESSOR_PREFIX + "retry_delay";
+		public static final String EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX = EVENT_PROCESSOR_PREFIX + "event_lock_retry_max";
+		public static final String EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY = EVENT_PROCESSOR_PREFIX + "event_lock_retry_delay";
 		public static final String MASS_INDEXER_PREFIX = "mass_indexer.";
 		public static final String MASS_INDEXER_POLLING_INTERVAL = MASS_INDEXER_PREFIX + "polling_interval";
 		public static final String MASS_INDEXER_PULSE_INTERVAL = MASS_INDEXER_PREFIX + "pulse_interval";
@@ -600,6 +641,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final OutboxEventProcessingOrder COORDINATION_EVENT_PROCESSOR_ORDER = OutboxEventProcessingOrder.AUTO;
 		public static final int COORDINATION_EVENT_PROCESSOR_BATCH_SIZE = 50;
 		public static final int COORDINATION_EVENT_PROCESSOR_RETRY_DELAY = 30;
+		public static final int COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_MAX = 20;
+		public static final int COORDINATION_EVENT_PROCESSOR_EVENT_LOCK_RETRY_DELAY = 2;
 		public static final int COORDINATION_MASS_INDEXER_POLLING_INTERVAL = 100;
 		public static final int COORDINATION_MASS_INDEXER_PULSE_INTERVAL = 2000;
 		public static final int COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = 30000;
