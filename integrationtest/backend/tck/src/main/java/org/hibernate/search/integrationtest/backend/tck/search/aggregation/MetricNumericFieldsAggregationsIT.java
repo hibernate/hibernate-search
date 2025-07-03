@@ -72,7 +72,8 @@ class MetricNumericFieldsAggregationsIT {
 	private final AggregationKey<BigDecimal> avgBigDecimals = AggregationKey.of( "avgBigDecimals" );
 	private final AggregationKey<Long> countDocuments = AggregationKey.of( "countDocuments" );
 	private final AggregationKey<Long> countValuesIntegerMultiValued = AggregationKey.of( "countValuesIntegerMultiValued" );
-	private final AggregationKey<Long> countDistinctValuesIntegerMultiValued = AggregationKey.of( "countDistinctValuesIntegerMultiValued" );
+	private final AggregationKey<Long> countDistinctValuesIntegerMultiValued =
+			AggregationKey.of( "countDistinctValuesIntegerMultiValued" );
 
 	@BeforeEach
 	void setup() {
@@ -211,7 +212,8 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( avgBigIntegers, f -> f.avg().field( "bigInteger", BigInteger.class ) )
 				.aggregation( avgBigDecimals, f -> f.avg().field( "bigDecimal", BigDecimal.class ) )
 				.aggregation( countDocuments, f -> f.countDocuments() )
-				.aggregation( countDistinctValuesIntegerMultiValued, f -> f.countDistinctValues().field( "integerMultiValued" ) )
+				.aggregation( countDistinctValuesIntegerMultiValued,
+						f -> f.countDistinctValues().field( "integerMultiValued" ) )
 				.aggregation( countValuesIntegerMultiValued, f -> f.countValues().field( "integerMultiValued" ) )
 				.toQuery();
 	}
@@ -262,7 +264,8 @@ class MetricNumericFieldsAggregationsIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			integer = root.field( "integer", f -> f.asInteger().aggregable( Aggregable.YES ) ).toReference();
-			integerMultiValued = root.field( "integerMultiValued", f -> f.asInteger().aggregable( Aggregable.YES ) ).multiValued().toReference();
+			integerMultiValued = root.field( "integerMultiValued", f -> f.asInteger().aggregable( Aggregable.YES ) )
+					.multiValued().toReference();
 			converted = root.field( "converted", f -> f.asInteger().aggregable( Aggregable.YES )
 					.projectionConverter( String.class, (value, context) -> value.toString() ) ).toReference();
 			doubleF = root.field( "doubleF", f -> f.asDouble().aggregable( Aggregable.YES ) ).toReference();
