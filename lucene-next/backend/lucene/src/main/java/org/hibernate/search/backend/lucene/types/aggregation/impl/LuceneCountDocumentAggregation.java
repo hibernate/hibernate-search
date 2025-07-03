@@ -19,7 +19,6 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 
 public class LuceneCountDocumentAggregation implements LuceneSearchAggregation<Long> {
 
-	@SuppressWarnings("unchecked")
 	public static Factory factory() {
 		return Factory.INSTANCE;
 	}

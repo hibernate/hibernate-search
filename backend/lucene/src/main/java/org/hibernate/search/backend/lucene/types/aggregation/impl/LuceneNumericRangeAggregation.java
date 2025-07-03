@@ -202,7 +202,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field, codec, convertAndEncode,
 					LuceneSearchAggregation.from( scope,
-							LuceneCountNumericLongAggregation.factory( codec ).create( scope, field ).build() ),
+							LuceneCountDocumentAggregation.factory().create( scope, null ).type().build() ),
 					new ArrayList<>(), new ArrayList<>() );
 		}
 	}
