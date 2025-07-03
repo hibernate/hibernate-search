@@ -15,25 +15,36 @@ import org.hibernate.search.backend.lucene.types.aggregation.impl.BucketOrder;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LongBucket;
 
 import com.carrotsearch.hppc.LongHashSet;
-import com.carrotsearch.hppc.LongIntHashMap;
-import com.carrotsearch.hppc.LongIntMap;
-import com.carrotsearch.hppc.procedures.LongIntProcedure;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.cursors.LongObjectCursor;
+import com.carrotsearch.hppc.procedures.LongObjectProcedure;
 
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.CollectorManager;
+import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
 import org.apache.lucene.util.PriorityQueue;
 
-public class NumericTermsCollector extends SimpleCollector {
+public class NumericTermsCollector extends SimpleCollector implements BaseTermsCollector {
 
 	private final LongHashSet uniqueLeafIndicesForDocument = new LongHashSet();
 
 	private final LongMultiValuesSource valuesSource;
-	private final LongIntMap hashCounts = new LongIntHashMap();
-	private LongMultiValues values;
+	private final LongObjectHashMap<SegmentValue> segmentValues = new LongObjectHashMap<>();
 
-	public NumericTermsCollector(LongMultiValuesSource valuesSource) {
+	private final CollectorKey<?, ?>[] keys;
+	private final CollectorManager<Collector, ?>[] managers;
+
+	private LongMultiValues values;
+	private LeafReaderContext leafReaderContext;
+
+	public NumericTermsCollector(LongMultiValuesSource valuesSource, CollectorKey<?, ?>[] keys,
+			CollectorManager<Collector, ?>[] managers) {
 		this.valuesSource = valuesSource;
+		this.keys = keys;
+		this.managers = managers;
 	}
 
 	@Override
@@ -46,19 +57,24 @@ public class NumericTermsCollector extends SimpleCollector {
 				// Each document must be counted only once per range.
 				long value = values.nextValue();
 				if ( uniqueLeafIndicesForDocument.add( value ) ) {
-					hashCounts.addTo( value, 1 );
+					SegmentValue segmentValue = segmentValues.get( value );
+					if ( segmentValue == null ) {
+						segmentValue = new SegmentValue( managers );
+						segmentValues.put( value, segmentValue );
+					}
+					segmentValue.collect( doc );
 				}
 			}
 		}
 	}
 
 	public List<LongBucket> counts(BucketOrder order, int topN, int minDocCount) {
-		int size = Math.min( topN, hashCounts.size() );
+		int size = Math.min( topN, segmentValues.size() );
 		PriorityQueue<LongBucket> pq = new HibernateSearchBucketOrderQueue( order, size );
 
-		hashCounts.forEach( (LongIntProcedure) (key, value) -> {
-			if ( value >= minDocCount ) {
-				pq.insertWithOverflow( new LongBucket( key, value ) );
+		segmentValues.forEach( (LongObjectProcedure<SegmentValue>) (key, value) -> {
+			if ( value.count >= minDocCount ) {
+				pq.insertWithOverflow( new LongBucket( key, value.collectors, value.count ) );
 			}
 		} );
 
@@ -77,11 +93,25 @@ public class NumericTermsCollector extends SimpleCollector {
 	}
 
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
-		values = valuesSource.getValues( context );
+		this.values = valuesSource.getValues( context );
+		this.leafReaderContext = context;
+		for ( LongObjectCursor<SegmentValue> value : segmentValues ) {
+			value.value.resetLeafCollectors( context );
+		}
 	}
 
 	public void finish() {
 		values = null;
+	}
+
+	@Override
+	public CollectorKey<?, ?>[] keys() {
+		return keys;
+	}
+
+	@Override
+	public CollectorManager<Collector, ?>[] managers() {
+		return managers;
 	}
 
 	private static class HibernateSearchBucketOrderQueue extends PriorityQueue<LongBucket> {
@@ -95,6 +125,34 @@ public class NumericTermsCollector extends SimpleCollector {
 		@Override
 		protected boolean lessThan(LongBucket t1, LongBucket t2) {
 			return comparator.compare( t1, t2 ) > 0;
+		}
+	}
+
+	private class SegmentValue {
+		final Collector[] collectors;
+		final LeafCollector[] leafCollectors;
+		long count = 0L;
+
+		SegmentValue(CollectorManager<Collector, ?>[] managers) throws IOException {
+			this.collectors = new Collector[managers.length];
+			this.leafCollectors = new LeafCollector[managers.length];
+			for ( int i = 0; i < managers.length; i++ ) {
+				collectors[i] = managers[i].newCollector();
+				leafCollectors[i] = collectors[i].getLeafCollector( leafReaderContext );
+			}
+		}
+
+		void collect(int doc) throws IOException {
+			count++;
+			for ( LeafCollector collector : leafCollectors ) {
+				collector.collect( doc );
+			}
+		}
+
+		void resetLeafCollectors(LeafReaderContext leafReaderContext) throws IOException {
+			for ( int i = 0; i < leafCollectors.length; i++ ) {
+				leafCollectors[i] = collectors[i].getLeafCollector( leafReaderContext );
+			}
 		}
 	}
 

@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl.impl;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
-import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
+import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationRangeValueStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -24,11 +24,11 @@ public class TermsAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateF
 	}
 
 	@Override
-	public <F> TermsAggregationOptionsStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
+	public <F> TermsAggregationRangeValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
-		TermsAggregationBuilder<F> builder = dslContext.scope()
+		TermsAggregationBuilder<F, Long> builder = dslContext.scope()
 				.fieldQueryElement( fieldPath, AggregationTypeKeys.TERMS ).type( type, valueModel );
 		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
