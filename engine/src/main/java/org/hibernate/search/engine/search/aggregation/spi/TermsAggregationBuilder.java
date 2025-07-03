@@ -6,13 +6,14 @@ package org.hibernate.search.engine.search.aggregation.spi;
 
 import java.util.Map;
 
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
-public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map<K, Long>> {
+public interface TermsAggregationBuilder<K, V> extends SearchAggregationBuilder<Map<K, V>> {
 
 	interface TypeSelector {
-		<K> TermsAggregationBuilder<K> type(Class<K> expectedType, ValueModel valueModel);
+		<K> TermsAggregationBuilder<K, Long> type(Class<K> expectedType, ValueModel valueModel);
 	}
 
 	void filter(SearchPredicate filter);
@@ -28,5 +29,7 @@ public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map
 	void minDocumentCount(int minDocumentCount);
 
 	void maxTermCount(int maxTermCount);
+
+	<T> TermsAggregationBuilder<K, T> withValue(SearchAggregation<T> aggregation);
 
 }

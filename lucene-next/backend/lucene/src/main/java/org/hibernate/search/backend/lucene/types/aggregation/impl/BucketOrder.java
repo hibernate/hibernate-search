@@ -9,7 +9,7 @@ import java.util.Comparator;
 public enum BucketOrder {
 	COUNT_ASC {
 		@Override
-		<F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator) {
+		<F, R> Comparator<Bucket<F, R>> toBucketComparatorInternal(Comparator<F> termComparator) {
 			return (left, right) -> {
 				int order = Long.compare( left.count(), right.count() );
 				if ( order != 0 ) {
@@ -22,12 +22,12 @@ public enum BucketOrder {
 
 		@Override
 		Comparator<LongBucket> toLongBucketComparatorInternal() {
-			return Comparator.comparingLong( LongBucket::count ).thenComparingLong( LongBucket::term );
+			return Comparator.comparingLong( LongBucket::count ).thenComparingLong( LongBucket::termOrd );
 		}
 	},
 	COUNT_DESC {
 		@Override
-		<F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator) {
+		<F, R> Comparator<Bucket<F, R>> toBucketComparatorInternal(Comparator<F> termComparator) {
 			return (left, right) -> {
 				int order = Long.compare( right.count(), left.count() ); // reversed, because desc
 				if ( order != 0 ) {
@@ -45,20 +45,20 @@ public enum BucketOrder {
 				if ( order != 0 ) {
 					return order;
 				}
-				order = Long.compare( left.term(), right.term() );
+				order = Long.compare( left.termOrd(), right.termOrd() );
 				return order;
 			};
 		}
 	},
 	TERM_ASC {
 		@Override
-		<F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator) {
+		<F, R> Comparator<Bucket<F, R>> toBucketComparatorInternal(Comparator<F> termComparator) {
 			return (left, right) -> termComparator.compare( left.term(), right.term() );
 		}
 
 		@Override
 		Comparator<LongBucket> toLongBucketComparatorInternal() {
-			return Comparator.comparingLong( LongBucket::term );
+			return Comparator.comparingLong( LongBucket::termOrd );
 		}
 	},
 	TERM_DESC {
@@ -68,17 +68,17 @@ public enum BucketOrder {
 		}
 
 		@Override
-		<F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator) {
+		<F, R> Comparator<Bucket<F, R>> toBucketComparatorInternal(Comparator<F> termComparator) {
 			return (left, right) -> termComparator.compare( left.term(), right.term() );
 		}
 
 		@Override
 		Comparator<LongBucket> toLongBucketComparatorInternal() {
-			return Comparator.comparingLong( LongBucket::term ).reversed();
+			return Comparator.comparingLong( LongBucket::termOrd ).reversed();
 		}
 	};
 
-	public <F> Comparator<Bucket<F>> toBucketComparator(Comparator<F> termAscendingComparator) {
+	public <F, R> Comparator<Bucket<F, R>> toBucketComparator(Comparator<F> termAscendingComparator) {
 		return toBucketComparatorInternal(
 				isTermOrderDescending() ? termAscendingComparator.reversed() : termAscendingComparator );
 	}
@@ -87,7 +87,7 @@ public enum BucketOrder {
 		return toLongBucketComparatorInternal();
 	}
 
-	abstract <F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator);
+	abstract <F, R> Comparator<Bucket<F, R>> toBucketComparatorInternal(Comparator<F> termComparator);
 
 	abstract Comparator<LongBucket> toLongBucketComparatorInternal();
 

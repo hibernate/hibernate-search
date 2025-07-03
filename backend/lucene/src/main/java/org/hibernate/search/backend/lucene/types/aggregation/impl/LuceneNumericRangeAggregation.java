@@ -8,13 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeCollectorFactory;
@@ -26,19 +23,14 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchA
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.CollectorManager;
-import org.apache.lucene.search.Query;
 
 /**
  * @param <F> The type of field values.
@@ -207,79 +199,4 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 		}
 	}
 
-	private static class LocalAggregationRequestContext implements AggregationRequestContext {
-
-		private final AggregationRequestContext delegate;
-		private final Set<CollectorFactory<?, ?, ?>> localCollectorFactories = new LinkedHashSet<>();
-
-		private LocalAggregationRequestContext(AggregationRequestContext delegate) {
-			this.delegate = delegate;
-		}
-
-		@Override
-		public <C extends Collector, T, CM extends CollectorManager<C, T>> void requireCollector(
-				CollectorFactory<C, T, CM> collectorFactory) {
-			localCollectorFactories.add( collectorFactory );
-		}
-
-		@Override
-		public NamedValues queryParameters() {
-			return delegate.queryParameters();
-		}
-
-		@Override
-		public PredicateRequestContext toPredicateRequestContext(String absolutePath) {
-			return delegate.toPredicateRequestContext( absolutePath );
-		}
-
-		@Override
-		public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {
-			return delegate.createNestedDocsProvider( nestedDocumentPath, nestedFilter );
-		}
-
-		public List<CollectorFactory<?, ?, ?>> localCollectorFactories() {
-			return new ArrayList<>( localCollectorFactories );
-		}
-	}
-
-	private static class LocalAggregationExtractContext implements AggregationExtractContext {
-
-		private final AggregationExtractContext delegate;
-
-		private Map<CollectorKey<?, ?>, Object> results;
-
-		private LocalAggregationExtractContext(AggregationExtractContext delegate) {
-			this.delegate = delegate;
-		}
-
-		@Override
-		public PredicateRequestContext toPredicateRequestContext(String absolutePath) {
-			return delegate.toPredicateRequestContext( absolutePath );
-		}
-
-		@Override
-		public IndexReader getIndexReader() {
-			return delegate.getIndexReader();
-		}
-
-		@Override
-		public FromDocumentValueConvertContext fromDocumentValueConvertContext() {
-			return delegate.fromDocumentValueConvertContext();
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public <C extends Collector, T> T getCollectorResults(CollectorKey<C, T> key) {
-			return (T) results.get( key );
-		}
-
-		@Override
-		public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {
-			return delegate.createNestedDocsProvider( nestedDocumentPath, nestedFilter );
-		}
-
-		public void setResults(Map<CollectorKey<?, ?>, Object> results) {
-			this.results = results;
-		}
-	}
 }

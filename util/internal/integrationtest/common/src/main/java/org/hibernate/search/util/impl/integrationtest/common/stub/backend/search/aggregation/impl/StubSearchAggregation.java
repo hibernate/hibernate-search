@@ -47,7 +47,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
 	public static class TermsTypeSelector implements TermsAggregationBuilder.TypeSelector {
 		@Override
-		public <V> TermsBuilder<V> type(Class<V> expectedType, ValueModel valueModel) {
+		public <V> TermsBuilder<V, Long> type(Class<V> expectedType, ValueModel valueModel) {
 			return new TermsBuilder<>();
 		}
 	}
@@ -59,7 +59,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		}
 	}
 
-	static class TermsBuilder<K> implements TermsAggregationBuilder<K> {
+	static class TermsBuilder<K, V> implements TermsAggregationBuilder<K, V> {
 
 		@Override
 		public void orderByCountDescending() {
@@ -92,12 +92,17 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		}
 
 		@Override
+		public <T> TermsAggregationBuilder<K, T> withValue(SearchAggregation<T> aggregation) {
+			return new TermsBuilder<>();
+		}
+
+		@Override
 		public void filter(SearchPredicate filter) {
 			// No-op
 		}
 
 		@Override
-		public SearchAggregation<Map<K, Long>> build() {
+		public SearchAggregation<Map<K, V>> build() {
 			return new StubSearchAggregation<>();
 		}
 	}
