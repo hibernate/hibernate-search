@@ -92,6 +92,7 @@ public class NumericTermsCollector extends SimpleCollector implements BaseTermsC
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
+	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
 		this.values = valuesSource.getValues( context );
 		this.leafReaderContext = context;
@@ -100,6 +101,7 @@ public class NumericTermsCollector extends SimpleCollector implements BaseTermsC
 		}
 	}
 
+	@Override
 	public void finish() {
 		values = null;
 	}

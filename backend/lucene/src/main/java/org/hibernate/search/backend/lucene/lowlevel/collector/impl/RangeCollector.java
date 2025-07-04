@@ -207,6 +207,7 @@ public class RangeCollector extends SimpleCollector {
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
+	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
 		values = valuesSource.getValues( context );
 		for ( int i = 0; i < collectors.length; i++ ) {
@@ -216,6 +217,7 @@ public class RangeCollector extends SimpleCollector {
 		}
 	}
 
+	@Override
 	public void finish() throws IOException {
 		values = null;
 	}
