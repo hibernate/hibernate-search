@@ -11,16 +11,16 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.LeafCollector;
-import org.apache.lucene.search.Scorable;
 import org.apache.lucene.search.ScoreMode;
+import org.apache.lucene.search.SimpleCollector;
 
-public class DoubleAggregationFunctionCollector<AF extends DoubleAggregationFunction<?>> implements Collector {
+public class DoubleAggregationFunctionCollector<AF extends DoubleAggregationFunction<?>> extends SimpleCollector {
 
 	private final LongMultiValuesSource valueSource;
 	private final DoubleAggregationFunction<AF> aggregationFunction;
 	private final Function<Long, Double> longToDouble;
+
+	private LongMultiValues values;
 
 	public DoubleAggregationFunctionCollector(LongMultiValuesSource valueSource,
 			DoubleAggregationFunction<AF> aggregationFunction, Function<Long, Double> longToDouble) {
@@ -38,8 +38,13 @@ public class DoubleAggregationFunctionCollector<AF extends DoubleAggregationFunc
 	}
 
 	@Override
-	public LeafCollector getLeafCollector(LeafReaderContext context) throws IOException {
-		return new AggregationFunctionLeafCollector( valueSource.getValues( context ) );
+	public void collect(int doc) throws IOException {
+		if ( values.advanceExact( doc ) ) {
+			while ( values.hasNextValue() ) {
+				long value = values.nextValue();
+				aggregationFunction.apply( longToDouble.apply( value ) );
+			}
+		}
 	}
 
 	@Override
@@ -47,26 +52,13 @@ public class DoubleAggregationFunctionCollector<AF extends DoubleAggregationFunc
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
-	public class AggregationFunctionLeafCollector implements LeafCollector {
-		private final LongMultiValues values;
+	@Override
+	protected void doSetNextReader(LeafReaderContext context) throws IOException {
+		values = valueSource.getValues( context );
+	}
 
-		public AggregationFunctionLeafCollector(LongMultiValues values) {
-			this.values = values;
-		}
-
-		@Override
-		public void collect(int doc) throws IOException {
-			if ( values.advanceExact( doc ) ) {
-				while ( values.hasNextValue() ) {
-					long value = values.nextValue();
-					aggregationFunction.apply( longToDouble.apply( value ) );
-				}
-			}
-		}
-
-		@Override
-		public void setScorer(Scorable scorer) {
-			// no-op by default
-		}
+	@Override
+	public void finish() throws IOException {
+		values = null;
 	}
 }

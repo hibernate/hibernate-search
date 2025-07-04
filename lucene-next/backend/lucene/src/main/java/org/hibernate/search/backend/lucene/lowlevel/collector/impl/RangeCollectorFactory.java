@@ -13,12 +13,12 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.CollectorManager;
 
-public class RangeCollectorFactory<E extends Number>
-		implements CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager<E>> {
+public class RangeCollectorFactory
+		implements CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager> {
 
-	public static <E extends Number> CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager<E>> instance(
+	public static CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager> instance(
 			LongMultiValuesSource valuesSource, EffectiveRange[] ranges, List<CollectorFactory<?, ?, ?>> collectorFactories) {
-		return new RangeCollectorFactory<>( valuesSource, ranges, collectorFactories );
+		return new RangeCollectorFactory( valuesSource, ranges, collectorFactories );
 	}
 
 	public final CollectorKey<RangeCollector, RangeCollector> key = CollectorKey.create();
@@ -35,7 +35,7 @@ public class RangeCollectorFactory<E extends Number>
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public RangeCollectorManager<E> createCollectorManager(CollectorExecutionContext context) throws IOException {
+	public RangeCollectorManager createCollectorManager(CollectorExecutionContext context) throws IOException {
 		Collector[][] collectors = new Collector[collectorFactories.size()][];
 		CollectorKey<?, ?>[] keys = new CollectorKey<?, ?>[collectorFactories.size()];
 		var managers = new CollectorManager[collectorFactories.size()];
@@ -51,7 +51,7 @@ public class RangeCollectorFactory<E extends Number>
 			}
 			index++;
 		}
-		return new RangeCollectorManager<>( valuesSource, ranges, collectors, keys, managers );
+		return new RangeCollectorManager( valuesSource, ranges, collectors, keys, managers );
 	}
 
 	@Override
