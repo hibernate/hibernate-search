@@ -33,7 +33,6 @@ public class RangeCollector extends SimpleCollector {
 	private final long[] boundaries;
 	private final IntArrayList[] countsPerBoundaries;
 
-	private final long[] counts;
 	private final Collector[][] collectors;
 	private final CollectorKey<?, ?>[] keys;
 	private final LeafCollector[][] leafCollectors;
@@ -138,7 +137,6 @@ public class RangeCollector extends SimpleCollector {
 			}
 		}
 
-		counts = new long[ranges.length];
 		leafCollectors = new LeafCollector[keys.length][];
 		for ( int i = 0; i < leafCollectors.length; i++ ) {
 			leafCollectors[i] = new LeafCollector[ranges.length];
@@ -147,7 +145,6 @@ public class RangeCollector extends SimpleCollector {
 
 	private void processLeafWithIndex(int index, int doc) throws IOException {
 		for ( IntCursor cursor : countsPerBoundaries[index] ) {
-			counts[cursor.value]++;
 			for ( int i = 0; i < keys.length; i++ ) {
 				leafCollectors[i][cursor.value].collect( doc );
 			}
@@ -191,10 +188,6 @@ public class RangeCollector extends SimpleCollector {
 				}
 			}
 		}
-	}
-
-	public long[] counts() {
-		return counts;
 	}
 
 	public Collector[][] collectors() {
