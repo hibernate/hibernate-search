@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestBuildingContextContext.buildingContextKey;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,8 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.data.Range;
@@ -29,34 +33,49 @@ import com.google.gson.JsonObject;
 /**
  * @param <F> The type of field values.
  * @param <K> The type of keys in the returned map. It can be {@code F}
+ * @param <V> The type of aggregated values.
  * or a different type if value converters are used.
  */
-public class ElasticsearchRangeAggregation<F, K>
-		extends AbstractElasticsearchBucketAggregation<Range<K>, Long> {
+public class ElasticsearchRangeAggregation<F, K, V>
+		extends AbstractElasticsearchBucketAggregation<Range<K>, V> {
 
 	private final String absoluteFieldPath;
 
 	private final List<Range<K>> rangesInOrder;
 	private final JsonArray rangesJson;
 
-	private ElasticsearchRangeAggregation(Builder<F, K> builder) {
+	private final ElasticsearchSearchAggregation<V> aggregation;
+
+	private ElasticsearchRangeAggregation(Builder<F, K, V> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.rangesInOrder = builder.rangesInOrder;
 		this.rangesJson = builder.rangesJson;
+		this.aggregation = builder.aggregation;
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject) {
+	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
 		outerObject.add( "range", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		innerObject.addProperty( "keyed", true );
 		innerObject.add( "ranges", rangesJson );
+
+		JsonObject subOuterObject = new JsonObject();
+		AggregationKey<V> innerExtractorKey = AggregationKey.of( "agg" );
+		context.add( buildingContextKey( INNER_EXTRACTOR_KEY ), innerExtractorKey );
+		context.add( buildingContextKey( INNER_EXTRACTOR ), aggregation.request( context, innerExtractorKey, subOuterObject ) );
+
+		if ( !subOuterObject.isEmpty() ) {
+			outerObject.add( "aggs", subOuterObject );
+		}
 	}
 
 	@Override
-	protected Extractor<Map<Range<K>, Long>> extractor(AggregationRequestContext context) {
-		return new RangeBucketExtractor( nestedPathHierarchy, filter, rangesInOrder );
+	protected Extractor<Map<Range<K>, V>> extractor(AggregationRequestBuildingContextContext context) {
+		AggregationKey<V> innerExtractorKey = context.get( buildingContextKey( INNER_EXTRACTOR_KEY ) );
+		Extractor<V> innerExtractor = context.get( buildingContextKey( INNER_EXTRACTOR ) );
+		return new RangeBucketExtractor( nestedPathHierarchy, filter, rangesInOrder, innerExtractorKey, innerExtractor );
 	}
 
 	public static class Factory<F>
@@ -83,47 +102,74 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public <T> Builder<F, T> type(Class<T> expectedType, ValueModel valueModel) {
-			return new Builder<>( scope, field, field.encodingContext().encoder( scope, field, expectedType, valueModel ) );
+		public <T> Builder<F, T, Long> type(Class<T> expectedType, ValueModel valueModel) {
+			return new CountBuilder<>( scope, field,
+					field.encodingContext().encoder( scope, field, expectedType, valueModel ) );
 		}
 	}
 
-	protected class RangeBucketExtractor extends AbstractBucketExtractor<Range<K>, Long> {
+	protected class RangeBucketExtractor extends AbstractBucketExtractor<Range<K>, V> {
 		private final List<Range<K>> rangesInOrder;
+		private final Extractor<V> innerExtractor;
+		private final AggregationKey<V> innerExtractorKey;
 
 		protected RangeBucketExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
-				List<Range<K>> rangesInOrder) {
+				List<Range<K>> rangesInOrder, AggregationKey<V> innerExtractorKey, Extractor<V> innerExtractor) {
 			super( nestedPathHierarchy, filter );
 			this.rangesInOrder = rangesInOrder;
+			this.innerExtractorKey = innerExtractorKey;
+			this.innerExtractor = innerExtractor;
 		}
 
 
 		@Override
-		protected Map<Range<K>, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
+		protected Map<Range<K>, V> doExtract(AggregationExtractContext context, JsonElement buckets) {
 			JsonObject bucketMap = buckets.getAsJsonObject();
-			Map<Range<K>, Long> result = CollectionHelper.newLinkedHashMap( rangesInOrder.size() );
+			Map<Range<K>, V> result = CollectionHelper.newLinkedHashMap( rangesInOrder.size() );
 			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
 				JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
 				Range<K> range = rangesInOrder.get( i );
-				long documentCount = getBucketDocCount( bucket );
-				result.put( range, documentCount );
+				if ( bucket.has( innerExtractorKey.name() ) ) {
+					bucket = bucket.getAsJsonObject( innerExtractorKey.name() );
+				}
+				result.put( range, innerExtractor.extract( bucket, context ) );
 			}
 			return result;
 		}
 	}
 
-	private static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
-			implements RangeAggregationBuilder<K> {
+	private static class CountBuilder<F, K> extends Builder<F, K, Long> {
+
+		protected CountBuilder(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<?> field,
+				Function<? super K, JsonElement> encoder) {
+			super( scope, field, encoder, new ArrayList<>(), new JsonArray(),
+					ElasticsearchSearchAggregation.from( scope,
+							ElasticsearchCountDocumentAggregation.factory( !field.nestedPathHierarchy().isEmpty() )
+									.create( scope, null ).type().build() ) );
+		}
+	}
+
+	private static class Builder<F, K, T> extends AbstractBuilder<Range<K>, T>
+			implements RangeAggregationBuilder<K, T> {
 
 		private final Function<? super K, JsonElement> encoder;
 
-		private final List<Range<K>> rangesInOrder = new ArrayList<>();
-		private final JsonArray rangesJson = new JsonArray();
+		private final List<Range<K>> rangesInOrder;
+		private final JsonArray rangesJson;
+		private final ElasticsearchSearchAggregation<T> aggregation;
 
-		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field,
-				Function<? super K, JsonElement> encoder) {
+		protected Builder(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<?> field,
+				Function<? super K, JsonElement> encoder,
+				List<Range<K>> rangesInOrder,
+				JsonArray rangesJson,
+				ElasticsearchSearchAggregation<T> aggregation) {
 			super( scope, field );
 			this.encoder = encoder;
+			this.rangesInOrder = rangesInOrder;
+			this.rangesJson = rangesJson;
+			this.aggregation = aggregation;
 		}
 
 		@Override
@@ -151,9 +197,14 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public ElasticsearchRangeAggregation<F, K> build() {
-			return new ElasticsearchRangeAggregation<>( this );
+		public <N> Builder<F, K, N> withValue(SearchAggregation<N> aggregation) {
+			return new Builder<>( scope, field, encoder, rangesInOrder, rangesJson,
+					ElasticsearchSearchAggregation.from( scope, aggregation ) );
 		}
 
+		@Override
+		public ElasticsearchRangeAggregation<F, K, T> build() {
+			return new ElasticsearchRangeAggregation<>( this );
+		}
 	}
 }

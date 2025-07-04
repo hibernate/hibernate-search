@@ -20,6 +20,7 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.RootAggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
@@ -42,7 +43,6 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -214,7 +214,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 		Query filter = scope.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
-			luceneQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
+			luceneQueryBuilder.add( filter, Occur.FILTER );
 		}
 
 		Query definitiveLuceneQuery = luceneQueryBuilder.build();
@@ -266,7 +266,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		if ( aggregations != null ) {
 			aggregationExtractors = new LinkedHashMap<>();
 			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( scope, sessionContext, routingKeys, extractionRequirementsBuilder,
+					new RootAggregationRequestContext( scope, sessionContext, routingKeys, extractionRequirementsBuilder,
 							parameters );
 			for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
 				aggregationExtractors.put( entry.getKey(), entry.getValue().request( aggregationRequestContext ) );

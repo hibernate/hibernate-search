@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestBuildingContextContext.buildingContextKey;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -15,6 +17,8 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -28,19 +32,21 @@ import com.google.gson.JsonObject;
  * @param <K> The type of keys in the returned map. It can be {@code F}
  * or a different type if value converters are used.
  */
-public class ElasticsearchTermsAggregation<F, K, T>
-		extends AbstractElasticsearchBucketAggregation<K, Long> {
+public class ElasticsearchTermsAggregation<F, K, T, V>
+		extends AbstractElasticsearchBucketAggregation<K, V> {
 
 	private final String absoluteFieldPath;
 
 	private final ProjectionConverter<T, ? extends K> fromFieldValueConverter;
 	private final BiFunction<JsonElement, JsonElement, T> decodeFunction;
 
+	private final ElasticsearchSearchAggregation<V> aggregation;
+
 	private final JsonObject order;
 	private final int size;
 	private final int minDocCount;
 
-	private ElasticsearchTermsAggregation(Builder<F, K, T> builder) {
+	private ElasticsearchTermsAggregation(Builder<F, K, T, V> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
@@ -48,10 +54,11 @@ public class ElasticsearchTermsAggregation<F, K, T>
 		this.order = builder.order;
 		this.size = builder.size;
 		this.minDocCount = builder.minDocCount;
+		this.aggregation = builder.aggregation;
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject) {
+	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
 		outerObject.add( "terms", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		if ( order != null ) {
@@ -59,11 +66,22 @@ public class ElasticsearchTermsAggregation<F, K, T>
 		}
 		innerObject.addProperty( "size", size );
 		innerObject.addProperty( "min_doc_count", minDocCount );
+
+		JsonObject subOuterObject = new JsonObject();
+		AggregationKey<V> innerExtractorKey = AggregationKey.of( "agg" );
+		context.add( buildingContextKey( INNER_EXTRACTOR_KEY ), innerExtractorKey );
+		context.add( buildingContextKey( INNER_EXTRACTOR ), aggregation.request( context, innerExtractorKey, subOuterObject ) );
+
+		if ( !subOuterObject.isEmpty() ) {
+			outerObject.add( "aggs", subOuterObject );
+		}
 	}
 
 	@Override
-	protected Extractor<Map<K, Long>> extractor(AggregationRequestContext context) {
-		return new TermsBucketExtractor( nestedPathHierarchy, filter );
+	protected Extractor<Map<K, V>> extractor(AggregationRequestBuildingContextContext context) {
+		AggregationKey<V> innerExtractorKey = context.get( buildingContextKey( INNER_EXTRACTOR_KEY ) );
+		Extractor<V> innerExtractor = context.get( buildingContextKey( INNER_EXTRACTOR ) );
+		return new TermsBucketExtractor( nestedPathHierarchy, filter, innerExtractorKey, innerExtractor );
 	}
 
 	public static class Factory<F>
@@ -93,11 +111,11 @@ public class ElasticsearchTermsAggregation<F, K, T>
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> Builder<F, T, ?> type(Class<T> expectedType, ValueModel valueModel) {
+		public <T> Builder<F, T, ?, Long> type(Class<T> expectedType, ValueModel valueModel) {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
-				return new Builder<>(
-						(key, string) -> string != null && !string.isJsonNull() ? string : key,
+				return new CountBuilder<>(
 						scope, field,
+						(key, string) -> string != null && !string.isJsonNull() ? string : key,
 						// unchecked cast to make eclipse-compiler happy
 						// we know that Elasticsearch projection converters work with the String
 						( (ProjectionConverter<JsonElement, ?>) field.type().rawProjectionConverter() )
@@ -105,22 +123,28 @@ public class ElasticsearchTermsAggregation<F, K, T>
 				);
 			}
 			else {
-				return new Builder<>( codec::decodeAggregationKey, scope, field,
+				return new CountBuilder<>( scope, field, codec::decodeAggregationKey,
 						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
 			}
 		}
 	}
 
-	protected class TermsBucketExtractor extends AbstractBucketExtractor<K, Long> {
+	protected class TermsBucketExtractor extends AbstractBucketExtractor<K, V> {
+		private final AggregationKey<V> innerExtractorKey;
+		private final Extractor<V> innerExtractor;
+
 		protected TermsBucketExtractor(List<String> nestedPathHierarchy,
-				ElasticsearchSearchPredicate filter) {
+				ElasticsearchSearchPredicate filter, AggregationKey<V> innerExtractorKey, Extractor<V> innerExtractor
+		) {
 			super( nestedPathHierarchy, filter );
+			this.innerExtractorKey = innerExtractorKey;
+			this.innerExtractor = innerExtractor;
 		}
 
 		@Override
-		protected Map<K, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
+		protected Map<K, V> doExtract(AggregationExtractContext context, JsonElement buckets) {
 			JsonArray bucketArray = buckets.getAsJsonArray();
-			Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
+			Map<K, V> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			for ( JsonElement bucketElement : bucketArray ) {
 				JsonObject bucket = bucketElement.getAsJsonObject();
@@ -130,29 +154,60 @@ public class ElasticsearchTermsAggregation<F, K, T>
 						decodeFunction.apply( keyJson, keyAsStringJson ),
 						convertContext
 				);
-				long documentCount = getBucketDocCount( bucket );
-				result.put( key, documentCount );
+
+				if ( bucket.has( innerExtractorKey.name() ) ) {
+					bucket = bucket.getAsJsonObject( innerExtractorKey.name() );
+				}
+				result.put( key, innerExtractor.extract( bucket, context ) );
 			}
 			return result;
 		}
 	}
 
-	private static class Builder<F, K, T> extends AbstractBuilder<K, Long>
-			implements TermsAggregationBuilder<K> {
+	private static class CountBuilder<F, K, T> extends Builder<F, K, T, Long> {
+
+		protected CountBuilder(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<F> field,
+				BiFunction<JsonElement, JsonElement, T> decodeFunction,
+				ProjectionConverter<T, ? extends K> fromFieldValueConverter) {
+			super( scope, field, decodeFunction, fromFieldValueConverter,
+					ElasticsearchSearchAggregation.from( scope,
+							ElasticsearchCountDocumentAggregation.factory( !field.nestedPathHierarchy().isEmpty() )
+									.create( scope, null ).type().build() ) );
+		}
+	}
+
+	private static class Builder<F, K, T, V> extends AbstractBuilder<K, V>
+			implements TermsAggregationBuilder<K, V> {
 
 		private final BiFunction<JsonElement, JsonElement, T> decodeFunction;
 		private final ProjectionConverter<T, ? extends K> fromFieldValueConverter;
+		private final ElasticsearchSearchAggregation<V> aggregation;
 
 		private JsonObject order;
-		private int minDocCount = 1;
-		private int size = 100;
+		private int minDocCount;
+		private int size;
 
-		private Builder(BiFunction<JsonElement, JsonElement, T> decodeFunction, ElasticsearchSearchIndexScope<?> scope,
+		private Builder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
-				ProjectionConverter<T, ? extends K> fromFieldValueConverter) {
+				BiFunction<JsonElement, JsonElement, T> decodeFunction,
+				ProjectionConverter<T, ? extends K> fromFieldValueConverter,
+				ElasticsearchSearchAggregation<V> aggregation) {
+			this( scope, field, decodeFunction, fromFieldValueConverter, aggregation, null, 1, 100 );
+		}
+
+		public Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<?> field,
+				BiFunction<JsonElement, JsonElement, T> decodeFunction,
+				ProjectionConverter<T, ? extends K> fromFieldValueConverter,
+				ElasticsearchSearchAggregation<V> aggregation,
+				JsonObject order, int minDocCount, int size) {
 			super( scope, field );
+			this.order = order;
 			this.decodeFunction = decodeFunction;
 			this.fromFieldValueConverter = fromFieldValueConverter;
+			this.aggregation = aggregation;
+			this.minDocCount = minDocCount;
+			this.size = size;
 		}
 
 		@Override
@@ -186,7 +241,13 @@ public class ElasticsearchTermsAggregation<F, K, T>
 		}
 
 		@Override
-		public ElasticsearchTermsAggregation<F, K, T> build() {
+		public <R> TermsAggregationBuilder<K, R> withValue(SearchAggregation<R> aggregation) {
+			return new Builder<>( scope, field, decodeFunction, fromFieldValueConverter,
+					ElasticsearchSearchAggregation.from( scope, aggregation ), order, minDocCount, size );
+		}
+
+		@Override
+		public ElasticsearchTermsAggregation<F, K, T, V> build() {
 			return new ElasticsearchTermsAggregation<>( this );
 		}
 

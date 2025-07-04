@@ -20,7 +20,7 @@ public interface LuceneSearchQuery<H>
 	 * @param id The id of the entity whose score should be explained.
 	 * This is the entity ID, which may be of any type ({@code long}, ...),
 	 * not the document ID which is always a string.
-	 * @return An {@link org.apache.lucene.search.Explanation} describing the score computation for the hit.
+	 * @return An {@link Explanation} describing the score computation for the hit.
 	 * @throws org.hibernate.search.util.common.SearchException If the query targets multiple mapped types,
 	 * or if the explain request fails.
 	 */
@@ -35,14 +35,14 @@ public interface LuceneSearchQuery<H>
 	 * @param id The id of the entity whose score should be explained.
 	 * This is the entity ID, which may be of any type ({@code long}, ...),
 	 * not the document ID which is always a string.
-	 * @return An {@link org.apache.lucene.search.Explanation} describing the score computation for the hit.
+	 * @return An {@link Explanation} describing the score computation for the hit.
 	 * @throws org.hibernate.search.util.common.SearchException If the given index name does not refer to a mapped name targeted by this query,
 	 * or if the explain request fails.
 	 */
 	Explanation explain(String typeName, Object id);
 
 	/**
-	 * @return The Lucene {@link org.apache.lucene.search.Sort} this query relies on.
+	 * @return The Lucene {@link Sort} this query relies on.
 	 */
 	Sort luceneSort();
 

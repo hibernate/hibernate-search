@@ -5,60 +5,78 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.BaseTermsCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TextTermsCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TextTermsCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 
-import org.apache.lucene.facet.FacetResult;
-import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.MultiDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
 
 /**
  * @param <K> The type of keys in the returned map. It can be {@code String}
  * or a different type if value converters are used.
  */
-public class LuceneTextTermsAggregation<K>
-		extends AbstractLuceneFacetsBasedTermsAggregation<String, String, K, String> {
+public class LuceneTextTermsAggregation<K, R>
+		extends AbstractLuceneMultivaluedTermsAggregation<String, String, K, String, R> {
 
 	private static final Comparator<String> STRING_COMPARATOR = Comparator.naturalOrder();
 
-	private LuceneTextTermsAggregation(Builder<K> builder) {
+	private CollectorKey<TextTermsCollector, TextTermsCollector> collectorKey;
+
+	private LuceneTextTermsAggregation(Builder<K, R> builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Extractor<Map<K, Long>> extractor(AggregationRequestContext context) {
-		return new LuceneTextTermsAggregationExtractor();
+	public Extractor<Map<K, R>> request(AggregationRequestContext context) {
+		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
+		JoiningTextMultiValuesSource source = JoiningTextMultiValuesSource.fromField(
+				absoluteFieldPath, nestedDocsProvider
+		);
+
+		LocalAggregationRequestContext localAggregationContext = new LocalAggregationRequestContext( context );
+		Extractor<R> extractor = aggregation.request( localAggregationContext );
+
+		var termsCollectorFactory = TextTermsCollectorFactory.instance( absoluteFieldPath, source,
+				localAggregationContext.localCollectorFactories() );
+		context.requireCollector( termsCollectorFactory );
+		collectorKey = termsCollectorFactory.getCollectorKey();
+
+		return new LuceneTextTermsAggregationExtractor( extractor );
 	}
 
 	private class LuceneTextTermsAggregationExtractor extends AbstractExtractor {
-		@Override
-		FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-				NestedDocsProvider nestedDocsProvider, int limit)
-				throws IOException {
-			JoiningTextMultiValuesSource valueSource = JoiningTextMultiValuesSource.fromField(
-					absoluteFieldPath, nestedDocsProvider
-			);
-			TextMultiValueFacetCounts facetCounts = new TextMultiValueFacetCounts(
-					reader, absoluteFieldPath, valueSource, facetsCollector
-			);
 
-			return facetCounts.getTopChildren( limit, absoluteFieldPath );
+		private LuceneTextTermsAggregationExtractor(Extractor<R> extractor) {
+			super( extractor );
+		}
+
+		@Override
+		protected BaseTermsCollector termsCollector(AggregationExtractContext context) throws IOException {
+			return context.getCollectorResults( collectorKey );
 		}
 
 		@Override
@@ -95,13 +113,31 @@ public class LuceneTextTermsAggregation<K>
 		}
 
 		@Override
-		String labelToTerm(String label) {
-			return label;
+		String termToFieldValue(String key) {
+			return key;
 		}
 
 		@Override
-		String termToFieldValue(String key) {
-			return key;
+		List<Bucket<String, R>> getTopBuckets(AggregationExtractContext context) throws IOException {
+			var termsCollector = context.getCollectorResults( collectorKey );
+
+			LocalAggregationExtractContext localContext = new LocalAggregationExtractContext( context );
+
+			List<LongBucket> results = termsCollector.results( order, maxTermCount, minDocCount );
+
+			var dv = MultiDocValues.getSortedSetValues( context.getIndexReader(), absoluteFieldPath );
+			List<Bucket<String, R>> buckets = new ArrayList<>();
+			for ( LongBucket bucket : results ) {
+				localContext.setResults( prepareResults( bucket, termsCollector ) );
+				buckets.add(
+						new Bucket<>(
+								dv.lookupOrd( bucket.termOrd() ).utf8ToString(),
+								bucket.count(),
+								extractor.extract( localContext )
+						)
+				);
+			}
+			return buckets;
 		}
 	}
 
@@ -113,40 +149,62 @@ public class LuceneTextTermsAggregation<K>
 		}
 	}
 
-	private static class TypeSelector extends AbstractTypeSelector<String, String> {
+	private static class TypeSelector extends AbstractTypeSelector<String> {
 		private TypeSelector(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <K> Builder<K> type(Class<K> expectedType, ValueModel valueModel) {
+		public <K> Builder<K, Long> type(Class<K> expectedType, ValueModel valueModel) {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
-				return new Builder<>( scope, field,
+				return new CountBuilder<>( scope, field,
 						( (ProjectionConverter<String, ?>) field.type().rawProjectionConverter() )
 								.withConvertedType( expectedType, field )
 				);
 			}
 			else {
-				return new Builder<>( scope, field,
+				return new CountBuilder<>( scope, field,
 						field.type().projectionConverter( valueModel ).withConvertedType( expectedType, field ) );
 			}
 		}
 	}
 
-	private static class Builder<K>
-			extends AbstractBuilder<String, String, K, String> {
+	private static class CountBuilder<K> extends Builder<K, Long> {
+
+		private CountBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field,
+				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
+			super( scope, field,
+					LuceneSearchAggregation.from( scope,
+							LuceneCountDocumentAggregation.factory().create( scope, null ).type().build() ),
+					fromFieldValueConverter );
+		}
+	}
+
+	private static class Builder<K, V>
+			extends AbstractBuilder<String, String, K, String, V> {
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field,
-				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
-			super( scope, field, fromFieldValueConverter );
+				LuceneSearchAggregation<V> aggregation, ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
+			super( scope, field, aggregation, fromFieldValueConverter );
+		}
+
+		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<?> field,
+				LuceneSearchAggregation<V> aggregation, ProjectionConverter<String, ? extends K> fromFieldValueConverter,
+				BucketOrder order, int minDocCount, int maxTermCount) {
+			super( scope, field, aggregation, fromFieldValueConverter, order, minDocCount, maxTermCount );
 		}
 
 		@Override
-		public LuceneTextTermsAggregation<K> build() {
+		public LuceneTextTermsAggregation<K, V> build() {
 			return new LuceneTextTermsAggregation<>( this );
 		}
 
+		@Override
+		public <T> TermsAggregationBuilder<K, T> withValue(SearchAggregation<T> aggregation) {
+			return new Builder<>( scope, field, LuceneSearchAggregation.from( scope, aggregation ), fromFieldValueConverter,
+					order, minDocCount, maxTermCount );
+		}
 	}
 
 }

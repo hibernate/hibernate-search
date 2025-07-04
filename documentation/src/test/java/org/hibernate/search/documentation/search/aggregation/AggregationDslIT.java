@@ -248,6 +248,143 @@ class AggregationDslIT {
 							entry( Genre.SCIENCE_FICTION, 3L )
 					);
 		} );
+
+		withinSearchSession( searchSession -> {
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByPriceKey, f -> f.terms()
+							.field( "price", Double.class )
+							.orderByCountAscending() )
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+	}
+
+	@Test
+	void terms_value() {
+		withinSearchSession( searchSession -> {
+			// tag::terms-sum[]
+			AggregationKey<Map<Double, Double>> sumByPriceKey = AggregationKey.of( "sumByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							sumByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+									.value( f.sum().field( "price", Double.class ) )
+					)
+					.fetch( 20 );
+			Map<Double, Double> sumByPrice = result.aggregation( sumByPriceKey );
+			// end::terms-sum[]
+			assertThat( sumByPrice )
+					.containsExactly(
+							entry( 7.99, 7.99 ),
+							entry( 15.99, 15.99 ),
+							entry( 19.99, 19.99 ),
+							entry( 24.99, 24.99 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count[]
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+									.value( f.countDocuments() ) // <4>
+					)
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count-implicit[]
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+					)
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count-implicit[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+	}
+
+	@Test
+	void range_value() {
+		withinSearchSession( searchSession -> {
+			// tag::range-sum[]
+			AggregationKey<Map<Range<Double>, Double>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 ) // <2>
+									.range( 10.0, 20.0 )
+									.range( 20.0, null ) // <3>
+									.value( f.sum().field( "price", Double.class ) )
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Double> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-sum[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 7.99 ),
+							entry( Range.canonical( 10.0, 20.0 ), 35.98 ),
+							entry( Range.canonical( 20.0, null ), 24.99 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-count[]
+			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 ) // <2>
+									.range( 10.0, 20.0 )
+									.range( 20.0, null ) // <3>
+									.value( f.countDocuments() ) // <4>
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-count[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
+					);
+		} );
 	}
 
 	@Test
@@ -489,7 +626,7 @@ class AggregationDslIT {
 			AggregationKey<Long> countPricesKey = AggregationKey.of( "countPrices" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countPricesKey, f -> f.count().field( "price" ) ) // <1>
+					.aggregation( countPricesKey, f -> f.countValues().field( "price" ) ) // <1>
 					.fetch( 20 );
 			Long countPrices = result.aggregation( countPricesKey );
 			assertThat( countPrices ).isEqualTo( 3L );
@@ -504,7 +641,7 @@ class AggregationDslIT {
 			AggregationKey<Long> countDistinctPricesKey = AggregationKey.of( "countDistinctPrices" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countDistinctPricesKey, f -> f.countDistinct().field( "price" ) ) // <1>
+					.aggregation( countDistinctPricesKey, f -> f.countDistinctValues().field( "price" ) ) // <1>
 					.fetch( 20 );
 			Long countDistinctPrices = result.aggregation( countDistinctPricesKey );
 			assertThat( countDistinctPrices ).isEqualTo( 3L );

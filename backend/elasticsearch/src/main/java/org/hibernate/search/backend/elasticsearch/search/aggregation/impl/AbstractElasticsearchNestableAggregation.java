@@ -50,11 +50,12 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	@Override
 	public final Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
-		jsonAggregations.add( key.name(), request( context ) );
-		return extractor( context );
+		AggregationRequestBuildingContextContext buildingContext = new AggregationRequestBuildingContextContext( context );
+		jsonAggregations.add( key.name(), request( buildingContext ) );
+		return extractor( buildingContext );
 	}
 
-	private JsonObject request(AggregationRequestContext context) {
+	private JsonObject request(AggregationRequestBuildingContextContext context) {
 		JsonObject result = doRequest( context );
 
 		if ( nestedPathHierarchy.isEmpty() ) {
@@ -90,9 +91,9 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		return result;
 	}
 
-	protected abstract JsonObject doRequest(AggregationRequestContext context);
+	protected abstract JsonObject doRequest(AggregationRequestBuildingContextContext context);
 
-	protected abstract Extractor<A> extractor(AggregationRequestContext context);
+	protected abstract Extractor<A> extractor(AggregationRequestBuildingContextContext context);
 
 	protected abstract static class AbstractExtractor<T> implements Extractor<T> {
 

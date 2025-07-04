@@ -87,7 +87,7 @@ public final class LuceneIndexSettings {
 	 * <p>
 	 * Expects a {@link IOStrategyName} value, or a String representation of such value.
 	 * <p>
-	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_STRATEGY}.
+	 * Defaults to {@link Defaults#IO_STRATEGY}.
 	 */
 	public static final String IO_STRATEGY = IO_PREFIX + IORadicals.STRATEGY;
 
@@ -115,7 +115,7 @@ public final class LuceneIndexSettings {
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_COMMIT_INTERVAL}.
+	 * Defaults to {@link Defaults#IO_COMMIT_INTERVAL}.
 	 */
 	public static final String IO_COMMIT_INTERVAL = IO_PREFIX + IORadicals.COMMIT_INTERVAL;
 
@@ -140,7 +140,7 @@ public final class LuceneIndexSettings {
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_REFRESH_INTERVAL}.
+	 * Defaults to {@link Defaults#IO_REFRESH_INTERVAL}.
 	 */
 	public static final String IO_REFRESH_INTERVAL = IO_PREFIX + IORadicals.REFRESH_INTERVAL;
 
@@ -276,7 +276,7 @@ public final class LuceneIndexSettings {
 	 * Expects a String, such as "hash".
 	 * See the reference documentation for a list of available values.
 	 * <p>
-	 * Defaults to {@link LuceneIndexSettings.Defaults#SHARDING_STRATEGY} (no sharding).
+	 * Defaults to {@link Defaults#SHARDING_STRATEGY} (no sharding).
 	 */
 	public static final String SHARDING_STRATEGY = SHARDING_PREFIX + ShardingRadicals.STRATEGY;
 

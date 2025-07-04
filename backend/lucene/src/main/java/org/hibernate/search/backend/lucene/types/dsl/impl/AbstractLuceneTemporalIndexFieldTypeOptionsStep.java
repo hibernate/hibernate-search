@@ -102,8 +102,8 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			}
 			builder.queryElementFactory( AggregationTypeKeys.MIN, LuceneMinNumericFieldAggregation.factory( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.MAX, LuceneMaxNumericFieldAggregation.factory( codec ) );
-			builder.queryElementFactory( AggregationTypeKeys.COUNT, LuceneCountNumericLongAggregation.factory( codec ) );
-			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT,
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_VALUES, LuceneCountNumericLongAggregation.factory( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT_VALUES,
 					LuceneCountDistinctNumericLongAggregation.factory( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.AVG, LuceneAvgNumericFieldAggregation.factory( codec ) );
 		}

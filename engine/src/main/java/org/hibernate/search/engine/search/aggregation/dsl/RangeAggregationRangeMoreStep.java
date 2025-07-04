@@ -20,14 +20,16 @@ import org.hibernate.search.util.common.data.Range;
  * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  * @param <N> The type of the next step.
  * @param <F> The type of the targeted field.
+ * @param <A> The type of the aggregated value.
  */
 public interface RangeAggregationRangeMoreStep<
 		SR,
-		S extends RangeAggregationRangeMoreStep<SR, ?, ?, PDF, F>,
-		N extends RangeAggregationOptionsStep<SR, ?, PDF, F, Map<Range<F>, Long>>,
+		S extends RangeAggregationRangeMoreStep<SR, ?, ?, PDF, F, A>,
+		N extends RangeAggregationOptionsStep<SR, ?, PDF, F, Map<Range<F>, A>>,
 		PDF extends TypedSearchPredicateFactory<SR>,
-		F>
-		extends RangeAggregationOptionsStep<SR, N, PDF, F, Map<Range<F>, Long>>,
-		RangeAggregationRangeStep<SR, S, PDF, F> {
-
+		F,
+		A>
+		extends RangeAggregationOptionsStep<SR, N, PDF, F, Map<Range<F>, A>>,
+		RangeAggregationRangeStep<SR, S, PDF, F, A>,
+		RangeAggregationRangeValueStep<SR, PDF, F> {
 }

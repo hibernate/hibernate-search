@@ -166,7 +166,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 	private static class MultiValueUnifiedHighlighter extends UnifiedHighlighter {
 
-		private MultiValueUnifiedHighlighter(MultiValueUnifiedHighlighter.Builder builder) {
+		private MultiValueUnifiedHighlighter(Builder builder) {
 			super( builder );
 		}
 

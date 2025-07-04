@@ -22,11 +22,11 @@ public class RangeAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateF
 	}
 
 	@Override
-	public <F> RangeAggregationRangeStep<SR, ?, PDF, F> field(String fieldPath, Class<F> type,
+	public <F> RangeAggregationRangeStep<SR, ?, PDF, F, Long> field(String fieldPath, Class<F> type,
 			ValueModel valueModel) {
 		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
-		RangeAggregationBuilder<F> builder = dslContext.scope()
+		RangeAggregationBuilder<F, Long> builder = dslContext.scope()
 				.fieldQueryElement( fieldPath, AggregationTypeKeys.RANGE ).type( type, valueModel );
 		return new RangeAggregationRangeStepImpl<>( builder, dslContext );
 	}
