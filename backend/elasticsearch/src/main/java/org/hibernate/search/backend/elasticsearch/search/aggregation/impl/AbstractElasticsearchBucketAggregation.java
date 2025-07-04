@@ -29,12 +29,15 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	private static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR =
 			JsonAccessor.root().property( "aggregations" ).property( ROOT_DOC_COUNT_NAME ).asObject();
 
+	protected static final String INNER_EXTRACTOR_KEY = "innerExtractorKey";
+	protected static final String INNER_EXTRACTOR = "innerExtractor";
+
 	AbstractElasticsearchBucketAggregation(AbstractBuilder<K, V> builder) {
 		super( builder );
 	}
 
 	@Override
-	protected final JsonObject doRequest(AggregationRequestContext context) {
+	protected final JsonObject doRequest(AggregationRequestBuildingContextContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -51,7 +54,8 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		return outerObject;
 	}
 
-	protected abstract void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestContext context);
+	protected abstract void doRequest(JsonObject outerObject, JsonObject innerObject,
+			AggregationRequestBuildingContextContext context);
 
 	protected abstract class AbstractBucketExtractor<A, B> extends AbstractExtractor<Map<A, B>> {
 

@@ -47,7 +47,7 @@ public class ElasticsearchMetricLongAggregation extends AbstractElasticsearchNes
 	}
 
 	@Override
-	protected final JsonObject doRequest(AggregationRequestContext context) {
+	protected final JsonObject doRequest(AggregationRequestBuildingContextContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -57,7 +57,7 @@ public class ElasticsearchMetricLongAggregation extends AbstractElasticsearchNes
 	}
 
 	@Override
-	protected Extractor<Long> extractor(AggregationRequestContext context) {
+	protected Extractor<Long> extractor(AggregationRequestBuildingContextContext context) {
 		return new MetricLongExtractor( nestedPathHierarchy, filter );
 	}
 

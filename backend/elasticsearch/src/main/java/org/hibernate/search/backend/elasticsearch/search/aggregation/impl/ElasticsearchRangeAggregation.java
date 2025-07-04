@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestBuildingContextContext.buildingContextKey;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +46,6 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 	private final ElasticsearchSearchAggregation<V> aggregation;
 
-	// TODO: do not store these two here:
-	private Extractor<V> innerExtractor;
-	private AggregationKey<V> innerExtractorKey;
-
 	private ElasticsearchRangeAggregation(Builder<F, K, V> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
@@ -57,27 +55,27 @@ public class ElasticsearchRangeAggregation<F, K, V>
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestContext context) {
+	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
 		outerObject.add( "range", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		innerObject.addProperty( "keyed", true );
 		innerObject.add( "ranges", rangesJson );
 
 		JsonObject subOuterObject = new JsonObject();
-		// this is just a "random name" so we can get the aggregation back from the response.
-		// once we switch to the "composite aggregation" where we compute multiple aggregations for a range,
-		// this should be moved into a new "aggregation" that would handle all the logic for adding and then extracting 0-n aggregations.
-		// TODO: not really good that we have state saved into aggregation within the request, we should pass it up instead
-		innerExtractorKey = AggregationKey.of( "agg" );
-		innerExtractor = aggregation.request( context, innerExtractorKey, subOuterObject );
+		AggregationKey<V> innerExtractorKey = AggregationKey.of( "agg" );
+		context.add( buildingContextKey( INNER_EXTRACTOR_KEY ), innerExtractorKey );
+		context.add( buildingContextKey( INNER_EXTRACTOR ), aggregation.request( context, innerExtractorKey, subOuterObject ) );
+
 		if ( !subOuterObject.isEmpty() ) {
 			outerObject.add( "aggs", subOuterObject );
 		}
 	}
 
 	@Override
-	protected Extractor<Map<Range<K>, V>> extractor(AggregationRequestContext context) {
-		return new RangeBucketExtractor( nestedPathHierarchy, filter, rangesInOrder );
+	protected Extractor<Map<Range<K>, V>> extractor(AggregationRequestBuildingContextContext context) {
+		AggregationKey<V> innerExtractorKey = context.get( buildingContextKey( INNER_EXTRACTOR_KEY ) );
+		Extractor<V> innerExtractor = context.get( buildingContextKey( INNER_EXTRACTOR ) );
+		return new RangeBucketExtractor( nestedPathHierarchy, filter, rangesInOrder, innerExtractorKey, innerExtractor );
 	}
 
 	public static class Factory<F>
@@ -112,11 +110,15 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 	protected class RangeBucketExtractor extends AbstractBucketExtractor<Range<K>, V> {
 		private final List<Range<K>> rangesInOrder;
+		private final Extractor<V> innerExtractor;
+		private final AggregationKey<V> innerExtractorKey;
 
 		protected RangeBucketExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
-				List<Range<K>> rangesInOrder) {
+				List<Range<K>> rangesInOrder, AggregationKey<V> innerExtractorKey, Extractor<V> innerExtractor) {
 			super( nestedPathHierarchy, filter );
 			this.rangesInOrder = rangesInOrder;
+			this.innerExtractorKey = innerExtractorKey;
+			this.innerExtractor = innerExtractor;
 		}
 
 

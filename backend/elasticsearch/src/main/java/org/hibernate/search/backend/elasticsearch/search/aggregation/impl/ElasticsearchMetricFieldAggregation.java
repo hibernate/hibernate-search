@@ -74,7 +74,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 	}
 
 	@Override
-	protected final JsonObject doRequest(AggregationRequestContext context) {
+	protected final JsonObject doRequest(AggregationRequestBuildingContextContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -84,7 +84,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 	}
 
 	@Override
-	protected Extractor<K> extractor(AggregationRequestContext context) {
+	protected Extractor<K> extractor(AggregationRequestBuildingContextContext context) {
 		return metricFieldExtractorCreator.extractor( filter );
 	}
 
