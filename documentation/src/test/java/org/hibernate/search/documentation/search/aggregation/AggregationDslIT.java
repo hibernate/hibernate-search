@@ -285,9 +285,10 @@ class AggregationDslIT {
 			// end::terms-sum[]
 			assertThat( sumByPrice )
 					.containsExactly(
-							entry( 10.0, 7.99 ),
-							entry( 20.0 , 35.98 ),
-							entry( null , 24.99 )
+							entry( 7.99, 7.99 ),
+							entry( 15.99, 15.99 ),
+							entry( 19.99, 19.99 ),
+							entry( 24.99, 24.99 )
 					);
 		} );
 
@@ -306,9 +307,31 @@ class AggregationDslIT {
 			// end::terms-count[]
 			assertThat( countsByPrice )
 					.containsExactly(
-							entry( Range.canonical( 0.0, 10.0 ), 1L ),
-							entry( Range.canonical( 10.0, 20.0 ), 2L ),
-							entry( Range.canonical( 20.0, null ), 1L )
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count-implicit[]
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+					)
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count-implicit[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
 					);
 		} );
 	}
