@@ -43,7 +43,7 @@ public class ElasticsearchCountDocumentAggregation extends AbstractElasticsearch
 
 	@Override
 	public Extractor<Long> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
-		return new CountDocumentsExtractor(isNested);
+		return new CountDocumentsExtractor( isNested );
 	}
 
 	private record CountDocumentsExtractor(boolean isNested) implements Extractor<Long> {

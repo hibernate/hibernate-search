@@ -44,6 +44,7 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 	private final ElasticsearchSearchAggregation<V> aggregation;
 
+	// TODO: do not store these two here:
 	private Extractor<V> innerExtractor;
 	private AggregationKey<V> innerExtractorKey;
 
@@ -66,6 +67,7 @@ public class ElasticsearchRangeAggregation<F, K, V>
 		// this is just a "random name" so we can get the aggregation back from the response.
 		// once we switch to the "composite aggregation" where we compute multiple aggregations for a range,
 		// this should be moved into a new "aggregation" that would handle all the logic for adding and then extracting 0-n aggregations.
+		// TODO: not really good that we have state saved into aggregation within the request, we should pass it up instead
 		innerExtractorKey = AggregationKey.of( "agg" );
 		innerExtractor = aggregation.request( context, innerExtractorKey, subOuterObject );
 		if ( !subOuterObject.isEmpty() ) {
@@ -103,7 +105,8 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 		@Override
 		public <T> Builder<F, T, Long> type(Class<T> expectedType, ValueModel valueModel) {
-			return new CountBuilder<>( scope, field, field.encodingContext().encoder( scope, field, expectedType, valueModel ) );
+			return new CountBuilder<>( scope, field,
+					field.encodingContext().encoder( scope, field, expectedType, valueModel ) );
 		}
 	}
 
@@ -125,7 +128,7 @@ public class ElasticsearchRangeAggregation<F, K, V>
 				JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
 				Range<K> range = rangesInOrder.get( i );
 				if ( bucket.has( innerExtractorKey.name() ) ) {
-					bucket =  bucket.getAsJsonObject( innerExtractorKey.name() );
+					bucket = bucket.getAsJsonObject( innerExtractorKey.name() );
 				}
 				result.put( range, innerExtractor.extract( bucket, context ) );
 			}
@@ -133,14 +136,15 @@ public class ElasticsearchRangeAggregation<F, K, V>
 		}
 	}
 
-	public static class CountBuilder<F, K> extends Builder<F, K, Long> {
+	private static class CountBuilder<F, K> extends Builder<F, K, Long> {
 
 		protected CountBuilder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<?> field,
 				Function<? super K, JsonElement> encoder) {
 			super( scope, field, encoder, new ArrayList<>(), new JsonArray(),
 					ElasticsearchSearchAggregation.from( scope,
-							ElasticsearchCountDocumentAggregation.factory(field.nestedPathHierarchy().isEmpty()).create( scope, null ).type().build() ) );
+							ElasticsearchCountDocumentAggregation.factory( !field.nestedPathHierarchy().isEmpty() )
+									.create( scope, null ).type().build() ) );
 		}
 	}
 
