@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestBuildingContextContext.buildingContextKey;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -44,10 +46,6 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	private final int size;
 	private final int minDocCount;
 
-	// TODO: do not store these two here:
-	private Extractor<V> innerExtractor;
-	private AggregationKey<V> innerExtractorKey;
-
 	private ElasticsearchTermsAggregation(Builder<F, K, T, V> builder) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
@@ -60,7 +58,7 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestContext context) {
+	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
 		outerObject.add( "terms", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		if ( order != null ) {
@@ -69,17 +67,20 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 		innerObject.addProperty( "size", size );
 		innerObject.addProperty( "min_doc_count", minDocCount );
 
-		// TODO: not really good that we have state saved into aggregation within the request, we should pass it up instead
 		JsonObject subOuterObject = new JsonObject();
-		innerExtractorKey = AggregationKey.of( "agg" );
-		innerExtractor = aggregation.request( context, innerExtractorKey, subOuterObject );
+		AggregationKey<V> innerExtractorKey = AggregationKey.of( "agg" );
+		context.add( buildingContextKey( INNER_EXTRACTOR_KEY ), innerExtractorKey );
+		context.add( buildingContextKey( INNER_EXTRACTOR ), aggregation.request( context, innerExtractorKey, subOuterObject ) );
+
 		if ( !subOuterObject.isEmpty() ) {
 			outerObject.add( "aggs", subOuterObject );
 		}
 	}
 
 	@Override
-	protected Extractor<Map<K, V>> extractor(AggregationRequestContext context) {
+	protected Extractor<Map<K, V>> extractor(AggregationRequestBuildingContextContext context) {
+		AggregationKey<V> innerExtractorKey = context.get( buildingContextKey( INNER_EXTRACTOR_KEY ) );
+		Extractor<V> innerExtractor = context.get( buildingContextKey( INNER_EXTRACTOR ) );
 		return new TermsBucketExtractor( nestedPathHierarchy, filter, innerExtractorKey, innerExtractor );
 	}
 
