@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.CollectorManager;
 
-public class RangeCollectorManager<E extends Number> implements CollectorManager<RangeCollector, RangeCollector> {
+public class RangeCollectorManager implements CollectorManager<RangeCollector, RangeCollector> {
 
 	private final LongMultiValuesSource valuesSource;
 	private final EffectiveRange[] ranges;

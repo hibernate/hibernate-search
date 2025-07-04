@@ -109,12 +109,14 @@ public class TextTermsCollector extends SimpleCollector implements BaseTermsColl
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
+	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
 		initRootSortedSetDocValues( context );
 		this.values = valuesSource.getValues( context );
 		leafReaderContext = context;
 	}
 
+	@Override
 	public void finish() throws IOException {
 		for ( LongObjectCursor<SegmentValue> value : segmentValues ) {
 			long globalOrd = sortedSetValues.lookupTerm( values.lookupOrd( value.key ) );

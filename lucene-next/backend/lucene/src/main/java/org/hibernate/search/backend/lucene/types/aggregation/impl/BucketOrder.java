@@ -83,7 +83,7 @@ public enum BucketOrder {
 				isTermOrderDescending() ? termAscendingComparator.reversed() : termAscendingComparator );
 	}
 
-	public <E> Comparator<LongBucket> toLongBucketComparator() {
+	public Comparator<LongBucket> toLongBucketComparator() {
 		return toLongBucketComparatorInternal();
 	}
 
