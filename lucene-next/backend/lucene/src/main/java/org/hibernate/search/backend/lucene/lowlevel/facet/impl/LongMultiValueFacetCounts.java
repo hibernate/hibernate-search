@@ -99,13 +99,8 @@ public class LongMultiValueFacetCounts extends Facets {
 	}
 
 	public FacetResult getTopChildrenSortByCount(int topN) {
-		PriorityQueue<Entry> pq = new PriorityQueue<Entry>( Math.min( topN, counts.length + hashCounts.size() ) ) {
-			@Override
-			protected boolean lessThan(Entry a, Entry b) {
-				// sort by count descending, breaking ties by value ascending:
-				return a.count < b.count || ( a.count == b.count && a.value > b.value );
-			}
-		};
+		PriorityQueue<Entry> pq =
+				new PriorityQueue<>( Math.min( topN, counts.length + hashCounts.size() ), FacetResultLessThan.INSTANCE );
 
 		int childCount = 0;
 		Entry e = null;
@@ -190,5 +185,15 @@ public class LongMultiValueFacetCounts extends Facets {
 		}
 
 		return b.toString();
+	}
+
+	private static class FacetResultLessThan implements PriorityQueue.LessThan<Entry> {
+		private static final FacetResultLessThan INSTANCE = new FacetResultLessThan();
+
+		@Override
+		public boolean lessThan(Entry a, Entry b) {
+			// sort by count descending, breaking ties by value ascending:
+			return a.count < b.count || ( a.count == b.count && a.value > b.value );
+		}
 	}
 }

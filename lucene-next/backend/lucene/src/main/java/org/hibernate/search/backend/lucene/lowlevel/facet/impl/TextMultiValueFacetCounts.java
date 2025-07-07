@@ -261,14 +261,8 @@ public class TextMultiValueFacetCounts extends Facets {
 	 * And there's no access to the value, leading to casting any type value has to be accessed. Hence, this impl:
 	 */
 	private static class HibernateSearchTopOrdAndIntQueue extends PriorityQueue<TopOrdAndIntQueue.OrdAndInt> {
-
 		public HibernateSearchTopOrdAndIntQueue(int maxSize) {
-			super( maxSize );
-		}
-
-		@Override
-		protected boolean lessThan(TopOrdAndIntQueue.OrdAndInt a, TopOrdAndIntQueue.OrdAndInt b) {
-			return a.lessThan( b );
+			super( maxSize, TopOrdAndIntQueue.OrdAndInt::lessThan );
 		}
 	}
 
