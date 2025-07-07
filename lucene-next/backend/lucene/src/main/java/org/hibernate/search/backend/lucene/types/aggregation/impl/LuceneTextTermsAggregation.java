@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.BaseTermsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TermResults;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TextTermsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TextTermsCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
@@ -44,7 +44,7 @@ public class LuceneTextTermsAggregation<K, R>
 
 	private static final Comparator<String> STRING_COMPARATOR = Comparator.naturalOrder();
 
-	private CollectorKey<TextTermsCollector, TextTermsCollector> collectorKey;
+	private CollectorKey<TextTermsCollector, TermResults> collectorKey;
 
 	private LuceneTextTermsAggregation(Builder<K, R> builder) {
 		super( builder );
@@ -75,7 +75,7 @@ public class LuceneTextTermsAggregation<K, R>
 		}
 
 		@Override
-		protected BaseTermsCollector termsCollector(AggregationExtractContext context) throws IOException {
+		protected TermResults termResults(AggregationExtractContext context) throws IOException {
 			return context.getCollectorResults( collectorKey );
 		}
 
@@ -119,16 +119,16 @@ public class LuceneTextTermsAggregation<K, R>
 
 		@Override
 		List<Bucket<String, R>> getTopBuckets(AggregationExtractContext context) throws IOException {
-			var termsCollector = context.getCollectorResults( collectorKey );
+			var termResults = context.getCollectorResults( collectorKey );
 
 			LocalAggregationExtractContext localContext = new LocalAggregationExtractContext( context );
 
-			List<LongBucket> results = termsCollector.results( order, maxTermCount, minDocCount );
+			List<LongBucket> results = termResults.counts( order, maxTermCount, minDocCount );
 
 			var dv = MultiDocValues.getSortedSetValues( context.getIndexReader(), absoluteFieldPath );
 			List<Bucket<String, R>> buckets = new ArrayList<>();
 			for ( LongBucket bucket : results ) {
-				localContext.setResults( prepareResults( bucket, termsCollector ) );
+				localContext.setResults( prepareResults( bucket, termResults ) );
 				buckets.add(
 						new Bucket<>(
 								dv.lookupOrd( bucket.termOrd() ).utf8ToString(),

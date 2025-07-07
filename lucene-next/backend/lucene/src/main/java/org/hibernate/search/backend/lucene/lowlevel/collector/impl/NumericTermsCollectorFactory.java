@@ -12,14 +12,14 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 import org.apache.lucene.search.CollectorManager;
 
 public class NumericTermsCollectorFactory
-		implements CollectorFactory<NumericTermsCollector, NumericTermsCollector, NumericTermsCollectorManager> {
+		implements CollectorFactory<NumericTermsCollector, TermResults, NumericTermsCollectorManager> {
 
-	public static CollectorFactory<NumericTermsCollector, NumericTermsCollector, NumericTermsCollectorManager> instance(
+	public static CollectorFactory<NumericTermsCollector, TermResults, NumericTermsCollectorManager> instance(
 			LongMultiValuesSource valuesSource, List<CollectorFactory<?, ?, ?>> collectorFactories) {
 		return new NumericTermsCollectorFactory( valuesSource, collectorFactories );
 	}
 
-	private final CollectorKey<NumericTermsCollector, NumericTermsCollector> key = CollectorKey.create();
+	private final CollectorKey<NumericTermsCollector, TermResults> key = CollectorKey.create();
 	private final LongMultiValuesSource valuesSource;
 	private final List<CollectorFactory<?, ?, ?>> collectorFactories;
 
@@ -45,7 +45,7 @@ public class NumericTermsCollectorFactory
 	}
 
 	@Override
-	public CollectorKey<NumericTermsCollector, NumericTermsCollector> getCollectorKey() {
+	public CollectorKey<NumericTermsCollector, TermResults> getCollectorKey() {
 		return key;
 	}
 }

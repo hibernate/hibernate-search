@@ -26,6 +26,26 @@ public class LongBucket {
 		this.count = count;
 	}
 
+	public LongBucket(long termOrd, List<Collector>[] collectors, long count) {
+		this.termOrd = termOrd;
+		this.collectors = collectors;
+		this.count = count;
+	}
+
+	public void add(Collector[] collectors, long count) {
+		this.count += count;
+		for ( int i = 0; i < collectors.length; i++ ) {
+			this.collectors[i].add( collectors[i] );
+		}
+	}
+
+	public void add(LongBucket bucket) {
+		this.count += bucket.count;
+		for ( int i = 0; i < collectors.length; i++ ) {
+			this.collectors[i].addAll( bucket.collectors[i] );
+		}
+	}
+
 	public long count() {
 		return count;
 	}

@@ -12,7 +12,7 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.CollectorManager;
 
 public class TextTermsCollectorManager
-		implements CollectorManager<TextTermsCollector, TextTermsCollector> {
+		implements CollectorManager<TextTermsCollector, TermResults> {
 
 	private final TextMultiValuesSource valuesSource;
 	private final String field;
@@ -33,8 +33,14 @@ public class TextTermsCollectorManager
 	}
 
 	@Override
-	public TextTermsCollector reduce(Collection<TextTermsCollector> collection) {
-		// TODO: actually reduce:
-		return collection.iterator().next();
+	public TermResults reduce(Collection<TextTermsCollector> collection) {
+		if ( collection.isEmpty() ) {
+			return TermResults.EMPTY;
+		}
+		TermResults results = new TermResults( keys, managers );
+		for ( TextTermsCollector collector : collection ) {
+			results.merge( collector.segmentValues() );
+		}
+		return results;
 	}
 }

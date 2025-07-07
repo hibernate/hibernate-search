@@ -12,14 +12,14 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValu
 import org.apache.lucene.search.CollectorManager;
 
 public class TextTermsCollectorFactory
-		implements CollectorFactory<TextTermsCollector, TextTermsCollector, TextTermsCollectorManager> {
+		implements CollectorFactory<TextTermsCollector, TermResults, TextTermsCollectorManager> {
 
-	public static CollectorFactory<TextTermsCollector, TextTermsCollector, TextTermsCollectorManager> instance(
+	public static CollectorFactory<TextTermsCollector, TermResults, TextTermsCollectorManager> instance(
 			String field, TextMultiValuesSource valuesSource, List<CollectorFactory<?, ?, ?>> collectorFactories) {
 		return new TextTermsCollectorFactory( field, valuesSource, collectorFactories );
 	}
 
-	public final CollectorKey<TextTermsCollector, TextTermsCollector> key = CollectorKey.create();
+	public final CollectorKey<TextTermsCollector, TermResults> key = CollectorKey.create();
 	private final TextMultiValuesSource valuesSource;
 	private final String field;
 	private final List<CollectorFactory<?, ?, ?>> collectorFactories;
@@ -47,7 +47,7 @@ public class TextTermsCollectorFactory
 	}
 
 	@Override
-	public CollectorKey<TextTermsCollector, TextTermsCollector> getCollectorKey() {
+	public CollectorKey<TextTermsCollector, TermResults> getCollectorKey() {
 		return key;
 	}
 }
