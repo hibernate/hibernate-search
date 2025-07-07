@@ -10,18 +10,17 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.EffectiveRange;
 
-import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.CollectorManager;
 
 public class RangeCollectorFactory
-		implements CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager> {
+		implements CollectorFactory<RangeCollector, RangeResults, RangeCollectorManager> {
 
-	public static CollectorFactory<RangeCollector, RangeCollector, RangeCollectorManager> instance(
+	public static CollectorFactory<RangeCollector, RangeResults, RangeCollectorManager> instance(
 			LongMultiValuesSource valuesSource, EffectiveRange[] ranges, List<CollectorFactory<?, ?, ?>> collectorFactories) {
 		return new RangeCollectorFactory( valuesSource, ranges, collectorFactories );
 	}
 
-	public final CollectorKey<RangeCollector, RangeCollector> key = CollectorKey.create();
+	public final CollectorKey<RangeCollector, RangeResults> key = CollectorKey.create();
 	private final LongMultiValuesSource valuesSource;
 	private final EffectiveRange[] ranges;
 	private final List<CollectorFactory<?, ?, ?>> collectorFactories;
@@ -33,10 +32,9 @@ public class RangeCollectorFactory
 		this.collectorFactories = collectorFactories;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public RangeCollectorManager createCollectorManager(CollectorExecutionContext context) throws IOException {
-		Collector[][] collectors = new Collector[collectorFactories.size()][];
 		CollectorKey<?, ?>[] keys = new CollectorKey<?, ?>[collectorFactories.size()];
 		var managers = new CollectorManager[collectorFactories.size()];
 		int index = 0;
@@ -44,18 +42,13 @@ public class RangeCollectorFactory
 			CollectorManager<?, ?> collectorManager = collectorFactory.createCollectorManager( context );
 			keys[index] = collectorFactory.getCollectorKey();
 			managers[index] = collectorManager;
-			Collector[] c = new Collector[ranges.length];
-			collectors[index] = c;
-			for ( int i = 0; i < c.length; i++ ) {
-				c[i] = collectorManager.newCollector();
-			}
 			index++;
 		}
-		return new RangeCollectorManager( valuesSource, ranges, collectors, keys, managers );
+		return new RangeCollectorManager( valuesSource, ranges, keys, managers );
 	}
 
 	@Override
-	public CollectorKey<RangeCollector, RangeCollector> getCollectorKey() {
+	public CollectorKey<RangeCollector, RangeResults> getCollectorKey() {
 		return key;
 	}
 }

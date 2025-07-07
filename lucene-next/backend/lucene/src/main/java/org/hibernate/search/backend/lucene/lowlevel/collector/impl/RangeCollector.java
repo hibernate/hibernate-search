@@ -22,7 +22,6 @@ import com.carrotsearch.hppc.cursors.IntCursor;
 
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.CollectorManager;
 import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
@@ -36,16 +35,14 @@ public class RangeCollector extends SimpleCollector {
 	private final Collector[][] collectors;
 	private final CollectorKey<?, ?>[] keys;
 	private final LeafCollector[][] leafCollectors;
-	private final CollectorManager<Collector, ?>[] managers;
 
 	private LongMultiValues values;
 
 	public RangeCollector(LongMultiValuesSource valuesSource, EffectiveRange[] ranges, Collector[][] collectors,
-			CollectorKey<?, ?>[] keys, CollectorManager<Collector, ?>[] managers) {
+			CollectorKey<?, ?>[] keys) {
 		this.valuesSource = valuesSource;
 		this.collectors = collectors;
 		this.keys = keys;
-		this.managers = managers;
 
 		// Maps all range inclusive endpoints to int flags; 1
 		// = start of interval, 2 = end of interval.  We need to
@@ -192,14 +189,6 @@ public class RangeCollector extends SimpleCollector {
 
 	public Collector[][] collectors() {
 		return collectors;
-	}
-
-	public CollectorKey<?, ?>[] collectorKeys() {
-		return keys;
-	}
-
-	public CollectorManager<Collector, ?>[] managers() {
-		return managers;
 	}
 
 	@Override
