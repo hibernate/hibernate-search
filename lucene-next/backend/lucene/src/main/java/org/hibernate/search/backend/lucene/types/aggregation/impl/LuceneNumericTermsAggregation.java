@@ -14,10 +14,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.BaseTermsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.NumericTermsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.NumericTermsCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TermResults;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
@@ -51,7 +51,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V, R>
 
 	private final Comparator<E> termComparator;
 	private final Function<E, V> decoder;
-	private CollectorKey<NumericTermsCollector, NumericTermsCollector> collectorKey;
+	private CollectorKey<NumericTermsCollector, TermResults> collectorKey;
 
 	private LuceneNumericTermsAggregation(Builder<F, E, K, V, R> builder) {
 		super( builder );
@@ -100,7 +100,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V, R>
 		}
 
 		@Override
-		protected BaseTermsCollector termsCollector(AggregationExtractContext context) throws IOException {
+		protected TermResults termResults(AggregationExtractContext context) throws IOException {
 			return context.getCollectorResults( collectorKey );
 		}
 
@@ -116,14 +116,14 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V, R>
 
 		@Override
 		List<Bucket<E, R>> getTopBuckets(AggregationExtractContext context) throws IOException {
-			var termsCollector = context.getCollectorResults( collectorKey );
+			var termResults = context.getCollectorResults( collectorKey );
 
 			LocalAggregationExtractContext localContext = new LocalAggregationExtractContext( context );
 
-			List<LongBucket> counts = termsCollector.counts( order, maxTermCount, minDocCount );
+			List<LongBucket> counts = termResults.counts( order, maxTermCount, minDocCount );
 			List<Bucket<E, R>> buckets = new ArrayList<>();
 			for ( LongBucket bucket : counts ) {
-				localContext.setResults( prepareResults( bucket, termsCollector ) );
+				localContext.setResults( prepareResults( bucket, termResults ) );
 				buckets.add(
 						new Bucket<>(
 								numericDomain.sortedDocValueToTerm( bucket.termOrd() ),

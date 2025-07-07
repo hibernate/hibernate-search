@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.BaseTermsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TermResults;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -76,13 +76,13 @@ public abstract class AbstractLuceneMultivaluedTermsAggregation<F, T, K, V, R>
 			return toMap( context.fromDocumentValueConvertContext(), buckets );
 		}
 
-		protected abstract BaseTermsCollector termsCollector(AggregationExtractContext context) throws IOException;
+		protected abstract TermResults termResults(AggregationExtractContext context) throws IOException;
 
 		protected R createZeroValue(AggregationExtractContext context) throws IOException {
 			LocalAggregationExtractContext localContext = new LocalAggregationExtractContext( context );
-			var termsCollector = termsCollector( context );
-			CollectorManager<Collector, ?>[] managers = termsCollector.managers();
-			CollectorKey<?, ?>[] keys = termsCollector.keys();
+			var termResults = termResults( context );
+			CollectorManager<Collector, ?>[] managers = termResults.collectorManagers();
+			CollectorKey<?, ?>[] keys = termResults.collectorKeys();
 			HashMap<CollectorKey<?, ?>, Object> results = new HashMap<>();
 			for ( int i = 0; i < keys.length; i++ ) {
 				results.put( keys[i], managers[i].reduce( List.of( managers[i].newCollector() ) ) );
@@ -110,12 +110,12 @@ public abstract class AbstractLuceneMultivaluedTermsAggregation<F, T, K, V, R>
 			return result;
 		}
 
-		protected Map<CollectorKey<?, ?>, Object> prepareResults(LongBucket bucket, BaseTermsCollector termsCollector)
+		protected Map<CollectorKey<?, ?>, Object> prepareResults(LongBucket bucket, TermResults termResults)
 				throws IOException {
 			Map<CollectorKey<?, ?>, Object> result = new HashMap<>();
 			List<Collector>[] collectors = bucket.collectors;
-			CollectorKey<?, ?>[] collectorKeys = termsCollector.keys();
-			CollectorManager<Collector, ?>[] managers = termsCollector.managers();
+			CollectorKey<?, ?>[] collectorKeys = termResults.collectorKeys();
+			CollectorManager<Collector, ?>[] managers = termResults.collectorManagers();
 			for ( int i = 0; i < collectorKeys.length; i++ ) {
 				result.put( collectorKeys[i], managers[i].reduce( collectors[i] ) );
 			}
