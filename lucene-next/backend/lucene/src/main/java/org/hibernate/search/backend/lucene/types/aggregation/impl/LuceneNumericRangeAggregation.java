@@ -15,6 +15,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.RangeResults;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
@@ -48,7 +49,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 	private final List<Range<K>> rangesInOrder;
 	private final List<Range<E>> encodedRangesInOrder;
 
-	private CollectorKey<RangeCollector, RangeCollector> collectorKey;
+	private CollectorKey<RangeCollector, RangeResults> collectorKey;
 
 	private LuceneNumericRangeAggregation(Builder<F, E, K, V> builder) {
 		super( builder );
@@ -102,26 +103,26 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 
 		@Override
 		public Map<Range<K>, V> extract(AggregationExtractContext context) throws IOException {
-			RangeCollector rangeCollector = context.getCollectorResults( collectorKey );
+			RangeResults rangeResults = context.getCollectorResults( collectorKey );
 
 			LocalAggregationExtractContext localContext = new LocalAggregationExtractContext( context );
 
 			Map<Range<K>, V> result = new LinkedHashMap<>();
 			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
-				localContext.setResults( prepareResults( i, rangeCollector ) );
+				localContext.setResults( prepareResults( i, rangeResults ) );
 				result.put( rangesInOrder.get( i ), extractor.extract( localContext ) );
 			}
 
 			return result;
 		}
 
-		private Map<CollectorKey<?, ?>, Object> prepareResults(int index, RangeCollector rangeCollector) throws IOException {
+		private Map<CollectorKey<?, ?>, Object> prepareResults(int index, RangeResults rangeResults) throws IOException {
 			Map<CollectorKey<?, ?>, Object> result = new HashMap<>();
-			Collector[][] collectors = rangeCollector.collectors();
-			CollectorKey<?, ?>[] collectorKeys = rangeCollector.collectorKeys();
-			CollectorManager<Collector, ?>[] managers = rangeCollector.managers();
+			List<Collector>[][] collectors = rangeResults.buckets();
+			CollectorKey<?, ?>[] collectorKeys = rangeResults.collectorKeys();
+			CollectorManager<Collector, ?>[] managers = rangeResults.collectorManagers();
 			for ( int i = 0; i < collectorKeys.length; i++ ) {
-				result.put( collectorKeys[i], managers[i].reduce( List.of( collectors[i][index] ) ) );
+				result.put( collectorKeys[i], managers[i].reduce( collectors[i][index] ) );
 			}
 			return result;
 		}
@@ -149,7 +150,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 	}
 
 	public static class Builder<F, E extends Number, K, V>
-			extends AbstractBuilder<Range<K>, V>
+			extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, V>
 			implements RangeAggregationBuilder<K, V> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
