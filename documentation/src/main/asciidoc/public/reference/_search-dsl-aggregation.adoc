@@ -174,14 +174,6 @@ i.e. the terms with the most matching documents appear first.
 
 Several other orders are available.
 
-[WARNING]
-====
-With the Lucene backend, due to limitations of the current implementation,
-using any order other than the default one (by descending count)
-may lead to incorrect results.
-See https://hibernate.atlassian.net/browse/HSEARCH-3666[HSEARCH-3666] for more information.
-====
-
 You can order entries by ascending term value:
 
 // Search 5 anchors backward compatibility
