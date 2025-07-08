@@ -220,6 +220,23 @@ When ordering entries by ascending count in a `terms` aggregation,
 link:{elasticsearchDocUrl}/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order[hit counts are approximate].
 ====
 
+[[search-dsl-aggregation-terms-value]]
+=== Aggregated value
+
+By default, the aggregated value represents the number of documents that fall into the group of a particular term.
+With the `.value(..)` step in aggregation definition, it is now possible to set the aggregated value to something other than the document count.
+The `.value(..)` accepts any other aggregation, which will be applied to the documents within the aggregated group.
+
+.Total price of books per category
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-sum]
+----
+<1> Define the path and type of the field whose values should be considered as terms for the aggregation.
+<2> Define what the aggregated value should represent, e.g. the sum of all book prices within the genre.
+====
+
 [[search-dsl-aggregation-terms-other]]
 === Other options
 
@@ -318,6 +335,23 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 See <<search-dsl-argument-type>> for more information.
 
+[[search-dsl-aggregation-range-value]]
+=== Aggregated value
+
+By default, the aggregated value represents the number of documents that fall into particular, defined range .
+With the `.value(..)` step in aggregation definition, it is now possible to set the aggregated value to something other than the document count.
+The `.value(..)` accepts any other aggregation, which will be applied to the documents within the aggregated group.
+
+.Total price of books per category
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-avg]
+----
+<1> Define the path and type of the field whose value ranges for the aggregation.
+<2> Define what the aggregated value should represent, e.g. the average rating of all books within the price range.
+====
+
 [[search-dsl-aggregation-range-other]]
 === Other options
 
@@ -329,14 +363,8 @@ but that can be <<search-dsl-aggregation-common-filter,controlled explicitly wit
 
 include::../components/_incubating-warning.adoc[]
 
-Hibernate Search provides a set of most common metric aggregations such as `sum`, `min`, `max`, `count`,
-`count distinct` and `avg`. These aggregations can be requested for fields of numerical or temporal type.
-
-[NOTE]
-====
-At the moment, it is only possible to request metric aggregations at the root level;
-that is, the aggregation will be applied to the entire hit set.
-====
+Hibernate Search provides a set of most common metric aggregations such as `sum`, `min`, `max`, `count documents`, `count values`,
+`count values distinct` and `avg`. These aggregations can be requested for fields of numerical or temporal types.
 
 [IMPORTANT]
 ====
@@ -390,9 +418,28 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 <1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
 ====
 
+=== Count documents  metric aggregation
+
+The `count documents` aggregation counts the number of documents.
+While it is usually discouraged to use this aggregation at the root level,
+as the result would be equivalent to the count returned by the search results in `SearchResultTotal`,
+this aggregation can still be useful in defining aggregation values in other, more complex aggregations like
+<<search-dsl-aggregation-range-value,`range`>> or <<search-dsl-aggregation-terms-value,`terms`>>.
+
+.Count the number of the science fiction books
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count-documents]
+----
+<1> Apply the document count aggregation. For this function a `Long.class` value is always returned.
+====
+
 === Count values metric aggregation
 
 The `count values` aggregation counts the number of non-empty field values.
+This aggregation mostly make sense when the aggregated field is multivalued.
+For single-valued fields this aggregation would result in the number of documents where the aggregated field is present.
 
 .Count the number of the science fiction books with prices
 ====
@@ -407,7 +454,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 The `count distinct values` aggregation counts the number of unique field values.
 
-.Count anytime the price field has a different value among all the science fiction books
+.Count the number of all different price value among all the science fiction books
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
