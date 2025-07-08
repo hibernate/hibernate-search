@@ -32,10 +32,6 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 		return true;
 	}
 
-	public boolean nonDefaultOrderInTermsAggregations() {
-		return true;
-	}
-
 	public boolean projectionPreservesNulls() {
 		return true;
 	}

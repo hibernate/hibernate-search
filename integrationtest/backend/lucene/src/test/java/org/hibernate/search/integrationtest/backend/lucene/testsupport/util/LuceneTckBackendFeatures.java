@@ -47,12 +47,6 @@ import org.apache.lucene.document.DoublePoint;
 class LuceneTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
-	public boolean nonDefaultOrderInTermsAggregations() {
-		// TODO HSEARCH-3666 Lucene terms aggregations (discrete facets) may return wrong results for any sort other than the default one
-		return false;
-	}
-
-	@Override
 	public boolean projectionPreservesNulls() {
 		return false;
 	}

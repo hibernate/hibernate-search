@@ -33,7 +33,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.T
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -230,8 +229,6 @@ class TermsAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderAsc")
 	void orderByCountAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -258,8 +255,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void orderByTermDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -287,8 +282,6 @@ class TermsAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testAlphabeticalSortOrder")
 	void orderByTermAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -412,8 +405,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -491,8 +482,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -521,8 +510,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -708,13 +695,6 @@ class TermsAggregationSpecificsIT<F> {
 
 	private SearchQueryOptionsStep<Object, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.createScope().query().where( f -> f.matchAll() );
-	}
-
-	private void assumeNonDefaultOrdersSupported() {
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().nonDefaultOrderInTermsAggregations(),
-				"Non-default orders are not supported for terms aggregations with this backend"
-		);
 	}
 
 	@SuppressWarnings("unchecked")
