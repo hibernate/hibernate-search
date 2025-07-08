@@ -244,4 +244,8 @@ public abstract class FieldTypeDescriptor<F, S extends SearchableProjectableInde
 		return Objects.toString( value, null );
 	}
 
+	public F normalize(F value) {
+		return value;
+	}
+
 }

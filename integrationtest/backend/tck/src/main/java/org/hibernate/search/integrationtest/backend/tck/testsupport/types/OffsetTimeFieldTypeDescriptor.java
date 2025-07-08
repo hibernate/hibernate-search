@@ -134,4 +134,9 @@ public class OffsetTimeFieldTypeDescriptor extends StandardFieldTypeDescriptor<O
 	public String format(OffsetTime value) {
 		return FormatUtils.format( value );
 	}
+
+	@Override
+	public OffsetTime normalize(OffsetTime value) {
+		return value == null ? null : value.withOffsetSameInstant( ZoneOffset.UTC );
+	}
 }

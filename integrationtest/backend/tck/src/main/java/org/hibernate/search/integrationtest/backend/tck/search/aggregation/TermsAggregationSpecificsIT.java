@@ -622,7 +622,91 @@ class TermsAggregationSpecificsIT<F> {
 				);
 	}
 
-	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_explicitDocCount(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								.value( f.countDocuments() )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
+									}
+								}, fieldType
+						)
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_min(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( fieldType.supportsMetricAggregation(),
+				"Since the value is a metric aggregation on the same field, we want to be sure that only those fields that support it are included." );
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
+								.value( f.min().field( fieldPath, fieldType.getJavaType() ) )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, fieldType.normalize( value ) );
+									}
+								}, fieldType
+						)
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_max(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( fieldType.supportsMetricAggregation(),
+				"Since the value is a metric aggregation on the same field, we want to be sure that only those fields that support it are included." );
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
+								.value( f.max().field( fieldPath, fieldType.getJavaType() ) )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, fieldType.normalize( value ) );
+									}
+								}, fieldType
+						)
+				);
+	}
+
+	private SearchQueryOptionsStep<Object, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.createScope().query().where( f -> f.matchAll() );
 	}
 
