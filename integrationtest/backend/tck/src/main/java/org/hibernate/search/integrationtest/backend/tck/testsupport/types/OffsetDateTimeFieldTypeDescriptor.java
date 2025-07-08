@@ -171,4 +171,9 @@ public class OffsetDateTimeFieldTypeDescriptor extends StandardFieldTypeDescript
 	public String format(OffsetDateTime value) {
 		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format( value );
 	}
+
+	@Override
+	public OffsetDateTime normalize(OffsetDateTime value) {
+		return value == null ? null : value.toInstant().atOffset( ZoneOffset.UTC );
+	}
 }

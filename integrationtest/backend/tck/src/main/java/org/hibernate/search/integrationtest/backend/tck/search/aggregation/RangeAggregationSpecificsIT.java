@@ -31,7 +31,9 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.RangeAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -558,6 +560,325 @@ class RangeAggregationSpecificsIT<F> {
 				);
 	}
 
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_countDocuments(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+								.ranges( Arrays.asList(
+										Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+										Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+										Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+								) ).value( f.countDocuments() )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept( Range.canonical( null, dataSet.ascendingValues.get( 3 ) ), 3L );
+					c.accept( Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							2L );
+					c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_min(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 3 ),
+														dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) ).value( f.min().field( fieldPath, fieldType.getJavaType() ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+							dataSet.fieldType.normalize( dataSet.ascendingValues.get( 0 ) )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							dataSet.fieldType.normalize( dataSet.ascendingValues.get( 3 ) )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							dataSet.fieldType.normalize( dataSet.ascendingValues.get( 5 ) )
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_max(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 3 ),
+														dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) ).value( f.max().field( fieldPath, fieldType.getJavaType() ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+							dataSet.fieldType.normalize( dataSet.ascendingValues.get( 2 ) )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							dataSet.fieldType.normalize( dataSet.ascendingValues.get( 4 ) )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							dataSet.fieldType.normalize( dataSet.ascendingValues.get( 6 ) )
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_countValues(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 3 ),
+														dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) ).value( f.countValues().field( index.binding().bucketMultiValue.relativeFieldName ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+							12L
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							8L
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							8L
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_countDistinctValues(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 3 ),
+														dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) )
+										.value( f.countDistinctValues()
+												.field( index.binding().bucketMultiValue.relativeFieldName ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+							5L // 10 * 0 0 0 0 -- hence odd number in this range
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							4L
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							4L
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_terms_countImplicit(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Map<Integer, Long>>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 3 ),
+														dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) )
+										.value( f.terms().field( index.binding().bucketMultiValue.relativeFieldName,
+												Integer.class ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+							Map.of( 0, 1L, 1, 1L, 2, 1L, 10, 1L, 20, 1L )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							Map.of( 3, 1L, 4, 1L, 30, 1L, 40, 1L )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							Map.of( 5, 1L, 6, 1L, 50, 1L, 60, 1L )
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_terms_sum(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Map<Integer, Integer>>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 3 ),
+														dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) )
+										.value( f.terms()
+												.field( index.binding().bucketMultiValue.relativeFieldName, Integer.class )
+												.value( f.sum().field( index.binding().bucketMultiValue.relativeFieldName,
+														Integer.class ) ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+							Map.of( 0, 0, 1, 13, 2, 26, 10, 13, 20, 26 )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+							Map.of( 3, 39, 4, 52, 30, 39, 40, 52 )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							Map.of( 5, 65, 6, 78, 50, 65, 60, 78 )
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_range_countExplicit(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Map<Range<F>, Long>>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) ).value( f.range().field( fieldPath, fieldType.getJavaType() )
+												.ranges( Arrays.asList(
+														Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+														Range.canonical( dataSet.ascendingValues.get( 3 ),
+																dataSet.ascendingValues.get( 5 ) ),
+														Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+												) ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+							Map.of(
+									Range.canonical( null, dataSet.ascendingValues.get( 3 ) ), 3L,
+									Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ), 2L,
+									Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 0L
+							)
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							Map.of(
+									Range.canonical( null, dataSet.ascendingValues.get( 3 ) ), 0L,
+									Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ), 0L,
+									Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L
+							)
+					);
+				} )
+		);
+	}
+
+
 	private void assumeNonCanonicalRangesSupported() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().nonCanonicalRangeInAggregations(),
@@ -565,7 +886,7 @@ class RangeAggregationSpecificsIT<F> {
 		);
 	}
 
-	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<Object, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.createScope().query().where( f -> f.matchAll() );
 	}
 
@@ -593,10 +914,18 @@ class RangeAggregationSpecificsIT<F> {
 		private void init() {
 			BulkIndexer indexer = index.bulkIndexer();
 			for ( int i = 0; i < documentFieldValues.size(); i++ ) {
-				F value = documentFieldValues.get( i );
+				final F value = documentFieldValues.get( i );
+				final int bucketValue = i;
 				indexer.add( name + "_document_" + i, name, document -> {
 					document.addValue( index.binding().fieldModels.get( fieldType ).reference, value );
 					document.addValue( index.binding().fieldWithConverterModels.get( fieldType ).reference, value );
+
+					document.addValue( index.binding().bucketValue.reference, bucketValue );
+
+					document.addValue( index.binding().bucketMultiValue.reference, bucketValue );
+					document.addValue( index.binding().bucketMultiValue.reference, bucketValue );
+					document.addValue( index.binding().bucketMultiValue.reference, bucketValue );
+					document.addValue( index.binding().bucketMultiValue.reference, bucketValue * 10 );
 				} );
 			}
 			indexer.add( name + "_document_empty", name, document -> {} );
@@ -608,6 +937,8 @@ class RangeAggregationSpecificsIT<F> {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithConverterModels;
 		final SimpleFieldModelsByType fieldWithAggregationDisabledModels;
+		final SimpleFieldModel<Integer> bucketValue;
+		final SimpleFieldModel<Integer> bucketMultiValue;
 
 		IndexBinding(IndexSchemaElement root) {
 			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
@@ -622,6 +953,11 @@ class RangeAggregationSpecificsIT<F> {
 			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonAggregable_", c -> c.aggregable( Aggregable.NO )
 			);
+			bucketValue = SimpleFieldModel.mapper( IntegerFieldTypeDescriptor.INSTANCE, c -> c.aggregable( Aggregable.YES ) )
+					.map( root, "bucketValue" );
+			bucketMultiValue =
+					SimpleFieldModel.mapper( IntegerFieldTypeDescriptor.INSTANCE, c -> c.aggregable( Aggregable.YES ) )
+							.mapMultiValued( root, "bucketMultiValue" );
 		}
 	}
 
