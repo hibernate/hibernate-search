@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
@@ -605,7 +606,8 @@ class RangeAggregationSpecificsIT<F> {
 												Range.canonical( dataSet.ascendingValues.get( 3 ),
 														dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
-										) ).value( f.min().field( fieldPath, fieldType.getJavaType() ) )
+										) )
+										.value( (AggregationFinalStep<F>) f.min().field( fieldPath, fieldType.getJavaType() ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -644,7 +646,8 @@ class RangeAggregationSpecificsIT<F> {
 												Range.canonical( dataSet.ascendingValues.get( 3 ),
 														dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
-										) ).value( f.max().field( fieldPath, fieldType.getJavaType() ) )
+										) )
+										.value( (AggregationFinalStep<F>) f.max().field( fieldPath, fieldType.getJavaType() ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -764,8 +767,8 @@ class RangeAggregationSpecificsIT<F> {
 														dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 										) )
-										.value( f.terms().field( index.binding().bucketMultiValue.relativeFieldName,
-												Integer.class ) )
+										.value( (AggregationFinalStep<Map<Integer, Long>>) f.terms()
+												.field( index.binding().bucketMultiValue.relativeFieldName, Integer.class ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -805,10 +808,10 @@ class RangeAggregationSpecificsIT<F> {
 														dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 										) )
-										.value( f.terms()
+										.value( (AggregationFinalStep<Map<Integer, Integer>>) f.terms()
 												.field( index.binding().bucketMultiValue.relativeFieldName, Integer.class )
-												.value( f.sum().field( index.binding().bucketMultiValue.relativeFieldName,
-														Integer.class ) ) )
+												.value( (AggregationFinalStep<Integer>) f.sum().field(
+														index.binding().bucketMultiValue.relativeFieldName, Integer.class ) ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
