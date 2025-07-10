@@ -27,6 +27,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
@@ -648,7 +649,7 @@ class TermsAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
-								.value( f.min().field( fieldPath, fieldType.getJavaType() ) )
+								.value( (AggregationFinalStep<F>) f.min().field( fieldPath, fieldType.getJavaType() ) )
 				)
 				.routing( dataSet.name ) )
 				.aggregation(
@@ -677,7 +678,7 @@ class TermsAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
-								.value( f.max().field( fieldPath, fieldType.getJavaType() ) )
+								.value( (AggregationFinalStep<F>) f.max().field( fieldPath, fieldType.getJavaType() ) )
 				)
 				.routing( dataSet.name ) )
 				.aggregation(
