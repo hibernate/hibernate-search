@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <F> The type of the targeted field.
  */
 @Incubating
-public interface TermsAggregationRangeValueStep<
+public interface TermsAggregationValueStep<
 		SR,
 		S extends TermsAggregationOptionsStep<SR, ?, PDF, F, A>,
 		PDF extends TypedSearchPredicateFactory<SR>,

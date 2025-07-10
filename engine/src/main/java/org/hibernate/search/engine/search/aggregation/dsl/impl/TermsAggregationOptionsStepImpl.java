@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
-import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationRangeValueStep;
+import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationValueStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFact
 import org.hibernate.search.util.common.impl.Contracts;
 
 class TermsAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>, F, V>
-		implements TermsAggregationRangeValueStep<SR, TermsAggregationOptionsStepImpl<SR, PDF, F, V>, PDF, F, Map<F, V>> {
+		implements TermsAggregationValueStep<SR, TermsAggregationOptionsStepImpl<SR, PDF, F, V>, PDF, F, Map<F, V>> {
 	private final TermsAggregationBuilder<F, V> builder;
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 

@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.data.Range;
  * @param <F> The type of the targeted field.
  */
 @Incubating
-public interface RangeAggregationRangeValueStep<
+public interface RangeAggregationValueStep<
 		SR,
 		PDF extends TypedSearchPredicateFactory<SR>,
 		F> {

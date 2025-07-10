@@ -31,5 +31,5 @@ public interface RangeAggregationRangeMoreStep<
 		A>
 		extends RangeAggregationOptionsStep<SR, N, PDF, F, Map<Range<F>, A>>,
 		RangeAggregationRangeStep<SR, S, PDF, F, A>,
-		RangeAggregationRangeValueStep<SR, PDF, F> {
+		RangeAggregationValueStep<SR, PDF, F> {
 }
