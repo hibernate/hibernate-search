@@ -27,7 +27,7 @@ public interface TermsAggregationFieldStep<SR, PDF extends TypedSearchPredicateF
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationRangeValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
+	default <F> TermsAggregationValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
 		return field( fieldPath, type, ValueModel.MAPPING );
 	}
 
@@ -43,7 +43,7 @@ public interface TermsAggregationFieldStep<SR, PDF extends TypedSearchPredicateF
 	 * @deprecated Use {@link #field(String, Class, ValueModel)} instead.
 	 */
 	@Deprecated(since = "7.2")
-	default <F> TermsAggregationRangeValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
+	default <F> TermsAggregationValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			org.hibernate.search.engine.search.common.ValueConvert convert) {
 		return field( fieldPath, type,
 				org.hibernate.search.engine.search.common.ValueConvert.toValueModel( convert ) );
@@ -59,7 +59,7 @@ public interface TermsAggregationFieldStep<SR, PDF extends TypedSearchPredicateF
 	 * See {@link ValueModel}.
 	 * @return The next step.
 	 */
-	<F> TermsAggregationRangeValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
+	<F> TermsAggregationValueStep<SR, ?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueModel valueModel);
 
 	/**
@@ -69,7 +69,7 @@ public interface TermsAggregationFieldStep<SR, PDF extends TypedSearchPredicateF
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationRangeValueStep<SR, ?, PDF, F, Map<F, Long>> field(
+	default <F> TermsAggregationValueStep<SR, ?, PDF, F, Map<F, Long>> field(
 			TermsAggregationFieldReference<? super SR, F> fieldReference) {
 		return field( fieldReference.absolutePath(), fieldReference.aggregationType(), fieldReference.valueModel() );
 	}
