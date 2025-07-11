@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+@Deprecated(since = "8.1", forRemoval = true)
 public final class SerializationUtils {
 
 	private SerializationUtils() {
