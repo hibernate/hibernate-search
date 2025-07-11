@@ -5,6 +5,7 @@
 package org.hibernate.search.util.common.impl;
 
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
@@ -249,6 +250,12 @@ public final class Futures {
 		}
 		catch (CompletionException e) {
 			return e.getCause();
+		}
+		catch (CancellationException e) {
+			if ( e.getCause() instanceof CancellationException originalCancelled ) {
+				return originalCancelled;
+			}
+			return e;
 		}
 		catch (Throwable t) {
 			return t;
