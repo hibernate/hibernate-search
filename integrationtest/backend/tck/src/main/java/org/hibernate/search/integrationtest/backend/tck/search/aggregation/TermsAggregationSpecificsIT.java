@@ -27,13 +27,13 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.StandardFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -230,8 +230,6 @@ class TermsAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderAsc")
 	void orderByCountAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -258,8 +256,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void orderByTermDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -287,8 +283,6 @@ class TermsAggregationSpecificsIT<F> {
 	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testAlphabeticalSortOrder")
 	void orderByTermAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -412,8 +406,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -491,8 +483,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -521,8 +511,6 @@ class TermsAggregationSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
-		assumeNonDefaultOrdersSupported();
-
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -622,15 +610,92 @@ class TermsAggregationSpecificsIT<F> {
 				);
 	}
 
-	private SearchQueryOptionsStep<?, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
-		return index.createScope().query().where( f -> f.matchAll() );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_explicitDocCount(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								.value( f.countDocuments() )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
+									}
+								}, fieldType
+						)
+				);
 	}
 
-	private void assumeNonDefaultOrdersSupported() {
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().nonDefaultOrderInTermsAggregations(),
-				"Non-default orders are not supported for terms aggregations with this backend"
-		);
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_min(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( fieldType.supportsMetricAggregation(),
+				"Since the value is a metric aggregation on the same field, we want to be sure that only those fields that support it are included." );
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
+								.value( (AggregationFinalStep<F>) f.min().field( fieldPath, fieldType.getJavaType() ) )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, fieldType.normalize( value ) );
+									}
+								}, fieldType
+						)
+				);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_max(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( fieldType.supportsMetricAggregation(),
+				"Since the value is a metric aggregation on the same field, we want to be sure that only those fields that support it are included." );
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
+								.value( (AggregationFinalStep<F>) f.max().field( fieldPath, fieldType.getJavaType() ) )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, fieldType.normalize( value ) );
+									}
+								}, fieldType
+						)
+				);
+	}
+
+	private SearchQueryOptionsStep<Object, ?, DocumentReference, ?, ?, ?> matchAllQuery() {
+		return index.createScope().query().where( f -> f.matchAll() );
 	}
 
 	@SuppressWarnings("unchecked")

@@ -36,8 +36,8 @@ public final class LuceneBackendSettings {
 	 * <p>
 	 * This should be set in order to get consistent behavior when Lucene is upgraded.
 	 * <p>
-	 * Expects a Lucene {@link org.apache.lucene.util.Version} object,
-	 * or a String accepted by {@link org.apache.lucene.util.Version#parseLeniently(java.lang.String)}
+	 * Expects a Lucene {@link Version} object,
+	 * or a String accepted by {@link Version#parseLeniently(String)}
 	 * <p>
 	 * Defaults to {@link Defaults#LUCENE_VERSION}, which may change when Hibernate Search or Lucene is upgraded,
 	 * and therefore does not offer any backwards-compatibility guarantees.

@@ -44,7 +44,7 @@ public abstract class AbstractLuceneMetricNumericLongAggregation extends Abstrac
 	private class LuceneNumericMetricLongAggregationExtraction implements Extractor<Long> {
 		@Override
 		public Long extract(AggregationExtractContext context) {
-			return context.getFacets( collectorKey );
+			return context.getCollectorResults( collectorKey );
 		}
 	}
 }

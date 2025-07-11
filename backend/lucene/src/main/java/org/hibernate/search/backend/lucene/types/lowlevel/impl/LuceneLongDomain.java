@@ -4,25 +4,18 @@
  */
 package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.comparator.impl.LongValuesSourceComparator;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.SortedNumericDocValuesField;
-import org.apache.lucene.facet.Facets;
-import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Pruning;
@@ -93,31 +86,8 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException {
-		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		return new LongMultiValueFacetCounts(
-				absoluteFieldPath, source,
-				facetsCollector
-		);
-	}
-
-	@Override
-	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			Collection<? extends Range<? extends Long>> ranges,
-			NestedDocsProvider nestedDocsProvider)
-			throws IOException {
-		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
-				absoluteFieldPath, nestedDocsProvider
-		);
-		return new LongMultiValueRangeFacetCounts(
-				absoluteFieldPath, source,
-				facetsCollector,
-				FacetCountsUtils.createLongRangesForIntegralValues( ranges )
-		);
+	public EffectiveRange[] createEffectiveRanges(Collection<? extends Range<? extends Long>> ranges) {
+		return EffectiveRange.createEffectiveRangesForIntegralValues( ranges );
 	}
 
 	@Override

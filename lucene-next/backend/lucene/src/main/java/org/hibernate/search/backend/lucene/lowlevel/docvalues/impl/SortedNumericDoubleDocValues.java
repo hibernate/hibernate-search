@@ -37,7 +37,7 @@ public abstract class SortedNumericDoubleDocValues extends DocIdSetIterator {
 	 *
 	 * @param target the target
 	 * @return the next value
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 */
 	public abstract boolean advanceExact(int target) throws IOException;
 
@@ -46,7 +46,7 @@ public abstract class SortedNumericDoubleDocValues extends DocIdSetIterator {
 	 * {@link #docValueCount} times for the document.
 	 *
 	 * @return next value
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 */
 	public abstract double nextValue() throws IOException;
 

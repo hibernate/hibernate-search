@@ -70,6 +70,10 @@ class MetricNumericFieldsAggregationsIT {
 	private final AggregationKey<Float> avgFloats = AggregationKey.of( "avgFloats" );
 	private final AggregationKey<BigInteger> avgBigIntegers = AggregationKey.of( "avgBigIntegers" );
 	private final AggregationKey<BigDecimal> avgBigDecimals = AggregationKey.of( "avgBigDecimals" );
+	private final AggregationKey<Long> countDocuments = AggregationKey.of( "countDocuments" );
+	private final AggregationKey<Long> countValuesIntegerMultiValued = AggregationKey.of( "countValuesIntegerMultiValued" );
+	private final AggregationKey<Long> countDistinctValuesIntegerMultiValued =
+			AggregationKey.of( "countDistinctValuesIntegerMultiValued" );
 
 	@BeforeEach
 	void setup() {
@@ -117,6 +121,9 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( avgBigIntegers ) ).isEqualTo( BigInteger.valueOf( 5 ) );
 		assertThat( result.aggregation( avgBigDecimals ).setScale( 2, RoundingMode.CEILING ) )
 				.isEqualTo( BigDecimal.valueOf( 580, 2 ) );
+		assertThat( result.aggregation( countDocuments ) ).isEqualTo( result.total().hitCount() );
+		assertThat( result.aggregation( countValuesIntegerMultiValued ) ).isEqualTo( 25 );
+		assertThat( result.aggregation( countDistinctValuesIntegerMultiValued ) ).isEqualTo( 3 );
 	}
 
 	@Test
@@ -159,6 +166,9 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( avgBigIntegers ) ).isEqualTo( BigInteger.valueOf( 5 ) );
 		assertThat( result.aggregation( avgBigDecimals ).setScale( 2, RoundingMode.CEILING ) )
 				.isEqualTo( BigDecimal.valueOf( 550, 2 ) );
+		assertThat( result.aggregation( countDocuments ) ).isEqualTo( result.total().hitCount() );
+		assertThat( result.aggregation( countValuesIntegerMultiValued ) ).isEqualTo( 50 );
+		assertThat( result.aggregation( countDistinctValuesIntegerMultiValued ) ).isEqualTo( 6 );
 	}
 
 	private SearchQuery<DocumentReference> defineAggregations(
@@ -180,10 +190,10 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( maxIntegers, f -> f.max().field( "integer", Integer.class ) )
 				.aggregation( maxIntegersAsString, f -> f.max().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( maxConverted, f -> f.max().field( "converted", String.class ) )
-				.aggregation( countIntegers, f -> f.count().field( "integer" ) )
-				.aggregation( countConverted, f -> f.count().field( "converted" ) )
-				.aggregation( countDistinctIntegers, f -> f.countDistinct().field( "integer" ) )
-				.aggregation( countDistinctConverted, f -> f.countDistinct().field( "converted" ) )
+				.aggregation( countIntegers, f -> f.countValues().field( "integer" ) )
+				.aggregation( countConverted, f -> f.countValues().field( "converted" ) )
+				.aggregation( countDistinctIntegers, f -> f.countDistinctValues().field( "integer" ) )
+				.aggregation( countDistinctConverted, f -> f.countDistinctValues().field( "converted" ) )
 				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
 				.aggregation( avgIntegersAsString, f -> f.avg().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
@@ -201,6 +211,10 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( avgFloats, f -> f.avg().field( "floatF", Float.class ) )
 				.aggregation( avgBigIntegers, f -> f.avg().field( "bigInteger", BigInteger.class ) )
 				.aggregation( avgBigDecimals, f -> f.avg().field( "bigDecimal", BigDecimal.class ) )
+				.aggregation( countDocuments, f -> f.countDocuments() )
+				.aggregation( countDistinctValuesIntegerMultiValued,
+						f -> f.countDistinctValues().field( "integerMultiValued" ) )
+				.aggregation( countValuesIntegerMultiValued, f -> f.countValues().field( "integerMultiValued" ) )
 				.toQuery();
 	}
 
@@ -223,6 +237,10 @@ class MetricNumericFieldsAggregationsIT {
 				document.addValue( mainIndex.binding().bigDecimal, BigDecimal.valueOf( value ) );
 				document.addValue( mainIndex.binding().style, style );
 
+				for ( int j = 0; j < 5; j++ ) {
+					document.addValue( mainIndex.binding().integerMultiValued, value );
+				}
+
 				DocumentElement object = document.addObject( mainIndex.binding().object );
 				object.addValue( mainIndex.binding().nestedInteger, value );
 			} );
@@ -234,6 +252,7 @@ class MetricNumericFieldsAggregationsIT {
 	@SuppressWarnings("unused")
 	private static class IndexBinding {
 		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<Integer> integerMultiValued;
 		final IndexFieldReference<Integer> converted;
 		final IndexFieldReference<Double> doubleF;
 		final IndexFieldReference<Float> floatF;
@@ -245,6 +264,8 @@ class MetricNumericFieldsAggregationsIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			integer = root.field( "integer", f -> f.asInteger().aggregable( Aggregable.YES ) ).toReference();
+			integerMultiValued = root.field( "integerMultiValued", f -> f.asInteger().aggregable( Aggregable.YES ) )
+					.multiValued().toReference();
 			converted = root.field( "converted", f -> f.asInteger().aggregable( Aggregable.YES )
 					.projectionConverter( String.class, (value, context) -> value.toString() ) ).toReference();
 			doubleF = root.field( "doubleF", f -> f.asDouble().aggregable( Aggregable.YES ) ).toReference();

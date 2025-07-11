@@ -248,6 +248,141 @@ class AggregationDslIT {
 							entry( Genre.SCIENCE_FICTION, 3L )
 					);
 		} );
+
+		withinSearchSession( searchSession -> {
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByPriceKey, f -> f.terms()
+							.field( "price", Double.class )
+							.orderByCountAscending() )
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+	}
+
+	@Test
+	void terms_value() {
+		withinSearchSession( searchSession -> {
+			// tag::terms-sum[]
+			AggregationKey<Map<Genre, Double>> sumByCategoryKey = AggregationKey.of( "sumByCategory" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							sumByCategoryKey, f -> f.terms()
+									.field( "genre", Genre.class ) // <1>
+									.value( f.sum().field( "price", Double.class ) ) // <2>
+					)
+					.fetch( 20 );
+			Map<Genre, Double> sumByPrice = result.aggregation( sumByCategoryKey );
+			// end::terms-sum[]
+			assertThat( sumByPrice )
+					.containsExactly(
+							entry( Genre.SCIENCE_FICTION, 60.97 ),
+							entry( Genre.CRIME_FICTION, 7.99 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count[]
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+									.value( f.countDocuments() ) // <4>
+					)
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count-implicit[]
+			AggregationKey<Map<Double, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+					)
+					.fetch( 20 );
+			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count-implicit[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, 1L ),
+							entry( 15.99, 1L ),
+							entry( 19.99, 1L ),
+							entry( 24.99, 1L )
+					);
+		} );
+	}
+
+	@Test
+	void range_value() {
+		withinSearchSession( searchSession -> {
+			// tag::range-avg[]
+			AggregationKey<Map<Range<Double>, Double>> avgRatingByPriceKey = AggregationKey.of( "avgRatingByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							avgRatingByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 )
+									.range( 10.0, 20.0 )
+									.range( 20.0, null )
+									.value( f.avg().field( "ratings", Double.class, ValueModel.RAW ) ) // <2>
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Double> countsByPrice = result.aggregation( avgRatingByPriceKey );
+			// end::range-avg[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 4.0 ),
+							entry( Range.canonical( 10.0, 20.0 ), 3.6 ),
+							entry( Range.canonical( 20.0, null ), 3.2 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-count[]
+			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 ) // <2>
+									.range( 10.0, 20.0 )
+									.range( 20.0, null ) // <3>
+									.value( f.countDocuments() ) // <4>
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-count[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
+					);
+		} );
 	}
 
 	@Test
@@ -447,8 +582,8 @@ class AggregationDslIT {
 					.aggregation( sumPricesKey, f -> f.sum().field( "price", Double.class ) ) // <1>
 					.fetch( 20 );
 			Double sumPrices = result.aggregation( sumPricesKey );
-			assertThat( sumPrices ).isEqualTo( 60.97 );
 			// end::sums[]
+			assertThat( sumPrices ).isEqualTo( 60.97 );
 		} );
 	}
 
@@ -462,8 +597,8 @@ class AggregationDslIT {
 					.aggregation( oldestReleaseKey, f -> f.min().field( "releaseDate", Date.class ) ) // <1>
 					.fetch( 20 );
 			Date oldestRelease = result.aggregation( oldestReleaseKey );
-			assertThat( oldestRelease ).isEqualTo( Date.valueOf( "1950-12-02" ) );
 			// end::min[]
+			assertThat( oldestRelease ).isEqualTo( Date.valueOf( "1950-12-02" ) );
 		} );
 	}
 
@@ -477,38 +612,53 @@ class AggregationDslIT {
 					.aggregation( mostRecentReleaseKey, f -> f.max().field( "releaseDate", Date.class ) ) // <1>
 					.fetch( 20 );
 			Date mostRecentRelease = result.aggregation( mostRecentReleaseKey );
-
 			// end::max[]
+			assertThat( mostRecentRelease ).isEqualTo( Date.valueOf( "1983-01-01" ) );
 		} );
 	}
 
 	@Test
-	void count() {
+	void countDocuments() {
 		withinSearchSession( searchSession -> {
-			// tag::count[]
-			AggregationKey<Long> countPricesKey = AggregationKey.of( "countPrices" );
+			// tag::count-documents[]
+			AggregationKey<Long> countBooksKey = AggregationKey.of( "countBooks" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countPricesKey, f -> f.count().field( "price" ) ) // <1>
+					.aggregation( countBooksKey, f -> f.countDocuments() ) // <1>
 					.fetch( 20 );
-			Long countPrices = result.aggregation( countPricesKey );
+			Long countPrices = result.aggregation( countBooksKey );
+			// end::count-documents[]
 			assertThat( countPrices ).isEqualTo( 3L );
-			// end::count[]
 		} );
 	}
 
 	@Test
-	void countDistinct() {
+	void countValues() {
+		withinSearchSession( searchSession -> {
+			// tag::count[]
+			AggregationKey<Long> countRatingsKey = AggregationKey.of( "countRatings" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
+					.aggregation( countRatingsKey, f -> f.countValues().field( "ratings" ) ) // <1>
+					.fetch( 20 );
+			Long countPrices = result.aggregation( countRatingsKey );
+			// end::count[]
+			assertThat( countPrices ).isEqualTo( 15L );
+		} );
+	}
+
+	@Test
+	void countDistinctValues() {
 		withinSearchSession( searchSession -> {
 			// tag::count-distinct[]
 			AggregationKey<Long> countDistinctPricesKey = AggregationKey.of( "countDistinctPrices" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countDistinctPricesKey, f -> f.countDistinct().field( "price" ) ) // <1>
+					.aggregation( countDistinctPricesKey, f -> f.countDistinctValues().field( "price" ) ) // <1>
 					.fetch( 20 );
 			Long countDistinctPrices = result.aggregation( countDistinctPricesKey );
-			assertThat( countDistinctPrices ).isEqualTo( 3L );
 			// end::count-distinct[]
+			assertThat( countDistinctPrices ).isEqualTo( 3L );
 		} );
 	}
 
@@ -542,6 +692,7 @@ class AggregationDslIT {
 			book1.setPrice( 24.99 );
 			book1.setGenre( Genre.SCIENCE_FICTION );
 			book1.setReleaseDate( Date.valueOf( "1950-12-02" ) );
+			book1.setRatings( List.of( 5, 5, 4, 2, 0 ) );
 			addEdition( book1, "Mass Market Paperback, 1st Edition", 9.99 );
 			addEdition( book1, "Kindle", 9.99 );
 
@@ -551,6 +702,7 @@ class AggregationDslIT {
 			book2.setPrice( 19.99 );
 			book2.setGenre( Genre.SCIENCE_FICTION );
 			book2.setReleaseDate( Date.valueOf( "1953-10-01" ) );
+			book2.setRatings( List.of( 5, 5, 3, 3, 5 ) );
 			addEdition( book2, "Mass Market Paperback, 12th Edition", 4.99 );
 			addEdition( book2, "Kindle", 19.99 );
 
@@ -560,6 +712,7 @@ class AggregationDslIT {
 			book3.setPrice( 15.99 );
 			book3.setGenre( Genre.SCIENCE_FICTION );
 			book3.setReleaseDate( Date.valueOf( "1983-01-01" ) );
+			book3.setRatings( List.of( 3, 3, 3, 3, 3 ) );
 			addEdition( book3, "Mass Market Paperback, 59th Edition", 3.99 );
 			addEdition( book3, "Kindle", 5.99 );
 
@@ -569,6 +722,7 @@ class AggregationDslIT {
 			book4.setPrice( 7.99 );
 			book4.setGenre( Genre.CRIME_FICTION );
 			book4.setReleaseDate( Date.valueOf( "2008-02-05" ) );
+			book4.setRatings( List.of( 4, 4, 4, 4, 4 ) );
 			addEdition( book4, "Mass Market Paperback, 2nd Edition", 10.99 );
 			addEdition( book4, "Kindle", 12.99 );
 

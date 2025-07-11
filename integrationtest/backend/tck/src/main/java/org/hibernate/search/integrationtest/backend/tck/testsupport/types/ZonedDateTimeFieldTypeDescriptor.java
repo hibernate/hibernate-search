@@ -193,4 +193,9 @@ public class ZonedDateTimeFieldTypeDescriptor extends StandardFieldTypeDescripto
 	public String format(ZonedDateTime value) {
 		return DateTimeFormatter.ISO_ZONED_DATE_TIME.format( value );
 	}
+
+	@Override
+	public ZonedDateTime normalize(ZonedDateTime value) {
+		return value == null ? null : value.withZoneSameInstant( ZoneOffset.UTC );
+	}
 }

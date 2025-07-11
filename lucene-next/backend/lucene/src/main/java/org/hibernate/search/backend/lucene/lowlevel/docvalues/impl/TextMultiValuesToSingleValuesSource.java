@@ -17,7 +17,7 @@ import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.util.BytesRef;
 
 /**
- * A source of {@link org.apache.lucene.index.SortedDocValues} (text doc values) with multiple values per document,
+ * A source of {@link SortedDocValues} (text doc values) with multiple values per document,
  * where multiple values are "aggregated" into a single value
  * according to a given {@link MultiValueMode}.
  * <p>
@@ -136,15 +136,14 @@ public abstract class TextMultiValuesToSingleValuesSource {
 				if ( parentDoc == lastSeenParentDoc ) {
 					return result;
 				}
-
 				lastSeenParentDoc = parentDoc;
+
 				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
 					// No child of this parent has a value
 					result = false;
 					return false;
 				}
 
-				lastSeenParentDoc = parentDoc;
 				lastEmittedOrd = (int) mode.pick( values, childDocsWithValues );
 				result = true;
 				return true;

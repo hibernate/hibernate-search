@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -41,6 +42,10 @@ public class Book {
 	// Using the legacy java.sql.Date type on purpose, to demonstrate how to ignore bridges
 	@GenericField(aggregable = Aggregable.YES)
 	private Date releaseDate;
+
+	@GenericField(aggregable = Aggregable.YES)
+	@ElementCollection
+	private List<Integer> ratings;
 
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
 	@OrderColumn
@@ -96,5 +101,13 @@ public class Book {
 
 	public void setEditions(List<BookEdition> editions) {
 		this.editions = editions;
+	}
+
+	public List<Integer> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(List<Integer> ratings) {
+		this.ratings = ratings;
 	}
 }
