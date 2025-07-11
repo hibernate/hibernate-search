@@ -10,6 +10,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+/**
+ * @deprecated With no alternative provided. This util was mostly intended for testing purposes.
+ * Create your own copy if you were relying on the functionality it provides.
+ */
+@Deprecated(since = "8.1", forRemoval = true)
 public final class SerializationUtils {
 
 	private SerializationUtils() {
