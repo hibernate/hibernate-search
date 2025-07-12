@@ -142,7 +142,7 @@
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.github.tomakehurst.wiremock>3.0.0-beta-10</version.com.github.tomakehurst.wiremock>
-        <version.org.apache.commons.lang3>3.17.0</version.org.apache.commons.lang3>
+        <version.org.apache.commons.lang3>3.18.0</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.commons-codec>1.18.0</version.commons-codec>
