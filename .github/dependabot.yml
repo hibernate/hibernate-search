@@ -61,8 +61,7 @@ updates:
           - "com.microsoft.sqlserver:mssql-jdbc"
           # Other test dependencies
           - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
-          - "org.apache.commons:commons-lang3" # used in hibernate-search-util-common tests
-          - "org.apache.commons:commons-math3" # used to solve dependency convergence for Wiremock
+          - "org.apache.commons:commons-math3" # used in hibernate-search-util-common tests
           - "org.openjdk.jmh:*" # performance testing dependency
           - "com.google.guava:guava" # Guava is used in our test utils
           - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
