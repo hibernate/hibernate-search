@@ -4,8 +4,10 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl;
 
+import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -173,6 +175,39 @@ public interface SearchAggregationFactory {
 	 */
 	@Incubating
 	AvgAggregationFieldStep<?, ?> avg();
+
+	/**
+	 * Starts the definition of a composite aggregation,
+	 * which will combine multiple given aggregations.
+	 *
+	 * @return A DSL step where the "composite" aggregation can be defined in more details.
+	 */
+	@Incubating
+	CompositeAggregationInnerStep composite();
+
+	/**
+	 * Create an aggregation that will compose a {@link List} based on the given aggregations.
+	 *
+	 * @param aggregations The aggregations used to populate the list, in order.
+	 * @return The "composite" aggregation.
+	 */
+	@Incubating
+	AggregationFinalStep<List<?>> composite(SearchAggregation<?>... aggregations);
+
+	/**
+	 * Create an aggregation that will compose a {@link List} based on the given almost-built aggregations.
+	 *
+	 * @param dslFinalSteps The final steps in the aggregation DSL allowing the retrieval of {@link SearchAggregation}s.
+	 * @return The "composite" aggregation.
+	 */
+	@Incubating
+	default AggregationFinalStep<List<?>> composite(AggregationFinalStep<?>... dslFinalSteps) {
+		SearchAggregation<?>[] aggregations = new SearchAggregation<?>[dslFinalSteps.length];
+		for ( int i = 0; i < dslFinalSteps.length; i++ ) {
+			aggregations[i] = dslFinalSteps[i].toAggregation();
+		}
+		return composite( aggregations );
+	}
 
 	/**
 	 * Delegating aggregation that creates the actual aggregation at query create time and provides access to query parameters.

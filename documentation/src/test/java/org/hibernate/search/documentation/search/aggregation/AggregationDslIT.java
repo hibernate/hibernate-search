@@ -332,6 +332,35 @@ class AggregationDslIT {
 							entry( 24.99, 1L )
 					);
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::terms-count-composite[]
+			record PriceAggregation(Double avg, Double min, Double max) {
+			}
+			AggregationKey<Map<Double, PriceAggregation>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.terms()
+									.field( "price", Double.class ) // <1>
+									.value( f.composite()
+											.from(
+													f.avg().field( "price", Double.class ),
+													f.min().field( "price", Double.class ),
+													f.max().field( "price", Double.class )
+											).as( PriceAggregation::new ) )
+					)
+					.fetch( 20 );
+			Map<Double, PriceAggregation> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::terms-count-composite[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( 7.99, new PriceAggregation( 7.99, 7.99, 7.99 ) ),
+							entry( 15.99, new PriceAggregation( 15.99, 15.99, 15.99 ) ),
+							entry( 19.99, new PriceAggregation( 19.99, 19.99, 19.99 ) ),
+							entry( 24.99, new PriceAggregation( 24.99, 24.99, 24.99 ) )
+					);
+		} );
 	}
 
 	@Test
@@ -381,6 +410,37 @@ class AggregationDslIT {
 							entry( Range.canonical( 0.0, 10.0 ), 1L ),
 							entry( Range.canonical( 10.0, 20.0 ), 2L ),
 							entry( Range.canonical( 20.0, null ), 1L )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-composite[]
+			record PriceAggregation(Double avg, Double min, Double max) {
+			}
+			AggregationKey<Map<Range<Double>, PriceAggregation>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation(
+							countsByPriceKey, f -> f.range()
+									.field( "price", Double.class ) // <1>
+									.range( 0.0, 10.0 ) // <2>
+									.range( 10.0, 20.0 )
+									.range( 20.0, null )
+									.value( f.composite() // <3>
+											.from(
+													f.avg().field( "price", Double.class ),
+													f.min().field( "price", Double.class ),
+													f.max().field( "price", Double.class )
+											).as( PriceAggregation::new ) )
+					)
+					.fetch( 20 );
+			Map<Range<Double>, PriceAggregation> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-composite[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), new PriceAggregation( 7.99, 7.99, 7.99 ) ),
+							entry( Range.canonical( 10.0, 20.0 ), new PriceAggregation( 17.99, 15.99, 19.99 ) ),
+							entry( Range.canonical( 20.0, null ), new PriceAggregation( 24.99, 24.99, 24.99 ) )
 					);
 		} );
 	}
@@ -672,8 +732,118 @@ class AggregationDslIT {
 					.aggregation( avgPricesKey, f -> f.avg().field( "price", Double.class ) ) // <1>
 					.fetch( 20 );
 			Double avgPrices = result.aggregation( avgPricesKey );
-			assertThat( avgPrices ).isEqualTo( 20.323333333333334 );
 			// end::avg[]
+			assertThat( avgPrices ).isEqualTo( 20.323333333333334 );
+		} );
+	}
+
+	@SuppressWarnings("raw")
+	@Test
+	void composite() {
+		withinSearchSession( searchSession -> {
+			// tag::composite-customObject[]
+			record PriceAggregation(Double avg, Double min, Double max) {
+			}
+
+			AggregationKey<PriceAggregation> avgPricesKey = AggregationKey.of( "aggregations" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( avgPricesKey, f -> f.composite() // <1>
+							.from(
+									f.avg().field( "price", Double.class ), // <2>
+									f.min().field( "price", Double.class ),
+									f.max().field( "price", Double.class )
+							).as( PriceAggregation::new ) ) // <3>
+					.fetch( 20 );
+			PriceAggregation aggregations = result.aggregation( avgPricesKey ); // <4>
+			// end::composite-customObject[]
+			assertThat( aggregations ).isEqualTo( new PriceAggregation( 17.24, 7.99, 24.99 ) );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::composite-customObject-asList[]
+			record BookAggregation(Double avg, Double min, Double max, Long ratingCount) {
+				BookAggregation(List<?> list) {
+					this( (Double) list.get( 0 ),
+							(Double) list.get( 1 ),
+							(Double) list.get( 2 ),
+							(Long) list.get( 3 ) );
+				}
+			}
+
+			AggregationKey<BookAggregation> aggKey = AggregationKey.of( "aggregations" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( aggKey, f -> f.composite() // <1>
+							.from(
+									f.avg().field( "price", Double.class ), // <2>
+									f.min().field( "price", Double.class ),
+									f.max().field( "price", Double.class ),
+									f.countValues().field( "ratings" )
+							).asList( BookAggregation::new ) ) // <3>
+					.fetch( 20 );
+			BookAggregation aggregations = result.aggregation( aggKey ); // <4>
+			// end::composite-customObject-asList[]
+			assertThat( aggregations ).isEqualTo( new BookAggregation( 17.24, 7.99, 24.99, 20L ) );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::composite-list[]
+			AggregationKey<List<?>> aggKey = AggregationKey.of( "aggregations" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( aggKey, f -> f.composite() // <1>
+							.from(
+									f.avg().field( "price", Double.class ), // <2>
+									f.min().field( "price", Double.class ),
+									f.max().field( "price", Double.class ),
+									f.countValues().field( "ratings" )
+							).asList() ) // <3>
+					.fetch( 20 );
+			List<?> aggregations = result.aggregation( aggKey ); // <4>
+			// end::composite-list[]
+			assertThat( (List) aggregations )
+					.hasSize( 4 )
+					.containsExactly( 17.24, 7.99, 24.99, 20L );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::composite-array[]
+			AggregationKey<Object[]> aggKey = AggregationKey.of( "aggregations" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( aggKey, f -> f.composite() // <1>
+							.from(
+									f.avg().field( "price", Double.class ), // <2>
+									f.min().field( "price", Double.class ),
+									f.max().field( "price", Double.class ),
+									f.countValues().field( "ratings" )
+							).asArray() ) // <3>
+					.fetch( 20 );
+			Object[] aggregations = result.aggregation( aggKey ); // <4>
+			// end::composite-array[]
+			assertThat( aggregations )
+					.hasSize( 4 )
+					.containsExactly( 17.24, 7.99, 24.99, 20L );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::composite-list-singlestep[]
+			AggregationKey<List<?>> aggKey = AggregationKey.of( "aggregations" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( aggKey, f -> f.composite( // <1>
+							f.avg().field( "price", Double.class ), // <2>
+							f.min().field( "price", Double.class ),
+							f.max().field( "price", Double.class ),
+							f.countValues().field( "ratings" )
+					) ) // <3>
+					.fetch( 20 );
+			List<?> aggregations = result.aggregation( aggKey ); // <4>
+			// end::composite-list-singlestep[]
+			assertThat( (List) aggregations )
+					.hasSize( 4 )
+					.containsExactly( 17.24, 7.99, 24.99, 20L );
 		} );
 	}
 

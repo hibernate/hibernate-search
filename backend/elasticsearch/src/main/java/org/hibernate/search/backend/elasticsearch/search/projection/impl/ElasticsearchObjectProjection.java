@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,11 +37,11 @@ public class ElasticsearchObjectProjection<E, V, P>
 	private final String[] absoluteFieldPathComponents;
 	private final String requiredContextAbsoluteFieldPath;
 	private final ElasticsearchSearchProjection<?>[] inners;
-	private final ProjectionCompositor<E, V> compositor;
+	private final ResultsCompositor<E, V> compositor;
 	private final ProjectionCollector.Provider<V, P> collectorProvider;
 
 	public ElasticsearchObjectProjection(Builder builder, ElasticsearchSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionCollector.Provider<V, P> collectorProvider) {
+			ResultsCompositor<E, V> compositor, ProjectionCollector.Provider<V, P> collectorProvider) {
 		super( builder.scope );
 		this.absoluteFieldPath = builder.objectField.absolutePath();
 		this.absoluteFieldPathComponents = builder.objectField.absolutePathComponents();
@@ -163,7 +163,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		}
 
 		@Override
-		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && objectField.multiValued() ) {
 				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),

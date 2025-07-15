@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 import org.hibernate.search.util.common.function.TriFunction;
 
 /**
@@ -30,55 +31,12 @@ import org.hibernate.search.util.common.function.TriFunction;
  *
  * @param <E> The type of the temporary storage for component values.
  * @param <V> The type of the final result representing a composed value.
+ *
+ * @deprecated Use {@link ResultsCompositor} instead.
  */
-public interface ProjectionCompositor<E, V> {
-
-	/**
-	 * Creates the initial container for component values.
-	 * <p>
-	 * This operation should be non-blocking.
-	 *
-	 * @return The initial container for component values,
-	 * to pass to the first call to {@link #set(Object, int, Object)}.
-	 */
-	E createInitial();
-
-	/**
-	 * Sets a value in the given component container.
-	 * <p>
-	 * This operation should be non-blocking.
-	 *
-	 * @param components The container for component values collected so far.
-	 * For the first call, this is the container returned by {@link #createInitial()}.
-	 * For the next calls, this is the container returned by the previous call to {@link #set(Object, int, Object)}.
-	 * @param index The index of the value to set.
-	 * @param value The value to set.
-	 * @return The container for component values.
-	 */
-	E set(E components, int index, Object value);
-
-	/**
-	 * Gets a value from the given component container.
-	 * <p>
-	 * This operation should be non-blocking.
-	 *
-	 * @param components The container for component values collected so far.
-	 * This is the container returned by the last call to {@link #set(Object, int, Object)}.
-	 * @param index The index of the value to get.
-	 * @return The new container for component values.
-	 */
-	Object get(E components, int index);
-
-	/**
-	 * Finishes composition, converting the component container into the final result.
-	 * <p>
-	 * This operation may be blocking.
-	 *
-	 * @param components The container for component values created by {@link #createInitial()} and populated
-	 * by successive calls to {@link #set(Object, int, Object)}.
-	 * @return The final result of the collecting.
-	 */
-	V finish(E components);
+@SuppressWarnings({ "deprecation", "removal" })
+@Deprecated(since = "8.1", forRemoval = true)
+public interface ProjectionCompositor<E, V> extends ResultsCompositor<E, V> {
 
 	static <P1, V> ProjectionCompositor<Object, V> from(Function<P1, V> transformer) {
 		return new SingleValuedProjectionCompositor<>( transformer );

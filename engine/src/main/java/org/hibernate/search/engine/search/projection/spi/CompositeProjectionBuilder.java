@@ -6,10 +6,11 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 public interface CompositeProjectionBuilder {
 
-	<E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+	<E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 			ProjectionCollector.Provider<V, P> collectorProvider);
 
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -28,6 +29,7 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CompositeAggregationFrom1AsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
@@ -679,6 +681,38 @@ class TermsAggregationSpecificsIT<F> {
 						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
 								.value( (AggregationFinalStep<F>) f.max().field( fieldPath, fieldType.getJavaType() ) )
+				)
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder(
+								c -> {
+									for ( F value : dataSet.valuesInDescendingOrder ) {
+										c.accept( value, fieldType.normalize( value ) );
+									}
+								}, fieldType
+						)
+				);
+	}
+
+	@SuppressWarnings("unchecked") // for the eclipse compiler
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void terms_composite(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( fieldType.supportsMetricAggregation(),
+				"Since the value is a metric aggregation on the same field, we want to be sure that only those fields that support it are included." );
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, F>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation(
+						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+								// while maybe silly as min/max == the same term as the key it is here just to test the nesting and aggregations:
+								.value( ( (CompositeAggregationFrom1AsStep<F>) f.composite() // cast here is for the eclipse compiler ...
+										.from( f.max().field( fieldPath, fieldType.getJavaType() ) ) )
+										.as( Function.<F>identity() ) )
 				)
 				.routing( dataSet.name ) )
 				.aggregation(

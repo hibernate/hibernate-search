@@ -881,6 +881,184 @@ class RangeAggregationSpecificsIT<F> {
 		);
 	}
 
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_composite_single(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, List<?>>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) ).value( f.composite().from( f.countDocuments() ).asList() )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+							List.of( 5L )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							List.of( 2L )
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_composite_double(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, List<?>>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) ).value( f.composite().from( f.countDocuments(), f.countDocuments() ).asList() )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+							List.of( 5L, 5L )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							List.of( 2L, 2L )
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_composite_triple(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Object[]>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) )
+										.value( f.composite().from( f.countDocuments(), f.countDocuments(), f.countDocuments() )
+												.asArray() )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+							new Object[] { 5L, 5L, 5L }
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							new Object[] { 2L, 2L, 2L }
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_composite_quad(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) )
+										.value( (AggregationFinalStep<Long>) f.composite()
+												.from( f.countDocuments(), f.countDocuments(), f.countDocuments(),
+														f.countDocuments() )
+												.asArray( arr -> (Long) arr[0] ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+							5L
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							2L
+					);
+				} )
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void rangesBucket_composite_as(FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		record MyRecord(Long countDoc, Long countValue) {
+		}
+
+		AggregationKey<Map<Range<F>, MyRecord>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery(
+				matchAllQuery()
+						.aggregation(
+								aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
+										.ranges( Arrays.asList(
+												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
+										) )
+										.value( f.composite()
+												.from( f.countDocuments(),
+														f.countValues()
+																.field( index.binding().bucketMultiValue.relativeFieldName ) )
+												.as( MyRecord::new ) )
+						)
+						.routing( dataSet.name )
+						.toQuery()
+		).aggregation(
+				aggregationKey,
+				containsExactly( c -> {
+					c.accept(
+							Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
+							new MyRecord( 5L, 20L )
+					);
+					c.accept(
+							Range.canonical( dataSet.ascendingValues.get( 5 ), null ),
+							new MyRecord( 2L, 8L )
+					);
+				} )
+		);
+	}
 
 	private void assumeNonCanonicalRangesSupported() {
 		assumeTrue(

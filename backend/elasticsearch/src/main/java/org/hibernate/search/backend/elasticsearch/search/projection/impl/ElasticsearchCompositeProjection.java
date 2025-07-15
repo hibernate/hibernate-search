@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 import com.google.gson.JsonObject;
 
@@ -30,11 +30,11 @@ class ElasticsearchCompositeProjection<E, V, A, P>
 		extends AbstractElasticsearchProjection<P> {
 
 	private final ElasticsearchSearchProjection<?>[] inners;
-	private final ProjectionCompositor<E, V> compositor;
+	private final ResultsCompositor<E, V> compositor;
 	private final ProjectionCollector<E, V, A, P> collector;
 
 	public ElasticsearchCompositeProjection(Builder builder, ElasticsearchSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionCollector<E, V, A, P> collector) {
+			ResultsCompositor<E, V> compositor, ProjectionCollector<E, V, A, P> collector) {
 		super( builder.scope );
 		this.inners = inners;
 		this.compositor = compositor;
@@ -118,7 +118,7 @@ class ElasticsearchCompositeProjection<E, V, A, P>
 		}
 
 		@Override
-		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			ElasticsearchSearchProjection<?>[] typedInners =
 					new ElasticsearchSearchProjection<?>[inners.length];

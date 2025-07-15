@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl;
 
+import org.hibernate.search.engine.search.aggregation.spi.CompositeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
 
@@ -12,5 +13,10 @@ public class StubSearchAggregationBuilderFactory
 	@Override
 	public <T> WithParametersAggregationBuilder<T> withParameters() {
 		return new StubSearchAggregation.StubWithParametersAggregationBuilder<>();
+	}
+
+	@Override
+	public <T> CompositeAggregationBuilder<T> compositeAggregation() {
+		return new StubSearchAggregation.StubCompositeAggregationBuilder<>();
 	}
 }

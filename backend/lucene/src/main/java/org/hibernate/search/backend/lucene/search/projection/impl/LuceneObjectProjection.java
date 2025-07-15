@@ -21,8 +21,8 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 import org.hibernate.search.util.common.SearchException;
 
 import org.apache.lucene.index.LeafReaderContext;
@@ -48,11 +48,11 @@ public class LuceneObjectProjection<E, V, P>
 	private final String nestedDocumentPath;
 	private final String requiredContextAbsoluteFieldPath;
 	private final LuceneSearchProjection<?>[] inners;
-	private final ProjectionCompositor<E, V> compositor;
+	private final ResultsCompositor<E, V> compositor;
 	private final ProjectionCollector.Provider<V, P> collectorProvider;
 
-	public LuceneObjectProjection(Builder builder, LuceneSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionCollector.Provider<V, P> collectorProvider) {
+	private LuceneObjectProjection(Builder builder, LuceneSearchProjection<?>[] inners,
+			ResultsCompositor<E, V> compositor, ProjectionCollector.Provider<V, P> collectorProvider) {
 		super( builder.scope );
 		this.absoluteFieldPath = builder.objectField.absolutePath();
 		this.nested = builder.objectField.type().nested();
@@ -224,7 +224,7 @@ public class LuceneObjectProjection<E, V, P>
 		}
 
 		@Override
-		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			if ( collectorProvider.isSingleValued() && objectField.multiValued() ) {
 				throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnMultiValuedField( objectField.absolutePath(),

@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.engine.search.aggregation.spi.CompositeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
@@ -31,5 +32,10 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	@Override
 	public <T> WithParametersAggregationBuilder<T> withParameters() {
 		return new ElasticsearchWithParametersAggregation.Builder<>( scope );
+	}
+
+	@Override
+	public <T> CompositeAggregationBuilder<T> compositeAggregation() {
+		return new ElasticsearchCompositeAggregation.Builder<>( scope );
 	}
 }

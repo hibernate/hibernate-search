@@ -5,7 +5,9 @@
 package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCompositeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneWithParametersAggregation;
+import org.hibernate.search.engine.search.aggregation.spi.CompositeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
 
@@ -20,5 +22,10 @@ public class LuceneSearchAggregationBuilderFactory implements SearchAggregationB
 	@Override
 	public <T> WithParametersAggregationBuilder<T> withParameters() {
 		return new LuceneWithParametersAggregation.Builder<>( scope );
+	}
+
+	@Override
+	public <T> CompositeAggregationBuilder<T> compositeAggregation() {
+		return new LuceneCompositeAggregation.Builder<>( scope );
 	}
 }

@@ -9,14 +9,14 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 public class CompositeProjectionValueStepImpl<T>
 		extends CompositeProjectionOptionsStepImpl<T, T>
 		implements CompositeProjectionValueStep<CompositeProjectionOptionsStepImpl<T, T>, T> {
 
 	public CompositeProjectionValueStepImpl(CompositeProjectionBuilder builder,
-			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor) {
+			SearchProjection<?>[] inners, ResultsCompositor<?, T> compositor) {
 		super( builder, inners, compositor, ProjectionCollector.nullable() );
 	}
 
