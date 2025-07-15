@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 class CompositeProjectionFrom2AsStepImpl<V1, V2>
 		extends AbstractCompositeProjectionFromAsStep
@@ -29,7 +29,7 @@ class CompositeProjectionFrom2AsStepImpl<V1, V2>
 	@Override
 	public <V> CompositeProjectionValueStep<?, V> as(BiFunction<V1, V2, V> transformer) {
 		return new CompositeProjectionValueStepImpl<>( builder, toProjectionArray(),
-				ProjectionCompositor.from( transformer )
+				ResultsCompositor.from( transformer )
 		);
 	}
 

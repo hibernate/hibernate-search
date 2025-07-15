@@ -23,8 +23,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateCl
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 public class LuceneSearchQuerySelectStepImpl<SR, R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
@@ -81,7 +81,7 @@ public class LuceneSearchQuerySelectStepImpl<SR, R, E, LOS>
 	@Override
 	public LuceneSearchQueryWhereStep<SR, List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
-				.build( projections, ProjectionCompositor.fromList( projections.length ),
+				.build( projections, ResultsCompositor.fromList( projections.length ),
 						ProjectionCollector.nullable() ) );
 	}
 

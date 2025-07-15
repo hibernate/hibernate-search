@@ -14,4 +14,6 @@ public interface SearchAggregationBuilderFactory {
 
 	<T> WithParametersAggregationBuilder<T> withParameters();
 
+	<T> CompositeAggregationBuilder<T> compositeAggregation();
+
 }

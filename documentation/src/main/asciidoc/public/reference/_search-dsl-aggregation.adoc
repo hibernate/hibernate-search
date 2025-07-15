@@ -475,6 +475,123 @@ even if the field type is represented by one of the integer number types.
 In this case, if you want to return decimals, provide `Double.class` for the expected returned type.
 ====
 
+[[search-dsl-aggregation-composite]]
+== `composite`: combine aggregations
+
+include::../components/_incubating-warning.adoc[]
+
+[[search-dsl-aggregation-composite-basics]]
+=== Basics
+
+The `composite` aggregation applies multiple aggregations and combines their results,
+either as a `List<?>`/`Object[]` or as a single object generated using a custom transformer.
+
+[TIP]
+====
+While composite aggregations can be defined at the root level,
+they are most useful as a container to collect multiple values from
+<<search-dsl-aggregation-terms-value,terms>> and <<search-dsl-aggregation-range-value,range>> aggregations.
+====
+
+[TIP]
+====
+Constructing composite aggregations is quite similar to <<search-dsl-projection-composite,composite projections>>.
+====
+
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-customObject]
+----
+<1> Call `.composite()`.
+<2> Define the inner aggregations on the `price` field.
+While this example uses the same field it is possible to use different fields within the same composite aggregation.
+<3> Define the result of the composite aggregation as the result of calling the constructor of a custom object, `PriceAggregation`.
+The constructor of `PriceAggregation` will be called for the aggregated results and resulting object can be than retrieved
+from the fetched search results.
+<4> Retrieving the `PriceAggregation` as aggregation results.
+====
+
+[[search-dsl-aggregation-composite-more-inners]]
+=== Composing more than 3 inner aggregations
+
+If you require more than 3 aggregations as arguments to `from(...)`,
+then the transform function will have to take a `List<?>` as an argument,
+and will be set using `asList(...)` instead of `as(..,)`:
+
+.Returning custom object created from multiple aggregation values with `.composite().from(...).asList(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-customObject-asList]
+----
+<1> Call `.composite()`.
+<2> Define the inner aggregations on the `price` and `ratings` fields.
+<3> Define the result of the aggregation as the result of calling a `list -> obj` function.
+The lambda will take elements of the list (the results of aggregations defined above, in that same order).
+For convenience an alternative constructor taking the list is defined.
+<4> Retrieving the `BookAggregation` as aggregation results.
+====
+
+[[search-dsl-aggregation-composite-as-list]]
+=== Aggregating to a `List<?>` or `Object[]`
+
+If you don't mind receiving the result of inner aggregations as a `List<?>`,
+you can do without the transformer by simply calling `asList()`:
+
+.Returning a `List` of aggregated values with `.composite().add(...).asList()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-list]
+----
+<1> Call `.composite()`.
+<2> Define the inner aggregations on the `price` and `ratings` fields.
+<3> Define the result of the aggregations as a list,
+meaning the aggregated result will be `List` instance with
+the value of the average `price` of the matched documents at index `0`,
+the value of the minimum `price` of the matched documents at index `1`,
+the value of the maximum `price` of the matched documents at index `2`,
+and the total number of `ratings` field values of the matched documents at index `3`.
+<4> Retrieving the `List<?>` as aggregation results.
+====
+
+Similarly, to get the result of inner aggregations as an array (`Object[]`),
+you can do without the transformer by calling `asArray()`:
+
+.Returning an array of aggregated values with `.composite(...).add(...).asArray()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-array]
+----
+<1> Call `.composite()`.
+<2> Define the inner aggregations on the `price` and `ratings` fields.
+<3> Define the result of the aggregations as an array,
+meaning the aggregated result will be `Object[]` instance with
+the value of the average `price` of the matched documents at index `0`,
+the value of the minimum `price` of the matched documents at index `1`,
+the value of the maximum `price` of the matched documents at index `2`,
+and the total number of `ratings` field values of the matched documents at index `3`.
+<4> Retrieving the `Object[]` as aggregation results.
+====
+
+Alternatively, to get the result as a `List<?>`,
+you can use the shorter variant of `.composite(...)` that directly takes aggregations as arguments:
+
+.Returning a `List` of aggregated values with `.composite(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-list-singlestep]
+----
+<1> Call `.composite(...)` and pass all of the required aggregations to it.
+<2> Define the inner aggregations on the `price` and `ratings` fields.
+<3> No extra `.as()`/`.asList()`/`.asArray()` method calls required.
+<4> Retrieving the `List<?>` as aggregation results.
+====
+
+
 [[search-dsl-aggregation-withparameters]]
 == `withParameters`: create aggregations using query parameters
 

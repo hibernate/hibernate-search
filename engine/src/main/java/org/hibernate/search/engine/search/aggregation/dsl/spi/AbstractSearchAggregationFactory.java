@@ -4,11 +4,14 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.spi;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.AvgAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CompositeAggregationInnerStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CountDistinctValuesAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CountDocumentsAggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationFieldStep;
@@ -20,6 +23,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 import org.hibernate.search.engine.search.aggregation.dsl.SumAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.AvgAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.CompositeAggregationInnerStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDistinctValuesAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDocumentsAggregationFinalStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.CountValuesAggregationFieldStepImpl;
@@ -88,6 +92,18 @@ public abstract class AbstractSearchAggregationFactory<
 
 	public AvgAggregationFieldStep<SR, PDF> avg() {
 		return new AvgAggregationFieldStepImpl<>( dslContext );
+	}
+
+	@Override
+	public CompositeAggregationInnerStep composite() {
+		return new CompositeAggregationInnerStepImpl( dslContext );
+	}
+
+	@Override
+	public AggregationFinalStep<List<?>> composite(SearchAggregation<?>... aggregations) {
+		return composite()
+				.from( aggregations )
+				.asList();
 	}
 
 	@Override

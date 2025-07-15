@@ -36,8 +36,8 @@ import org.hibernate.search.engine.search.projection.dsl.impl.HighlightProjectio
 import org.hibernate.search.engine.search.projection.dsl.impl.IdProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.ScoreProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionFactoryExtensionStep;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -118,7 +118,7 @@ public abstract class AbstractSearchProjectionFactory<
 	@Override
 	public CompositeProjectionValueStep<?, List<?>> composite(SearchProjection<?>... projections) {
 		return new CompositeProjectionValueStepImpl<>( dslContext.scope().projectionBuilders().composite(),
-				projections, ProjectionCompositor.fromList( projections.length ) );
+				projections, ResultsCompositor.fromList( projections.length ) );
 	}
 
 	@Override

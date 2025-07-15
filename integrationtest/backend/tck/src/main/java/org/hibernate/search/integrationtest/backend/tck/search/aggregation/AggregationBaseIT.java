@@ -78,8 +78,7 @@ class AggregationBaseIT {
 		// Mandatory extension, unsupported
 		assertThatThrownBy(
 				() -> scope.aggregation().extension( new UnSupportedExtension() )
-		)
-				.isInstanceOf( SearchException.class );
+		).isInstanceOf( SearchException.class );
 	}
 
 	@Test

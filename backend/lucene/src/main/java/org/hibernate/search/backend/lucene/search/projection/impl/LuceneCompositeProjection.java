@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 import org.apache.lucene.index.LeafReaderContext;
 
@@ -31,11 +31,11 @@ class LuceneCompositeProjection<E, V, A, P>
 		extends AbstractLuceneProjection<P> {
 
 	private final LuceneSearchProjection<?>[] inners;
-	private final ProjectionCompositor<E, V> compositor;
+	private final ResultsCompositor<E, V> compositor;
 	private final ProjectionCollector<E, V, A, P> collector;
 
 	public LuceneCompositeProjection(Builder builder, LuceneSearchProjection<?>[] inners,
-			ProjectionCompositor<E, V> compositor, ProjectionCollector<E, V, A, P> collector) {
+			ResultsCompositor<E, V> compositor, ProjectionCollector<E, V, A, P> collector) {
 		super( builder.scope );
 		this.inners = inners;
 		this.compositor = compositor;
@@ -141,7 +141,7 @@ class LuceneCompositeProjection<E, V, A, P>
 		}
 
 		@Override
-		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			LuceneSearchProjection<?>[] typedInners =
 					new LuceneSearchProjection<?>[inners.length];

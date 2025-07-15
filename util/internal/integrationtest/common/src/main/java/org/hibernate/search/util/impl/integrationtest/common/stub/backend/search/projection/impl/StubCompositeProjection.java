@@ -13,16 +13,16 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 class StubCompositeProjection<E, V, A, P> extends StubSearchProjection<P> {
 
 	private final StubSearchProjection<?>[] inners;
-	private final ProjectionCompositor<E, V> compositor;
+	private final ResultsCompositor<E, V> compositor;
 	private final ProjectionCollector<E, V, A, P> collector;
 	private final boolean singleValued;
 
-	protected StubCompositeProjection(StubSearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+	protected StubCompositeProjection(StubSearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 			ProjectionCollector<E, V, A, P> collector, boolean singleValued) {
 		this.inners = inners;
 		this.compositor = compositor;
@@ -94,7 +94,7 @@ class StubCompositeProjection<E, V, A, P> extends StubSearchProjection<P> {
 		}
 
 		@Override
-		public final <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+		public final <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ResultsCompositor<E, V> compositor,
 				ProjectionCollector.Provider<V, P> collectorProvider) {
 			StubSearchProjection<?>[] typedInners =
 					new StubSearchProjection<?>[inners.length];
@@ -105,7 +105,7 @@ class StubCompositeProjection<E, V, A, P> extends StubSearchProjection<P> {
 		}
 
 		protected <E, V, A, P> SearchProjection<P> doBuild(StubSearchProjection<?>[] typedInners,
-				ProjectionCompositor<E, V> compositor,
+				ResultsCompositor<E, V> compositor,
 				ProjectionCollector<E, V, A, P> collector, boolean singleValued) {
 			return new StubCompositeProjection<>( typedInners, compositor, collector, singleValued );
 		}

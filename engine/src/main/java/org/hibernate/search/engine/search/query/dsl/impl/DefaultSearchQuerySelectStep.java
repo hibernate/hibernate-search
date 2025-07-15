@@ -18,12 +18,12 @@ import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
@@ -77,7 +77,7 @@ public final class DefaultSearchQuerySelectStep<SR, R, E, LOS>
 	@Override
 	public DefaultSearchQueryOptionsStep<SR, List<?>, LOS> select(SearchProjection<?>... projections) {
 		return select( scope.projectionBuilders().composite()
-				.build( projections, ProjectionCompositor.fromList( projections.length ),
+				.build( projections, ResultsCompositor.fromList( projections.length ),
 						ProjectionCollector.nullable() ) );
 	}
 

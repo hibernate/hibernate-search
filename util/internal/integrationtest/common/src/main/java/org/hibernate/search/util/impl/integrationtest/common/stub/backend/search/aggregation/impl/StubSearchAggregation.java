@@ -9,12 +9,14 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.spi.CompositeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
@@ -139,6 +141,24 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		@Override
 		public SearchAggregation<T> build() {
 			return new StubSearchAggregation<>();
+		}
+	}
+
+	public static class StubCompositeAggregationBuilder<A> implements CompositeAggregationBuilder<A> {
+
+		@Override
+		public SearchAggregation<A> build() {
+			return new StubSearchAggregation<>();
+		}
+
+		@Override
+		public CompositeAggregationBuilder<A> innerAggregations(SearchAggregation<?>[] inners) {
+			return this;
+		}
+
+		@Override
+		public <V> CompositeAggregationBuilder<V> compositor(ResultsCompositor<?, V> compositor) {
+			return new StubCompositeAggregationBuilder<>();
 		}
 	}
 }

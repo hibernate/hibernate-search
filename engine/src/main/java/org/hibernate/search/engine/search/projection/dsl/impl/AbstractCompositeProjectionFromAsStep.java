@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
 abstract class AbstractCompositeProjectionFromAsStep
 		implements CompositeProjectionFromAsStep {
@@ -26,28 +26,28 @@ abstract class AbstractCompositeProjectionFromAsStep
 	public final CompositeProjectionValueStep<?, List<?>> asList() {
 		SearchProjection<?>[] inners = toProjectionArray();
 		return new CompositeProjectionValueStepImpl<>( builder, inners,
-				ProjectionCompositor.fromList( inners.length ) );
+				ResultsCompositor.fromList( inners.length ) );
 	}
 
 	@Override
 	public final <V> CompositeProjectionValueStep<?, V> asList(Function<? super List<?>, ? extends V> transformer) {
 		SearchProjection<?>[] inners = toProjectionArray();
 		return new CompositeProjectionValueStepImpl<>( builder, inners,
-				ProjectionCompositor.fromList( inners.length, transformer ) );
+				ResultsCompositor.fromList( inners.length, transformer ) );
 	}
 
 	@Override
 	public CompositeProjectionValueStep<?, Object[]> asArray() {
 		SearchProjection<?>[] inners = toProjectionArray();
 		return new CompositeProjectionValueStepImpl<>( builder, inners,
-				ProjectionCompositor.fromArray( inners.length ) );
+				ResultsCompositor.fromArray( inners.length ) );
 	}
 
 	@Override
 	public <V> CompositeProjectionValueStep<?, V> asArray(Function<? super Object[], ? extends V> transformer) {
 		SearchProjection<?>[] inners = toProjectionArray();
 		return new CompositeProjectionValueStepImpl<>( builder, inners,
-				ProjectionCompositor.fromArray( inners.length, transformer ) );
+				ResultsCompositor.fromArray( inners.length, transformer ) );
 	}
 
 	abstract SearchProjection<?>[] toProjectionArray();

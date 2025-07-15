@@ -2,16 +2,17 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.engine.search.projection.spi;
+package org.hibernate.search.engine.search.spi;
 
-@SuppressWarnings({ "deprecation", "removal" })
-@Deprecated(since = "8.1", forRemoval = true)
-abstract class ObjectArrayProjectionCompositor<V>
-		implements ProjectionCompositor<Object[], V> {
+import org.hibernate.search.util.common.annotation.Incubating;
+
+@Incubating
+abstract class ObjectArrayResultsCompositor<V>
+		implements ResultsCompositor<Object[], V> {
 
 	private final int size;
 
-	ObjectArrayProjectionCompositor(int size) {
+	ObjectArrayResultsCompositor(int size) {
 		this.size = size;
 	}
 
