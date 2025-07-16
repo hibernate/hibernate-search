@@ -33,13 +33,14 @@ public final class AggregationRequestBuildingContextContext implements Aggregati
 		buildingContext.put( key, value );
 	}
 
-	public AggregationRequestContext rootAggregationRequestContext() {
-		return aggregationRequestContext;
-	}
-
 	@Override
 	public PredicateRequestContext getRootPredicateContext() {
 		return aggregationRequestContext.getRootPredicateContext();
+	}
+
+	@Override
+	public boolean isRootContext() {
+		return false;
 	}
 
 	public static <V> Key<V> buildingContextKey(String name) {

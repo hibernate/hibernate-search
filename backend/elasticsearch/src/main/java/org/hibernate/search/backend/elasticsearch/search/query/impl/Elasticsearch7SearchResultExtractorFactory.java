@@ -4,12 +4,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.util.Map;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
-import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
 /**
  * @see Elasticsearch7SearchResultExtractor
@@ -19,7 +18,7 @@ public class Elasticsearch7SearchResultExtractorFactory implements Elasticsearch
 	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
 			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregations) {
+			List<ElasticsearchSearchAggregation.Extractor<?>> aggregations) {
 		return new Elasticsearch7SearchResultExtractor<>(
 				requestContext,
 				rootExtractor, aggregations

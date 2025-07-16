@@ -5,7 +5,6 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -247,20 +246,19 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
 
-		Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregationExtractors;
+		List<ElasticsearchSearchAggregation.Extractor<?>> aggregationExtractors;
 		if ( aggregations != null ) {
-			aggregationExtractors = new LinkedHashMap<>();
+			aggregationExtractors = new ArrayList<>();
 			JsonObject jsonAggregations = new JsonObject();
 
 			for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
-				aggregationExtractors.put( entry.getKey(),
-						entry.getValue().request( requestContext, entry.getKey(), jsonAggregations ) );
+				aggregationExtractors.add( entry.getValue().request( requestContext, entry.getKey(), jsonAggregations ) );
 			}
 
 			payload.add( "aggregations", jsonAggregations );
 		}
 		else {
-			aggregationExtractors = Collections.emptyMap();
+			aggregationExtractors = List.of();
 		}
 
 		if ( queryHighlighter != null ) {

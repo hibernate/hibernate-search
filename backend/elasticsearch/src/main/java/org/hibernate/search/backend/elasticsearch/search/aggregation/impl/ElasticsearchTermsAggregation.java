@@ -68,9 +68,8 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 		innerObject.addProperty( "min_doc_count", minDocCount );
 
 		JsonObject subOuterObject = new JsonObject();
-		AggregationKey<V> innerExtractorKey = AggregationKey.of( "agg" );
-		context.add( buildingContextKey( INNER_EXTRACTOR_KEY ), innerExtractorKey );
-		context.add( buildingContextKey( INNER_EXTRACTOR ), aggregation.request( context, innerExtractorKey, subOuterObject ) );
+		context.add( buildingContextKey( INNER_EXTRACTOR ),
+				aggregation.request( context, AggregationKey.of( "agg" ), subOuterObject ) );
 
 		if ( !subOuterObject.isEmpty() ) {
 			outerObject.add( "aggs", subOuterObject );
@@ -78,10 +77,9 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	}
 
 	@Override
-	protected Extractor<Map<K, V>> extractor(AggregationRequestBuildingContextContext context) {
-		AggregationKey<V> innerExtractorKey = context.get( buildingContextKey( INNER_EXTRACTOR_KEY ) );
+	protected Extractor<Map<K, V>> extractor(AggregationKey<?> key, AggregationRequestBuildingContextContext context) {
 		Extractor<V> innerExtractor = context.get( buildingContextKey( INNER_EXTRACTOR ) );
-		return new TermsBucketExtractor( nestedPathHierarchy, filter, innerExtractorKey, innerExtractor );
+		return new TermsBucketExtractor( key, nestedPathHierarchy, filter, innerExtractor );
 	}
 
 	public static class Factory<F>
@@ -130,14 +128,11 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	}
 
 	protected class TermsBucketExtractor extends AbstractBucketExtractor<K, V> {
-		private final AggregationKey<V> innerExtractorKey;
 		private final Extractor<V> innerExtractor;
 
-		protected TermsBucketExtractor(List<String> nestedPathHierarchy,
-				ElasticsearchSearchPredicate filter, AggregationKey<V> innerExtractorKey, Extractor<V> innerExtractor
-		) {
-			super( nestedPathHierarchy, filter );
-			this.innerExtractorKey = innerExtractorKey;
+		protected TermsBucketExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter, Extractor<V> innerExtractor) {
+			super( key, nestedPathHierarchy, filter );
 			this.innerExtractor = innerExtractor;
 		}
 
@@ -154,10 +149,6 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 						decodeFunction.apply( keyJson, keyAsStringJson ),
 						convertContext
 				);
-
-				if ( bucket.has( innerExtractorKey.name() ) ) {
-					bucket = bucket.getAsJsonObject( innerExtractorKey.name() );
-				}
 				result.put( key, innerExtractor.extract( bucket, context ) );
 			}
 			return result;

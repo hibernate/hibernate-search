@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 
@@ -84,8 +85,8 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 	}
 
 	@Override
-	protected Extractor<K> extractor(AggregationRequestBuildingContextContext context) {
-		return metricFieldExtractorCreator.extractor( filter );
+	protected Extractor<K> extractor(AggregationKey<?> key, AggregationRequestBuildingContextContext context) {
+		return metricFieldExtractorCreator.extractor( key, filter );
 	}
 
 	private static class Factory<F>
@@ -155,9 +156,10 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
-		protected MetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
+		protected MetricFieldExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter, ElasticsearchFieldCodec<F> codec) {
-			super( nestedPathHierarchy, filter );
+			super( key, nestedPathHierarchy, filter );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 			this.codec = codec;
 		}
@@ -187,15 +189,16 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			}
 
 			@Override
-			AbstractExtractor<K> extractor(ElasticsearchSearchPredicate filter) {
-				return new MetricFieldExtractor<>( nestedPathHierarchy, filter, fromFieldValueConverter, codec );
+			AbstractExtractor<K> extractor(AggregationKey<?> key, ElasticsearchSearchPredicate filter) {
+				return new MetricFieldExtractor<>( key, nestedPathHierarchy, filter, fromFieldValueConverter, codec );
 			}
 		}
 	}
 
 	private static class DoubleMetricFieldExtractor extends AbstractExtractor<Double> {
-		protected DoubleMetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
-			super( nestedPathHierarchy, filter );
+		protected DoubleMetricFieldExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter) {
+			super( key, nestedPathHierarchy, filter );
 		}
 
 		@Override
@@ -211,8 +214,8 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			}
 
 			@Override
-			AbstractExtractor<Double> extractor(ElasticsearchSearchPredicate filter) {
-				return new DoubleMetricFieldExtractor( nestedPathHierarchy, filter );
+			AbstractExtractor<Double> extractor(AggregationKey<?> key, ElasticsearchSearchPredicate filter) {
+				return new DoubleMetricFieldExtractor( key, nestedPathHierarchy, filter );
 			}
 		}
 	}
@@ -221,9 +224,10 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 
 		private final ProjectionConverter<JsonElement, K> projectionConverter;
 
-		protected RawMetricFieldExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
+		protected RawMetricFieldExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter,
 				ProjectionConverter<JsonElement, K> projectionConverter) {
-			super( nestedPathHierarchy, filter );
+			super( key, nestedPathHierarchy, filter );
 			this.projectionConverter = projectionConverter;
 		}
 
@@ -242,8 +246,8 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			}
 
 			@Override
-			AbstractExtractor<K> extractor(ElasticsearchSearchPredicate filter) {
-				return new RawMetricFieldExtractor<>( nestedPathHierarchy, filter, projectionConverter );
+			AbstractExtractor<K> extractor(AggregationKey<?> key, ElasticsearchSearchPredicate filter) {
+				return new RawMetricFieldExtractor<>( key, nestedPathHierarchy, filter, projectionConverter );
 			}
 		}
 	}
@@ -255,7 +259,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			this.nestedPathHierarchy = nestedPathHierarchy;
 		}
 
-		abstract AbstractExtractor<K> extractor(ElasticsearchSearchPredicate filter);
+		abstract AbstractExtractor<K> extractor(AggregationKey<?> key, ElasticsearchSearchPredicate filter);
 	}
 
 	private static class Builder<F, K> extends AbstractBuilder<K>

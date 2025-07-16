@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -59,9 +60,9 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 
 	protected abstract class AbstractBucketExtractor<A, B> extends AbstractExtractor<Map<A, B>> {
 
-		protected AbstractBucketExtractor(List<String> nestedPathHierarchy,
+		protected AbstractBucketExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
 				ElasticsearchSearchPredicate filter) {
-			super( nestedPathHierarchy, filter );
+			super( key, nestedPathHierarchy, filter );
 		}
 
 		@Override
