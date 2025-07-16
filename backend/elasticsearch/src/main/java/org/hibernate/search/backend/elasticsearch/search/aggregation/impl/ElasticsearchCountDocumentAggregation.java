@@ -43,14 +43,21 @@ public class ElasticsearchCountDocumentAggregation extends AbstractElasticsearch
 
 	@Override
 	public Extractor<Long> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
-		return new CountDocumentsExtractor( isNested );
+		return new CountDocumentsExtractor( key, isNested, context.isRootContext() );
 	}
 
-	private record CountDocumentsExtractor(boolean isNested) implements Extractor<Long> {
+	private record CountDocumentsExtractor(AggregationKey<?> key, boolean isNested, boolean rootContext)
+			implements Extractor<Long> {
 
 		@Override
 		public Long extract(JsonObject aggregationResult, AggregationExtractContext context) {
-			if ( aggregationResult != null ) {
+			if ( rootContext ) {
+				if ( context instanceof ElasticsearchSearchQueryExtractContext c ) {
+					return TOTAL_HITS_VALUE_PROPERTY_ACCESSOR.get( c.getResponseBody() )
+							.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
+				}
+			}
+			else {
 				if ( isNested ) {
 					// We must return the number of root documents,
 					// not the number of leaf documents that Elasticsearch returns by default.
@@ -61,10 +68,6 @@ public class ElasticsearchCountDocumentAggregation extends AbstractElasticsearch
 					return RESPONSE_DOC_COUNT_ACCESSOR.get( aggregationResult )
 							.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 				}
-			}
-			else if ( context instanceof ElasticsearchSearchQueryExtractContext c ) {
-				return TOTAL_HITS_VALUE_PROPERTY_ACCESSOR.get( c.getResponseBody() )
-						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
 			}
 			throw ElasticsearchClientLog.INSTANCE.elasticsearchResponseMissingData();
 		}

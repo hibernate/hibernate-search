@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
 
 import com.google.gson.JsonElement;
@@ -57,8 +58,8 @@ public class ElasticsearchMetricLongAggregation extends AbstractElasticsearchNes
 	}
 
 	@Override
-	protected Extractor<Long> extractor(AggregationRequestBuildingContextContext context) {
-		return new MetricLongExtractor( nestedPathHierarchy, filter );
+	protected Extractor<Long> extractor(AggregationKey<?> key, AggregationRequestBuildingContextContext context) {
+		return new MetricLongExtractor( key, nestedPathHierarchy, filter );
 	}
 
 	private static class Factory<F>
@@ -80,8 +81,9 @@ public class ElasticsearchMetricLongAggregation extends AbstractElasticsearchNes
 	}
 
 	private static class MetricLongExtractor extends AbstractExtractor<Long> {
-		protected MetricLongExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
-			super( nestedPathHierarchy, filter );
+		protected MetricLongExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter) {
+			super( key, nestedPathHierarchy, filter );
 		}
 
 		@Override

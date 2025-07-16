@@ -22,7 +22,7 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 	public Extractor<JsonObject> request(AggregationRequestContext context, AggregationKey<?> key,
 			JsonObject jsonAggregations) {
 		jsonAggregations.add( key.name(), requestJson );
-		return PassThroughExtractor.INSTANCE;
+		return new PassThroughExtractor( key );
 	}
 
 	static class Builder extends AbstractBuilder<JsonObject> {
@@ -40,12 +40,10 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 		}
 	}
 
-	private static class PassThroughExtractor implements Extractor<JsonObject> {
-		public static final PassThroughExtractor INSTANCE = new PassThroughExtractor();
-
+	private record PassThroughExtractor(AggregationKey<?> key) implements Extractor<JsonObject> {
 		@Override
 		public JsonObject extract(JsonObject aggregationResult, AggregationExtractContext context) {
-			return aggregationResult;
+			return aggregationResult.getAsJsonObject( key.name() );
 		}
 	}
 }

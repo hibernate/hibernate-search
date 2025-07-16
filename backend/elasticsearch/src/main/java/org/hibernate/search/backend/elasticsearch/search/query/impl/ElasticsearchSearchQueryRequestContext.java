@@ -74,6 +74,11 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	}
 
 	@Override
+	public boolean isRootContext() {
+		return true;
+	}
+
+	@Override
 	public Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {
 		if ( distanceSorts == null ) {
 			return null;

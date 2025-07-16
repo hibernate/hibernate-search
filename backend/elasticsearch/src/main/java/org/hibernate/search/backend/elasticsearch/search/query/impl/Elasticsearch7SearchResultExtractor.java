@@ -62,20 +62,19 @@ class Elasticsearch7SearchResultExtractor<H>
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 
 	private final ElasticsearchSearchProjection.Extractor<?, H> rootExtractor;
-	private final Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregations;
+	private final List<ElasticsearchSearchAggregation.Extractor<?>> aggregations;
 
 	Elasticsearch7SearchResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
 			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> aggregations) {
+			List<ElasticsearchSearchAggregation.Extractor<?>> aggregations) {
 		this.requestContext = requestContext;
 		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
 	}
 
 	@Override
-	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody,
-			Deadline deadline) {
+	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody, Deadline deadline) {
 		ElasticsearchSearchQueryExtractContext extractContext = requestContext.createExtractContext(
 				responseBody
 		);
@@ -143,12 +142,9 @@ class Elasticsearch7SearchResultExtractor<H>
 
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
 
-		for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation.Extractor<?>> entry : aggregations.entrySet() ) {
-			AggregationKey<?> key = entry.getKey();
-			ElasticsearchSearchAggregation.Extractor<?> aggregation = entry.getValue();
-
-			Object extracted = aggregation.extract( jsonAggregations.getAsJsonObject( key.name() ), extractContext );
-			extractedMap.put( key, extracted );
+		for ( ElasticsearchSearchAggregation.Extractor<?> extractor : aggregations ) {
+			Object extracted = extractor.extract( jsonAggregations, extractContext );
+			extractedMap.put( extractor.key(), extracted );
 		}
 
 		return extractedMap;

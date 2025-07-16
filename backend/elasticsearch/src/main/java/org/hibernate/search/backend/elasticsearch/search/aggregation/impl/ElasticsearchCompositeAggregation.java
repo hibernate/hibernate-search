@@ -13,14 +13,12 @@ import org.hibernate.search.engine.search.spi.ResultsCompositor;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchAggregation<A> {
-	private final ElasticsearchSearchIndexScope<?> scope;
 	private final ElasticsearchSearchAggregation<?>[] aggregations;
 	private final ResultsCompositor<?, A> compositor;
 
 
 	private ElasticsearchCompositeAggregation(Builder<A> builder) {
 		super( builder );
-		scope = builder.scope;
 		aggregations = builder.inners;
 		compositor = builder.compositor;
 	}
@@ -36,7 +34,7 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 				jsonAggregations.add( keys[i].name(), innerObject.get( keys[i].name() ) );
 			}
 		}
-		return new CompositeExtractor<>( compositor, extractors, keys );
+		return new CompositeExtractor<>( key, compositor, extractors, keys );
 	}
 
 	public static class Builder<T> extends AbstractBuilder<T>
@@ -75,7 +73,8 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 		}
 	}
 
-	private record CompositeExtractor<E, A>(ResultsCompositor<E, A> compositor, Extractor<?>[] extractors,
+	private record CompositeExtractor<E, A>(AggregationKey<?> key, ResultsCompositor<E, A> compositor,
+											Extractor<?>[] extractors,
 											AggregationKey<?>[] keys)
 			implements Extractor<A> {
 
@@ -84,11 +83,7 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 			E initial = compositor.createInitial();
 
 			for ( int i = 0; i < extractors.length; i++ ) {
-				JsonObject subResult = aggregationResult;
-				if ( aggregationResult.has( keys[i].name() ) ) {
-					subResult = aggregationResult.getAsJsonObject( keys[i].name() );
-				}
-				initial = compositor.set( initial, i, extractors[i].extract( subResult, context ) );
+				initial = compositor.set( initial, i, extractors[i].extract( aggregationResult, context ) );
 			}
 
 			return compositor.finish( initial );

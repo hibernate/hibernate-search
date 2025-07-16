@@ -52,7 +52,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 	public final Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
 		AggregationRequestBuildingContextContext buildingContext = new AggregationRequestBuildingContextContext( context );
 		jsonAggregations.add( key.name(), request( buildingContext ) );
-		return extractor( buildingContext );
+		return extractor( key, buildingContext );
 	}
 
 	private JsonObject request(AggregationRequestBuildingContextContext context) {
@@ -93,14 +93,17 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	protected abstract JsonObject doRequest(AggregationRequestBuildingContextContext context);
 
-	protected abstract Extractor<A> extractor(AggregationRequestBuildingContextContext context);
+	protected abstract Extractor<A> extractor(AggregationKey<?> key, AggregationRequestBuildingContextContext context);
 
 	protected abstract static class AbstractExtractor<T> implements Extractor<T> {
 
+		private final AggregationKey<?> key;
 		private final List<String> nestedPathHierarchy;
 		private final ElasticsearchSearchPredicate filter;
 
-		protected AbstractExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter) {
+		protected AbstractExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter) {
+			this.key = key;
 			this.nestedPathHierarchy = nestedPathHierarchy;
 			this.filter = filter;
 		}
@@ -109,7 +112,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		public final T extract(JsonObject aggregationResult, AggregationExtractContext context) {
 			int nestedPathHierarchySize = nestedPathHierarchy.size();
 
-			JsonObject actualAggregationResult = aggregationResult;
+			JsonObject actualAggregationResult = aggregationResult.getAsJsonObject( key.name() );
 
 			for ( int i = 0; i < nestedPathHierarchySize; ++i ) {
 				actualAggregationResult = RESPONSE_NESTED_ACCESSOR.get( actualAggregationResult )
@@ -125,6 +128,11 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		}
 
 		protected abstract T doExtract(JsonObject aggregationResult, AggregationExtractContext context);
+
+		@Override
+		public AggregationKey<?> key() {
+			return key;
+		}
 	}
 
 

@@ -41,6 +41,11 @@ public interface ElasticsearchSearchAggregation<A> extends SearchAggregation<A> 
 		 * @return The aggregation result extracted from the response.
 		 */
 		T extract(JsonObject aggregationResult, AggregationExtractContext context);
+
+		/**
+		 * @return The aggregation key, the one that this extractor was requested for by {@link ElasticsearchSearchAggregation#request(AggregationRequestContext, AggregationKey, JsonObject)}.
+		 */
+		AggregationKey<?> key();
 	}
 
 	static <A> ElasticsearchSearchAggregation<A> from(ElasticsearchSearchIndexScope<?> scope,

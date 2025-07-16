@@ -10,4 +10,6 @@ public interface AggregationRequestContext {
 
 	PredicateRequestContext getRootPredicateContext();
 
+	boolean isRootContext();
+
 }

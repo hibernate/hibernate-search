@@ -62,9 +62,8 @@ public class ElasticsearchRangeAggregation<F, K, V>
 		innerObject.add( "ranges", rangesJson );
 
 		JsonObject subOuterObject = new JsonObject();
-		AggregationKey<V> innerExtractorKey = AggregationKey.of( "agg" );
-		context.add( buildingContextKey( INNER_EXTRACTOR_KEY ), innerExtractorKey );
-		context.add( buildingContextKey( INNER_EXTRACTOR ), aggregation.request( context, innerExtractorKey, subOuterObject ) );
+		context.add( buildingContextKey( INNER_EXTRACTOR ),
+				aggregation.request( context, AggregationKey.of( "agg" ), subOuterObject ) );
 
 		if ( !subOuterObject.isEmpty() ) {
 			outerObject.add( "aggs", subOuterObject );
@@ -72,10 +71,9 @@ public class ElasticsearchRangeAggregation<F, K, V>
 	}
 
 	@Override
-	protected Extractor<Map<Range<K>, V>> extractor(AggregationRequestBuildingContextContext context) {
-		AggregationKey<V> innerExtractorKey = context.get( buildingContextKey( INNER_EXTRACTOR_KEY ) );
+	protected Extractor<Map<Range<K>, V>> extractor(AggregationKey<?> key, AggregationRequestBuildingContextContext context) {
 		Extractor<V> innerExtractor = context.get( buildingContextKey( INNER_EXTRACTOR ) );
-		return new RangeBucketExtractor( nestedPathHierarchy, filter, rangesInOrder, innerExtractorKey, innerExtractor );
+		return new RangeBucketExtractor( key, nestedPathHierarchy, filter, rangesInOrder, innerExtractor );
 	}
 
 	public static class Factory<F>
@@ -111,13 +109,11 @@ public class ElasticsearchRangeAggregation<F, K, V>
 	protected class RangeBucketExtractor extends AbstractBucketExtractor<Range<K>, V> {
 		private final List<Range<K>> rangesInOrder;
 		private final Extractor<V> innerExtractor;
-		private final AggregationKey<V> innerExtractorKey;
 
-		protected RangeBucketExtractor(List<String> nestedPathHierarchy, ElasticsearchSearchPredicate filter,
-				List<Range<K>> rangesInOrder, AggregationKey<V> innerExtractorKey, Extractor<V> innerExtractor) {
-			super( nestedPathHierarchy, filter );
+		protected RangeBucketExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
+				ElasticsearchSearchPredicate filter, List<Range<K>> rangesInOrder, Extractor<V> innerExtractor) {
+			super( key, nestedPathHierarchy, filter );
 			this.rangesInOrder = rangesInOrder;
-			this.innerExtractorKey = innerExtractorKey;
 			this.innerExtractor = innerExtractor;
 		}
 
@@ -129,9 +125,6 @@ public class ElasticsearchRangeAggregation<F, K, V>
 			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
 				JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
 				Range<K> range = rangesInOrder.get( i );
-				if ( bucket.has( innerExtractorKey.name() ) ) {
-					bucket = bucket.getAsJsonObject( innerExtractorKey.name() );
-				}
 				result.put( range, innerExtractor.extract( bucket, context ) );
 			}
 			return result;
