@@ -79,9 +79,7 @@ class EntityAsTreeSmokeIT {
 		indexed2.containedNonEntities.add( containedNonEntity2_1 );
 
 		try ( SearchSession session = mapping.createSession() ) {
-			TypedSearchScope<EntityAsTreeSmokeIT_IndexedEntity__, IndexedEntity> scope =
-					EntityAsTreeSmokeIT_IndexedEntity__.INDEX.scope( session );
-			assertThat( session.search( scope )
+			assertThat( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.search( session )
 					.where( f -> f.match().field( EntityAsTreeSmokeIT_IndexedEntity__.INDEX.containedEntities.text )
 							.matching( "entity text" ) )
 					.fetchHits( 20 ) )
