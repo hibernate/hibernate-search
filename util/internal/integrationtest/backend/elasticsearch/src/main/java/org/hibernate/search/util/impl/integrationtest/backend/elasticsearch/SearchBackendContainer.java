@@ -108,25 +108,13 @@ public final class SearchBackendContainer {
 				ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, dockerImageName.getVersionPart() );
 
 		// Disable a few features that we don't use and that just slow up container startup.
-		if ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 8 ) {
-			if ( version.minor().orElse( Integer.MAX_VALUE ) > 7 ) {
-				container.withEnv( "cluster.deprecation_indexing.enabled", "false" )
-						.withEnv( "xpack.profiling.enabled", "false" )
-						.withEnv( "xpack.ent_search.enabled", "false" );
-			}
-			return container.withEnv( "cluster.deprecation_indexing.enabled", "false" )
-					.withEnv( "indices.lifecycle.history_index_enabled", "false" )
-					.withEnv( "slm.history_index_enabled", "false" )
-					.withEnv( "stack.templates.enabled", "false" )
-					.withEnv( "xpack.ml.enabled", "false" )
-					.withEnv( "xpack.monitoring.templates.enabled", "false" )
-					.withEnv( "xpack.watcher.enabled", "false" );
-		}
-
 		if ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 7 ) {
 			if ( version.minor().orElse( Integer.MAX_VALUE ) > 15 ) {
 				container.withEnv( "cluster.deprecation_indexing.enabled", "false" )
-						.withEnv( "slm.history_index_enabled", "false" );
+						.withEnv( "slm.history_index_enabled", "false" )
+						// We do not really use the geoip processing and it may attempt to download info on startup/periodically..
+						// let's disable it:
+						.withEnv( "ingest.geoip.downloader.enabled", "false" );
 			}
 			return container.withEnv( "indices.lifecycle.history_index_enabled", "false" )
 					.withEnv( "stack.templates.enabled", "false" )
@@ -134,7 +122,20 @@ public final class SearchBackendContainer {
 					.withEnv( "xpack.watcher.enabled", "false" );
 		}
 
-		return container;
+		if ( version.majorOptional().orElse( Integer.MIN_VALUE ) > 8
+				|| ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 8
+						&& version.minor().orElse( Integer.MAX_VALUE ) > 7 ) ) {
+			container.withEnv( "cluster.deprecation_indexing.enabled", "false" )
+					.withEnv( "xpack.profiling.enabled", "false" )
+					.withEnv( "xpack.ent_search.enabled", "false" );
+		}
+		return container.withEnv( "cluster.deprecation_indexing.enabled", "false" )
+				.withEnv( "indices.lifecycle.history_index_enabled", "false" )
+				.withEnv( "slm.history_index_enabled", "false" )
+				.withEnv( "stack.templates.enabled", "false" )
+				.withEnv( "xpack.ml.enabled", "false" )
+				.withEnv( "xpack.monitoring.templates.enabled", "false" )
+				.withEnv( "xpack.watcher.enabled", "false" );
 	}
 
 	private static GenericContainer<?> opensearch(DockerImageName dockerImageName) {
