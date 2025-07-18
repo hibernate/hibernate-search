@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.QueryStringPredicateOpti
  * For more details on rewrite methods, and in particular which options are allowed, see the backend specific documentation, e.g.
  * Elasticsearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-term-rewrite.html">rewrite parameters page</a>,
  * OpenSearch <a href="https://opensearch.org/docs/latest/query-dsl/full-text/query-string/#parameters">query string parameters table</a>
- * or Lucene <a href="https://lucene.apache.org/core/9_9_2/core/org/apache/lucene/search/MultiTermQuery.html">MultiTermQuery</a>.
+ * or Lucene <a href="https://lucene.apache.org/core/9_12_2/core/org/apache/lucene/search/MultiTermQuery.html">MultiTermQuery</a>.
  */
 public enum RewriteMethod {
 

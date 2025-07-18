@@ -158,6 +158,9 @@
 
     <modules>
         <module>bom/public</module>
+        <module>bom/platform-lucene</module>
+        <module>bom/platform-lucene-next</module>
+        <module>bom/platform-elasticsearch</module>
         <module>build/parents/relocation</module>
         <module>build/parents/build</module>
         <module>build/enforcer</module>
@@ -314,6 +317,28 @@
         <version.gitflow-incremental-builder>4.5.5</version.gitflow-incremental-builder>
         <version.spotless-maven-plugin>2.45.0</version.spotless-maven-plugin>
         <version.maven-antrun-plugin>3.1.0</version.maven-antrun-plugin>
+
+        <!-- >>> Version of dependencies that we need to keep in the root to share between build and "bom" pom files -->
+        <!-- >>> ORM 7 with Jakarta Persistence -->
+        <!-- IMPORTANT: Make sure that version.jakarta.persistence aligns with the imported version! -->
+        <!--
+            NOTE: when Hibernate ORM updates Byte Buddy, make sure to check Jenkinsfile to see if
+            `net.bytebuddy.experimental` property can be removed.
+         -->
+        <version.org.hibernate.orm>7.0.6.Final</version.org.hibernate.orm>
+        <!-- >>> Lucene -->
+        <!--
+            When upgrading Lucene, check HibernateSearchKnnVectorsFormat to see if its internals should be updated too.
+            In particular if a delegating Lucene99HnswVectorsFormat should be changed to a different version.
+
+            Also make sure to update Javadocs for RewriteMethod.
+        -->
+        <version.org.apache.lucene>9.12.2</version.org.apache.lucene>
+        <version.org.apache.lucene.next>10.2.2</version.org.apache.lucene.next>
+        <!-- >>> Elasticsearch -->
+        <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
+        <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
+        <version.org.elasticsearch.client>9.0.3</version.org.elasticsearch.client>
 
         <!-- Repository Deployment URLs -->
 
