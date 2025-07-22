@@ -8,18 +8,18 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.CountDocumentsAggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.engine.search.aggregation.spi.CountDocumentAggregationBuilder;
 
 public class CountDocumentsAggregationFinalStepImpl
 		implements CountDocumentsAggregationFinalStep {
-	private final SearchAggregationDslContext<?, ?, ?> dslContext;
+	private final CountDocumentAggregationBuilder builder;
 
 	public CountDocumentsAggregationFinalStepImpl(SearchAggregationDslContext<?, ?, ?> dslContext) {
-		this.dslContext = dslContext;
+		this.builder = dslContext.scope().rootQueryElement( AggregationTypeKeys.COUNT_DOCUMENTS ).builder();
 	}
 
 	@Override
 	public SearchAggregation<Long> toAggregation() {
-		return dslContext.scope()
-				.rootQueryElement( AggregationTypeKeys.COUNT_DOCUMENTS ).type().build();
+		return builder.build();
 	}
 }

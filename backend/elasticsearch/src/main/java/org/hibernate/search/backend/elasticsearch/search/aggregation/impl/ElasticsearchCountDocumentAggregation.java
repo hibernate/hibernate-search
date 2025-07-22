@@ -7,7 +7,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryExtractContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -28,17 +28,53 @@ public class ElasticsearchCountDocumentAggregation extends AbstractElasticsearch
 	private static final JsonAccessor<Long> RESPONSE_ROOT_DOC_COUNT_ACCESSOR =
 			JsonAccessor.root().property( "root_doc_count" ).property( "doc_count" ).asLong();
 
-	public static SearchQueryElementFactory<CountDocumentAggregationBuilder.TypeSelector,
-			ElasticsearchSearchIndexScope<?>,
-			ElasticsearchSearchIndexCompositeNodeContext> factory(boolean isNested) {
-		return new ElasticsearchCountDocumentAggregation.Factory( isNested );
-	}
-
 	private final boolean isNested;
 
 	private ElasticsearchCountDocumentAggregation(Builder builder) {
 		super( builder );
 		this.isNested = builder.isNested;
+	}
+
+	public static SearchQueryElementFactory<CountDocumentAggregationBuilder.TypeSelector,
+			ElasticsearchSearchIndexScope<?>,
+			ElasticsearchSearchIndexNodeContext> factory() {
+		return new Factory();
+	}
+
+	private static class Factory
+			implements SearchQueryElementFactory<CountDocumentAggregationBuilder.TypeSelector,
+					ElasticsearchSearchIndexScope<?>,
+					ElasticsearchSearchIndexNodeContext> {
+
+		@Override
+		public CountDocumentAggregationBuilder.TypeSelector create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexNodeContext node) {
+			return new TypeSelector( scope, node );
+		}
+
+		@Override
+		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
+			if ( !getClass().equals( other.getClass() ) ) {
+				throw QueryLog.INSTANCE.differentImplementationClassForQueryElement( getClass(), other.getClass() );
+			}
+		}
+	}
+
+	private static final class TypeSelector implements CountDocumentAggregationBuilder.TypeSelector {
+		private final ElasticsearchSearchIndexScope<?> scope;
+		private final ElasticsearchSearchIndexNodeContext node;
+
+		private TypeSelector(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexNodeContext node) {
+			this.scope = scope;
+			this.node = node; // doesn't matter in this case
+		}
+
+		@Override
+		public CountDocumentAggregationBuilder builder() {
+			boolean isNested = node.isValueField() && !node.toValueField().nestedPathHierarchy().isEmpty();
+			return new ElasticsearchCountDocumentAggregation.Builder( scope, isNested );
+		}
 	}
 
 	@Override
@@ -70,40 +106,6 @@ public class ElasticsearchCountDocumentAggregation extends AbstractElasticsearch
 				}
 			}
 			throw ElasticsearchClientLog.INSTANCE.elasticsearchResponseMissingData();
-		}
-	}
-
-	private static class Factory
-			implements
-			SearchQueryElementFactory<CountDocumentAggregationBuilder.TypeSelector,
-					ElasticsearchSearchIndexScope<?>,
-					ElasticsearchSearchIndexCompositeNodeContext> {
-		private final boolean isNested;
-
-		public Factory(boolean isNested) {
-			this.isNested = isNested;
-		}
-
-		@Override
-		public CountDocumentAggregationBuilder.TypeSelector create(ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexCompositeNodeContext node) {
-			return new ElasticsearchCountDocumentAggregation.TypeSelector( scope, isNested );
-		}
-
-		@Override
-		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
-			if ( !getClass().equals( other.getClass() ) ) {
-				throw QueryLog.INSTANCE.differentImplementationClassForQueryElement( getClass(), other.getClass() );
-			}
-		}
-	}
-
-	private record TypeSelector(ElasticsearchSearchIndexScope<?> scope, boolean isNested)
-			implements CountDocumentAggregationBuilder.TypeSelector {
-
-		@Override
-		public CountDocumentAggregationBuilder type() {
-			return new Builder( scope, isNested );
 		}
 	}
 

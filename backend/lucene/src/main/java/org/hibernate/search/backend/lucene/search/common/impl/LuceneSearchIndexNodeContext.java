@@ -15,4 +15,7 @@ public interface LuceneSearchIndexNodeContext
 	@Override
 	LuceneSearchIndexCompositeNodeContext toObjectField();
 
+	@Override
+	LuceneSearchIndexValueFieldContext<?> toValueField();
+
 }

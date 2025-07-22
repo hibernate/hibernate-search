@@ -176,7 +176,7 @@ public class LuceneTextTermsAggregation<K, R>
 				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
 			super( scope, field,
 					LuceneSearchAggregation.from( scope,
-							LuceneCountDocumentAggregation.factory().create( scope, null ).type().build() ),
+							LuceneCountDocumentAggregation.factory().create( scope, field ).builder().build() ),
 					fromFieldValueConverter );
 		}
 	}

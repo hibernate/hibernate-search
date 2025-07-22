@@ -12,9 +12,8 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.AvgAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CompositeAggregationInnerStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountAggregationKindStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CountDistinctValuesAggregationFieldStep;
-import org.hibernate.search.engine.search.aggregation.dsl.CountDocumentsAggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.MaxAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.MinAggregationFieldStep;
@@ -24,9 +23,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.SumAggregationFieldSte
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.AvgAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.CompositeAggregationInnerStepImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.CountAggregationKindStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDistinctValuesAggregationFieldStepImpl;
-import org.hibernate.search.engine.search.aggregation.dsl.impl.CountDocumentsAggregationFinalStepImpl;
-import org.hibernate.search.engine.search.aggregation.dsl.impl.CountValuesAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.MaxAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.MinAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.RangeAggregationFieldStepImpl;
@@ -76,18 +74,15 @@ public abstract class AbstractSearchAggregationFactory<
 	}
 
 	@Override
-	public CountValuesAggregationFieldStep<SR, PDF> countValues() {
-		return new CountValuesAggregationFieldStepImpl<>( dslContext );
+	public CountAggregationKindStep<SR, PDF> count() {
+		return new CountAggregationKindStepImpl<>( dslContext );
 	}
 
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.1", forRemoval = true)
 	@Override
-	public CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinctValues() {
+	public CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinct() {
 		return new CountDistinctValuesAggregationFieldStepImpl<>( dslContext );
-	}
-
-	@Override
-	public CountDocumentsAggregationFinalStep countDocuments() {
-		return new CountDocumentsAggregationFinalStepImpl( dslContext );
 	}
 
 	public AvgAggregationFieldStep<SR, PDF> avg() {

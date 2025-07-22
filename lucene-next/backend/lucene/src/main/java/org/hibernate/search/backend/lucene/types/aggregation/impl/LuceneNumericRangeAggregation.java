@@ -150,7 +150,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 	}
 
 	public static class Builder<F, E extends Number, K, V>
-			extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, V>
+			extends AbstractBuilder<Range<K>, V>
 			implements RangeAggregationBuilder<K, V> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
@@ -195,7 +195,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K, V>
 				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field, codec, convertAndEncode,
 					LuceneSearchAggregation.from( scope,
-							LuceneCountDocumentAggregation.factory().create( scope, null ).type().build() ),
+							LuceneCountDocumentAggregation.factory().create( scope, field ).builder().build() ),
 					new ArrayList<>(), new ArrayList<>() );
 		}
 	}

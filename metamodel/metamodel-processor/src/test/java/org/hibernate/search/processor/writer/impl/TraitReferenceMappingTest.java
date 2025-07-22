@@ -39,6 +39,7 @@ class TraitReferenceMappingTest {
 		}
 	}
 
+	@SuppressWarnings("removal")
 	private static Stream<Arguments> traitNames() {
 		Set<String> traitNames = new HashSet<>();
 		traitNames.addAll( traitNames( IndexFieldTraits.Predicates.class ) );
@@ -46,6 +47,8 @@ class TraitReferenceMappingTest {
 		traitNames.addAll( traitNames( IndexFieldTraits.Sorts.class ) );
 		traitNames.addAll( traitNames( IndexFieldTraits.Aggregations.class ) );
 
+		// this is a redundant-to-be-removed type and does not require the field reference:
+		traitNames.remove( IndexFieldTraits.Aggregations.COUNT_DISTINCT );
 		// count documents is an aggregation that does not require a field and as a result does not require the field reference:
 		traitNames.remove( IndexFieldTraits.Aggregations.COUNT_DOCUMENTS );
 

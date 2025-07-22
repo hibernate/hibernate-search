@@ -24,14 +24,10 @@ public final class AggregationTypeKeys {
 			of( IndexFieldTraits.Aggregations.MIN );
 	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> MAX =
 			of( IndexFieldTraits.Aggregations.MAX );
-	public static final SearchQueryElementTypeKey<SearchFilterableAggregationBuilder<Long>> COUNT_VALUES =
-			of( IndexFieldTraits.Aggregations.COUNT_VALUES );
-	public static final SearchQueryElementTypeKey<SearchFilterableAggregationBuilder<Long>> COUNT_DISTINCT_VALUES =
-			of( IndexFieldTraits.Aggregations.COUNT_DISTINCT_VALUES );
-	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> AVG =
-			of( IndexFieldTraits.Aggregations.AVG );
+	public static final SearchQueryElementTypeKey<CountValuesAggregationBuilder.TypeSelector> COUNT =
+			of( IndexFieldTraits.Aggregations.COUNT );
 	public static final SearchQueryElementTypeKey<CountDocumentAggregationBuilder.TypeSelector> COUNT_DOCUMENTS =
 			of( IndexFieldTraits.Aggregations.COUNT_DOCUMENTS );
-
-
+	public static final SearchQueryElementTypeKey<FieldMetricAggregationBuilder.TypeSelector> AVG =
+			of( IndexFieldTraits.Aggregations.AVG );
 }

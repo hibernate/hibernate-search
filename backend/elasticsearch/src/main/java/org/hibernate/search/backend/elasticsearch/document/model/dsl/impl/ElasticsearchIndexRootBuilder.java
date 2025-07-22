@@ -87,7 +87,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		this.defaultDynamicType = DynamicType.create( dynamicMapping );
 
 		this.typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT_DOCUMENTS,
-				ElasticsearchCountDocumentAggregation.factory( false ) );
+				ElasticsearchCountDocumentAggregation.factory() );
 		this.addDefaultImplicitFields();
 	}
 
