@@ -23,4 +23,19 @@ public interface CountValuesAggregationOptionsStep<
 		PDF extends TypedSearchPredicateFactory<SR>>
 		extends AggregationFinalStep<Long>, AggregationFilterStep<SR, S, PDF> {
 
+	/**
+	 * Count only distinct field values.
+	 *
+	 * @return The next step.
+	 */
+	default S distinct() {
+		return distinct( true );
+	}
+
+	/**
+	 * Specify whether to count distinct or all field values.
+	 * @param distinct Use {@code true} if only distinct field values should be counted, {@code false} otherwise.
+	 * @return The next step.
+	 */
+	S distinct(boolean distinct);
 }

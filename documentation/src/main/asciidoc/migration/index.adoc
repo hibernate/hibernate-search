@@ -84,8 +84,7 @@ The https://hibernate.org/community/compatibility-policy/#code-categorization[AP
 in Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
-* Metic aggregations `count()` and `countDistinct()` are deprecated in favor of more
-descriptive `countValues()` and `countDistinctValues()`, as these aggregations are counting the field values rather than documents.
+* Metic aggregation `countDistinct()` is deprecated in favor of an option in the `count()` aggregation: `.count().field(..).distinct()`.
 
 [[spi]]
 == SPI

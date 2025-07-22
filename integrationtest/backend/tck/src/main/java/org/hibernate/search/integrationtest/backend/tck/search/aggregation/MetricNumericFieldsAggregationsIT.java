@@ -190,10 +190,10 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( maxIntegers, f -> f.max().field( "integer", Integer.class ) )
 				.aggregation( maxIntegersAsString, f -> f.max().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( maxConverted, f -> f.max().field( "converted", String.class ) )
-				.aggregation( countIntegers, f -> f.countValues().field( "integer" ) )
-				.aggregation( countConverted, f -> f.countValues().field( "converted" ) )
-				.aggregation( countDistinctIntegers, f -> f.countDistinctValues().field( "integer" ) )
-				.aggregation( countDistinctConverted, f -> f.countDistinctValues().field( "converted" ) )
+				.aggregation( countIntegers, f -> f.count().field( "integer" ) )
+				.aggregation( countConverted, f -> f.count().field( "converted" ).distinct( false ) )
+				.aggregation( countDistinctIntegers, f -> f.count().field( "integer" ).distinct() )
+				.aggregation( countDistinctConverted, f -> f.count().field( "converted" ).distinct( true ) )
 				.aggregation( avgIntegers, f -> f.avg().field( "integer", Integer.class ) )
 				.aggregation( avgIntegersAsString, f -> f.avg().field( "integer", String.class, ValueModel.STRING ) )
 				.aggregation( avgConverted, f -> f.avg().field( "converted", String.class ) )
@@ -211,10 +211,9 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( avgFloats, f -> f.avg().field( "floatF", Float.class ) )
 				.aggregation( avgBigIntegers, f -> f.avg().field( "bigInteger", BigInteger.class ) )
 				.aggregation( avgBigDecimals, f -> f.avg().field( "bigDecimal", BigDecimal.class ) )
-				.aggregation( countDocuments, f -> f.countDocuments() )
-				.aggregation( countDistinctValuesIntegerMultiValued,
-						f -> f.countDistinctValues().field( "integerMultiValued" ) )
-				.aggregation( countValuesIntegerMultiValued, f -> f.countValues().field( "integerMultiValued" ) )
+				.aggregation( countDocuments, f -> f.count().documents() )
+				.aggregation( countDistinctValuesIntegerMultiValued, f -> f.count().field( "integerMultiValued" ).distinct() )
+				.aggregation( countValuesIntegerMultiValued, f -> f.count().field( "integerMultiValued" ) )
 				.toQuery();
 	}
 

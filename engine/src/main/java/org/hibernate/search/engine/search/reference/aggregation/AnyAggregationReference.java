@@ -26,8 +26,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public record AnyAggregationReference<SR, T>(   String absolutePath, Class<SR> scopeRootType, ValueModel valueModel,
 												Class<T> aggregationType)
 		implements AvgAggregationFieldReference<SR, T>,
-		CountValuesAggregationFieldReference<SR>,
-		CountDistinctValuesAggregationFieldReference<SR>,
+		CountAggregationFieldReference<SR>,
 		MaxAggregationFieldReference<SR, T>,
 		MinAggregationFieldReference<SR, T>,
 		RangeAggregationFieldReference<SR, T>,

@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObject
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexRoot;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountDocumentAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountAggregation;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
@@ -58,7 +58,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
-		this.typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT_DOCUMENTS, LuceneCountDocumentAggregation.factory() );
+		this.typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT, LuceneCountAggregation.factory() );
 	}
 
 	@Override

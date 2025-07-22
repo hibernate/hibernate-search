@@ -26,7 +26,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ro
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.PropertyMappingIndexSettingsContributor;
-import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchCountDocumentAggregation;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchCountAggregation;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
@@ -86,8 +86,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		this.customIndexMapping = customIndexMapping;
 		this.defaultDynamicType = DynamicType.create( dynamicMapping );
 
-		this.typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT_DOCUMENTS,
-				ElasticsearchCountDocumentAggregation.factory( false ) );
+		this.typeBuilder.queryElementFactory( AggregationTypeKeys.COUNT, ElasticsearchCountAggregation.factory() );
 		this.addDefaultImplicitFields();
 	}
 

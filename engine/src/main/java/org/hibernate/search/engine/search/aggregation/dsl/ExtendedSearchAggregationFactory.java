@@ -7,6 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A base interface for subtypes of {@link TypedSearchAggregationFactory} allowing to
@@ -43,28 +44,14 @@ public interface ExtendedSearchAggregationFactory<
 	@Override
 	MaxAggregationFieldStep<SR, PDF> max();
 
-	@SuppressWarnings("removal")
-	@Deprecated(since = "8.1", forRemoval = true)
+	@Incubating
 	@Override
-	default CountValuesAggregationFieldStep<SR, PDF> count() {
-		return countValues();
-	}
-
-	@Override
-	CountValuesAggregationFieldStep<SR, PDF> countValues();
+	CountAggregationKindStep<SR, PDF> count();
 
 	@SuppressWarnings("removal")
 	@Deprecated(since = "8.1", forRemoval = true)
 	@Override
-	default CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinct() {
-		return countDistinctValues();
-	}
-
-	@Override
-	CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinctValues();
-
-	@Override
-	CountDocumentsAggregationFinalStep countDocuments();
+	CountDistinctValuesAggregationFieldStep<SR, PDF> countDistinct();
 
 	@Override
 	AvgAggregationFieldStep<SR, PDF> avg();

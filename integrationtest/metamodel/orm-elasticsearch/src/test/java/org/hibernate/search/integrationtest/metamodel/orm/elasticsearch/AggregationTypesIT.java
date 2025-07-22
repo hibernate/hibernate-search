@@ -62,9 +62,9 @@ class AggregationTypesIT {
 					.aggregation( AggregationKey.of( "sum" ),
 							f -> f.sum().field( AggregationTypesIT_IndexedEntity__.INDEX.myNumber ) )
 					.aggregation( AggregationKey.of( "count" ),
-							f -> f.countValues().field( AggregationTypesIT_IndexedEntity__.INDEX.myNumber ) )
+							f -> f.count().field( AggregationTypesIT_IndexedEntity__.INDEX.myNumber ) )
 					.aggregation( AggregationKey.of( "countDistinct" ),
-							f -> f.countDistinctValues().field( AggregationTypesIT_IndexedEntity__.INDEX.myNumber ) )
+							f -> f.count().field( AggregationTypesIT_IndexedEntity__.INDEX.myNumber ).distinct() )
 					.aggregation( AggregationKey.of( "min" ),
 							f -> f.min().field( AggregationTypesIT_IndexedEntity__.INDEX.myNumber ) )
 					.aggregation( AggregationKey.of( "max" ),

@@ -9,17 +9,17 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
-import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.CountValuesAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
 class CountValuesAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements CountValuesAggregationOptionsStep<SR, CountValuesAggregationOptionsStepImpl<SR, PDF>, PDF> {
-	private final SearchFilterableAggregationBuilder<Long> builder;
+	private final CountValuesAggregationBuilder builder;
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	CountValuesAggregationOptionsStepImpl(SearchFilterableAggregationBuilder<Long> builder,
+	CountValuesAggregationOptionsStepImpl(CountValuesAggregationBuilder builder,
 			SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
@@ -41,5 +41,11 @@ class CountValuesAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicate
 	@Override
 	public SearchAggregation<Long> toAggregation() {
 		return builder.build();
+	}
+
+	@Override
+	public CountValuesAggregationOptionsStepImpl<SR, PDF> distinct(boolean distinct) {
+		builder.distinct( distinct );
+		return this;
 	}
 }

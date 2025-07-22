@@ -196,7 +196,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K, V, R>
 				ProjectionConverter<V, ? extends K> fromFieldValueConverter,
 				Function<E, V> decoder) {
 			super( codec, scope, field, LuceneSearchAggregation.from( scope,
-					LuceneCountDocumentAggregation.factory().create( scope, null ).type().build() ), fromFieldValueConverter,
+					LuceneCountAggregation.factory().create( scope, field ).documents().build() ), fromFieldValueConverter,
 					decoder );
 		}
 	}

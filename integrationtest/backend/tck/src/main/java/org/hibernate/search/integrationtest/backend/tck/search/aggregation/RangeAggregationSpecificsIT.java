@@ -575,7 +575,7 @@ class RangeAggregationSpecificsIT<F> {
 										Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
 										Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
 										Range.canonical( dataSet.ascendingValues.get( 5 ), null )
-								) ).value( f.countDocuments() )
+								) ).value( f.count().documents() )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -686,7 +686,7 @@ class RangeAggregationSpecificsIT<F> {
 												Range.canonical( dataSet.ascendingValues.get( 3 ),
 														dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
-										) ).value( f.countValues().field( index.binding().bucketMultiValue.relativeFieldName ) )
+										) ).value( f.count().field( index.binding().bucketMultiValue.relativeFieldName ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -726,8 +726,8 @@ class RangeAggregationSpecificsIT<F> {
 														dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 										) )
-										.value( f.countDistinctValues()
-												.field( index.binding().bucketMultiValue.relativeFieldName ) )
+										.value( f.count().field( index.binding().bucketMultiValue.relativeFieldName )
+												.distinct() )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -895,7 +895,7 @@ class RangeAggregationSpecificsIT<F> {
 										.ranges( Arrays.asList(
 												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
-										) ).value( f.composite().from( f.countDocuments() ).asList() )
+										) ).value( f.composite().from( f.count().documents() ).asList() )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -928,7 +928,7 @@ class RangeAggregationSpecificsIT<F> {
 										.ranges( Arrays.asList(
 												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
-										) ).value( f.composite().from( f.countDocuments(), f.countDocuments() ).asList() )
+										) ).value( f.composite().from( f.count().documents(), f.count().documents() ).asList() )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -962,7 +962,8 @@ class RangeAggregationSpecificsIT<F> {
 												Range.canonical( null, dataSet.ascendingValues.get( 5 ) ),
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 										) )
-										.value( f.composite().from( f.countDocuments(), f.countDocuments(), f.countDocuments() )
+										.value( f.composite()
+												.from( f.count().documents(), f.count().documents(), f.count().documents() )
 												.asArray() )
 						)
 						.routing( dataSet.name )
@@ -998,8 +999,8 @@ class RangeAggregationSpecificsIT<F> {
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 										) )
 										.value( (AggregationFinalStep<Long>) f.composite()
-												.from( f.countDocuments(), f.countDocuments(), f.countDocuments(),
-														f.countDocuments() )
+												.from( f.count().documents(), f.count().documents(), f.count().documents(),
+														f.count().documents() )
 												.asArray( arr -> (Long) arr[0] ) )
 						)
 						.routing( dataSet.name )
@@ -1038,9 +1039,8 @@ class RangeAggregationSpecificsIT<F> {
 												Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 										) )
 										.value( f.composite()
-												.from( f.countDocuments(),
-														f.countValues()
-																.field( index.binding().bucketMultiValue.relativeFieldName ) )
+												.from( f.count().documents(),
+														f.count().field( index.binding().bucketMultiValue.relativeFieldName ) )
 												.as( MyRecord::new ) )
 						)
 						.routing( dataSet.name )

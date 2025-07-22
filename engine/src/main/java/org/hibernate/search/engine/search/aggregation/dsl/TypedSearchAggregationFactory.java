@@ -106,37 +106,17 @@ public interface TypedSearchAggregationFactory<SR> extends SearchAggregationFact
 
 
 	/**
-	 * Perform the count values metric aggregation.
+	 * Perform the count metric aggregation.
 	 * <p>
-	 * Counts the number of non-empty field values.
-	 * <p>
-	 * As this aggregation counts the field values for a multi-valued fields the resulting count
-	 * may be greater as the number of the matched documents.
-	 *
-	 * @return The next step.
-	 * @deprecated Use {@link #countValues()} instead.
-	 */
-	@SuppressWarnings("removal")
-	@Deprecated(since = "8.1", forRemoval = true)
-	@Incubating
-	@Override
-	default CountValuesAggregationFieldStep<SR, ?> count() {
-		return countValues();
-	}
-
-	/**
-	 * Perform the count values metric aggregation.
-	 * <p>
-	 * Counts the number of non-empty field values.
-	 * <p>
-	 * As this aggregation counts the field values for a multi-valued fields the resulting count
-	 * may be greater as the number of the matched documents.
+	 * The following steps allow defining the kind of the count aggregation:
+	 * {@link CountAggregationKindStep#documents() count documents}
+	 * or {@link CountAggregationKindStep#field(String) count values}.
 	 *
 	 * @return The next step.
 	 */
-	@Override
 	@Incubating
-	CountValuesAggregationFieldStep<SR, ?> countValues();
+	@Override
+	CountAggregationKindStep<SR, ?> count();
 
 	/**
 	 * Perform the count distinct values metric aggregation.
@@ -144,38 +124,13 @@ public interface TypedSearchAggregationFactory<SR> extends SearchAggregationFact
 	 * Counts the number of unique field values.
 	 *
 	 * @return The next step.
-	 * @deprecated Use {@link #countDistinctValues()} instead.
+	 * @deprecated Use {@link #count()} with {@link CountValuesAggregationOptionsStep#distinct()} instead.
 	 */
 	@SuppressWarnings("removal")
 	@Deprecated(since = "8.1", forRemoval = true)
 	@Incubating
 	@Override
-	default CountDistinctValuesAggregationFieldStep<SR, ?> countDistinct() {
-		return countDistinctValues();
-	}
-
-	/**
-	 * Perform the count distinct values metric aggregation.
-	 * <p>
-	 * Counts the number of unique field values.
-	 *
-	 * @return The next step.
-	 */
-	@Override
-	@Incubating
-	CountDistinctValuesAggregationFieldStep<SR, ?> countDistinctValues();
-
-	/**
-	 * Perform the count documents metric aggregation.
-	 * <p>
-	 * Counts the number of matched documents.
-	 * This aggregation may be useful for building {@link #range()} or {@link #terms()} aggregations.
-	 *
-	 * @return The next step.
-	 */
-	@Override
-	@Incubating
-	CountDocumentsAggregationFinalStep countDocuments();
+	CountDistinctValuesAggregationFieldStep<SR, ?> countDistinct();
 
 	/**
 	 * Perform the avg metric aggregation.

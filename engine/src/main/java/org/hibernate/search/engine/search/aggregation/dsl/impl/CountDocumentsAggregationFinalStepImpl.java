@@ -20,6 +20,6 @@ public class CountDocumentsAggregationFinalStepImpl
 	@Override
 	public SearchAggregation<Long> toAggregation() {
 		return dslContext.scope()
-				.rootQueryElement( AggregationTypeKeys.COUNT_DOCUMENTS ).type().build();
+				.rootQueryElement( AggregationTypeKeys.COUNT ).documents().build();
 	}
 }

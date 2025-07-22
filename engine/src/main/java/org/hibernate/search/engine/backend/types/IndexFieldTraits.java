@@ -103,19 +103,12 @@ public final class IndexFieldTraits {
 		public static final String SUM = "aggregation:sum";
 		public static final String MIN = "aggregation:min";
 		public static final String MAX = "aggregation:max";
+		public static final String COUNT = "aggregation:count";
 		/**
-		 * @deprecated Use {@link #COUNT_VALUES} instead.
+		 * @deprecated Use {@link #COUNT} instead.
 		 */
 		@Deprecated(since = "8.1", forRemoval = true)
-		public static final String COUNT = "aggregation:countValues";
-		/**
-		 * @deprecated Use {@link #COUNT_DISTINCT_VALUES} instead.
-		 */
-		@Deprecated(since = "8.1", forRemoval = true)
-		public static final String COUNT_DISTINCT = "aggregation:countDistinctValues";
-		public static final String COUNT_VALUES = "aggregation:countValues";
-		public static final String COUNT_DISTINCT_VALUES = "aggregation:countDistinctValues";
-		public static final String COUNT_DOCUMENTS = "aggregation:countDocuments";
+		public static final String COUNT_DISTINCT = "aggregation:countDistinct";
 		public static final String AVG = "aggregation:avg";
 
 	}
