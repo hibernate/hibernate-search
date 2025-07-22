@@ -386,7 +386,7 @@
 
         <!-- Container images for various integration tests -->
         <!-- The latest version of Elasticsearch tested against by default -->
-        <version.org.elasticsearch.latest>9.0.2</version.org.elasticsearch.latest>
+        <version.org.elasticsearch.latest>9.0.4</version.org.elasticsearch.latest>
         <test.elasticsearch.version></test.elasticsearch.version>
         <test.elasticsearch.distribution>elastic</test.elasticsearch.distribution>
 
