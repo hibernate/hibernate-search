@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
+@Deprecated(since = "8.1", forRemoval = true)
 class CountDistinctValuesAggregationOptionsStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements CountDistinctValuesAggregationOptionsStep<SR, CountDistinctValuesAggregationOptionsStepImpl<SR, PDF>, PDF> {
 	private final SearchFilterableAggregationBuilder<Long> builder;

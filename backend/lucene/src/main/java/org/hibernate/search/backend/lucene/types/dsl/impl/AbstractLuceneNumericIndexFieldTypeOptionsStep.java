@@ -8,8 +8,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneAvgNumericFieldAggregation;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountDistinctNumericLongAggregation;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountNumericLongAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountValuesAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneMaxNumericFieldAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneMinNumericFieldAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
@@ -96,9 +95,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 			builder.queryElementFactory( AggregationTypeKeys.SUM, sumMetricAggregationFactory( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.MIN, LuceneMinNumericFieldAggregation.factory( codec ) );
 			builder.queryElementFactory( AggregationTypeKeys.MAX, LuceneMaxNumericFieldAggregation.factory( codec ) );
-			builder.queryElementFactory( AggregationTypeKeys.COUNT_VALUES, LuceneCountNumericLongAggregation.factory( codec ) );
-			builder.queryElementFactory( AggregationTypeKeys.COUNT_DISTINCT_VALUES,
-					LuceneCountDistinctNumericLongAggregation.factory( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT, LuceneCountValuesAggregation.factory() );
 			builder.queryElementFactory( AggregationTypeKeys.AVG, avgMetricAggregationFactory( codec ) );
 		}
 

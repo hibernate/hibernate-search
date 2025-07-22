@@ -12,21 +12,55 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.CountDocumentAggregationBuilder;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 
 public class LuceneCountDocumentAggregation implements LuceneSearchAggregation<Long> {
 
+	private final Set<String> indexNames;
+
+	private LuceneCountDocumentAggregation(Builder builder) {
+		this.indexNames = builder.scope.hibernateSearchIndexNames();
+	}
+
 	public static Factory factory() {
 		return Factory.INSTANCE;
 	}
 
-	private final Set<String> indexNames;
+	protected static class Factory
+			implements
+			SearchQueryElementFactory<CountDocumentAggregationBuilder.TypeSelector,
+					LuceneSearchIndexScope<?>,
+					LuceneSearchIndexNodeContext> {
 
-	LuceneCountDocumentAggregation(Builder builder) {
-		this.indexNames = builder.scope.hibernateSearchIndexNames();
+		private static final Factory INSTANCE = new Factory();
+
+		private Factory() {
+		}
+
+		@Override
+		public CountDocumentAggregationBuilder.TypeSelector create(LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexNodeContext node) {
+			return new TypeSelector( scope, node );
+		}
+
+		@Override
+		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
+			if ( !getClass().equals( other.getClass() ) ) {
+				throw QueryLog.INSTANCE.differentImplementationClassForQueryElement( getClass(), other.getClass() );
+			}
+		}
+	}
+
+	private record TypeSelector(LuceneSearchIndexScope<?> scope, LuceneSearchIndexNodeContext node)
+			implements CountDocumentAggregationBuilder.TypeSelector {
+
+		@Override
+		public CountDocumentAggregationBuilder builder() {
+			return new LuceneCountDocumentAggregation.Builder( scope );
+		}
 	}
 
 	@Override
@@ -51,45 +85,7 @@ public class LuceneCountDocumentAggregation implements LuceneSearchAggregation<L
 		return indexNames;
 	}
 
-	protected static class Factory
-			implements
-			SearchQueryElementFactory<CountDocumentAggregationBuilder.TypeSelector,
-					LuceneSearchIndexScope<?>,
-					LuceneSearchIndexCompositeNodeContext> {
-
-		private static final Factory INSTANCE = new Factory();
-
-		private Factory() {
-		}
-
-		@Override
-		public CountDocumentAggregationBuilder.TypeSelector create(LuceneSearchIndexScope<?> scope,
-				LuceneSearchIndexCompositeNodeContext node) {
-			return new TypeSelector( scope );
-		}
-
-		@Override
-		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
-			if ( !getClass().equals( other.getClass() ) ) {
-				throw QueryLog.INSTANCE.differentImplementationClassForQueryElement( getClass(), other.getClass() );
-			}
-		}
-	}
-
-	protected record TypeSelector(LuceneSearchIndexScope<?> scope) implements CountDocumentAggregationBuilder.TypeSelector {
-		@Override
-		public CountDocumentAggregationBuilder type() {
-			return new Builder( scope );
-		}
-	}
-
-	public static class Builder implements CountDocumentAggregationBuilder {
-
-		protected final LuceneSearchIndexScope<?> scope;
-
-		public Builder(LuceneSearchIndexScope<?> scope) {
-			this.scope = scope;
-		}
+	private record Builder(LuceneSearchIndexScope<?> scope) implements CountDocumentAggregationBuilder {
 
 		@Override
 		public LuceneCountDocumentAggregation build() {

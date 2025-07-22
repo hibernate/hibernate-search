@@ -622,7 +622,7 @@ class TermsAggregationSpecificsIT<F> {
 		assertThatQuery( matchAllQuery()
 				.aggregation(
 						aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
-								.value( f.countDocuments() )
+								.value( f.count().documents() )
 				)
 				.routing( dataSet.name ) )
 				.aggregation(

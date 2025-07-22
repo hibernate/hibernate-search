@@ -4,25 +4,31 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
-import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationFieldStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountAggregationKindStep;
+import org.hibernate.search.engine.search.aggregation.dsl.CountDocumentsAggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.CountValuesAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
-import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.CountValuesAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
-public class CountValuesAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
-		implements CountValuesAggregationFieldStep<SR, PDF> {
+public class CountAggregationKindStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
+		implements CountAggregationKindStep<SR, PDF> {
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
 
-	public CountValuesAggregationFieldStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
+	public CountAggregationKindStepImpl(SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
+	public CountDocumentsAggregationFinalStep documents() {
+		return new CountDocumentsAggregationFinalStepImpl( dslContext );
+	}
+
+	@Override
 	public CountValuesAggregationOptionsStep<SR, ?, PDF> field(String fieldPath) {
-		SearchFilterableAggregationBuilder<Long> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT_VALUES );
+		CountValuesAggregationBuilder builder = dslContext.scope()
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT ).builder();
 		return new CountValuesAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

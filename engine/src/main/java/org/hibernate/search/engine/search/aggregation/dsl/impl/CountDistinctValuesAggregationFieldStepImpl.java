@@ -8,9 +8,11 @@ import org.hibernate.search.engine.search.aggregation.dsl.CountDistinctValuesAgg
 import org.hibernate.search.engine.search.aggregation.dsl.CountDistinctValuesAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
-import org.hibernate.search.engine.search.aggregation.spi.SearchFilterableAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.CountValuesAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 
+@SuppressWarnings("removal")
+@Deprecated(since = "8.1", forRemoval = true)
 public class CountDistinctValuesAggregationFieldStepImpl<SR, PDF extends TypedSearchPredicateFactory<SR>>
 		implements CountDistinctValuesAggregationFieldStep<SR, PDF> {
 	private final SearchAggregationDslContext<SR, ?, ? extends PDF> dslContext;
@@ -21,8 +23,9 @@ public class CountDistinctValuesAggregationFieldStepImpl<SR, PDF extends TypedSe
 
 	@Override
 	public CountDistinctValuesAggregationOptionsStep<SR, ?, PDF> field(String fieldPath) {
-		SearchFilterableAggregationBuilder<Long> builder = dslContext.scope()
-				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT_DISTINCT_VALUES );
+		CountValuesAggregationBuilder builder = dslContext.scope()
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.COUNT ).builder();
+		builder.distinct( true );
 		return new CountDistinctValuesAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

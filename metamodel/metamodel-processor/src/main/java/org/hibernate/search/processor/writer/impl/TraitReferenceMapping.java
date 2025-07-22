@@ -10,8 +10,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.IndexFieldTraits;
 import org.hibernate.search.engine.search.reference.aggregation.AvgAggregationFieldReference;
-import org.hibernate.search.engine.search.reference.aggregation.CountDistinctValuesAggregationFieldReference;
-import org.hibernate.search.engine.search.reference.aggregation.CountValuesAggregationFieldReference;
+import org.hibernate.search.engine.search.reference.aggregation.CountAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.MaxAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.MinAggregationFieldReference;
 import org.hibernate.search.engine.search.reference.aggregation.RangeAggregationFieldReference;
@@ -116,10 +115,8 @@ class TraitReferenceMapping {
 		traits.put( IndexFieldTraits.Aggregations.MAX, new TraitReferenceDetails( MaxAggregationFieldReference.class, "A4",
 				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
 		) );
-		traits.put( IndexFieldTraits.Aggregations.COUNT_VALUES,
-				new TraitReferenceDetails( CountValuesAggregationFieldReference.class, "A5", TraitKind.UNTYPED ) );
-		traits.put( IndexFieldTraits.Aggregations.COUNT_DISTINCT_VALUES,
-				new TraitReferenceDetails( CountDistinctValuesAggregationFieldReference.class, "A6", TraitKind.UNTYPED ) );
+		traits.put( IndexFieldTraits.Aggregations.COUNT,
+				new TraitReferenceDetails( CountAggregationFieldReference.class, "A5", TraitKind.UNTYPED ) );
 		traits.put( IndexFieldTraits.Aggregations.AVG, new TraitReferenceDetails( AvgAggregationFieldReference.class, "A7",
 				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
 		) );

@@ -79,8 +79,8 @@ public class MetricAggregationsTestCase<F> {
 				.where( SearchPredicateFactory::matchAll )
 				.aggregation( result.minKey, f -> f.min().field( fieldPath, javaClass, valueModel ) )
 				.aggregation( result.maxKey, f -> f.max().field( fieldPath, javaClass, valueModel ) )
-				.aggregation( result.countKey, f -> f.countValues().field( fieldPath ) )
-				.aggregation( result.countDistinctKey, f -> f.countDistinctValues().field( fieldPath ) )
+				.aggregation( result.countKey, f -> f.count().field( fieldPath ) )
+				.aggregation( result.countDistinctKey, f -> f.count().field( fieldPath ).distinct() )
 				.aggregation( result.avgKey, f -> f.avg().field( fieldPath, javaClass, valueModel ) );
 
 		if ( metricAggregationsValues.sum() != null ) {

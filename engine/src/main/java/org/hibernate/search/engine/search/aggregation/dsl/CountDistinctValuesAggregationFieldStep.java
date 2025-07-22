@@ -7,7 +7,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
-import org.hibernate.search.engine.search.reference.aggregation.CountValuesAggregationFieldReference;
+import org.hibernate.search.engine.search.reference.aggregation.CountAggregationFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -34,8 +34,7 @@ public interface CountDistinctValuesAggregationFieldStep<SR, PDF extends TypedSe
 	 * @return The next step.
 	 */
 	@Incubating
-	default CountDistinctValuesAggregationOptionsStep<SR, ?, PDF> field(
-			CountValuesAggregationFieldReference<SR> fieldReference) {
+	default CountDistinctValuesAggregationOptionsStep<SR, ?, PDF> field(CountAggregationFieldReference<SR> fieldReference) {
 		return field( fieldReference.absolutePath() );
 	}
 }
