@@ -186,6 +186,9 @@ pipeline {
 							return params.ORM_REPOSITORY?.trim() || params.ORM_BRANCH?.trim() || params.ORM_PULL_REQUEST_ID?.trim()
 						}
 					}
+					tools {
+						jdk 'OpenJDK 21 Latest'
+					}
 					steps {
 						script {
 							if (params.ORM_BRANCH?.trim() && params.ORM_PULL_REQUEST_ID?.trim()) {
