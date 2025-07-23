@@ -87,16 +87,22 @@ public class TermResults {
 	}
 
 	private static class HibernateSearchBucketOrderQueue extends PriorityQueue<LongBucket> {
-		private final Comparator<LongBucket> comparator;
 
 		public HibernateSearchBucketOrderQueue(BucketOrder order, int maxSize) {
-			super( maxSize );
-			this.comparator = order.toLongBucketComparator();
+			super( maxSize, new ComparatorBasedLessThan( order ) );
 		}
 
-		@Override
-		protected boolean lessThan(LongBucket t1, LongBucket t2) {
-			return comparator.compare( t1, t2 ) > 0;
+		private static class ComparatorBasedLessThan implements LessThan<LongBucket> {
+			private final Comparator<LongBucket> comparator;
+
+			public ComparatorBasedLessThan(BucketOrder order) {
+				this.comparator = order.toLongBucketComparator();
+			}
+
+			@Override
+			public boolean lessThan(LongBucket t1, LongBucket t2) {
+				return comparator.compare( t1, t2 ) > 0;
+			}
 		}
 	}
 }
