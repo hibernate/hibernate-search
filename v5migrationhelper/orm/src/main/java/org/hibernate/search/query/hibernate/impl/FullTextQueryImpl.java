@@ -272,7 +272,8 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
 			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
-				applyEntityGraphHint( hintName, hintValueToEntityGraph( value ) );
+				final GraphSemantic graphSemantic = GraphSemantic.fromHintName( hintName );
+				applyEntityGraphHint( graphSemantic, hintValueToEntityGraph( value ), hintName );
 				break;
 			default:
 				break;
@@ -293,13 +294,13 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	@Override
 	public QueryParameterBindings getParameterBindings() {
 		// parameters not supported in Hibernate Search queries
-		return QueryParameterBindings.NO_PARAM_BINDINGS;
+		return QueryParameterBindings.empty();
 	}
 
 	@Override
 	public QueryParameterBindings getQueryParameterBindings() {
 		// parameters not supported in Hibernate Search queries
-		return QueryParameterBindings.NO_PARAM_BINDINGS;
+		return QueryParameterBindings.empty();
 	}
 
 	@Override

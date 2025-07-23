@@ -118,7 +118,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
 			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
-				applyEntityGraphHint( hintName, value );
+				final GraphSemantic graphSemantic = GraphSemantic.fromHintName( hintName );
+				applyEntityGraphHint( graphSemantic, value, hintName );
 				break;
 			default:
 				OrmMiscLog.INSTANCE.ignoringUnrecognizedQueryHint( hintName );
