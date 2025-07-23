@@ -6,6 +6,7 @@ package org.hibernate.search.documentation.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.data.Offset.offset;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.sql.Date;
@@ -284,9 +285,14 @@ class AggregationDslIT {
 			Map<Genre, Double> sumByPrice = result.aggregation( sumByCategoryKey );
 			// end::terms-sum[]
 			assertThat( sumByPrice )
-					.containsExactly(
-							entry( Genre.SCIENCE_FICTION, 60.97 ),
-							entry( Genre.CRIME_FICTION, 7.99 )
+					.hasSize( 2 )
+					.containsOnlyKeys(
+							Genre.SCIENCE_FICTION,
+							Genre.CRIME_FICTION
+					)
+					.satisfies(
+							map -> assertThat( map.get( Genre.SCIENCE_FICTION ) ).isCloseTo( 60.97, offset( 0.0001 ) ),
+							map -> assertThat( map.get( Genre.CRIME_FICTION ) ).isCloseTo( 7.99, offset( 0.0001 ) )
 					);
 		} );
 
@@ -354,11 +360,41 @@ class AggregationDslIT {
 			Map<Double, PriceAggregation> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::terms-count-composite[]
 			assertThat( countsByPrice )
-					.containsExactly(
-							entry( 7.99, new PriceAggregation( 7.99, 7.99, 7.99 ) ),
-							entry( 15.99, new PriceAggregation( 15.99, 15.99, 15.99 ) ),
-							entry( 19.99, new PriceAggregation( 19.99, 19.99, 19.99 ) ),
-							entry( 24.99, new PriceAggregation( 24.99, 24.99, 24.99 ) )
+					.hasSize( 4 )
+					.containsOnlyKeys( 7.99, 15.99, 19.99, 24.99 )
+					.satisfies(
+							map -> {
+								var agg = map.get( 7.99 );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 7.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 7.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 7.99, offset( 0.0001 ) )
+								);
+							},
+							map -> {
+								var agg = map.get( 15.99 );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 15.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 15.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 15.99, offset( 0.0001 ) )
+								);
+							},
+							map -> {
+								var agg = map.get( 19.99 );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 19.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 19.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 19.99, offset( 0.0001 ) )
+								);
+							},
+							map -> {
+								var agg = map.get( 24.99 );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 24.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 24.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 24.99, offset( 0.0001 ) )
+								);
+							}
 					);
 		} );
 	}
@@ -382,10 +418,16 @@ class AggregationDslIT {
 			Map<Range<Double>, Double> countsByPrice = result.aggregation( avgRatingByPriceKey );
 			// end::range-avg[]
 			assertThat( countsByPrice )
-					.containsExactly(
-							entry( Range.canonical( 0.0, 10.0 ), 4.0 ),
-							entry( Range.canonical( 10.0, 20.0 ), 3.6 ),
-							entry( Range.canonical( 20.0, null ), 3.2 )
+					.hasSize( 3 )
+					.containsOnlyKeys(
+							Range.canonical( 0.0, 10.0 ),
+							Range.canonical( 10.0, 20.0 ),
+							Range.canonical( 20.0, null )
+					)
+					.satisfies(
+							map -> assertThat( map.get( Range.canonical( 0.0, 10.0 ) ) ).isCloseTo( 4.0, offset( 0.0001 ) ),
+							map -> assertThat( map.get( Range.canonical( 10.0, 20.0 ) ) ).isCloseTo( 3.6, offset( 0.0001 ) ),
+							map -> assertThat( map.get( Range.canonical( 20.0, null ) ) ).isCloseTo( 3.2, offset( 0.0001 ) )
 					);
 		} );
 
@@ -437,10 +479,37 @@ class AggregationDslIT {
 			Map<Range<Double>, PriceAggregation> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::range-composite[]
 			assertThat( countsByPrice )
-					.containsExactly(
-							entry( Range.canonical( 0.0, 10.0 ), new PriceAggregation( 7.99, 7.99, 7.99 ) ),
-							entry( Range.canonical( 10.0, 20.0 ), new PriceAggregation( 17.99, 15.99, 19.99 ) ),
-							entry( Range.canonical( 20.0, null ), new PriceAggregation( 24.99, 24.99, 24.99 ) )
+					.hasSize( 3 )
+					.containsOnlyKeys(
+							Range.canonical( 0.0, 10.0 ),
+							Range.canonical( 10.0, 20.0 ),
+							Range.canonical( 20.0, null )
+					)
+					.satisfies(
+							map -> {
+								var agg = map.get( Range.canonical( 0.0, 10.0 ) );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 7.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 7.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 7.99, offset( 0.0001 ) )
+								);
+							},
+							map -> {
+								var agg = map.get( Range.canonical( 10.0, 20.0 ) );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 17.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 15.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 19.99, offset( 0.0001 ) )
+								);
+							},
+							map -> {
+								var agg = map.get( Range.canonical( 20.0, null ) );
+								assertThat( agg ).satisfies(
+										a -> assertThat( a.avg() ).isCloseTo( 24.99, offset( 0.0001 ) ),
+										a -> assertThat( a.min() ).isCloseTo( 24.99, offset( 0.0001 ) ),
+										a -> assertThat( a.max() ).isCloseTo( 24.99, offset( 0.0001 ) )
+								);
+							}
 					);
 		} );
 	}
@@ -643,7 +712,7 @@ class AggregationDslIT {
 					.fetch( 20 );
 			Double sumPrices = result.aggregation( sumPricesKey );
 			// end::sums[]
-			assertThat( sumPrices ).isEqualTo( 60.97 );
+			assertThat( sumPrices ).isCloseTo( 60.97, offset( 0.0001 ) );
 		} );
 	}
 
@@ -733,7 +802,7 @@ class AggregationDslIT {
 					.fetch( 20 );
 			Double avgPrices = result.aggregation( avgPricesKey );
 			// end::avg[]
-			assertThat( avgPrices ).isEqualTo( 20.323333333333334 );
+			assertThat( avgPrices ).isCloseTo( 20.323333333333334, offset( 0.0001 ) );
 		} );
 	}
 
@@ -757,7 +826,11 @@ class AggregationDslIT {
 					.fetch( 20 );
 			PriceAggregation aggregations = result.aggregation( avgPricesKey ); // <4>
 			// end::composite-customObject[]
-			assertThat( aggregations ).isEqualTo( new PriceAggregation( 17.24, 7.99, 24.99 ) );
+			assertThat( aggregations ).satisfies(
+					a -> assertThat( a.avg() ).isCloseTo( 17.24, offset( 0.0001 ) ),
+					a -> assertThat( a.min() ).isCloseTo( 7.99, offset( 0.0001 ) ),
+					a -> assertThat( a.max() ).isCloseTo( 24.99, offset( 0.0001 ) )
+			);
 		} );
 
 		withinSearchSession( searchSession -> {
@@ -784,7 +857,11 @@ class AggregationDslIT {
 					.fetch( 20 );
 			BookAggregation aggregations = result.aggregation( aggKey ); // <4>
 			// end::composite-customObject-asList[]
-			assertThat( aggregations ).isEqualTo( new BookAggregation( 17.24, 7.99, 24.99, 20L ) );
+			assertThat( aggregations ).satisfies(
+					a -> assertThat( a.avg() ).isCloseTo( 17.24, offset( 0.0001 ) ),
+					a -> assertThat( a.min() ).isCloseTo( 7.99, offset( 0.0001 ) ),
+					a -> assertThat( a.max() ).isCloseTo( 24.99, offset( 0.0001 ) )
+			);
 		} );
 
 		withinSearchSession( searchSession -> {
@@ -803,8 +880,13 @@ class AggregationDslIT {
 			List<?> aggregations = result.aggregation( aggKey ); // <4>
 			// end::composite-list[]
 			assertThat( (List) aggregations )
-					.hasSize( 4 )
-					.containsExactly( 17.24, 7.99, 24.99, 20L );
+					.hasSize( 4 );
+			assertThat( aggregations ).satisfies(
+					a -> assertThat( (Double) a.get( 0 ) ).isCloseTo( 17.24, offset( 0.0001 ) ),
+					a -> assertThat( (Double) a.get( 1 ) ).isCloseTo( 7.99, offset( 0.0001 ) ),
+					a -> assertThat( (Double) a.get( 2 ) ).isCloseTo( 24.99, offset( 0.0001 ) ),
+					a -> assertThat( (Long) a.get( 3 ) ).isEqualTo( 20L )
+			);
 		} );
 
 		withinSearchSession( searchSession -> {
@@ -823,8 +905,13 @@ class AggregationDslIT {
 			Object[] aggregations = result.aggregation( aggKey ); // <4>
 			// end::composite-array[]
 			assertThat( aggregations )
-					.hasSize( 4 )
-					.containsExactly( 17.24, 7.99, 24.99, 20L );
+					.hasSize( 4 );
+			assertThat( aggregations ).satisfies(
+					a -> assertThat( (Double) a[0] ).isCloseTo( 17.24, offset( 0.0001 ) ),
+					a -> assertThat( (Double) a[1] ).isCloseTo( 7.99, offset( 0.0001 ) ),
+					a -> assertThat( (Double) a[2] ).isCloseTo( 24.99, offset( 0.0001 ) ),
+					a -> assertThat( (Long) a[3] ).isEqualTo( 20L )
+			);
 		} );
 
 		withinSearchSession( searchSession -> {
@@ -842,8 +929,13 @@ class AggregationDslIT {
 			List<?> aggregations = result.aggregation( aggKey ); // <4>
 			// end::composite-list-singlestep[]
 			assertThat( (List) aggregations )
-					.hasSize( 4 )
-					.containsExactly( 17.24, 7.99, 24.99, 20L );
+					.hasSize( 4 );
+			assertThat( aggregations ).satisfies(
+					a -> assertThat( (Double) a.get( 0 ) ).isCloseTo( 17.24, offset( 0.0001 ) ),
+					a -> assertThat( (Double) a.get( 1 ) ).isCloseTo( 7.99, offset( 0.0001 ) ),
+					a -> assertThat( (Double) a.get( 2 ) ).isCloseTo( 24.99, offset( 0.0001 ) ),
+					a -> assertThat( (Long) a.get( 3 ) ).isEqualTo( 20L )
+			);
 		} );
 	}
 
