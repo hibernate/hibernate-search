@@ -23,6 +23,9 @@ import com.google.gson.JsonObject;
 public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		extends AbstractElasticsearchNestableAggregation<Map<K, V>> {
 
+	protected static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_ACCESSOR =
+			JsonAccessor.root().property( "aggregations" ).asObject();
+
 	private static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_ACCESSOR =
 			JsonAccessor.root().property( "reverse_nested" ).asObject();
 
@@ -30,7 +33,6 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	private static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR =
 			JsonAccessor.root().property( "aggregations" ).property( ROOT_DOC_COUNT_NAME ).asObject();
 
-	protected static final String INNER_EXTRACTOR_KEY = "innerExtractorKey";
 	protected static final String INNER_EXTRACTOR = "innerExtractor";
 
 	AbstractElasticsearchBucketAggregation(AbstractBuilder<K, V> builder) {
