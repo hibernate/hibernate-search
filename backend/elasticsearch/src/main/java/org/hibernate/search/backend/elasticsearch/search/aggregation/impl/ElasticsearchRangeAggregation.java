@@ -66,7 +66,7 @@ public class ElasticsearchRangeAggregation<F, K, V>
 				aggregation.request( context, AggregationKey.of( "agg" ), subOuterObject ) );
 
 		if ( !subOuterObject.isEmpty() ) {
-			outerObject.add( "aggs", subOuterObject );
+			REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, subOuterObject );
 		}
 	}
 

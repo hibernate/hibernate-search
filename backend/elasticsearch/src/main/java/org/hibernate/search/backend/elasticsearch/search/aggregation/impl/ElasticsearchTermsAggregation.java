@@ -72,7 +72,7 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 				aggregation.request( context, AggregationKey.of( "agg" ), subOuterObject ) );
 
 		if ( !subOuterObject.isEmpty() ) {
-			outerObject.add( "aggs", subOuterObject );
+			REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, subOuterObject );
 		}
 	}
 
