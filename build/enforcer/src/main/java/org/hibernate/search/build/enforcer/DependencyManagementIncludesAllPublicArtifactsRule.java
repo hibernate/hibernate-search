@@ -9,6 +9,7 @@ import static org.hibernate.search.build.enforcer.MavenProjectUtils.isAnyParentR
 import static org.hibernate.search.build.enforcer.MavenProjectUtils.isProjectDeploySkipped;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectDependenciesResolver;
 
 @Named("dependencyManagementIncludesAllPublicArtifactsRule") // rule name - must start with lowercase character
 public class DependencyManagementIncludesAllPublicArtifactsRule extends AbstractEnforcerRule {
@@ -28,6 +30,10 @@ public class DependencyManagementIncludesAllPublicArtifactsRule extends Abstract
 	// Inject needed Maven components
 	@Inject
 	private MavenSession session;
+	@Inject
+	private ProjectDependenciesResolver projectDependenciesResolver;
+
+	private Set<Dependency> excludes = new HashSet<>();
 
 	public void execute() throws EnforcerRuleException {
 		Set<String> dependencies = session.getCurrentProject()
@@ -36,10 +42,16 @@ public class DependencyManagementIncludesAllPublicArtifactsRule extends Abstract
 				.stream()
 				.map( Dependency::getArtifactId )
 				.collect( Collectors.toSet() );
+		Set<String> projectsToSkip = excludes.stream()
+				.map( Dependency::getArtifactId )
+				.collect( Collectors.toSet() );
 
 		List<String> problems = new ArrayList<>();
 
 		for ( MavenProject project : session.getAllProjects() ) {
+			if ( projectsToSkip.contains( project.getArtifactId() ) ) {
+				continue;
+			}
 			boolean publicParent = isAnyParentPublicParent( project );
 			boolean relocationParent = isAnyParentRelocationParent( project );
 			boolean shouldBePublished = publicParent || relocationParent;

@@ -158,6 +158,9 @@
 
     <modules>
         <module>bom/public</module>
+        <module>bom/platform-common</module>
+        <module>bom/platform</module>
+        <module>bom/platform-next</module>
         <module>build/parents/relocation</module>
         <module>build/parents/build</module>
         <module>build/enforcer</module>

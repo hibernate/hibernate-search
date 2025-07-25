@@ -39,31 +39,6 @@ https://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix
 The https://hibernate.org/community/compatibility-policy/[compatibility policy] may also be of interest.
 ====
 
-[TIP]
-====
-If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
-as part of your dependency management to keep all its artifact versions aligned:
-[source, XML, subs="+attributes"]
-----
-<dependencyManagement>
-    <dependencies>
-        <!--
-            Import Hibernate Search BOM
-            to get all of its artifact versions aligned:
-        -->
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-bom</artifactId>
-            <version>{hibernateSearchVersion}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-        <!-- Any other dependency management entries -->
-    </dependencies>
-</dependencyManagement>
-----
-====
-
 [NOTE]
 .Elasticsearch licensing
 ====
@@ -86,6 +61,88 @@ see <<backend-elasticsearch-compatibility>> for more information.
 Every section of this documentation referring to Elasticsearch
 is also relevant for the OpenSearch distribution.
 ====
+
+[[compatibility-search-dependencies]]
+=== Adding Hibernate Search dependencies to your project
+
+[[compatibility-search-dependencies-bom]]
+==== Hibernate Search BOM
+
+If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
+as part of your dependency management to keep all its artifact versions aligned:
+[source, XML, subs="+attributes"]
+----
+<dependencyManagement>
+    <dependencies>
+        <!--
+            Import Hibernate Search BOM
+            to get all of its artifact versions aligned:
+        -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-bom</artifactId>
+            <version>{hibernateSearchVersion}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <!-- Any other dependency management entries -->
+    </dependencies>
+</dependencyManagement>
+----
+
+[[compatibility-search-dependencies-platform]]
+==== Hibernate Search Platform
+
+include::../components/_incubating-warning.adoc[]
+
+Besides the lean BOM file, Hibernate Search also provides several platform POM files that manage
+the versions of Hibernate Search artifacts, _and_ their transitive dependencies, _and_ related artifacts that must be aligned.
+For example, it brings the management of all other `org.hibernate.orm` artifacts,
+beyond the ones required by the <<mapper-orm,ORM mapper>>, or extra Lucene artifacts like
+`lucene-suggest` or `lucene-analysis-icu` and others, that can be helpful for more advanced applications.
+These platform files will help keep the versions of extra Hibernate ORM/Lucene/Elasticsearch client dependencies
+aligned with the versions of artifacts from the same groups that are used by Hibernate Search itself.
+
+Currently, there are two platform POM files for Hibernate Search:
+* `hibernate-search-platform-bom`: use this when in doubt.
+* `hibernate-search-platform-next-bom`: use this if you want to use the <<other-integrations-lucene-next,Lucene-next>> backend.
+
+To leverage the dependency management provided by these platform files, use the same approach of importing as for
+the <<compatibility-search-dependencies-bom,regular BOM>> file:
+
+.Importing the Hibernate Search platform BOM
+[source, XML, subs="+attributes"]
+----
+<dependencyManagement>
+    <dependencies>
+        <!--
+            Import Hibernate Search platform
+            to get all of its artifact versions aligned:
+        -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-platform-bom</artifactId>
+            <version>{hibernateSearchVersion}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <!-- Any other dependency management entries -->
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <!-- Any other dependency management entries -->
+    <!--
+         For example, add an extra Lucene dependency without specifying the version
+         as it is managed by the platform POM:
+    -->
+    <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-suggest</artifactId>
+    </dependency>
+    <!-- Any other dependency management entries -->
+</dependencies>
+----
 
 [[compatibility-framework]]
 == [[gettingstarted-framework]] Framework support
@@ -183,7 +240,7 @@ or by explicitly listing a dependency with its version that we want to be used:
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-platform</artifactId>
-            <version>${version.org.hibernate.orm}</version>
+            <version>{hibernateVersion}</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
