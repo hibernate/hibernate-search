@@ -138,8 +138,8 @@ public class ElasticsearchRangeAggregation<F, K, V>
 				Function<? super K, JsonElement> encoder) {
 			super( scope, field, encoder, new ArrayList<>(), new JsonArray(),
 					ElasticsearchSearchAggregation.from( scope,
-							ElasticsearchCountDocumentAggregation.factory( !field.nestedPathHierarchy().isEmpty() )
-									.create( scope, null ).type().build() ) );
+							ElasticsearchCountAggregation.factory()
+									.create( scope, field ).documents().build() ) );
 		}
 	}
 

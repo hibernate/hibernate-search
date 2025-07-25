@@ -304,7 +304,7 @@ class AggregationDslIT {
 					.aggregation(
 							countsByPriceKey, f -> f.terms()
 									.field( "price", Double.class ) // <1>
-									.value( f.countDocuments() ) // <4>
+									.value( f.count().documents() ) // <4>
 					)
 					.fetch( 20 );
 			Map<Double, Long> countsByPrice = result.aggregation( countsByPriceKey );
@@ -442,7 +442,7 @@ class AggregationDslIT {
 									.range( 0.0, 10.0 ) // <2>
 									.range( 10.0, 20.0 )
 									.range( 20.0, null ) // <3>
-									.value( f.countDocuments() ) // <4>
+									.value( f.count().documents() ) // <4>
 					)
 					.fetch( 20 );
 			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
@@ -753,7 +753,8 @@ class AggregationDslIT {
 			AggregationKey<Long> countBooksKey = AggregationKey.of( "countBooks" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countBooksKey, f -> f.countDocuments() ) // <1>
+					.aggregation( countBooksKey, f -> f.count() // <1>
+							.documents() ) // <2>
 					.fetch( 20 );
 			Long countPrices = result.aggregation( countBooksKey );
 			// end::count-documents[]
@@ -768,7 +769,8 @@ class AggregationDslIT {
 			AggregationKey<Long> countRatingsKey = AggregationKey.of( "countRatings" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countRatingsKey, f -> f.countValues().field( "ratings" ) ) // <1>
+					.aggregation( countRatingsKey, f -> f.count() // <1>
+							.field( "ratings" ) ) // <2>
 					.fetch( 20 );
 			Long countPrices = result.aggregation( countRatingsKey );
 			// end::count[]
@@ -783,7 +785,9 @@ class AggregationDslIT {
 			AggregationKey<Long> countDistinctPricesKey = AggregationKey.of( "countDistinctPrices" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "genre" ).matching( Genre.SCIENCE_FICTION ) )
-					.aggregation( countDistinctPricesKey, f -> f.countDistinctValues().field( "price" ) ) // <1>
+					.aggregation( countDistinctPricesKey, f -> f.count() // <1>
+							.field( "price" ) // <2>
+							.distinct() ) // <3>
 					.fetch( 20 );
 			Long countDistinctPrices = result.aggregation( countDistinctPricesKey );
 			// end::count-distinct[]
@@ -852,7 +856,7 @@ class AggregationDslIT {
 									f.avg().field( "price", Double.class ), // <2>
 									f.min().field( "price", Double.class ),
 									f.max().field( "price", Double.class ),
-									f.countValues().field( "ratings" )
+									f.count().field( "ratings" )
 							).asList( BookAggregation::new ) ) // <3>
 					.fetch( 20 );
 			BookAggregation aggregations = result.aggregation( aggKey ); // <4>
@@ -874,7 +878,7 @@ class AggregationDslIT {
 									f.avg().field( "price", Double.class ), // <2>
 									f.min().field( "price", Double.class ),
 									f.max().field( "price", Double.class ),
-									f.countValues().field( "ratings" )
+									f.count().field( "ratings" )
 							).asList() ) // <3>
 					.fetch( 20 );
 			List<?> aggregations = result.aggregation( aggKey ); // <4>
@@ -899,7 +903,7 @@ class AggregationDslIT {
 									f.avg().field( "price", Double.class ), // <2>
 									f.min().field( "price", Double.class ),
 									f.max().field( "price", Double.class ),
-									f.countValues().field( "ratings" )
+									f.count().field( "ratings" )
 							).asArray() ) // <3>
 					.fetch( 20 );
 			Object[] aggregations = result.aggregation( aggKey ); // <4>
@@ -923,7 +927,7 @@ class AggregationDslIT {
 							f.avg().field( "price", Double.class ), // <2>
 							f.min().field( "price", Double.class ),
 							f.max().field( "price", Double.class ),
-							f.countValues().field( "ratings" )
+							f.count().field( "ratings" )
 					) ) // <3>
 					.fetch( 20 );
 			List<?> aggregations = result.aggregation( aggKey ); // <4>

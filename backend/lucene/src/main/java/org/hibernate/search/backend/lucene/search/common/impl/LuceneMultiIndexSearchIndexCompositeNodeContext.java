@@ -7,6 +7,7 @@ package org.hibernate.search.backend.lucene.search.common.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexCompositeNodeContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
 public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
@@ -34,6 +35,11 @@ public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 	@Override
 	protected LuceneSearchIndexCompositeNodeTypeContext typeOf(LuceneSearchIndexCompositeNodeContext indexElement) {
 		return indexElement.type();
+	}
+
+	@Override
+	public LuceneSearchIndexValueFieldContext<?> toValueField() {
+		return SearchIndexSchemaElementContextHelper.throwingToValueField( this );
 	}
 
 	@Override

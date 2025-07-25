@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.engine.search.aggregation.spi;
 
-public interface CountDocumentAggregationBuilder extends SearchAggregationBuilder<Long> {
+public interface CountValuesAggregationBuilder extends SearchFilterableAggregationBuilder<Long> {
+
+	void distinct(boolean distinct);
 
 }

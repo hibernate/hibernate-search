@@ -163,8 +163,8 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 				ProjectionConverter<T, ? extends K> fromFieldValueConverter) {
 			super( scope, field, decodeFunction, fromFieldValueConverter,
 					ElasticsearchSearchAggregation.from( scope,
-							ElasticsearchCountDocumentAggregation.factory( !field.nestedPathHierarchy().isEmpty() )
-									.create( scope, null ).type().build() ) );
+							ElasticsearchCountAggregation.factory()
+									.create( scope, field ).documents().build() ) );
 		}
 	}
 

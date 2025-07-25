@@ -11,24 +11,41 @@ import org.hibernate.search.engine.search.reference.aggregation.CountAggregation
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The initial step in a "count values" aggregation definition, where the target field can be set.
+ * The initial step in a "count" aggregation definition, where the kind of the aggregation can be picked.
  *
  * @param <SR> Scope root type.
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 @Incubating
-public interface CountValuesAggregationFieldStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
+public interface CountAggregationKindStep<SR, PDF extends TypedSearchPredicateFactory<SR>> {
 
 	/**
-	 * Target the given field in the count values aggregation.
+	 * Count documents that match the query.
+	 * <p>
+	 * This aggregation may be useful for building {@link SearchAggregationFactory#range()} or {@link SearchAggregationFactory#terms()} aggregations.
+	 *
+	 * @return The next step.
+	 */
+	@Incubating
+	CountDocumentsAggregationFinalStep documents();
+
+	/**
+	 * Count the number of non-empty values for the given field.
+	 * <p>
+	 * For a multi-valued field, the resulting count
+	 * may be greater than the number of matched documents.
 	 *
 	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
 	 * @return The next step.
 	 */
+	@Incubating
 	CountValuesAggregationOptionsStep<SR, ?, PDF> field(String fieldPath);
 
 	/**
-	 * Target the given field in the count values aggregation.
+	 * Count the number of non-empty values for the given field.
+	 * <p>
+	 * For a multi-valued field, the resulting count
+	 * may be greater than the number of matched documents.
 	 *
 	 * @param fieldReference The field reference representing a <a href="SearchAggregationFactory.html#field-references">definition</a> of the index field to aggregate.
 	 * @return The next step.

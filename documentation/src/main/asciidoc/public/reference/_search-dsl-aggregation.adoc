@@ -355,8 +355,9 @@ but that can be <<search-dsl-aggregation-common-filter,controlled explicitly wit
 
 include::../components/_incubating-warning.adoc[]
 
-Hibernate Search provides a set of most common metric aggregations such as `sum`, `min`, `max`, `count documents`, `count values`,
-`count values distinct` and `avg`. These aggregations can be requested for fields of numerical or temporal types.
+Hibernate Search provides a set of most common metric aggregations such as `sum`, `min`, `max`, `count` and `avg`.
+These aggregations can be requested for fields of numerical or temporal types,
+or, in the case of `count`, at the document level (counting documents).
 
 [IMPORTANT]
 ====
@@ -410,7 +411,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 <1> Define the target field path to which you want to apply the aggregation function and the expected returned type.
 ====
 
-=== Count documents  metric aggregation
+=== Count metric aggregation
+
+The count aggregation allows counting either the documents that matched or field values.
 
 The `count documents` aggregation counts the number of documents.
 While it is usually discouraged to use this aggregation at the root level,
@@ -424,10 +427,9 @@ this aggregation can still be useful in defining aggregation values in other, mo
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count-documents]
 ----
-<1> Apply the document count aggregation. For this function a `Long.class` value is always returned.
+<1> Start building the counts aggregation by calling `.count()`. This aggregation always return a `Long.class` value.
+<2> Request the document count.
 ====
-
-=== Count values metric aggregation
 
 The `count values` aggregation counts the number of non-empty field values.
 This aggregation mostly make sense when the aggregated field is multivalued.
@@ -439,12 +441,11 @@ For single-valued fields this aggregation would result in the number of document
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count]
 ----
-<1> Define the target field path to which you want to apply the aggregation function. For this function a `Long.class` value is always returned.
+<1> Start building the counts aggregation by calling `.count()`. This aggregation always return a `Long.class` value.
+<2> Specify the path of the field whose values to count.
 ====
 
-=== Count distinct values metric aggregation
-
-The `count distinct values` aggregation counts the number of unique field values.
+Additionally, it is possible to count only the distinct field values.
 
 .Count the number of all different price value among all the science fiction books
 ====
@@ -452,7 +453,9 @@ The `count distinct values` aggregation counts the number of unique field values
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count-distinct]
 ----
-<1> Define the target field path to which you want to apply the aggregation function. For this function a `Long.class` value is always returned.
+<1> Start building the counts aggregation by calling `.count()`. This aggregation always return a `Long.class` value.
+<2> Specify the path of the field whose values to count.
+<3> Request a count of distinct values (ignoring duplicates).
 ====
 
 === Avg metric aggregation
