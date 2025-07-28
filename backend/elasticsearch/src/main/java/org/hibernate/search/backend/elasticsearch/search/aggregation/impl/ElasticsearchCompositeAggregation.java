@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -13,9 +16,15 @@ import org.hibernate.search.engine.search.spi.ResultsCompositor;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchAggregation<A> {
+	private static final String REVERSE_NESTED_WRAPPER_NAME = "reverse_nested_wrapper";
+	private static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR =
+			JsonAccessor.root().property( REVERSE_NESTED_WRAPPER_NAME ).asObject();
+
+	private static final AggregationKey<?> REVERSE_NESTED_WRAPPER_KEY = AggregationKey.of( REVERSE_NESTED_WRAPPER_NAME );
+	private static final AggregationKey<?> REGULAR_KEY = AggregationKey.of( "regular_aggregation" );
+
 	private final ElasticsearchSearchAggregation<?>[] aggregations;
 	private final ResultsCompositor<?, A> compositor;
-
 
 	private ElasticsearchCompositeAggregation(Builder<A> builder) {
 		super( builder );
@@ -80,6 +89,10 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 
 		@Override
 		public A extract(JsonObject aggregationResult, AggregationExtractContext context) {
+			if ( REVERSE_NESTED_WRAPPER_KEY.equals( key ) ) {
+				aggregationResult = REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR.get( aggregationResult )
+						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );
+			}
 			E initial = compositor.createInitial();
 
 			for ( int i = 0; i < extractors.length; i++ ) {
@@ -88,5 +101,9 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 
 			return compositor.finish( initial );
 		}
+	}
+
+	static AggregationKey<?> compositeKeyFor(boolean isNested) {
+		return isNested ? REVERSE_NESTED_WRAPPER_KEY : REGULAR_KEY;
 	}
 }

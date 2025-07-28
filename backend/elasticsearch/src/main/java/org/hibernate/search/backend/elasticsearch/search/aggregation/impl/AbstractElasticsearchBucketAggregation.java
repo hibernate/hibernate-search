@@ -29,6 +29,9 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	private static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_ACCESSOR =
 			JsonAccessor.root().property( "reverse_nested" ).asObject();
 
+	protected static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR =
+			JsonAccessor.root().property( "reverse_nested_wrapper" ).asObject();
+
 	private static final String ROOT_DOC_COUNT_NAME = "root_doc_count";
 	private static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR =
 			JsonAccessor.root().property( "aggregations" ).property( ROOT_DOC_COUNT_NAME ).asObject();
@@ -47,11 +50,31 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		doRequest( outerObject, innerObject, context );
 
 		if ( isNested() ) {
-			JsonObject rootDocCountSubAggregationOuterObject = new JsonObject();
-			JsonObject rootDocCountSubAggregationInnerObject = new JsonObject();
+			// if we are looking at a nested composite/non-document-count sub-aggregation
+			//  we have to wrap it in a single aggregation with `reverse_nested` in it.
+			if ( !innerObject.isEmpty() ) {
+				JsonObject aggregations = new JsonObject();
+				JsonObject wrapper = new JsonObject();
+				REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR.set( aggregations, wrapper );
+				REQUEST_REVERSE_NESTED_ACCESSOR.set( wrapper, new JsonObject() );
+				REQUEST_AGGREGATIONS_ACCESSOR.set( wrapper, innerObject );
+				REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, aggregations );
+			}
+			else {
+				// we are looking at the "default" "just give me the counts" aggregation here:
+				JsonObject rootDocCountSubAggregationOuterObject = new JsonObject();
+				JsonObject rootDocCountSubAggregationInnerObject = new JsonObject();
 
-			REQUEST_REVERSE_NESTED_ACCESSOR.set( rootDocCountSubAggregationOuterObject, rootDocCountSubAggregationInnerObject );
-			REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR.set( outerObject, rootDocCountSubAggregationOuterObject );
+				REQUEST_REVERSE_NESTED_ACCESSOR.set(
+						rootDocCountSubAggregationOuterObject,
+						rootDocCountSubAggregationInnerObject
+				);
+				REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR.set( outerObject, rootDocCountSubAggregationOuterObject );
+			}
+		}
+		else if ( !innerObject.isEmpty() ) {
+			// regular bucket/composite aggregation requested:
+			REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, innerObject );
 		}
 
 		return outerObject;

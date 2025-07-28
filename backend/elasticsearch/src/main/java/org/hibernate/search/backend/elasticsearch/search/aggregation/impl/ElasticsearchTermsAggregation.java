@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestBuildingContextContext.buildingContextKey;
+import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchCompositeAggregation.compositeKeyFor;
 
 import java.util.List;
 import java.util.Map;
@@ -59,21 +60,18 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 
 	@Override
 	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
-		outerObject.add( "terms", innerObject );
-		innerObject.addProperty( "field", absoluteFieldPath );
+		JsonObject termsDefinition = new JsonObject();
+		outerObject.add( "terms", termsDefinition );
+		termsDefinition.addProperty( "field", absoluteFieldPath );
 		if ( order != null ) {
-			innerObject.add( "order", order );
+			termsDefinition.add( "order", order );
 		}
-		innerObject.addProperty( "size", size );
-		innerObject.addProperty( "min_doc_count", minDocCount );
+		termsDefinition.addProperty( "size", size );
+		termsDefinition.addProperty( "min_doc_count", minDocCount );
 
-		JsonObject subOuterObject = new JsonObject();
 		context.add( buildingContextKey( INNER_EXTRACTOR ),
-				aggregation.request( context, AggregationKey.of( "agg" ), subOuterObject ) );
+				aggregation.request( context, compositeKeyFor( isNested() ), innerObject ) );
 
-		if ( !subOuterObject.isEmpty() ) {
-			REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, subOuterObject );
-		}
 	}
 
 	@Override

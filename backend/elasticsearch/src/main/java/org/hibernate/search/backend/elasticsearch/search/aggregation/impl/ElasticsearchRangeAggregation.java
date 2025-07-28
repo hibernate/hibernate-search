@@ -5,6 +5,7 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestBuildingContextContext.buildingContextKey;
+import static org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchCompositeAggregation.compositeKeyFor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,18 +57,14 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 	@Override
 	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
-		outerObject.add( "range", innerObject );
-		innerObject.addProperty( "field", absoluteFieldPath );
-		innerObject.addProperty( "keyed", true );
-		innerObject.add( "ranges", rangesJson );
+		JsonObject rangeDefinition = new JsonObject();
+		outerObject.add( "range", rangeDefinition );
+		rangeDefinition.addProperty( "field", absoluteFieldPath );
+		rangeDefinition.addProperty( "keyed", true );
+		rangeDefinition.add( "ranges", rangesJson );
 
-		JsonObject subOuterObject = new JsonObject();
 		context.add( buildingContextKey( INNER_EXTRACTOR ),
-				aggregation.request( context, AggregationKey.of( "agg" ), subOuterObject ) );
-
-		if ( !subOuterObject.isEmpty() ) {
-			REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, subOuterObject );
-		}
+				aggregation.request( context, compositeKeyFor( isNested() ), innerObject ) );
 	}
 
 	@Override

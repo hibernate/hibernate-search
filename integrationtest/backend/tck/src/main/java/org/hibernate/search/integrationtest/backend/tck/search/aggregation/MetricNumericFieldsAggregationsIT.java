@@ -5,10 +5,13 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -24,6 +27,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
@@ -74,6 +78,13 @@ class MetricNumericFieldsAggregationsIT {
 	private final AggregationKey<Long> countValuesIntegerMultiValued = AggregationKey.of( "countValuesIntegerMultiValued" );
 	private final AggregationKey<Long> countDistinctValuesIntegerMultiValued =
 			AggregationKey.of( "countDistinctValuesIntegerMultiValued" );
+	private final AggregationKey<Long> countValuesNestedIntegerMultiValued =
+			AggregationKey.of( "countValuesNestedIntegerMultiValued" );
+	private final AggregationKey<Long> countDistinctValuesNestedIntegerMultiValued =
+			AggregationKey.of( "countDistinctValuesNestedIntegerMultiValued" );
+	private final AggregationKey<Integer> sumNestedIntegerMultiValued = AggregationKey.of( "sumNestedIntegerMultiValued" );
+	private final AggregationKey<Map<Range<Integer>, List<?>>> rangeWithNested = AggregationKey.of( "rangeWithNested" );
+	private final AggregationKey<Map<Range<Integer>, List<?>>> rangeOnNested = AggregationKey.of( "rangeOnNested" );
 
 	@BeforeEach
 	void setup() {
@@ -124,6 +135,17 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( countDocuments ) ).isEqualTo( result.total().hitCount() );
 		assertThat( result.aggregation( countValuesIntegerMultiValued ) ).isEqualTo( 25 );
 		assertThat( result.aggregation( countDistinctValuesIntegerMultiValued ) ).isEqualTo( 3 );
+		assertThat( result.aggregation( countValuesNestedIntegerMultiValued ) ).isEqualTo( 25L );
+		assertThat( result.aggregation( countDistinctValuesNestedIntegerMultiValued ) ).isEqualTo( 3L );
+		assertThat( result.aggregation( sumNestedIntegerMultiValued ) ).isEqualTo( 145 );
+		assertThat( result.aggregation( rangeWithNested ) ).containsExactly(
+				entry( Range.canonical( -100, 2 ), List.of( 0L, 0L, 0L ) ),
+				entry( Range.canonical( 2, 100 ), List.of( 5L, 5L, 25L ) )
+		);
+		assertThat( result.aggregation( rangeOnNested ) ).containsExactly(
+				entry( Range.canonical( -100, 2 ), List.of( 0L, 0L, 0L ) ),
+				entry( Range.canonical( 2, 100 ), List.of( 5L, 5L, 25L ) )
+		);
 	}
 
 	@Test
@@ -169,6 +191,17 @@ class MetricNumericFieldsAggregationsIT {
 		assertThat( result.aggregation( countDocuments ) ).isEqualTo( result.total().hitCount() );
 		assertThat( result.aggregation( countValuesIntegerMultiValued ) ).isEqualTo( 50 );
 		assertThat( result.aggregation( countDistinctValuesIntegerMultiValued ) ).isEqualTo( 6 );
+		assertThat( result.aggregation( countValuesNestedIntegerMultiValued ) ).isEqualTo( 50L );
+		assertThat( result.aggregation( countDistinctValuesNestedIntegerMultiValued ) ).isEqualTo( 6L );
+		assertThat( result.aggregation( sumNestedIntegerMultiValued ) ).isEqualTo( 275 );
+		assertThat( result.aggregation( rangeWithNested ) ).containsExactly(
+				entry( Range.canonical( -100, 2 ), List.of( 3L, 3L, 15L ) ),
+				entry( Range.canonical( 2, 100 ), List.of( 7L, 7L, 35L ) )
+		);
+		assertThat( result.aggregation( rangeOnNested ) ).containsExactly(
+				entry( Range.canonical( -100, 2 ), List.of( 3L, 3L, 15L ) ),
+				entry( Range.canonical( 2, 100 ), List.of( 7L, 7L, 35L ) )
+		);
 	}
 
 	private SearchQuery<DocumentReference> defineAggregations(
@@ -214,6 +247,28 @@ class MetricNumericFieldsAggregationsIT {
 				.aggregation( countDocuments, f -> f.count().documents() )
 				.aggregation( countDistinctValuesIntegerMultiValued, f -> f.count().field( "integerMultiValued" ).distinct() )
 				.aggregation( countValuesIntegerMultiValued, f -> f.count().field( "integerMultiValued" ) )
+				.aggregation( countValuesNestedIntegerMultiValued,
+						f -> f.count().field( "object.nestedIntegerMultiValued" ) )
+				.aggregation( countDistinctValuesNestedIntegerMultiValued,
+						f -> f.count().field( "object.nestedIntegerMultiValued" ).distinct() )
+				.aggregation( sumNestedIntegerMultiValued,
+						f -> f.sum().field( "object.nestedIntegerMultiValued", Integer.class ) )
+				.aggregation(
+						rangeWithNested, f -> f.range().field( "integer", Integer.class )
+								.range( -100, 2 )
+								.range( 2, 100 )
+								.value( f.composite()
+										.from( f.count().documents(), f.count().field( "integer" ),
+												f.count().field( "object.nestedIntegerMultiValued" ) )
+										.asList() ) )
+				.aggregation(
+						rangeOnNested, f -> f.range().field( "object.nestedInteger", Integer.class )
+								.range( -100, 2 )
+								.range( 2, 100 )
+								.value( f.composite()
+										.from( f.count().documents(), f.count().field( "integer" ),
+												f.count().field( "object.nestedIntegerMultiValued" ) )
+										.asList() ) )
 				.toQuery();
 	}
 
@@ -242,6 +297,9 @@ class MetricNumericFieldsAggregationsIT {
 
 				DocumentElement object = document.addObject( mainIndex.binding().object );
 				object.addValue( mainIndex.binding().nestedInteger, value );
+				for ( int j = 0; j < 5; j++ ) {
+					object.addValue( mainIndex.binding().nestedIntegerMultiValued, value );
+				}
 			} );
 		}
 		bulkIndexer.add( "empty", document -> {} )
@@ -260,6 +318,7 @@ class MetricNumericFieldsAggregationsIT {
 		final IndexFieldReference<String> style;
 		final IndexObjectFieldReference object;
 		final IndexFieldReference<Integer> nestedInteger;
+		final IndexFieldReference<Integer> nestedIntegerMultiValued;
 
 		IndexBinding(IndexSchemaElement root) {
 			integer = root.field( "integer", f -> f.asInteger().aggregable( Aggregable.YES ) ).toReference();
@@ -279,6 +338,9 @@ class MetricNumericFieldsAggregationsIT {
 			object = nested.toReference();
 			nestedInteger = nested.field( "nestedInteger", f -> f.asInteger().aggregable( Aggregable.YES ) )
 					.toReference();
+			nestedIntegerMultiValued =
+					nested.field( "nestedIntegerMultiValued", f -> f.asInteger().aggregable( Aggregable.YES ) ).multiValued()
+							.toReference();
 		}
 	}
 }
