@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	 */
 	private static final String BASE_URL_FORMAT =
 			"https://search.maven.org/solrsearch/select?q=%s&core=gav&start=%d&rows=%d&wt=json";
+	private static final String MAVEN_STATUS_URL = "https://status.maven.org/api/v2/summary.json";
 	private static final int ROWS_PER_PAGE = 100;
 	private static final int MAX_RETRIES = 5;
 	private static final int RETRY_DELAY_SECONDS = 2;
@@ -114,28 +116,35 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		final Gson gson = new GsonBuilder().create();
 		Set<Artifact> foundArtifacts = new TreeSet<>();
 
-		for ( Artifact filter : toQuery ) {
-			StringBuilder queryBuilder = new StringBuilder();
-			queryBuilder.append( "g:" ).append( encodeValue( filter.g ) );
+		StatusSummary mavenStatus = fetch( gson, MAVEN_STATUS_URL, StatusSummary.class, StatusSummary::empty );
 
-			if ( filter.a != null && !filter.a.trim().isEmpty() ) {
-				queryBuilder.append( "+AND+a:" ).append( encodeValue( filter.a ) );
-			}
-			if ( filter.v != null && !filter.v.trim().isEmpty() ) {
-				queryBuilder.append( "+AND+v:" ).append( encodeValue( filter.v ) );
-			}
+		if ( mavenStatus.isSearchAvailable() ) {
+			for ( Artifact filter : toQuery ) {
+				StringBuilder queryBuilder = new StringBuilder();
+				queryBuilder.append( "g:" ).append( encodeValue( filter.g ) );
 
-			int start = 0;
-			do {
-				String url = String.format( Locale.ROOT, BASE_URL_FORMAT, queryBuilder, start, ROWS_PER_PAGE );
-				SearchResponse response = fetch( gson, url );
-				foundArtifacts.addAll( response.response.docs );
-				if ( response.response.start + response.response.docs.size() >= response.response.numFound ) {
-					break;
+				if ( filter.a != null && !filter.a.trim().isEmpty() ) {
+					queryBuilder.append( "+AND+a:" ).append( encodeValue( filter.a ) );
 				}
-				start += ROWS_PER_PAGE;
+				if ( filter.v != null && !filter.v.trim().isEmpty() ) {
+					queryBuilder.append( "+AND+v:" ).append( encodeValue( filter.v ) );
+				}
+
+				int start = 0;
+				do {
+					String url = String.format( Locale.ROOT, BASE_URL_FORMAT, queryBuilder, start, ROWS_PER_PAGE );
+					SearchResponse response = fetch( gson, url, SearchResponse.class, SearchResponse::empty );
+					foundArtifacts.addAll( response.response.docs );
+					if ( response.response.start + response.response.docs.size() >= response.response.numFound ) {
+						break;
+					}
+					start += ROWS_PER_PAGE;
+				}
+				while ( true );
 			}
-			while ( true );
+		}
+		else {
+			getLog().warn( "maven.search.org is down. Skipping search of artifacts. Check incomplete." );
 		}
 
 		List<String> problems = new ArrayList<>();
@@ -159,17 +168,17 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		return String.format( Locale.ROOT, GAV_FORMAT, d.getGroupId(), d.getArtifactId(), d.getVersion() );
 	}
 
-	private SearchResponse fetch(Gson gson, String url) throws EnforcerRuleException {
+	private <T> T fetch(Gson gson, String url, Class<T> klass, Supplier<T> empty) throws EnforcerRuleException {
 		for ( int i = 0; i < MAX_RETRIES; i++ ) {
 			try (
 					var stream = URI.create( url ).toURL().openStream(); var isr = new InputStreamReader( stream );
 					var reader = new JsonReader( isr )
 			) {
-				getLog().info( "Fetching included artifacts from " + url );
-				return gson.fromJson( reader, SearchResponse.class );
+				getLog().info( "Fetching from " + url );
+				return gson.fromJson( reader, klass );
 			}
 			catch (IOException e) {
-				getLog().warn( "Fetching artifacts from " + url + " failed Retrying in " + RETRY_DELAY_SECONDS
+				getLog().warn( "Fetching from " + url + " failed. Retrying in " + RETRY_DELAY_SECONDS
 						+ "s... (Attempt " + ( i + 1 ) + "/" + ( MAX_RETRIES ) + "): " + e.getMessage() );
 				try {
 					TimeUnit.SECONDS.sleep( RETRY_DELAY_SECONDS );
@@ -180,8 +189,8 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 				}
 			}
 		}
-		getLog().warn( "Fetching the artifacts from " + url + " failed after " + ( MAX_RETRIES ) + " attempts." );
-		return SearchResponse.empty();
+		getLog().warn( "Fetching from " + url + " failed after " + ( MAX_RETRIES ) + " attempts." );
+		return empty.get();
 	}
 
 	private String encodeValue(String value) {
@@ -273,5 +282,30 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		int numFound;
 		int start;
 		List<Artifact> docs;
+	}
+
+	private static class StatusSummary {
+		public List<Component> components;
+
+		private static class Component {
+			public String id;
+			public String name;
+			public String status; // e.g., "operational", "degraded_performance", "major_outage"
+		}
+
+		boolean isSearchAvailable() {
+			for ( Component component : components ) {
+				if ( component.name != null && component.name.contains( "search.maven.org" ) ) {
+					return "operational".equalsIgnoreCase( component.status );
+				}
+			}
+			return false;
+		}
+
+		static StatusSummary empty() {
+			StatusSummary statusSummary = new StatusSummary();
+			statusSummary.components = List.of();
+			return statusSummary;
+		}
 	}
 }
