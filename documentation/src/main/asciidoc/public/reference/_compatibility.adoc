@@ -104,6 +104,7 @@ These platform files will help keep the versions of extra Hibernate ORM/Lucene/E
 aligned with the versions of artifacts from the same groups that are used by Hibernate Search itself.
 
 Currently, there are two platform POM files for Hibernate Search:
+
 * `hibernate-search-platform-bom`: use this when in doubt.
 * `hibernate-search-platform-next-bom`: use this if you want to use the <<other-integrations-lucene-next,Lucene-next>> backend.
 
