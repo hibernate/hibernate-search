@@ -1,6 +1,63 @@
 Hibernate Search Changelog
 ==========================
 
+8.1.0.Alpha1 (2025-07-29)
+-------------------------
+
+** Bug
+    * HSEARCH-3666 Lucene terms aggregations (discrete facets) may return wrong results for any sort other than the default one
+
+** Deprecation
+    * HSEARCH-5437 Deprecate JPA/ORM query extension and Search#toOrmQuery / Search#toOrmQuery for removal
+
+** Improvement
+    * HSEARCH-5436 Upgrade to AWS SDK 2.32.10
+    * HSEARCH-5435 Upgrade Jackson to 2.19.2
+    * HSEARCH-5433 Update to Hibernate ORM 7.0.8.Final
+    * HSEARCH-5431 Upgrade to Hibernate ORM 7.0.7
+    * HSEARCH-5427 Upgrade Elasticsearch client to 9.0.4
+    * HSEARCH-5426 Adjust the count aggregation DSL
+    * HSEARCH-5423 Introduce search method to reference scopes
+    * HSEARCH-5418 Upgrade to Hibernate ORM 7.0.6.Final
+    * HSEARCH-5415 Upgrade to Hibernate ORM 7.0.5.Final
+    * HSEARCH-5413 Upgrade to Hibernate ORM 7.0.4.Final
+    * HSEARCH-5410 Add compatibility with OpenSearch 3.1.0
+    * HSEARCH-5408 Upgrade Elasticsearch client to 9.0.3
+    * HSEARCH-5407 Upgrade to Hibernate ORM 7.0.3.Final
+    * HSEARCH-5406 Upgrade to Lucene 10.2.2
+    * HSEARCH-5405 Upgrade to Lucene 9.12.2
+    * HSEARCH-5402 Upgrade Jackson to 2.19.1
+    * HSEARCH-5399 Upgrade to Hibernate ORM 7.0.2.Final
+    * HSEARCH-5397 Upgrade to Hibernate ORM 7.0.1.Final
+    * HSEARCH-5356 Introduce the extended (platform) BOM 
+    * HSEARCH-5309 Limit the time that the outbox polling processor spends trying to lock/load event entities after processing
+
+** New Feature
+    * HSEARCH-5421 Composite aggregation
+    * HSEARCH-3661 Setting the value of bucket aggregations to something more than just the document count
+
+** Proposal
+    * HSEARCH-5301 Consider adding org.apache.lucene:lucene-backward-codecs to BOM
+
+** Remove Feature
+    * HSEARCH-5417 Deprecate for removal org.hibernate.search.util.common.serialization.spi.SerializationUtils
+
+** Task
+    * HSEARCH-5430 Test against the latest OpenSearch 2.19.3
+    * HSEARCH-5429 Test against the latest Elasticsearch 8.18.4
+    * HSEARCH-5428 Test against the latest Elasticsearch 9.0.4
+    * HSEARCH-5422 Use Maven 3.9.11 as a required minimum version for the build
+    * HSEARCH-5420 Switch to  org.wiremock:wiremock
+    * HSEARCH-5416 Account for the CompletableFuture#reportJoin changes in the newer JDK
+    * HSEARCH-5412 Test against latest Elasticsearch 8.18.3
+    * HSEARCH-5411 Test against latest Elasticsearch 7.17.29
+    * HSEARCH-5404 Stop exporting logging/reporting.impl packages to org.jboss.logging
+    * HSEARCH-5401 Test against JDK 26
+    * HSEARCH-5400 Switch to Maven Central publishing
+    * HSEARCH-5398 Use Maven 3.9.10 as a required minimum version for the build
+    * HSEARCH-5354 Switch to Central Publishing Portal API for publishing to Maven Central
+    * HSEARCH-5351 Switch to JReleaser for nexus publishing
+
 8.0.0.Final (2025-06-06)
 -------------------------
 
