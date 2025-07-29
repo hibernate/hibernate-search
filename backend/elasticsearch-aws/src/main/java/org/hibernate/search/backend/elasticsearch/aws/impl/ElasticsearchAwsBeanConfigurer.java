@@ -22,7 +22,7 @@ public class ElasticsearchAwsBeanConfigurer implements BeanConfigurer {
 		);
 		context.define(
 				ElasticsearchAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.DEFAULT,
-				beanResolver -> BeanHolder.of( ignored -> DefaultCredentialsProvider.create() )
+				beanResolver -> BeanHolder.of( ignored -> DefaultCredentialsProvider.builder().build() )
 		);
 		context.define(
 				ElasticsearchAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.STATIC,
