@@ -45,9 +45,10 @@ import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScroll
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
+@Deprecated(since = "8.1", forRemoval = true)
 @SuppressForbiddenApis(reason = "We need to use the internal QueryOptionsImpl"
 		+ " in order to implement a org.hibernate.query.Query")
-@SuppressWarnings("unchecked") // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
+@SuppressWarnings({ "unchecked", "removal" }) // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
 public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {

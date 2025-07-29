@@ -12,6 +12,8 @@ import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 
+@SuppressWarnings("removal")
+@Deprecated(since = "8.1", forRemoval = true)
 final class HibernateOrmSearchQueryAdapterExtension<H>
 		implements
 		SearchQueryExtension<HibernateOrmSearchQueryAdapter<H>, H> {

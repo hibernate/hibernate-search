@@ -689,6 +689,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 <3> Turn the `SearchQuery` object into a JPA query.
 <4> Turn the `SearchQuery` object into a Hibernate ORM query.
 ====
+[WARNING]
+====
+Both JPA and Hibernate ORM query adapters are deprecated and will be removed in the future version of Hibernate Search.
+====
 
 // Search 5 anchors backward compatibility
 [[_resulttransformer]]

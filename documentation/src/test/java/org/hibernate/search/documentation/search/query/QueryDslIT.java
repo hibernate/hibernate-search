@@ -287,6 +287,7 @@ class QueryDslIT {
 		} );
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void searchQuery() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {

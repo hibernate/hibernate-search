@@ -52,6 +52,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test the compatibility layer between our APIs and JPA APIs
  * for the {@link TypedQuery} class.
  */
+@SuppressWarnings("removal")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ToJpaQueryIT {
 
