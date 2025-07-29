@@ -184,16 +184,10 @@ and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/searc
   * **Be careful** when filling the form with the build parameters.
   * Note that for new branches where the job has never run, the first run will not ask for parameters and thus will fail:
     that's expected, just run it again.
-* Release the artifacts on the [OSSRH repository manager](https://oss.sonatype.org/#stagingRepositories).
-  * Log into Nexus. The credentials can be found on Bitwarden; ask a teammate if you don't have access.
-  * Click "staging repositories" to the left.
-  * Examine your staging repository: check that all expected artifacts are there.
-  * If necessary (that's very rare), test the release in the staging repository.
-    You can drop the staging repo if there is a problem,
-    but you'll need to revert the commits pushed during the release.
-  * If everything is ok, select the staging repository and click the "Release" button.
-    * For Search 5.x and below, you will also need to "Close" the repository before you can release it.
-      A manual refresh may be necessary after closing.
+* If the release option `RELEASE_PUBLISH_AUTOMATICALLY` was selected as `false`-- release the artifacts on the [Maven Central portal](https://central.sonatype.com/).
+  * Log into Maven Central. The credentials can be found on Bitwarden; ask a teammate if you don't have access.
+  * Click on the profile circle at the top right and pick "View Deployments".
+  * Find your deployment on the left and click "Publish".
 
 ### Announcing the release
 
