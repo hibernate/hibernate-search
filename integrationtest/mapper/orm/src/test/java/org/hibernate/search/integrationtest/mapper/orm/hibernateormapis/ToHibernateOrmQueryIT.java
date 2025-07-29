@@ -50,6 +50,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test the compatibility layer between our APIs and Hibernate ORM APIs
  * for the {@link Query} class.
  */
+@SuppressWarnings("removal")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ToHibernateOrmQueryIT {
 

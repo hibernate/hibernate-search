@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
-import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.DelegatingSearchSession;
 
@@ -95,9 +94,14 @@ public final class Search {
 	 * @param searchQuery The search query to convert.
 	 * @param <H> The type of query hits.
 	 * @return A representation of the given query as a JPA query.
+	 *
+	 * @deprecated This method is deprecated for removal with no alternative.
+	 * Use Hibernate Search query DSL API to work with your query and results.
 	 */
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.1", forRemoval = true)
 	public static <H> TypedQuery<H> toJpaQuery(SearchQuery<H> searchQuery) {
-		return HibernateOrmSearchQueryAdapter.create( searchQuery );
+		return org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
 	/**
@@ -112,9 +116,14 @@ public final class Search {
 	 * @param searchQuery The search query to convert.
 	 * @param <H> The type of query hits.
 	 * @return A representation of the given query as a Hibernate ORM query.
+	 *
+	 * @deprecated This method is deprecated for removal with no alternative.
+	 * Use Hibernate Search query DSL API to work with your query and results.
 	 */
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.1", forRemoval = true)
 	public static <H> Query<H> toOrmQuery(SearchQuery<H> searchQuery) {
-		return HibernateOrmSearchQueryAdapter.create( searchQuery );
+		return org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
 	private static SearchMapping getSearchMapping(SessionFactoryImplementor sessionFactoryImplementor) {
