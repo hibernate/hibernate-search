@@ -161,7 +161,7 @@
         <version.mysql.mysql-connector-j>9.3.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.2.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.8.0.25.04</version.com.oracle.database.jdbc>
-        <version.com.microsoft.sqlserver.mssql-jdbc>13.1.0.jre11-preview</version.com.microsoft.sqlserver.mssql-jdbc>
+        <version.com.microsoft.sqlserver.mssql-jdbc>13.1.1.jre11-preview</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
