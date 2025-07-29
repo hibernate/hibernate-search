@@ -98,13 +98,13 @@
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
-        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
+        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 7.
              DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
              Thanks to not using dependency management for these dependencies, we get a build failure
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
-        <version.jakarta.enterprise>4.0.1</version.jakarta.enterprise>
+        <version.jakarta.enterprise>4.1.0</version.jakarta.enterprise>
         <!--
             IMPORTANT:
             Even though we are importing the Hibernate ORM BOM where Jakarta Persistence is managed, we don't have easy access

@@ -29,7 +29,7 @@
         <version.bom.com.carrotsearch>0.10.0</version.bom.com.carrotsearch>
         <version.bom.com.google.code.gson>2.13.1</version.bom.com.google.code.gson>
         <version.bom.jakarta.batch>2.1.1</version.bom.jakarta.batch>
-        <version.bom.jakarta.enterprise>4.0.1</version.bom.jakarta.enterprise>
+        <version.bom.jakarta.enterprise>4.1.0</version.bom.jakarta.enterprise>
         <version.bom.jakarta.inject>2.0.1</version.bom.jakarta.inject>
         <version.bom.jakarta.persistence>3.2.0</version.bom.jakarta.persistence>
         <version.bom.jakarta.transaction>2.0.1</version.bom.jakarta.transaction>
@@ -444,6 +444,11 @@
             <dependency>
                 <groupId>jakarta.enterprise</groupId>
                 <artifactId>jakarta.enterprise.lang-model</artifactId>
+                <version>${version.bom.jakarta.enterprise}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.enterprise</groupId>
+                <artifactId>jakarta.enterprise.cdi-el-api</artifactId>
                 <version>${version.bom.jakarta.enterprise}</version>
             </dependency>
 
@@ -881,6 +886,11 @@
                                         <dependency>
                                             <groupId>jakarta.enterprise</groupId>
                                             <artifactId>jakarta.enterprise.cdi-spec-doc</artifactId>
+                                            <version>${version.bom.jakarta.enterprise}</version>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>jakarta.enterprise</groupId>
+                                            <artifactId>cdi-ide-config</artifactId>
                                             <version>${version.bom.jakarta.enterprise}</version>
                                         </dependency>
                                         <dependency>
