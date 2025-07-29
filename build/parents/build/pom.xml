@@ -84,7 +84,7 @@
         <version.com.google.code.gson>2.13.1</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.32.10</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
-        <version.com.fasterxml.jackson>2.19.1</version.com.fasterxml.jackson>
+        <version.com.fasterxml.jackson>2.19.2</version.com.fasterxml.jackson>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
