@@ -19,6 +19,10 @@
 
     <properties>
         <maven.compiler.testSources.noParameterCompilation.skip>false</maven.compiler.testSources.noParameterCompilation.skip>
+
+        <surefire.jvm.args.module>
+            ${test.mockito.agent.jvm.args}
+        </surefire.jvm.args.module>
     </properties>
 
     <dependencies>
