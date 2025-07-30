@@ -12,6 +12,12 @@
     <name>Hibernate Search ITs - ORM</name>
     <description>Hibernate Search integration tests for the Hibernate ORM integration</description>
 
+    <properties>
+        <surefire.jvm.args.module>
+            ${test.mockito.agent.jvm.args}
+        </surefire.jvm.args.module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>

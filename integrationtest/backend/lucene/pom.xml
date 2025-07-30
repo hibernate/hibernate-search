@@ -14,6 +14,9 @@
 
     <properties>
         <surefire.module>lucene</surefire.module>
+        <surefire.jvm.args.module>
+            ${test.mockito.agent.jvm.args}
+        </surefire.jvm.args.module>
     </properties>
 
     <dependencies>

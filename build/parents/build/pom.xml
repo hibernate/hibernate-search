@@ -271,6 +271,9 @@
         <!-- Eclipse plugin options -->
 
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+
+        <!--Agents configuration -->
+        <test.mockito.agent.jvm.args>-javaagent:${org.mockito:mockito-core:jar}</test.mockito.agent.jvm.args>
     </properties>
 
     <dependencyManagement>
@@ -1427,6 +1430,17 @@
                             <propertyPrefix>parsed-version.org.wildfly</propertyPrefix>
                             <versionString>${version.org.wildfly}</versionString>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
