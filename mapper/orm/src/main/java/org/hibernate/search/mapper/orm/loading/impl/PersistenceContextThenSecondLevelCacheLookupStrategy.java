@@ -4,10 +4,14 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.Map;
+
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.graph.RootGraph;
+import org.hibernate.metamodel.RepresentationMode;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
@@ -22,7 +26,7 @@ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
  * @author Emmanuel Bernard
  */
 @SuppressForbiddenApis(reason = "EntityPersister is needed to retrieve/use EntityDataAccess")
-class PersistenceContextThenSecondLevelCacheLookupStrategy
+abstract class PersistenceContextThenSecondLevelCacheLookupStrategy
 		implements EntityLoadingCacheLookupStrategyImplementor {
 
 	static EntityLoadingCacheLookupStrategyImplementor create(EntityMappingType entityMappingType,
@@ -37,18 +41,29 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 					entityPersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}
-		return new PersistenceContextThenSecondLevelCacheLookupStrategy(
-				persistenceContextLookupStrategy,
-				entityPersister,
-				cacheAccess,
-				session
-		);
+
+		if ( RepresentationMode.MAP.equals( entityMappingType.getRepresentationStrategy().getMode() ) ) {
+			return new DynamicMapPersistenceContextThenSecondLevelCacheLookupStrategy(
+					persistenceContextLookupStrategy,
+					entityPersister,
+					cacheAccess,
+					session
+			);
+		}
+		else {
+			return new PojoPersistenceContextThenSecondLevelCacheLookupStrategy(
+					persistenceContextLookupStrategy,
+					entityPersister,
+					cacheAccess,
+					session
+			);
+		}
 	}
 
 	private final EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy;
-	private final EntityPersister persister;
 	private final EntityDataAccess cacheAccess;
-	private final SessionImplementor session;
+	protected final EntityPersister persister;
+	protected final SessionImplementor session;
 
 	private PersistenceContextThenSecondLevelCacheLookupStrategy(
 			EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy,
@@ -84,12 +99,49 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 
 		try {
 			// This will load the object from the second level cache
-			return session.byId( persister.getEntityName() ).load( entityKey.getIdentifier() );
+			return lookupByIdentifier( entityKey );
 		}
 		catch (ObjectNotFoundException ignored) {
 			// Unlikely but needed: an index might be out of sync, and the cache might be as well
 			// Ignore the exception and handle as a cache miss by returning null
 			return null;
+		}
+	}
+
+	protected abstract Object lookupByIdentifier(EntityKey entityKey);
+
+	@SuppressForbiddenApis(reason = "EntityPersister is needed to retrieve/use EntityDataAccess")
+	private static class DynamicMapPersistenceContextThenSecondLevelCacheLookupStrategy
+			extends PersistenceContextThenSecondLevelCacheLookupStrategy {
+
+		private final RootGraph<Map<String, ?>> graphForDynamicEntity;
+
+		private DynamicMapPersistenceContextThenSecondLevelCacheLookupStrategy(
+				EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy, EntityPersister persister,
+				EntityDataAccess cacheAccess, SessionImplementor session) {
+			super( persistenceContextLookupStrategy, persister, cacheAccess, session );
+			this.graphForDynamicEntity = session.getSessionFactory().createGraphForDynamicEntity( persister.getEntityName() );
+		}
+
+		@Override
+		protected Object lookupByIdentifier(EntityKey entityKey) {
+			return session.find( graphForDynamicEntity, entityKey.getIdentifier() );
+		}
+	}
+
+	@SuppressForbiddenApis(reason = "EntityPersister is needed to retrieve/use EntityDataAccess")
+	private static class PojoPersistenceContextThenSecondLevelCacheLookupStrategy
+			extends PersistenceContextThenSecondLevelCacheLookupStrategy {
+
+		private PojoPersistenceContextThenSecondLevelCacheLookupStrategy(
+				EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy, EntityPersister persister,
+				EntityDataAccess cacheAccess, SessionImplementor session) {
+			super( persistenceContextLookupStrategy, persister, cacheAccess, session );
+		}
+
+		@Override
+		protected Object lookupByIdentifier(EntityKey entityKey) {
+			return session.find( persister.getMappedClass(), entityKey.getIdentifier() );
 		}
 	}
 }

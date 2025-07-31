@@ -537,7 +537,8 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> entity1 = (Map<String, Object>) session.byId( DYNAMIC_SUBTYPE_B ).load( 1 );
+			Map<String, Object> entity1 = (Map<String, Object>) session
+					.find( session.getSessionFactory().createGraphForDynamicEntity( DYNAMIC_SUBTYPE_B ), 1 );
 			entity1.put( "propertyOfA", "updatedValue" );
 		} );
 		backendMock.verifyExpectationsMet();
@@ -545,8 +546,8 @@ class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
-			session.remove( session.byId( DYNAMIC_SUBTYPE_B ).load( 1 ) );
-			session.remove( session.byId( DYNAMIC_SUBTYPE_C ).load( 2 ) );
+			session.remove( session.find( session.getSessionFactory().createGraphForDynamicEntity( DYNAMIC_SUBTYPE_B ), 1 ) );
+			session.remove( session.find( session.getSessionFactory().createGraphForDynamicEntity( DYNAMIC_SUBTYPE_C ), 2 ) );
 
 		} );
 		backendMock.verifyExpectationsMet();
