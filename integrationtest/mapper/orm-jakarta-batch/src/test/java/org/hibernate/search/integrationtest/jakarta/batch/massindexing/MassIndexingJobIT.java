@@ -41,11 +41,10 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.BeforeParameterizedClassInvocation;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.Arguments;
@@ -56,7 +55,6 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @ParameterizedClass
 @MethodSource("params")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MassIndexingJobIT {
 
 	public static List<? extends Arguments> params() {
@@ -79,22 +77,19 @@ class MassIndexingJobIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
-	private static EntityManagerFactory emf;
+	private EntityManagerFactory emf;
 
 	@Parameter(0)
 	static boolean jpaCompliance;
 
-	@BeforeParameterizedClassInvocation
-	static void setup() {
+	@BeforeEach
+	void initData() {
 		emf = ormSetupHelper.start()
 				.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
 				.withProperty( "hibernate.jpa.compliance.query", jpaCompliance )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.setup();
-	}
 
-	@BeforeEach
-	void initData() {
 		List<Company> companies = new ArrayList<>();
 		List<Person> people = new ArrayList<>();
 		List<WhoAmI> whos = new ArrayList<>();
@@ -131,6 +126,11 @@ class MassIndexingJobIT {
 			}
 			groups.forEach( em::persist );
 		} );
+	}
+
+	@AfterEach
+	void tearDown() {
+		emf.close();
 	}
 
 	@Test
