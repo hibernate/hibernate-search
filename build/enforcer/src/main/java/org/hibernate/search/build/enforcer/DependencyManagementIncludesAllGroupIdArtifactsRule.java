@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -77,8 +78,10 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 				.stream()
 				.map( DependencyManagementIncludesAllGroupIdArtifactsRule::dependencyString )
 				.collect( Collectors.toSet() );
-		Set<String> skip = dependenciesToSkip.stream()
+		Set<Pattern> skip = dependenciesToSkip.stream()
 				.map( DependencyManagementIncludesAllGroupIdArtifactsRule::dependencyString )
+				.map( s -> String.format( Locale.ROOT, "^%s$", s ) )
+				.map( Pattern::compile )
 				.collect( Collectors.toSet() );
 		Set<String> include = includedProjects.stream()
 				.map( DependencyManagementIncludesAllGroupIdArtifactsRule::dependencyString )
@@ -90,7 +93,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 					Locale.ROOT, GAV_FORMAT, project.getGroupId(), project.getArtifactId(),
 					project.getVersion()
 			);
-			if ( !include.isEmpty() && !include.contains( projectGav ) || skip.contains( projectGav ) ) {
+			if ( !include.isEmpty() && !include.contains( projectGav ) || shouldSkip( projectGav, skip ) ) {
 				continue;
 			}
 			boolean publicParent = isAnyParentPublicParent( project );
@@ -150,7 +153,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		List<String> problems = new ArrayList<>();
 		for ( Artifact artifact : foundArtifacts ) {
 			String toCheck = artifact.formattedString();
-			if ( skip.contains( toCheck ) ) {
+			if ( shouldSkip( toCheck, skip ) ) {
 				continue;
 			}
 			if ( !dependencies.remove( toCheck ) ) {
@@ -166,6 +169,15 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 
 	private static String dependencyString(Dependency d) {
 		return String.format( Locale.ROOT, GAV_FORMAT, d.getGroupId(), d.getArtifactId(), d.getVersion() );
+	}
+	
+	private static boolean shouldSkip(String gav, Set<Pattern> skipPatterns) {
+		for ( Pattern skipPattern : skipPatterns ) {
+			if ( skipPattern.matcher( gav ).matches() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private <T> T fetch(Gson gson, String url, Class<T> klass, Supplier<T> empty) throws EnforcerRuleException {
