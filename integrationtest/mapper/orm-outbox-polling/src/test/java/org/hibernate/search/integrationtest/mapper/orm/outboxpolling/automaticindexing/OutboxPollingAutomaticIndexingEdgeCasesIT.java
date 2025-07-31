@@ -20,6 +20,8 @@ import jakarta.persistence.OneToOne;
 
 import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.Timeouts;
+import org.hibernate.dialect.lock.spi.LockTimeoutType;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
@@ -201,7 +203,8 @@ class OutboxPollingAutomaticIndexingEdgeCasesIT {
 	@Test
 	void lockedEventRowRetries() {
 		assumeTrue(
-				sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices().getDialect().supportsSkipLocked(),
+				sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices().getDialect().getLockingSupport()
+						.getMetadata().getLockTimeoutType( Timeouts.SKIP_LOCKED ) == LockTimeoutType.QUERY,
 				"This test only make sense if skip locked rows is supported by the underlying DB. " +
 						"Otherwise the locking will trow an exception and the batch will be just reprocessed without a retry of locking events." );
 

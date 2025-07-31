@@ -16,7 +16,9 @@ import jakarta.persistence.PessimisticLockException;
 
 import org.hibernate.LockMode;
 import org.hibernate.Session;
+import org.hibernate.Timeouts;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.lock.spi.LockTimeoutType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
@@ -44,7 +46,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		// That's possible because event processing is not sensitive to processing order,
 		// so we can afford to just skip events that are already locked,
 		// and process them later when they are no longer locked.
-		if ( dialect.supportsSkipLocked() ) {
+		if ( dialect.getLockingSupport().getMetadata().getLockTimeoutType( Timeouts.SKIP_LOCKED ) == LockTimeoutType.QUERY ) {
 			lockMode = LockMode.UPGRADE_SKIPLOCKED;
 		}
 		// If LockMode.UPGRADE_SKIPLOCKED is not supported, we just do basic locking and hope for the best

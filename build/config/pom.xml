@@ -220,11 +220,15 @@
                                     If no prefix is specified then rule is considered to be both public and internal at the same time.
                                 -->
 
+                                <argument>^org\.hibernate\.Timeouts$</argument>
+
                                 <argument>^org\.hibernate\.query\.Query$</argument>
                                 <argument>^org\.hibernate\.query\.SelectionQuery$</argument>
                                 <argument>^org\.hibernate\.query\.MutationQuery$</argument>
                                 <argument>^org\.hibernate\.query\.BindableType$</argument>
                                 <argument>^org\.hibernate\.query\.BindingContext$</argument>
+
+                                <argument>^org\.hibernate\.dialect\.lock\.spi\.LockingSupport$</argument>
 
                                 <argument>^org\.hibernate\.metamodel\.MappingMetamodel$</argument>
                                 <argument>^org\.hibernate\.metamodel\.mapping\.Bindable$</argument>
