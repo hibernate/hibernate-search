@@ -9,6 +9,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 import org.hibernate.search.mapper.orm.model.impl.DocumentIdSourceProperty;
@@ -31,7 +32,8 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	private final String jpaEntityName;
 	private final EntityMappingType entityMappingType;
 	private final boolean documentIdIsEntityId;
-	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
+	private final HibernateOrmBatchLoadingStrategy<E, ?> batchLoadingStrategy;
+	private final String uniquePropertyName;
 	private final PojoPathFilter dirtyFilter;
 	private final PojoPathFilter dirtyContainingAssociationFilter;
 
@@ -44,7 +46,10 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		this.entityMappingType = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
 		this.documentIdIsEntityId = builder.documentIdSourceProperty != null
 				&& builder.documentIdSourceProperty.name.equals( entityMappingType.getIdentifierMapping().getAttributeName() );
-		this.loadingStrategy = builder.loadingStrategy;
+		this.batchLoadingStrategy = builder.batchLoadingStrategy;
+		this.uniquePropertyName = builder.documentIdSourceProperty != null
+				? builder.documentIdSourceProperty.name
+				: entityMappingType.getIdentifierMapping().getAttributeName();
 		this.dirtyFilter = builder.dirtyFilter;
 		this.dirtyContainingAssociationFilter = builder.dirtyContainingAssociationFilter;
 	}
@@ -79,8 +84,13 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	}
 
 	@Override
-	public HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy() {
-		return loadingStrategy;
+	public HibernateOrmBatchLoadingStrategy<E, ?> batchLoadingStrategy() {
+		return batchLoadingStrategy;
+	}
+
+	@Override
+	public String uniquePropertyName() {
+		return uniquePropertyName;
 	}
 
 	@Override
@@ -113,7 +123,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		private DocumentIdSourceProperty<?> documentIdSourceProperty;
 		private PojoPathFilter dirtyFilter;
 		private PojoPathFilter dirtyContainingAssociationFilter;
-		private HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
+		private HibernateOrmBatchLoadingStrategy<E, ?> batchLoadingStrategy;
 
 		Builder(PojoRawTypeModel<E> typeModel, PersistentClass persistentClass) {
 			this.typeIdentifier = typeModel.typeIdentifier();
@@ -141,11 +151,14 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		@SuppressWarnings("unchecked") // The binder uses reflection to create a strategy of the appropriate type
 		public void applyLoadingBinder(Object binder, PojoEntityLoadingBindingContext context) {
 			var castBinder = (HibernateOrmEntityLoadingBinder) binder;
-			this.loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) castBinder
-					.createLoadingStrategy( persistentClass, documentIdSourceProperty );
-			if ( this.loadingStrategy != null ) {
-				context.selectionLoadingStrategy( typeIdentifier.javaClass(), this.loadingStrategy );
-				context.massLoadingStrategy( typeIdentifier.javaClass(), this.loadingStrategy );
+			// TODO: we'll implement this one a biiiiiiiiiiit later ...
+			this.batchLoadingStrategy = null;
+
+			HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E,
+					?>) castBinder.createLoadingStrategy( persistentClass, documentIdSourceProperty );
+			if ( loadingStrategy != null ) {
+				context.selectionLoadingStrategy( typeIdentifier.javaClass(), loadingStrategy );
+				context.massLoadingStrategy( typeIdentifier.javaClass(), loadingStrategy );
 			}
 		}
 	}
