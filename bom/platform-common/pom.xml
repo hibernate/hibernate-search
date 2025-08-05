@@ -19,7 +19,7 @@
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
         <version.bom.org.hibernate.orm>7.1.0.CR1</version.bom.org.hibernate.orm>
-        <version.bom.org.elasticsearch.client>9.0.4</version.bom.org.elasticsearch.client>
+        <version.bom.org.elasticsearch.client>9.1.0</version.bom.org.elasticsearch.client>
         <version.bom.software.amazon.awssdk>2.32.10</version.bom.software.amazon.awssdk>
         <version.bom.io.smallrye>3.3.1</version.bom.io.smallrye>
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
