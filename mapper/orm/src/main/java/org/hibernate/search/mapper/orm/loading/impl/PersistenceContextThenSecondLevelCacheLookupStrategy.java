@@ -4,13 +4,10 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.util.Map;
-
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.graph.RootGraph;
 import org.hibernate.metamodel.RepresentationMode;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
@@ -114,18 +111,15 @@ abstract class PersistenceContextThenSecondLevelCacheLookupStrategy
 	private static class DynamicMapPersistenceContextThenSecondLevelCacheLookupStrategy
 			extends PersistenceContextThenSecondLevelCacheLookupStrategy {
 
-		private final RootGraph<Map<String, ?>> graphForDynamicEntity;
-
 		private DynamicMapPersistenceContextThenSecondLevelCacheLookupStrategy(
 				EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy, EntityPersister persister,
 				EntityDataAccess cacheAccess, SessionImplementor session) {
 			super( persistenceContextLookupStrategy, persister, cacheAccess, session );
-			this.graphForDynamicEntity = session.getSessionFactory().createGraphForDynamicEntity( persister.getEntityName() );
 		}
 
 		@Override
 		protected Object lookupByIdentifier(EntityKey entityKey) {
-			return session.find( graphForDynamicEntity, entityKey.getIdentifier() );
+			return session.find( persister.getEntityName(), entityKey.getIdentifier() );
 		}
 	}
 
