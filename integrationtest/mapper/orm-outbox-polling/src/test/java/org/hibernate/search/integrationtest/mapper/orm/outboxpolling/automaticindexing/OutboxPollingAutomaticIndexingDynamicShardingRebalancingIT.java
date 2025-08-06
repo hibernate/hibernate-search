@@ -35,11 +35,17 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test of automatic rebalancing for dynamic sharding with the outbox-polling coordination strategy.
  */
+// This test is pretty much failing most of the time on Windows.
+//  We have a JIRA HSEARCH-5280 to look into it.
+//  For now, we'll just skip it on Windows envs:
+@DisabledOnOs(OS.WINDOWS)
 @TestForIssue(jiraKey = "HSEARCH-4140")
 class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 
