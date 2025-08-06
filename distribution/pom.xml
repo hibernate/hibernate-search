@@ -9,7 +9,7 @@
     <parent>
         <artifactId>hibernate-search-parent-public</artifactId>
         <groupId>org.hibernate.search</groupId>
-        <version>8.1.0-SNAPSHOT</version>
+        <version>8.1.0.CR2</version>
         <relativePath>../build/parents/public</relativePath>
     </parent>
 
