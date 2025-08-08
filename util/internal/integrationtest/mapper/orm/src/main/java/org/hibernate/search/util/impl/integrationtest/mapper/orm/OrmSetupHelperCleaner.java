@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,17 +12,10 @@ import java.util.function.Consumer;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import jakarta.persistence.metamodel.Attribute;
-import jakarta.persistence.metamodel.EmbeddableType;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.ManagedType;
-import jakarta.persistence.metamodel.Metamodel;
-import jakarta.persistence.metamodel.PluralAttribute;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.util.common.SearchException;
@@ -135,7 +127,6 @@ class OrmSetupHelperCleaner {
 		}
 	}
 
-
 	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping) {
 		if ( config.tenantIds.isEmpty() ) {
 			executeActions( config.preClear, sessionFactory, mapping, null );
@@ -149,61 +140,6 @@ class OrmSetupHelperCleaner {
 		sessionFactory.getSchemaManager().truncateMappedObjects();
 	}
 
-	private static void clearEntityInstances(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
-			Object tenantId, EntityType<?> entityType) {
-		if ( Modifier.isAbstract( entityType.getJavaType().getModifiers() ) ) {
-			// There are no instances of this specific class,
-			// only instances of subclasses, and those are handled separately.
-			return;
-		}
-		if ( hasSelfAssociation( entityType.getJavaType(), sessionFactory, entityType ) ) {
-			if ( mapping != null ) {
-				mapping.listenerEnabled( false );
-			}
-			try {
-				//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
-				OrmUtils.with( sessionFactory, tenantId ).runInTransaction( s -> {
-					//CHECKSTYLE:ON
-					Query<?> query = selectAllOfSpecificType( entityType, s );
-					try {
-						query.list().forEach( s::remove );
-					}
-					catch (RuntimeException e) {
-						throw new RuntimeException( "Failed to delete all entity instances returned by "
-								+ query.getQueryString() + " on type " + entityType + ": " + e.getMessage(), e );
-					}
-				} );
-			}
-			finally {
-				if ( mapping != null ) {
-					mapping.listenerEnabled( true );
-				}
-			}
-		}
-		else {
-			//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
-			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( s -> {
-				//CHECKSTYLE:ON
-				Query<?> query = deleteAllOfSpecificType( entityType, s );
-				try {
-					query.executeUpdate();
-				}
-				catch (RuntimeException e) {
-					throw new RuntimeException( "Failed to execute " + query.getQueryString() + " on type " + entityType
-							+ ": " + e.getMessage(), e );
-				}
-			} );
-		}
-	}
-
-	private static Query<?> selectAllOfSpecificType(EntityType<?> entityType, Session session) {
-		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, QueryType.SELECT );
-	}
-
-	private static Query<?> deleteAllOfSpecificType(EntityType<?> entityType, Session session) {
-		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, QueryType.DELETE );
-	}
-
 	public OrmSetupHelperCleaner appendConfiguration(Consumer<DataClearConfig> configurer) {
 		configurer.accept( this.config );
 		return this;
@@ -212,70 +148,6 @@ class OrmSetupHelperCleaner {
 	public boolean usesExactly(SessionFactory sessionFactory) {
 		// exactly the same
 		return this.sessionFactory == sessionFactory;
-	}
-
-	enum QueryType {
-		SELECT,
-		DELETE
-	}
-
-	private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?> entityType, Session session,
-			QueryType queryType) {
-		StringBuilder builder = new StringBuilder( QueryType.SELECT.equals( queryType ) ? "select e " : "delete " );
-
-		builder.append( "from " ).append( entityType.getName() ).append( " e" );
-		Class<?> typeArg = null;
-		if ( hasEntitySubclass( session.getSessionFactory(), entityType ) ) {
-			// We must target the type explicitly, without polymorphism,
-			// because subtypes might have associations pointing to the supertype,
-			// in which case deleting subtypes and supertypes in the same query
-			// may fail or not, depending on processing order (supertype before subtype or subtype before supertype).
-			builder.append( " where type( e ) in (:type)" );
-			typeArg = entityType.getJavaType();
-		}
-		@SuppressWarnings("deprecation")
-		Query<?> query = QueryType.SELECT.equals( queryType )
-				? session.createQuery( builder.toString(), entityType.getJavaType() )
-				: session.createQuery( builder.toString() );
-		if ( typeArg != null ) {
-			query.setParameter( "type", typeArg );
-		}
-		return query;
-	}
-
-	private static boolean hasEntitySubclass(SessionFactory sessionFactory, EntityType<?> parentEntity) {
-		Metamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getJpaMetamodel();
-		for ( EntityType<?> entity : metamodel.getEntities() ) {
-			if ( parentEntity.equals( entity.getSupertype() ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean hasSelfAssociation(Class<?> entityJavaType, SessionFactoryImplementor sessionFactory,
-			ManagedType<?> managedType) {
-		for ( Attribute<?, ?> attribute : managedType.getAttributes() ) {
-			if ( attribute.isAssociation() ) {
-				Class<?> type;
-				if ( attribute.isCollection() ) {
-					type = ( (PluralAttribute<?, ?, ?>) attribute ).getElementType().getJavaType();
-				}
-				else {
-					type = attribute.getJavaType();
-				}
-				if ( entityJavaType.isAssignableFrom( type ) ) {
-					return true;
-				}
-			}
-			if ( Attribute.PersistentAttributeType.EMBEDDED.equals( attribute.getPersistentAttributeType() ) ) {
-				EmbeddableType<?> embeddable = sessionFactory.getJpaMetamodel().embeddable( attribute.getJavaType() );
-				if ( hasSelfAssociation( entityJavaType, sessionFactory, embeddable ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	private static class DataClearConfigImpl implements DataClearConfig {
