@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+8.1.0.Final (2025-08-08)
+-------------------------
+
+** Improvement
+    * HSEARCH-5448 Upgrade Elasticsearch client to 9.1.1
+    * HSEARCH-5447 Upgrade to Hibernate ORM 7.1.0.Final
+
+** Task
+    * HSEARCH-5449 Test against the latest Elasticsearch 9.1.1
+
 8.1.0.CR2 (2025-08-06)
 -------------------------
 
