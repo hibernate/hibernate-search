@@ -12,7 +12,7 @@
 
     <groupId>org.hibernate.search</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>8.1.0-SNAPSHOT</version>
+    <version>8.1.0.Final</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search</name>
@@ -449,7 +449,7 @@
         <goal.spotless-maven-plugin>apply</goal.spotless-maven-plugin>
 
         <!-- For Reproducible Builds -->
-        <project.build.outputTimestamp>2025-08-06T12:24:41Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-08-08T14:12:23Z</project.build.outputTimestamp>
 
         <!-- Sonar options -->
         <!--
