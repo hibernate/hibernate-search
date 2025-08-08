@@ -42,6 +42,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.awaitility.Awaitility;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OutboxPollingAutomaticIndexingEventSendingIT {
 
@@ -89,12 +91,16 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class
 				)
+				.dataClearing( dc -> dc.preClear( session -> eventFilter.hideAllEvents() ) )
 				.setup();
 	}
 
 	@BeforeEach
 	void resetFilter() {
 		eventFilter.reset();
+		Awaitility.await().untilAsserted( () -> with( sessionFactory ).runInTransaction( session -> {
+			assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isZero();
+		} ) );
 	}
 
 	@Test
