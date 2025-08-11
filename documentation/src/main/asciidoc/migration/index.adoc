@@ -84,9 +84,6 @@ The https://hibernate.org/community/compatibility-policy/#code-categorization[AP
 in Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
-* Metic aggregation `countDistinct()` is deprecated in favor of an option in the `count()` aggregation: `.count().field(..).distinct()`.
-* Both JPA and Hibernate ORM query adapters alongside with `Search#toJpaQuery` and `Search#toOrmQuery` are deprecated for removal without any alternatives.
-
 [[spi]]
 == SPI
 
