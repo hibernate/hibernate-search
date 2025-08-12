@@ -122,7 +122,7 @@
 
         <!-- >>> WildFly dependencies -->
         <!-- This is used to generate a link to the WildFly documentation -->
-        <version.org.wildfly>36.0.1.Final</version.org.wildfly>
+        <version.org.wildfly>37.0.0.Final</version.org.wildfly>
 
         <!-- Test dependencies -->
 
@@ -136,7 +136,7 @@
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.18.0</version.org.mockito>
-        <version.org.assertj.assertj-core>3.27.3</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.27.4</version.org.assertj.assertj-core>
         <!-- NOTE: Remove a Dependabot rule for 4.2.1 once the upgrade can be applied -->
         <version.org.awaitily>4.3.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
@@ -157,7 +157,7 @@
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.3.232</version.com.h2database>
         <version.org.postgresql>42.7.7</version.org.postgresql>
-        <version.org.mariadb.jdbc>3.5.4</version.org.mariadb.jdbc>
+        <version.org.mariadb.jdbc>3.5.5</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.4.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.2.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.9.0.25.07</version.com.oracle.database.jdbc>
