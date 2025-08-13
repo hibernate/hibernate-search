@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstant
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldHighlightProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextCountValuesAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
@@ -229,6 +230,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		if ( resolvedAggregable ) {
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneTextTermsAggregation.Factory() );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT, LuceneTextCountValuesAggregation.factory() );
 		}
 
 		return builder.build();

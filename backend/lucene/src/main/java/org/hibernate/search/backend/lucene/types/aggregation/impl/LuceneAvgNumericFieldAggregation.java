@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.AggregationFunctionCollector;
-import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValues;
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValuesCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.SumCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
@@ -27,21 +27,17 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 		return new Factory<>( codec );
 	}
 
-	// Supplementary collector used by the avg function
-	protected CollectorKey<AggregationFunctionCollector<CountValues>, Long> countCollectorKey;
-
 	LuceneAvgNumericFieldAggregation(Builder<F, E, K> builder) {
 		super( builder );
 	}
 
 	@Override
-	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
+	List<CollectorKey<?, Long>> fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
 		SumCollectorFactory sumCollectorFactory = new SumCollectorFactory( source );
 		CountValuesCollectorFactory countValuesCollectorFactory = new CountValuesCollectorFactory( source );
-		collectorKey = sumCollectorFactory.getCollectorKey();
-		countCollectorKey = countValuesCollectorFactory.getCollectorKey();
 		context.requireCollector( sumCollectorFactory );
 		context.requireCollector( countValuesCollectorFactory );
+		return List.of( sumCollectorFactory.getCollectorKey(), countValuesCollectorFactory.getCollectorKey() );
 	}
 
 	private static class LuceneNumericMetricFieldAggregationExtraction<F, E extends Number, K> implements Extractor<K> {
@@ -79,10 +75,11 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 			}
 
 			@Override
-			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation,
+					List<CollectorKey<?, Long>> collectorKeys) {
 				return new LuceneNumericMetricFieldAggregationExtraction<>(
-						aggregation.collectorKey,
-						( (LuceneAvgNumericFieldAggregation<?, ?, ?>) aggregation ).countCollectorKey,
+						collectorKeys.get( 0 ),
+						collectorKeys.get( 1 ),
 						aggregation.codec,
 						fromFieldValueConverter
 				);
@@ -115,10 +112,11 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 			@SuppressWarnings("unchecked")
 			@Override
-			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation,
+					List<CollectorKey<?, Long>> collectorKeys) {
 				return (Extractor<K>) new LuceneNumericMetricFieldAggregationDoubleExtraction<>(
-						aggregation.collectorKey,
-						( (LuceneAvgNumericFieldAggregation<?, ?, ?>) aggregation ).countCollectorKey,
+						collectorKeys.get( 0 ),
+						collectorKeys.get( 1 ),
 						aggregation.codec
 				);
 			}
@@ -152,10 +150,11 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 			@SuppressWarnings("unchecked")
 			@Override
-			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation,
+					List<CollectorKey<?, Long>> collectorKeys) {
 				return (Extractor<K>) new LuceneNumericMetricFieldAggregationRawExtraction<>(
-						aggregation.collectorKey,
-						( (LuceneAvgNumericFieldAggregation<?, ?, ?>) aggregation ).countCollectorKey,
+						collectorKeys.get( 0 ),
+						collectorKeys.get( 1 ),
 						aggregation.codec
 				);
 			}
