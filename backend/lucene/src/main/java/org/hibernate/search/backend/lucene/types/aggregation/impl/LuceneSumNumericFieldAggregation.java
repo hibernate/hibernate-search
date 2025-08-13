@@ -4,7 +4,10 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.SumCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
@@ -25,10 +28,10 @@ public class LuceneSumNumericFieldAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
+	List<CollectorKey<?, Long>> fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
 		SumCollectorFactory collectorFactory = new SumCollectorFactory( source );
-		collectorKey = collectorFactory.getCollectorKey();
 		context.requireCollector( collectorFactory );
+		return List.of( collectorFactory.getCollectorKey() );
 	}
 
 	public static class Factory<F>

@@ -16,8 +16,6 @@ public abstract class AbstractLuceneMetricNumericLongAggregation extends Abstrac
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 
-	protected CollectorKey<?, Long> collectorKey;
-
 	AbstractLuceneMetricNumericLongAggregation(AbstractBuilder<Long> builder) {
 		super( builder );
 		this.indexNames = builder.scope.hibernateSearchIndexNames();
@@ -29,19 +27,19 @@ public abstract class AbstractLuceneMetricNumericLongAggregation extends Abstrac
 		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromField(
 				absoluteFieldPath, createNestedDocsProvider( context )
 		);
-		fillCollectors( source, context );
 
-		return new LuceneNumericMetricLongAggregationExtraction();
+		return new LuceneNumericMetricLongAggregationExtractor( fillCollectors( source, context ) );
 	}
 
-	abstract void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context);
+	abstract CollectorKey<?, Long> fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context);
 
 	@Override
 	public Set<String> indexNames() {
 		return indexNames;
 	}
 
-	private class LuceneNumericMetricLongAggregationExtraction implements Extractor<Long> {
+	private record LuceneNumericMetricLongAggregationExtractor(CollectorKey<?, Long> collectorKey) implements Extractor<Long> {
+
 		@Override
 		public Long extract(AggregationExtractContext context) {
 			return context.getCollectorResults( collectorKey );
