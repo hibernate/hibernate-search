@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl;
 
+import java.util.Locale;
+
 public class CountValues implements AggregationFunction<CountValues> {
 
 	private long count = 0L;
@@ -26,5 +28,10 @@ public class CountValues implements AggregationFunction<CountValues> {
 	@Override
 	public CountValues implementation() {
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return String.format( Locale.ROOT, "CountValues{count=%d}", count );
 	}
 }
