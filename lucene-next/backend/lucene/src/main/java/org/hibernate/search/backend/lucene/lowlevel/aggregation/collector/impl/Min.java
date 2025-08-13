@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl;
 
+import java.util.Locale;
+
 public class Min implements AggregationFunction<Min> {
 
 	private Long min;
@@ -21,7 +23,9 @@ public class Min implements AggregationFunction<Min> {
 	@Override
 	public void merge(AggregationFunction<Min> sibling) {
 		Long other = sibling.implementation().min;
-		apply( other );
+		if ( other != null ) {
+			apply( other );
+		}
 	}
 
 	@Override
@@ -32,5 +36,10 @@ public class Min implements AggregationFunction<Min> {
 	@Override
 	public Min implementation() {
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return String.format( Locale.ROOT, "Min{min=%d}", min );
 	}
 }

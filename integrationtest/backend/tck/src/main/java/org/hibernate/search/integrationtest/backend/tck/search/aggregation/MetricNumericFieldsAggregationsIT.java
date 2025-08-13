@@ -273,22 +273,22 @@ class MetricNumericFieldsAggregationsIT {
 	}
 
 	private void initData() {
-		int[] integers = new int[] { 9, 18, 3, 18, 7, -10, 3, 0, 7, 0 };
+		Integer[] integers = new Integer[] { 9, 18, 3, 18, 7, -10, 3, 0, 7, 0, null };
 		String[] styles = new String[] { "bla", "aaa" };
 
 		BulkIndexer bulkIndexer = mainIndex.bulkIndexer();
 		for ( int i = 0; i < integers.length; i++ ) {
-			int value = integers[i];
+			Integer value = integers[i];
 			String style = styles[i % 2];
 			String id = i + ":" + value + ":" + style;
 
 			bulkIndexer.add( id, document -> {
 				document.addValue( mainIndex.binding().integer, value );
 				document.addValue( mainIndex.binding().converted, value );
-				document.addValue( mainIndex.binding().doubleF, (double) value );
-				document.addValue( mainIndex.binding().floatF, (float) value );
-				document.addValue( mainIndex.binding().bigInteger, BigInteger.valueOf( value ) );
-				document.addValue( mainIndex.binding().bigDecimal, BigDecimal.valueOf( value ) );
+				document.addValue( mainIndex.binding().doubleF, value == null ? null : Double.valueOf( value.doubleValue() ) );
+				document.addValue( mainIndex.binding().floatF, value == null ? null : Float.valueOf( value.floatValue() ) );
+				document.addValue( mainIndex.binding().bigInteger, value == null ? null : BigInteger.valueOf( value ) );
+				document.addValue( mainIndex.binding().bigDecimal, value == null ? null : BigDecimal.valueOf( value ) );
 				document.addValue( mainIndex.binding().style, style );
 
 				for ( int j = 0; j < 5; j++ ) {
