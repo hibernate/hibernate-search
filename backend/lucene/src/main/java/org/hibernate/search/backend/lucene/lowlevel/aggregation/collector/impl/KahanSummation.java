@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl;
 
+import java.util.Locale;
+
 /**
  * <p>
  * Copied with some changes from {@code org.opensearch.search.aggregations.metrics.CompensatedSum}
@@ -15,6 +17,7 @@ public class KahanSummation {
 
 	private double value;
 	private double delta;
+	private boolean initialized;
 
 	/**
 	 * Used to calculate sums using the Kahan summation algorithm.
@@ -42,6 +45,13 @@ public class KahanSummation {
 	}
 
 	/**
+	 * Whether anything was actually added to this sum or is the result is supposed to be `null`.
+	 */
+	public boolean initialized() {
+		return initialized;
+	}
+
+	/**
 	 * Increments the Kahan sum by adding a value without a correction term.
 	 */
 	public KahanSummation add(double value) {
@@ -60,6 +70,7 @@ public class KahanSummation {
 	 * Increments the Kahan sum by adding two sums, and updating the correction term for reducing numeric errors.
 	 */
 	public KahanSummation add(double value, double delta) {
+		initialized = true;
 		// If the value is Inf or NaN, just add it to the running tally to "convert" to
 		// Inf/NaN. This keeps the behavior bwc from before kahan summing
 		if ( Double.isFinite( value ) ) {
@@ -75,4 +86,8 @@ public class KahanSummation {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return String.format( Locale.ROOT, "{value=%s, delta=%s, initialized=%s}", value, delta, initialized );
+	}
 }
