@@ -6,6 +6,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneCountValuesAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
@@ -82,6 +83,7 @@ class LuceneBooleanIndexFieldTypeOptionsStep
 		if ( resolvedAggregable ) {
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneNumericTermsAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT, LuceneCountValuesAggregation.factory() );
 		}
 
 		return builder.build();

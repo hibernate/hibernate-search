@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
@@ -32,8 +33,6 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 	protected final LuceneNumericDomain<E> numericDomain;
 	private final AbstractExtractorBuilder<F, E, K> extractorCreator;
 
-	protected CollectorKey<?, Long> collectorKey;
-
 	AbstractLuceneMetricNumericFieldAggregation(Builder<F, E, K> builder) {
 		super( builder );
 		this.indexNames = builder.scope.hibernateSearchIndexNames();
@@ -48,11 +47,10 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromField(
 				absoluteFieldPath, createNestedDocsProvider( context )
 		);
-		fillCollectors( source, context );
-		return extractorCreator.extractor( this );
+		return extractorCreator.extractor( this, fillCollectors( source, context ) );
 	}
 
-	abstract void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context);
+	abstract List<CollectorKey<?, Long>> fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context);
 
 	@Override
 	public Set<String> indexNames() {
@@ -88,9 +86,10 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 			}
 
 			@Override
-			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation,
+					List<CollectorKey<?, Long>> collectorKeys) {
 				return new LuceneNumericMetricFieldAggregationExtraction<>(
-						aggregation.collectorKey,
+						collectorKeys.get( 0 ),
 						aggregation.codec,
 						fromFieldValueConverter
 				);
@@ -98,12 +97,12 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		}
 	}
 
-	private static class LuceneNumericMetricFieldAggregationDoubleExtraction implements Extractor<Double> {
+	private static class LuceneNumericMetricFieldAggregationDoubleExtractor implements Extractor<Double> {
 
 		private final CollectorKey<?, Long> collectorKey;
 		private final AbstractLuceneNumericFieldCodec<?, ?> codec;
 
-		private LuceneNumericMetricFieldAggregationDoubleExtraction(CollectorKey<?, Long> collectorKey,
+		private LuceneNumericMetricFieldAggregationDoubleExtractor(CollectorKey<?, Long> collectorKey,
 				AbstractLuceneNumericFieldCodec<?, ?> codec) {
 			this.collectorKey = collectorKey;
 			this.codec = codec;
@@ -119,9 +118,10 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		private static class Builder<F, E extends Number> extends AbstractExtractorBuilder<F, E, Double> {
 
 			@Override
-			Extractor<Double> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, Double> aggregation) {
-				return new LuceneNumericMetricFieldAggregationDoubleExtraction(
-						aggregation.collectorKey,
+			Extractor<Double> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, Double> aggregation,
+					List<CollectorKey<?, Long>> collectorKeys) {
+				return new LuceneNumericMetricFieldAggregationDoubleExtractor(
+						collectorKeys.get( 0 ),
 						aggregation.codec
 				);
 			}
@@ -149,9 +149,10 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {
 
 			@Override
-			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation) {
+			Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation,
+					List<CollectorKey<?, Long>> collectorKeys) {
 				return new LuceneNumericMetricFieldAggregationRawExtraction<>(
-						aggregation.collectorKey,
+						collectorKeys.get( 0 ),
 						aggregation.numericDomain
 				);
 			}
@@ -160,7 +161,8 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 	protected abstract static class AbstractExtractorBuilder<F, E extends Number, K> {
 
-		abstract Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation);
+		abstract Extractor<K> extractor(AbstractLuceneMetricNumericFieldAggregation<F, E, K> aggregation,
+				List<CollectorKey<?, Long>> collectorKeys);
 	}
 
 	protected abstract static class TypeSelector<F, E extends Number> implements FieldMetricAggregationBuilder.TypeSelector {
@@ -209,7 +211,7 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		// we've checked the types in the place where we are calling this method:
 		@SuppressWarnings("unchecked")
 		protected <T> AbstractExtractorBuilder<F, E, T> doubleExtractor() {
-			return (AbstractExtractorBuilder<F, E, T>) new LuceneNumericMetricFieldAggregationDoubleExtraction.Builder<>();
+			return (AbstractExtractorBuilder<F, E, T>) new LuceneNumericMetricFieldAggregationDoubleExtractor.Builder<>();
 		}
 
 		protected abstract <T> Builder<F, E, T> getFtBuilder(AbstractExtractorBuilder<F, E, T> extractorCreator);

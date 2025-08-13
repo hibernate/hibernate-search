@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.logging.impl.QueryLog;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountDistinctValuesCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.aggregation.collector.impl.CountValuesCollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
@@ -65,10 +66,11 @@ public class LuceneCountValuesAggregation extends AbstractLuceneMetricNumericLon
 	}
 
 	@Override
-	void fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
+	CollectorKey<?, Long> fillCollectors(JoiningLongMultiValuesSource source, AggregationRequestContext context) {
 		var collectorFactory = collectorFactorySupplier.apply( source );
-		collectorKey = collectorFactory.getCollectorKey();
+		var collectorKey = collectorFactory.getCollectorKey();
 		context.requireCollector( collectorFactory );
+		return collectorKey;
 	}
 
 	protected static class Builder extends AbstractBuilder<Long> implements CountValuesAggregationBuilder {
