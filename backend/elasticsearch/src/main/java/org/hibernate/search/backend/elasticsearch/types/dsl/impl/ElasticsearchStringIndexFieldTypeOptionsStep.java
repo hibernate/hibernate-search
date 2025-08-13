@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchCountValuesAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchPredicateTypeKeys;
@@ -230,6 +231,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		if ( resolvedAggregable ) {
 			builder.aggregable( true );
 			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.COUNT, ElasticsearchCountValuesAggregation.factory() );
 		}
 
 		return builder.build();

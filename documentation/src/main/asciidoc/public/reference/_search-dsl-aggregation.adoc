@@ -357,7 +357,7 @@ include::../components/_incubating-warning.adoc[]
 
 Hibernate Search provides a set of most common metric aggregations such as `sum`, `min`, `max`, `count` and `avg`.
 These aggregations can be requested for fields of numerical or temporal types,
-or, in the case of `count`, at the document level (counting documents).
+or, in the case of `count`, also for fields of text and boolean types as well as at the document level (counting documents).
 
 [IMPORTANT]
 ====

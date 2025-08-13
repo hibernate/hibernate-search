@@ -170,7 +170,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	private static String dependencyString(Dependency d) {
 		return String.format( Locale.ROOT, GAV_FORMAT, d.getGroupId(), d.getArtifactId(), d.getVersion() );
 	}
-	
+
 	private static boolean shouldSkip(String gav, Set<Pattern> skipPatterns) {
 		for ( Pattern skipPattern : skipPatterns ) {
 			if ( skipPattern.matcher( gav ).matches() ) {
