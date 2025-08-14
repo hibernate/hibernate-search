@@ -7,7 +7,7 @@
         <groupId>org.hibernate.search</groupId>
         <!-- Using public parent to reuse the javadoc generation config -->
         <artifactId>hibernate-search-parent-internal</artifactId>
-        <version>8.1.1-SNAPSHOT</version>
+        <version>8.1.1.Final</version>
         <relativePath>../parents/internal</relativePath>
     </parent>
 
