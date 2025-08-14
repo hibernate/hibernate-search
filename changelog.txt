@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+8.1.1.Final (2025-08-14)
+-------------------------
+
+** Bug
+    * HSEARCH-5456 Metric aggregation (e.g. min/max) may fail for a Lucene backend when there are `null` values
+
+** Improvement
+    * HSEARCH-5457 Enable count-values aggregation for string/boolean fields
+    * HSEARCH-5453 Upgrade Elasticsearch client to 9.1.2
+
+** Task
+    * HSEARCH-5455 Test against the latest Elasticsearch 8.19.2
+    * HSEARCH-5454 Test against the latest Elasticsearch 9.1.2
+
 8.1.0.Final (2025-08-08)
 -------------------------
 
