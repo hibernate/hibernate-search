@@ -17,10 +17,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestLog;

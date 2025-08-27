@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
