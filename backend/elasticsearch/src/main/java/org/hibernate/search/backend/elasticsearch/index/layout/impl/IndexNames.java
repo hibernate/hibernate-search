@@ -7,7 +7,7 @@ package org.hibernate.search.backend.elasticsearch.index.layout.impl;
 import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 
 public final class IndexNames {
 

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.util.spi;
+package org.hibernate.search.backend.elasticsearch.client.common.util.spi;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
