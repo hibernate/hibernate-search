@@ -4,8 +4,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
-import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
@@ -22,9 +20,11 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
-public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
+import java.util.regex.Pattern;
 
-	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
+public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
+    private static final Pattern DISTRIBUTION_NAME_PATTERN = Pattern.compile( "([^\\d]+)?(?:(?<=^)|(?=$)|(?<=.):(?=.))(.+)?" );
+    private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
 					.asBoolean()
 					.withDefault( ElasticsearchAwsBackendSettings.Defaults.SIGNING_ENABLED )
@@ -52,6 +52,11 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.asString()
 					.build();
 
+    static final OptionalConfigurationProperty<String> DISTRIBUTION_NAME =
+			ConfigurationProperty.forKey( "version" )
+                    .asString()
+					.build();
+
 	@Override
 	public void configure(ElasticsearchHttpClientConfigurationContext context) {
 		ConfigurationPropertySource propertySource = context.configurationPropertySource();
@@ -63,17 +68,23 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, AwsLog.INSTANCE::missingPropertyForSigning );
 		String service;
-		switch ( context.configuredVersion().map( ElasticsearchVersion::distribution )
-				.orElse( ElasticsearchDistributionName.OPENSEARCH ) ) {
-			case AMAZON_OPENSEARCH_SERVERLESS:
-				service = "aoss";
-				break;
-			case ELASTIC:
-			case OPENSEARCH:
-			default:
-				service = "es";
-				break;
-		}
+
+        String distributionName = DISTRIBUTION_NAME.getAndTransform(propertySource, v ->
+                v.map(String::toLowerCase)
+                        .map(DISTRIBUTION_NAME_PATTERN::matcher)
+                        .map(matcher -> {
+                            if (matcher.matches()) {
+                                return matcher.group(1);
+                            }
+                            return null;
+                        }).orElse("opensearch"));
+
+        if ("amazon-opensearch-serverless".equals(distributionName)) {
+            service = "aoss";
+        } else {
+            service = "es";
+        }
+
 		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
 
 		AwsLog.INSTANCE.signingEnabled( region, service, credentialsProvider );
