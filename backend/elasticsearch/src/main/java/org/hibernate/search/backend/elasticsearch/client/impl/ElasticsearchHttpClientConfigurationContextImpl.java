@@ -18,17 +18,14 @@ final class ElasticsearchHttpClientConfigurationContextImpl
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource configurationPropertySource;
 	private final HttpAsyncClientBuilder clientBuilder;
-	private final Optional<ElasticsearchVersion> configuredVersion;
 
 	ElasticsearchHttpClientConfigurationContextImpl(
 			BeanResolver beanResolver,
 			ConfigurationPropertySource configurationPropertySource,
-			HttpAsyncClientBuilder clientBuilder,
-			Optional<ElasticsearchVersion> configuredVersion) {
+			HttpAsyncClientBuilder clientBuilder) {
 		this.beanResolver = beanResolver;
 		this.configurationPropertySource = configurationPropertySource;
 		this.clientBuilder = clientBuilder;
-		this.configuredVersion = configuredVersion;
 	}
 
 	@Override
@@ -44,11 +41,6 @@ final class ElasticsearchHttpClientConfigurationContextImpl
 	@Override
 	public HttpAsyncClientBuilder clientBuilder() {
 		return clientBuilder;
-	}
-
-	@Override
-	public Optional<ElasticsearchVersion> configuredVersion() {
-		return configuredVersion;
 	}
 
 }
