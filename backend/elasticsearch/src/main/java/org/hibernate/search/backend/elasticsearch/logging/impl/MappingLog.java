@@ -9,7 +9,7 @@ import static org.hibernate.search.backend.elasticsearch.logging.impl.Elasticsea
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;

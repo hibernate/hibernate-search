@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.util.impl.test.JsonHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
