@@ -4,27 +4,24 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
+import java.util.Objects;
+
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpHost;
-
 public final class ElasticsearchResponse {
-
-	private final HttpHost host;
+	private final String host;
 	private final int statusCode;
-
 	private final String statusMessage;
-
 	private final JsonObject body;
 
-	public ElasticsearchResponse(HttpHost host, int statusCode, String statusMessage, JsonObject body) {
+	public ElasticsearchResponse(String host, int statusCode, String statusMessage, JsonObject body) {
 		this.host = host;
 		this.statusCode = statusCode;
 		this.statusMessage = statusMessage;
 		this.body = body;
 	}
 
-	public HttpHost host() {
+	public String host() {
 		return host;
 	}
 
@@ -39,5 +36,4 @@ public final class ElasticsearchResponse {
 	public JsonObject body() {
 		return body;
 	}
-
 }
