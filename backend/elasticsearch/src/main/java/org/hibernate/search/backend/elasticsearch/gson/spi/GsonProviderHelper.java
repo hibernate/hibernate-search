@@ -7,18 +7,18 @@ package org.hibernate.search.backend.elasticsearch.gson.spi;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 /**
  * Centralizes the configuration of the Gson objects.
  */
-public final class GsonProvider {
+public final class GsonProviderHelper {
 
 	/*
 	 * See https://github.com/google/gson/issues/764.
@@ -38,53 +38,7 @@ public final class GsonProvider {
 			);
 
 	public static GsonProvider create(Supplier<GsonBuilder> builderBaseSupplier, boolean logPrettyPrinting) {
-		return new GsonProvider( builderBaseSupplier, logPrettyPrinting );
-	}
-
-	private final Gson gson;
-
-	private final Gson gsonNoSerializeNulls;
-
-	private final JsonLogHelper logHelper;
-
-	private GsonProvider(Supplier<GsonBuilder> builderBaseSupplier, boolean logPrettyPrinting) {
-		// Null serialization needs to be enabled to index null fields
-		gson = builderBaseSupplier.get()
-				.serializeNulls()
-				.create();
-		initializeTypeAdapters( gson );
-
-		gsonNoSerializeNulls = builderBaseSupplier.get()
-				.create();
-		initializeTypeAdapters( gsonNoSerializeNulls );
-
-		logHelper = JsonLogHelper.create( builderBaseSupplier.get(), logPrettyPrinting );
-	}
-
-	public Gson getGson() {
-		return gson;
-	}
-
-	/**
-	 * @return Same as {@link #getGson()}, but with null serialization turned off.
-	 */
-	public Gson getGsonNoSerializeNulls() {
-		return gsonNoSerializeNulls;
-	}
-
-	public JsonLogHelper getLogHelper() {
-		return logHelper;
-	}
-
-	/*
-	 * Workaround for https://github.com/google/gson/issues/764.
-	 * We just initialize every adapter known to cause problems before we make the Gson object
-	 * available to multiple threads.
-	 */
-	private static void initializeTypeAdapters(Gson gson) {
-		for ( TypeToken<?> typeToken : TYPES_CAUSING_GSON_CONCURRENT_INITIALIZATION_BUG ) {
-			gson.getAdapter( typeToken );
-		}
+		return GsonProvider.create( builderBaseSupplier, logPrettyPrinting, TYPES_CAUSING_GSON_CONCURRENT_INITIALIZATION_BUG );
 	}
 
 }
