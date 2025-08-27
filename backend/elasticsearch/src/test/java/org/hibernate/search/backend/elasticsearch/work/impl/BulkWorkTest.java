@@ -76,7 +76,7 @@ class BulkWorkTest {
 		responseBody.add( "items", items );
 		items.add( new JsonObject() );
 		items.add( new JsonObject() );
-		ElasticsearchResponse response = new ElasticsearchResponse( new HttpHost( "mockHost:9200" ),
+		ElasticsearchResponse response = new ElasticsearchResponse( "mockHost:9200",
 				200, "OK", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();
@@ -120,7 +120,7 @@ class BulkWorkTest {
 
 		JsonObject responseBody = new JsonObject();
 		responseBody.addProperty( "someProperty", "someValue" );
-		ElasticsearchResponse response = new ElasticsearchResponse( new HttpHost( "mockHost:9200" ),
+		ElasticsearchResponse response = new ElasticsearchResponse( "mockHost:9200",
 				500, "SomeStatus", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();

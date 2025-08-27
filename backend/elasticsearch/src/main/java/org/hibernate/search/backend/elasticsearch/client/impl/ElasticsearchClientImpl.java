@@ -199,7 +199,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		try {
 			JsonObject body = parseBody( response );
 			return new ElasticsearchResponse(
-					response.getHost(),
+					response.getHost().toHostString(),
 					response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(),
 					body );
