@@ -12,6 +12,9 @@ defaults:
 env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
 
+permissions:
+  contents: read
+
 jobs:
   publish-build-scans:
     name: Publish Develocity build scans
