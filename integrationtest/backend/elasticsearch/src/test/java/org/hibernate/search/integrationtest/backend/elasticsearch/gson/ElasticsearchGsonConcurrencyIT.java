@@ -45,7 +45,7 @@ class ElasticsearchGsonConcurrencyIT {
 	 * However, you will need to raise them in your local copy of the code
 	 * to have a high chance of reproducing the bug.
 	 */
-	private static final int REPRODUCER_ATTEMPTS = 20;
+	private static final int REPRODUCER_ATTEMPTS = 200;
 	// This must be at least 2, but you don't need more than the number of CPU cores.
 	private static final int INDEX_COUNT_PER_ATTEMPT = 4;
 
