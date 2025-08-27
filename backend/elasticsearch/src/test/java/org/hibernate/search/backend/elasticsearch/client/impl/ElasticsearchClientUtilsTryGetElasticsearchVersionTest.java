@@ -116,7 +116,7 @@ class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 		// which doesn't allow retrieving the version.
 		when( clientMock.submit( any() ) )
 				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
-						new HttpHost( "mockHost:9200" ), 404, "", null ) ) );
+						"mockHost:9200", 404, "", null ) ) );
 		ElasticsearchVersion version = ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock );
 		assertThat( version ).isNull();
 	}
@@ -131,6 +131,6 @@ class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 		responseBody.add( "version", versionObject );
 		when( clientMock.submit( any() ) )
 				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
-						new HttpHost( "mockHost:9200" ), 200, "", responseBody ) ) );
+						"mockHost:9200", 200, "", responseBody ) ) );
 	}
 }

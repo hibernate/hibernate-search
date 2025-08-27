@@ -19,8 +19,6 @@ import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
-import org.apache.http.HttpHost;
-
 @CategorizedLogger(
 		category = ElasticsearchRequestLog.CATEGORY_NAME,
 		description = """
@@ -51,7 +49,7 @@ public interface ElasticsearchRequestLog extends BasicLogger {
 			value = "Executed Elasticsearch HTTP %s request to '%s' with path '%s',"
 					+ " query parameters %s and %d objects in payload in %dms."
 					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>")
-	void executedRequestWithFailure(String method, HttpHost host, String path, Map<String, String> getParameters,
+	void executedRequestWithFailure(String method, String host, String path, Map<String, String> getParameters,
 			int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
@@ -61,7 +59,7 @@ public interface ElasticsearchRequestLog extends BasicLogger {
 			value = "Executed Elasticsearch HTTP %s request to '%s' with path '%s',"
 					+ " query parameters %s and %d objects in payload in %dms."
 					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>")
-	void executedRequest(String method, HttpHost host, String path, Map<String, String> getParameters, int bodyParts,
+	void executedRequest(String method, String host, String path, Map<String, String> getParameters, int bodyParts,
 			long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
