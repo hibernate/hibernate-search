@@ -36,13 +36,10 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
         </dependency>
+        <!-- To be removed/changed in the future versions? Users should pick their own desired client? -->
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client-sniffer</artifactId>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-elasticsearch-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>

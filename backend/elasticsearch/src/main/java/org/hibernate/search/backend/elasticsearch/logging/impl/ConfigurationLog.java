@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
@@ -67,11 +68,6 @@ public interface ConfigurationLog {
 			+ " Valid names are: %2$s.")
 	SearchException invalidElasticsearchDistributionName(String invalidRepresentation, List<String> validRepresentations);
 
-	@Message(id = ID_OFFSET + 89, value = "Invalid host/port: '%1$s'."
-			+ " The host/port string must use the format 'host:port', for example 'mycompany.com:9200'"
-			+ " The URI scheme ('http://', 'https://') must not be included.")
-	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
-
 	@Message(id = ID_OFFSET + 91, value = "Invalid name for the type-name mapping strategy: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidTypeNameMappingStrategyName(String invalidRepresentation, List<String> validRepresentations);
@@ -79,33 +75,6 @@ public interface ConfigurationLog {
 	@Message(id = ID_OFFSET + 121, value = "Invalid dynamic type: '%1$s'."
 			+ " Valid values are: %2$s.")
 	SearchException invalidDynamicType(String invalidRepresentation, List<String> validRepresentations);
-
-	@Message(id = ID_OFFSET + 126, value = "Invalid target hosts configuration:"
-			+ " both the 'uris' property and the 'protocol' property are set."
-			+ " Uris: '%1$s'. Protocol: '%2$s'."
-			+ " Either set the protocol and hosts simultaneously using the 'uris' property,"
-			+ " or set them separately using the 'protocol' property and the 'hosts' property.")
-	SearchException uriAndProtocol(List<String> uris, String protocol);
-
-	@Message(id = ID_OFFSET + 127, value = "Invalid target hosts configuration:"
-			+ " both the 'uris' property and the 'hosts' property are set."
-			+ " Uris: '%1$s'. Hosts: '%2$s'."
-			+ " Either set the protocol and hosts simultaneously using the 'uris' property,"
-			+ " or set them separately using the 'protocol' property and the 'hosts' property.")
-	SearchException uriAndHosts(List<String> uris, List<String> hosts);
-
-	@Message(id = ID_OFFSET + 128,
-			value = "Invalid target hosts configuration: the 'uris' use different protocols (http, https)."
-					+ " All URIs must use the same protocol. Uris: '%1$s'.")
-	SearchException differentProtocolsOnUris(List<String> uris);
-
-	@Message(id = ID_OFFSET + 129,
-			value = "Invalid target hosts configuration: the list of hosts must not be empty.")
-	SearchException emptyListOfHosts();
-
-	@Message(id = ID_OFFSET + 130,
-			value = "Invalid target hosts configuration: the list of URIs must not be empty.")
-	SearchException emptyListOfUris();
 
 	@Message(id = ID_OFFSET + 148,
 			value = "Invalid backend configuration: mapping requires multi-tenancy"
@@ -121,4 +90,14 @@ public interface ConfigurationLog {
 	@Message(id = ID_OFFSET + 192,
 			value = "Elasticsearch backend will use client factory '%s'. Context: %s")
 	void backendClientFactory(BeanHolder<?> clientFactoryHolder, String eventContext);
+
+	@Message(id = ID_OFFSET + 194,
+			value = "Elasticsearch backend have found no client factories. Please make one of the client factory implementations available. Context: %s")
+	SearchException backendClientFactoryNotConfigured(String eventContext);
+
+	@Message(id = ID_OFFSET + 195,
+			value = "Elasticsearch backend have found multiple client factories: %s. Please make just one of the client factory implementations available. Context: %s")
+	SearchException backendClientFactoryMultipleConfigured(List<BeanHolder<ElasticsearchClientFactory>> factories,
+			String eventContext);
+
 }

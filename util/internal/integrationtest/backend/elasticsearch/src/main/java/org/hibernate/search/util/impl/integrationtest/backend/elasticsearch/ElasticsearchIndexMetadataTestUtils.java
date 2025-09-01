@@ -6,8 +6,8 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import com.google.gson.Gson;

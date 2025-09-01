@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Properties;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.IndexSettings;
@@ -24,8 +24,8 @@ class ElasticsearchConfigurationIT {
 	private Properties buildHibernateConfiguration() {
 		Properties config = new Properties();
 		// backend configuration
-		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.HOSTS ), "127.0.0.1:9200" );
-		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.PROTOCOL ), "http" );
+		config.put( BackendSettings.backendKey( ElasticsearchBackendClientCommonSettings.HOSTS ), "127.0.0.1:9200" );
+		config.put( BackendSettings.backendKey( ElasticsearchBackendClientCommonSettings.PROTOCOL ), "http" );
 		// index configuration
 		config.put(
 				IndexSettings.indexKey( "myIndex", ElasticsearchIndexSettings.INDEXING_MAX_BULK_SIZE ),

@@ -7,10 +7,10 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;

@@ -11,6 +11,7 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.analysis.impl.ElasticsearchAnalysisPerformer;
+import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -21,7 +22,6 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
-import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.analysis.AnalysisToken;
 import org.hibernate.search.engine.backend.index.IndexManager;
