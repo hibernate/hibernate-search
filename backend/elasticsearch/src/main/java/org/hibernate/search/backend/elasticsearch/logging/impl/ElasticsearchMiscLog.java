@@ -52,12 +52,6 @@ public interface ElasticsearchMiscLog {
 					+ " This extension can only be applied to components created by an Elasticsearch backend.")
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
-	@Message(id = ID_OFFSET + 18,
-			value = "Invalid requested type for client: '%1$s'."
-					+ " The Elasticsearch low-level client can only be unwrapped to '%2$s'.")
-	SearchException clientUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
-			@FormatWith(ClassFormatter.class) Class<?> actualClass);
-
 	@Message(id = ID_OFFSET + 19,
 			value = "Invalid requested type for this backend: '%1$s'."
 					+ " Elasticsearch backends can only be unwrapped to '%2$s'.")

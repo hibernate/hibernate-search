@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
@@ -50,7 +49,10 @@ public final class ElasticsearchBackendSettings {
 	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
 	 * <p>
 	 * Defaults to {@link Defaults#HOSTS}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#HOSTS} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String HOSTS = "hosts";
 
 	/**
@@ -61,7 +63,10 @@ public final class ElasticsearchBackendSettings {
 	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
 	 * <p>
 	 * Defaults to {@link Defaults#PROTOCOL}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#PROTOCOL} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String PROTOCOL = "protocol";
 
 	/**
@@ -77,7 +82,10 @@ public final class ElasticsearchBackendSettings {
 	 * Setting this property at the same time as {@link #HOSTS} or {@link #PROTOCOL} will lead to an exception being thrown on startup.
 	 * <p>
 	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#URIS} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String URIS = "uris";
 
 	/**
@@ -85,7 +93,10 @@ public final class ElasticsearchBackendSettings {
 	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
 	 * <p>
 	 * Defaults to {@link Defaults#PATH_PREFIX}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#PATH_PREFIX} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String PATH_PREFIX = "path_prefix";
 
 	/**
@@ -118,7 +129,10 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no username (anonymous access).
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#USERNAME} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String USERNAME = "username";
 
 	/**
@@ -127,7 +141,10 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no username (anonymous access).
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#PASSWORD} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String PASSWORD = "password";
 
 	/**
@@ -139,7 +156,10 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to no request timeout.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#REQUEST_TIMEOUT} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String REQUEST_TIMEOUT = "request_timeout";
 
 	/**
@@ -149,7 +169,10 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#READ_TIMEOUT}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#READ_TIMEOUT} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String READ_TIMEOUT = "read_timeout";
 
 	/**
@@ -159,7 +182,10 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#CONNECTION_TIMEOUT} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String CONNECTION_TIMEOUT = "connection_timeout";
 
 	/**
@@ -170,7 +196,10 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#MAX_CONNECTIONS} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_CONNECTIONS = "max_connections";
 
 	/**
@@ -180,7 +209,10 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#MAX_CONNECTIONS_PER_ROUTE} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
 
 	/**
@@ -190,7 +222,10 @@ public final class ElasticsearchBackendSettings {
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#DISCOVERY_ENABLED} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
 
 	/**
@@ -200,19 +235,25 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#DISCOVERY_REFRESH_INTERVAL} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
 
 	/**
-	 * A {@link ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
+	 * A {@link org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
 	 * <p>
 	 * It can be used for example to tune the SSL context to accept self-signed certificates.
 	 * It allows overriding other HTTP client settings, such as {@link #USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
 	 * <p>
-	 * Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
+	 * Expects a reference to a bean of type {@link org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer}.
 	 * <p>
 	 * Defaults to no value.
+	 *
+	 * @deprecated Use client specific configurers instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String CLIENT_CONFIGURER = "client.configurer";
 
 	/**
@@ -298,7 +339,10 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * If this property is not set, only the {@code Keep-Alive} header is considered,
 	 * and if it's absent, idle connections will be kept forever.
+	 *
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#MAX_KEEP_ALIVE} instead.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_KEEP_ALIVE = "max_keep_alive";
 
 	/**
@@ -326,14 +370,50 @@ public final class ElasticsearchBackendSettings {
 		private Defaults() {
 		}
 
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#HOSTS} instead.
+		*/
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#PROTOCOL} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final String PROTOCOL = "http";
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#PATH_PREFIX} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final String PATH_PREFIX = "";
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#READ_TIMEOUT} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int READ_TIMEOUT = 30000;
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#CONNECTION_TIMEOUT} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int CONNECTION_TIMEOUT = 1000;
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#MAX_CONNECTIONS} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int MAX_CONNECTIONS = 40;
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#MAX_CONNECTIONS_PER_ROUTE} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int MAX_CONNECTIONS_PER_ROUTE = 20;
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#DISCOVERY_ENABLED} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final boolean DISCOVERY_ENABLED = false;
+		/**
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#DISCOVERY_REFRESH_INTERVAL} instead.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		/**

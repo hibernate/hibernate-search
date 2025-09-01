@@ -9,11 +9,15 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Creates the Elasticsearch client.
  */
 public interface ElasticsearchClientFactory {
+
+	@Incubating
+	String DEFAULT_BEAN_NAME = "default";
 
 	ElasticsearchClientImplementor create(BeanResolver beanResolver,
 			ConfigurationPropertySource propertySource,

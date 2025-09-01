@@ -4,25 +4,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
-import java.io.IOException;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.apache.http.HttpEntity;
-
-public class ElasticsearchClientUtils {
+public final class ElasticsearchClientUtils {
 
 	private static final JsonAccessor<String> DISTRIBUTION_ACCESSOR =
 			JsonAccessor.root().property( "version" ).property( "distribution" ).asString();
@@ -35,14 +28,6 @@ public class ElasticsearchClientUtils {
 
 	public static boolean isSuccessCode(int code) {
 		return 200 <= code && code < 300;
-	}
-
-	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) throws IOException {
-		final List<JsonObject> bodyParts = request.bodyParts();
-		if ( bodyParts.isEmpty() ) {
-			return null;
-		}
-		return new GsonHttpEntity( gson, bodyParts );
 	}
 
 	public static ElasticsearchVersion tryGetElasticsearchVersion(ElasticsearchClient client) {

@@ -8,48 +8,30 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
-
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 
 /**
- * The context passed to {@link ElasticsearchHttpClientConfigurer}.
+ * The context passed to {@link ElasticsearchHttpClientConfigurer}
+ *
+ * @deprecated Use the client specific configurers instead.
  */
-public interface ElasticsearchHttpClientConfigurationContext {
-
-	/**
-	 * @return A {@link BeanResolver}.
-	 */
-	BeanResolver beanResolver();
-
-	/**
-	 * @return A configuration property source, appropriately masked so that the factory
-	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
-	 * can be accessed at the root.
-	 * <strong>CAUTION:</strong> the property key "type" is reserved for use by the engine.
-	 */
-	ConfigurationPropertySource configurationPropertySource();
-
-	/**
-	 * @return An Apache HTTP client builder, to set the configuration.
-	 * @see <a href="http://hc.apache.org/httpcomponents-client-ga/">the Apache HTTP Client documentation</a>
-	 */
-	HttpAsyncClientBuilder clientBuilder();
+@Deprecated(since = "8.2", forRemoval = true)
+public interface ElasticsearchHttpClientConfigurationContext
+		extends
+		org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurationContext {
 
 	/**
 	 * @return The version of Elasticsearch/OpenSearch configured on the backend.
 	 * May be empty if not configured explicitly (in which case it will only be known after the client is built).
-     *
-     * @deprecated Use the {@link #configurationPropertySource() property source} and inspect the corresponding properties
-     * (e.g. {@link ElasticsearchBackendSettings#VERSION}) instead.
+	 *
+	 * @deprecated Use the {@link #configurationPropertySource() property source} and inspect the corresponding properties
+	 * (e.g. {@link ElasticsearchBackendSettings#VERSION}) instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	default Optional<ElasticsearchVersion> configuredVersion() {
-        return ConfigurationProperty.forKey(ElasticsearchBackendSettings.VERSION)
-                .as(ElasticsearchVersion.class, ElasticsearchVersion::of)
-                .build().get(configurationPropertySource());
+		return ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION )
+				.as( ElasticsearchVersion.class, ElasticsearchVersion::of )
+				.build().get( configurationPropertySource() );
 	}
 
 }
