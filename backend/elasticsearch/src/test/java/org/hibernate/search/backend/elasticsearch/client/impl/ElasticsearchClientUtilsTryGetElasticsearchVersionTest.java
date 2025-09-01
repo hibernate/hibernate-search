@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpHost;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;

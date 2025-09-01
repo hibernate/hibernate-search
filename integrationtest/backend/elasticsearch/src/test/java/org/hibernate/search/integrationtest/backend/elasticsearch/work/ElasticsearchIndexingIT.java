@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.client.common.cfg.spi.ElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -61,7 +61,7 @@ class ElasticsearchIndexingIT {
 	public void init(Object layoutStrategy, URLEncodedString writeName) {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendClientSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy

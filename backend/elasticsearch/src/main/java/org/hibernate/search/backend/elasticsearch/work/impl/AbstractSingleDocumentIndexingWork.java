@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
 import com.google.gson.JsonObject;
