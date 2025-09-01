@@ -20,6 +20,9 @@ import com.google.gson.reflect.TypeToken;
  */
 public final class GsonProviderHelper {
 
+	private GsonProviderHelper() {
+	}
+
 	/*
 	 * See https://github.com/google/gson/issues/764.
 	 *

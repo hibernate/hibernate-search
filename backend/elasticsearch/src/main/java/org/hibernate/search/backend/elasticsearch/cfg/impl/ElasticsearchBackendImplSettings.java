@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.cfg.impl;
 /**
  * Implementation-related settings, used for testing only.
  */
+@Deprecated(since = "8.2", forRemoval = true)
 public final class ElasticsearchBackendImplSettings {
 
 	private ElasticsearchBackendImplSettings() {

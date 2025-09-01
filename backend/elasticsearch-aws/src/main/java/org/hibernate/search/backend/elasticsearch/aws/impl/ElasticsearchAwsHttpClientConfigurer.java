@@ -4,12 +4,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
+import java.util.Locale;
+import java.util.regex.Pattern;
+
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -20,11 +23,9 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
-import java.util.regex.Pattern;
-
 public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
-    private static final Pattern DISTRIBUTION_NAME_PATTERN = Pattern.compile( "([^\\d]+)?(?:(?<=^)|(?=$)|(?<=.):(?=.))(.+)?" );
-    private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
+	private static final Pattern DISTRIBUTION_NAME_PATTERN = Pattern.compile( "([^\\d]+)?(?:(?<=^)|(?=$)|(?<=.):(?=.))(.+)?" );
+	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
 					.asBoolean()
 					.withDefault( ElasticsearchAwsBackendSettings.Defaults.SIGNING_ENABLED )
@@ -52,9 +53,9 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.asString()
 					.build();
 
-    static final OptionalConfigurationProperty<String> DISTRIBUTION_NAME =
+	static final OptionalConfigurationProperty<String> DISTRIBUTION_NAME =
 			ConfigurationProperty.forKey( "version" )
-                    .asString()
+					.asString()
 					.build();
 
 	@Override
@@ -69,21 +70,22 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, AwsLog.INSTANCE::missingPropertyForSigning );
 		String service;
 
-        String distributionName = DISTRIBUTION_NAME.getAndTransform(propertySource, v ->
-                v.map(String::toLowerCase)
-                        .map(DISTRIBUTION_NAME_PATTERN::matcher)
-                        .map(matcher -> {
-                            if (matcher.matches()) {
-                                return matcher.group(1);
-                            }
-                            return null;
-                        }).orElse("opensearch"));
+		String distributionName = DISTRIBUTION_NAME.getAndTransform( propertySource,
+				v -> v.map( ver -> ver.toLowerCase( Locale.ROOT ) )
+						.map( DISTRIBUTION_NAME_PATTERN::matcher )
+						.map( matcher -> {
+							if ( matcher.matches() ) {
+								return matcher.group( 1 );
+							}
+							return null;
+						} ).orElse( "opensearch" ) );
 
-        if ("amazon-opensearch-serverless".equals(distributionName)) {
-            service = "aoss";
-        } else {
-            service = "es";
-        }
+		if ( "amazon-opensearch-serverless".equals( distributionName ) ) {
+			service = "aoss";
+		}
+		else {
+			service = "es";
+		}
 
 		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
 

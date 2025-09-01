@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,17 +37,18 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.cfg.ElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
@@ -192,8 +192,9 @@ class ElasticsearchClientFactoryImplIT {
 		HttpResponseInterceptor responseInterceptor = spy( HttpResponseInterceptor.class );
 
 		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
-				ElasticsearchBackendSettings.CLIENT_CONFIGURER,
-				(ElasticsearchHttpClientConfigurer) context -> context.clientBuilder()
+				ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+				(org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer) context -> context
+						.clientBuilder()
 						.addInterceptorFirst( responseInterceptor )
 		) ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -225,7 +226,7 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -255,7 +256,7 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.PATH_PREFIX, "bla/bla/bla" );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -285,8 +286,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
-					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.PATH_PREFIX, "bla/bla/bla" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -316,8 +317,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendSettings.PROTOCOL, "https" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.PROTOCOL, "https" );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -347,7 +348,7 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.URIS, httpsUrisFor( wireMockRule1 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -418,8 +419,8 @@ class ElasticsearchClientFactoryImplIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" );
-						properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "99999" );
+						properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" );
+						properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "99999" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -446,8 +447,8 @@ class ElasticsearchClientFactoryImplIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "99999" );
-						properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "1000" );
+						properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "99999" );
+						properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "1000" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -481,9 +482,9 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -518,9 +519,9 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -556,7 +557,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS,
+							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -581,7 +583,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1, wireMockRule2 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.URIS,
+							httpsUrisFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -607,7 +610,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS,
+							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -645,9 +649,10 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS,
+							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 					// Use a timeout much higher than 1s, because wiremock can be really slow...
-					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -694,7 +699,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS,
+							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -743,8 +749,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ElasticsearchBackendSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -797,10 +803,10 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendSettings.PROTOCOL, "https" );
-					properties.accept( ElasticsearchBackendSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ElasticsearchBackendSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendClientCommonSettings.PROTOCOL, "https" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			/*
@@ -869,8 +875,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.USERNAME, username );
-					properties.accept( ElasticsearchBackendSettings.PASSWORD, password );
+					properties.accept( ElasticsearchBackendClientCommonSettings.USERNAME, username );
+					properties.accept( ElasticsearchBackendClientCommonSettings.PASSWORD, password );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
@@ -907,8 +913,8 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.USERNAME, username );
-					properties.accept( ElasticsearchBackendSettings.PASSWORD, password );
+					properties.accept( ElasticsearchBackendClientCommonSettings.USERNAME, username );
+					properties.accept( ElasticsearchBackendClientCommonSettings.PASSWORD, password );
 				}
 		) ) {
 			// Nothing to do here
@@ -918,8 +924,8 @@ class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	void uriAndProtocol() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
-			properties.accept( ElasticsearchBackendSettings.PROTOCOL, "http" );
+			properties.accept( ElasticsearchBackendClientCommonSettings.URIS, "http://is-not-called:12345" );
+			properties.accept( ElasticsearchBackendClientCommonSettings.PROTOCOL, "http" );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -936,8 +942,8 @@ class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	void uriAndHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
-			properties.accept( ElasticsearchBackendSettings.HOSTS, "not-called-either:234" );
+			properties.accept( ElasticsearchBackendClientCommonSettings.URIS, "http://is-not-called:12345" );
+			properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, "not-called-either:234" );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -954,7 +960,8 @@ class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	void differentProtocolsOnUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345, https://neather-is:12345" );
+			properties.accept( ElasticsearchBackendClientCommonSettings.URIS,
+					"http://is-not-called:12345, https://neather-is:12345" );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -969,7 +976,7 @@ class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	void emptyListOfUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.URIS, Collections.emptyList() );
+			properties.accept( ElasticsearchBackendClientCommonSettings.URIS, Collections.emptyList() );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -982,7 +989,7 @@ class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	void emptyListOfHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.HOSTS, Collections.emptyList() );
+			properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, Collections.emptyList() );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -1006,7 +1013,8 @@ class ElasticsearchClientFactoryImplIT {
 							.withBody( responseBody ) ) );
 
 			try ( ElasticsearchClientImplementor client = createClient( properties -> {
-				properties.accept( ElasticsearchBackendSpiSettings.CLIENT_INSTANCE, BeanReference.ofInstance( myRestClient ) );
+				properties.accept( ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
+						BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
 				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 				assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -1028,7 +1036,7 @@ class ElasticsearchClientFactoryImplIT {
 	void maxKeepAliveNegativeValue() {
 		assertThatThrownBy( () -> createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.MAX_KEEP_ALIVE, -1 );
+					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, -1 );
 				}
 		) ).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -1061,12 +1069,12 @@ class ElasticsearchClientFactoryImplIT {
 		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
 			properties.accept(
-					ElasticsearchBackendSettings.CLIENT_CONFIGURER,
-					(ElasticsearchHttpClientConfigurer) context -> {
+					ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+					(org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer) context -> {
 						context.clientBuilder().setConnectionManager( createPoolManager( usedConnections ) );
 					}
 			);
-			properties.accept( ElasticsearchBackendSettings.MAX_KEEP_ALIVE, time );
+			properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, time );
 		} ) ) {
 
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -1138,17 +1146,17 @@ class ElasticsearchClientFactoryImplIT {
 		Map<String, Object> clientProperties = new HashMap<>( defaultBackendProperties );
 
 		// We won't target the provided ES instance, but Wiremock
-		clientProperties.remove( ElasticsearchBackendSettings.HOSTS );
-		clientProperties.remove( ElasticsearchBackendSettings.PROTOCOL );
-		clientProperties.remove( ElasticsearchBackendSettings.URIS );
+		clientProperties.remove( ElasticsearchBackendClientCommonSettings.HOSTS );
+		clientProperties.remove( ElasticsearchBackendClientCommonSettings.PROTOCOL );
+		clientProperties.remove( ElasticsearchBackendClientCommonSettings.URIS );
 
 		// Per-test overrides
 		additionalProperties.accept( clientProperties::put );
 
 		// By default, target the Wiremock server 1 using HTTP
-		if ( !clientProperties.containsKey( ElasticsearchBackendSettings.HOSTS )
-				&& !clientProperties.containsKey( ElasticsearchBackendSettings.URIS ) ) {
-			clientProperties.put( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
+		if ( !clientProperties.containsKey( ElasticsearchBackendClientCommonSettings.HOSTS )
+				&& !clientProperties.containsKey( ElasticsearchBackendClientCommonSettings.URIS ) ) {
+			clientProperties.put( ElasticsearchBackendClientCommonSettings.URIS, httpUrisFor( wireMockRule1 ) );
 		}
 
 		ConfigurationPropertySource clientPropertySource = AllAwareConfigurationPropertySource.fromMap( clientProperties );
@@ -1167,8 +1175,7 @@ class ElasticsearchClientFactoryImplIT {
 		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
 				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
-				GsonProvider.create( GsonBuilder::new, true ),
-				Optional.of( ElasticsearchTestDialect.getActualVersion() )
+				GsonProvider.create( GsonBuilder::new, true )
 		);
 	}
 
@@ -1262,10 +1269,11 @@ class ElasticsearchClientFactoryImplIT {
 		return node;
 	}
 
+	@SuppressWarnings("removal")
 	private static BeanConfigurer elasticsearchSslBeanConfigurer() {
 		return context -> {
 			context.define(
-					ElasticsearchHttpClientConfigurer.class,
+					org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer.class,
 					BeanReference.ofInstance( new ElasticsearchHttpClientConfigurer() {
 						@Override
 						public void configure(ElasticsearchHttpClientConfigurationContext context) {

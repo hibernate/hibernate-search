@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
+import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.common.SearchException;
 
 import com.google.gson.JsonObject;

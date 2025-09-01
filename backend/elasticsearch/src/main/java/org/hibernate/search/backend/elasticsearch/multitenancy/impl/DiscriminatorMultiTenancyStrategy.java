@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
