@@ -7,10 +7,10 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 
 /**
  * A flush work for ES5, using the Flush API then the Refresh API.
