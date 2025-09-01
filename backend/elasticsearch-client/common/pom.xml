@@ -14,7 +14,7 @@
     </parent>
     <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
 
-    <name>Hibernate Search Backend - Elasticsearch Client SPI</name>
+    <name>Hibernate Search Backend - Elasticsearch Client Common</name>
     <description>Rest client SPI for the Elasticsearch backend</description>
 
     <properties>

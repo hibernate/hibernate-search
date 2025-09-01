@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.client;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.DelegatingElasticsearchHttpClientConfigurationContext;
+
 /**
  * An extension point allowing fine tuning of the Apache HTTP Client used by the Elasticsearch integration.
  * <p>
@@ -15,8 +17,13 @@ package org.hibernate.search.backend.elasticsearch.client;
  * <p>
  * Note that you don't have to configure the client unless you have specific needs:
  * the default configuration should work just fine for an on-premise Elasticsearch server.
+ *
+ * @deprecated Use the client specific configurers instead.
  */
-public interface ElasticsearchHttpClientConfigurer {
+@SuppressWarnings("removal")
+@Deprecated(since = "8.2", forRemoval = true)
+public interface ElasticsearchHttpClientConfigurer
+		extends org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer {
 
 	/**
 	 * Configure the HTTP Client.
@@ -33,5 +40,11 @@ public interface ElasticsearchHttpClientConfigurer {
 	 * and configuration properties in particular.
 	 */
 	void configure(ElasticsearchHttpClientConfigurationContext context);
+
+	@Override
+	default void configure(
+			org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurationContext context) {
+		configure( new DelegatingElasticsearchHttpClientConfigurationContext( context ) );
+	}
 
 }
