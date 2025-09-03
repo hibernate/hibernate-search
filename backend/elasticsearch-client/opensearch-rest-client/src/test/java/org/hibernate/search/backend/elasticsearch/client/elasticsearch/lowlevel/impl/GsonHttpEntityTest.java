@@ -35,8 +35,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.apache.http.Header;
-import org.apache.http.nio.ContentEncoder;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.nio.ContentEncoder;
+import org.apache.hc.core5.http.nio.DataStreamChannel;
 
 class GsonHttpEntityTest {
 
@@ -172,9 +173,8 @@ class GsonHttpEntityTest {
 	@MethodSource("params")
 	void contentType(String ignoredLabel, List<JsonObject> payload) throws IOException {
 		init( payload );
-		Header contentType = gsonEntity.getContentType();
-		assertThat( contentType.getName() ).isEqualTo( "Content-Type" );
-		assertThat( contentType.getValue() ).isEqualTo( "application/json; charset=UTF-8" );
+		String contentType = gsonEntity.getContentType();
+		assertThat( contentType ).isEqualTo( "application/json; charset=UTF-8" );
 	}
 
 	@ParameterizedTest(name = "{0}")
@@ -257,9 +257,9 @@ class GsonHttpEntityTest {
 
 	private String doProduceContent(GsonHttpEntity entity, int pushBackPeriod) throws IOException {
 		try ( ByteArrayOutputStream outputStream = new ByteArrayOutputStream() ) {
-			ContentEncoder contentEncoder = new OutputStreamContentEncoder( outputStream, pushBackPeriod );
+			OutputStreamContentEncoder contentEncoder = new OutputStreamContentEncoder( outputStream, pushBackPeriod );
 			while ( !contentEncoder.isCompleted() ) {
-				entity.produceContent( contentEncoder, StubIOControl.INSTANCE );
+				entity.produce( contentEncoder );
 			}
 			return outputStream.toString( StandardCharsets.UTF_8.name() );
 		}
@@ -288,7 +288,7 @@ class GsonHttpEntityTest {
 		}
 	}
 
-	private static class OutputStreamContentEncoder implements ContentEncoder {
+	private static class OutputStreamContentEncoder implements ContentEncoder, DataStreamChannel {
 		private boolean complete = false;
 		private final OutputStream outputStream;
 		private final int pushBackPeriod;
@@ -299,6 +299,11 @@ class GsonHttpEntityTest {
 		private OutputStreamContentEncoder(OutputStream outputStream, int pushBackPeriod) {
 			this.outputStream = outputStream;
 			this.pushBackPeriod = pushBackPeriod;
+		}
+
+		@Override
+		public void requestOutput() {
+
 		}
 
 		@Override
@@ -316,7 +321,17 @@ class GsonHttpEntityTest {
 		}
 
 		@Override
-		public void complete() {
+		public void endStream() throws IOException {
+			complete = true;
+		}
+
+		@Override
+		public void endStream(List<? extends Header> trailers) throws IOException {
+			complete = true;
+		}
+
+		@Override
+		public void complete(List<? extends Header> trailers) {
 			this.complete = true;
 		}
 
