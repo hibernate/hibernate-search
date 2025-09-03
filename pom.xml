@@ -302,16 +302,16 @@
         <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.7.1</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
-        <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
+        <version.sonar.plugin>5.2.0.4988</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <!--
             We want to keep patch updates for groovy enabled as those may contain compatibility with a more recent JDK versions.
             e.g. 4.0.13 won't work with JDK 23, while 4.0.26 is working just fine.
          -->
         <version.org.apache.groovy.groovy-jsr223>5.0.0</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>11.0.0</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>11.0.1</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.18.0</version.versions.plugin>
-        <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
+        <version.maven-wrapper-plugin>3.3.3</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
         <version.gitflow-incremental-builder>4.5.5</version.gitflow-incremental-builder>
