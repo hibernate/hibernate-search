@@ -47,6 +47,6 @@ public interface ElasticsearchClientCommonLog
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 1, value = "")
+	@Message(id = ID_OFFSET + 2, value = "")
 	void nextLoggerIdForConvenience();
 }
