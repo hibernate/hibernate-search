@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl;
+package org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -33,21 +34,22 @@ import org.hibernate.search.util.common.impl.Futures;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import co.elastic.clients.transport.rest5_client.low_level.Request;
+import co.elastic.clients.transport.rest5_client.low_level.RequestOptions;
+import co.elastic.clients.transport.rest5_client.low_level.Response;
+import co.elastic.clients.transport.rest5_client.low_level.ResponseException;
+import co.elastic.clients.transport.rest5_client.low_level.ResponseListener;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
+import co.elastic.clients.transport.rest5_client.low_level.sniffer.Sniffer;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.impl.EnglishReasonPhraseCatalog;
 import org.apache.hc.core5.util.Timeout;
-import org.opensearch.client.Request;
-import org.opensearch.client.RequestOptions;
-import org.opensearch.client.Response;
-import org.opensearch.client.ResponseException;
-import org.opensearch.client.ResponseListener;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.sniff.Sniffer;
 
 public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
-	private final BeanHolder<? extends RestClient> restClientHolder;
+	private final BeanHolder<? extends Rest5Client> restClientHolder;
 
 	private final Sniffer sniffer;
 
@@ -59,7 +61,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	ElasticsearchClientImpl(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
+	ElasticsearchClientImpl(BeanHolder<? extends Rest5Client> restClientHolder, Sniffer sniffer,
 			SimpleScheduledExecutor timeoutExecutorService,
 			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {
@@ -86,10 +88,10 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> clientClass) {
-		if ( RestClient.class.isAssignableFrom( clientClass ) ) {
+		if ( Rest5Client.class.isAssignableFrom( clientClass ) ) {
 			return (T) restClientHolder.get();
 		}
-		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, RestClient.class );
+		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, Rest5Client.class );
 	}
 
 	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
@@ -196,17 +198,19 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private ElasticsearchResponse convertResponse(Response response) {
+		String reason = EnglishReasonPhraseCatalog.INSTANCE.getReason( response.getStatusCode(), Locale.ENGLISH );
 		try {
+
 			JsonObject body = parseBody( response );
 			return new ElasticsearchResponse(
 					response.getHost().toHostString(),
-					response.getStatusLine().getStatusCode(),
-					response.getStatusLine().getReasonPhrase(),
+					response.getStatusCode(),
+					reason,
 					body );
 		}
 		catch (IOException | RuntimeException e) {
-			throw ElasticsearchClientLog.INSTANCE.failedToParseElasticsearchResponse( response.getStatusLine().getStatusCode(),
-					response.getStatusLine().getReasonPhrase(), e.getMessage(), e );
+			throw ElasticsearchClientLog.INSTANCE.failedToParseElasticsearchResponse( response.getStatusCode(),
+					reason, e.getMessage(), e );
 		}
 	}
 

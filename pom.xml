@@ -176,6 +176,7 @@
         <module>backend/elasticsearch-aws</module>
         <module>backend/elasticsearch-client/common</module>
         <module>backend/elasticsearch-client/elasticsearch-rest-client</module>
+        <module>backend/elasticsearch-client/elasticsearch-java-client</module>
         <module>backend/elasticsearch-client/opensearch-rest-client</module>
         <module>mapper/pojo-base</module>
         <module>mapper/pojo-standalone</module>
