@@ -40,11 +40,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch-rest</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-elasticsearch-java</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
         </dependency>
 
         <dependency>
@@ -99,8 +99,8 @@
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
                             <classpathDependencyExcludes>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-elasticsearch-java</exclude>
+                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch</exclude>
+                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplElasticsearchJavaIT</exclude>
@@ -124,8 +124,8 @@
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.opensearch}</argLine>
                             <classpathDependencyExcludes>
                                 <!-- Do not remove the "default" client so that we can test this scenario where a user drops a dependency to a nondefault one -->
-                                <!-- <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-elasticsearch-rest</exclude>-->
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-elasticsearch-java</exclude>
+                                <!-- <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest</exclude> -->
+                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplElasticsearchJavaIT</exclude>
@@ -148,8 +148,8 @@
                             <summaryFile>${failsafe.client.elasticsearch.java.summaryFile}</summaryFile>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.elasticsearch.java}</argLine>
                             <classpathDependencyExcludes>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-elasticsearch-java</exclude>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>
+                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest</exclude>
+                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplIT</exclude>

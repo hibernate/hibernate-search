@@ -307,17 +307,17 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-elasticsearch-rest</artifactId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-elasticsearch-java</artifactId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-opensearch-rest</artifactId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

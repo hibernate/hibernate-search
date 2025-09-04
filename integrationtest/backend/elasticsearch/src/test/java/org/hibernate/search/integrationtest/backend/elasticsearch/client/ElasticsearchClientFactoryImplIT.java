@@ -46,9 +46,9 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.cfg.ElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.cfg.spi.ElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.client.rest.cfg.ElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
@@ -193,7 +193,7 @@ class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
 				ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
-				(org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer) context -> context
+				(org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer) context -> context
 						.clientBuilder()
 						.addInterceptorFirst( responseInterceptor )
 		) ) ) {
@@ -1070,7 +1070,7 @@ class ElasticsearchClientFactoryImplIT {
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
 			properties.accept(
 					ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
-					(org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer) context -> {
+					(org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer) context -> {
 						context.clientBuilder().setConnectionManager( createPoolManager( usedConnections ) );
 					}
 			);
@@ -1273,7 +1273,7 @@ class ElasticsearchClientFactoryImplIT {
 	private static BeanConfigurer elasticsearchSslBeanConfigurer() {
 		return context -> {
 			context.define(
-					org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer.class,
+					org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer.class,
 					BeanReference.ofInstance( new ElasticsearchHttpClientConfigurer() {
 						@Override
 						public void configure(ElasticsearchHttpClientConfigurationContext context) {
