@@ -12,7 +12,7 @@
         <version>8.2.0-SNAPSHOT</version>
         <relativePath>../../../build/parents/public</relativePath>
     </parent>
-    <artifactId>hibernate-search-backend-elasticsearch-client-elasticsearch-java</artifactId>
+    <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
 
     <name>Hibernate Search Backend - Elasticsearch client based on the low-level Elasticsearch java client</name>
     <description>Hibernate Search Elasticsearch client based on the low-level Elasticsearch java client</description>
@@ -20,7 +20,7 @@
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
         <deploy.skip>false</deploy.skip>
-        <java.module.name>org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient</java.module.name>
+        <java.module.name>org.hibernate.search.backend.elasticsearch.client.java</java.module.name>
     </properties>
 
     <dependencies>
