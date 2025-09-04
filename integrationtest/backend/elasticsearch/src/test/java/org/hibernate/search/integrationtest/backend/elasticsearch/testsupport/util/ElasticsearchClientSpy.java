@@ -12,12 +12,12 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.impl.integrationtest.common.extension.CallQueue;
 
@@ -76,7 +76,8 @@ public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCall
 	}
 
 	public BeanReference<ElasticsearchClientFactory> factoryReference() {
-		return beanResolver -> BeanHolder.of( new SpyingElasticsearchClientFactory( new ElasticsearchClientFactoryImpl() ) );
+		return beanResolver -> BeanHolder.of( new SpyingElasticsearchClientFactory(
+				beanResolver.resolve( ElasticsearchClientFactory.class, BeanRetrieval.BUILTIN ).get() ) );
 	}
 
 	public void expectNext(ElasticsearchRequest request, ElasticsearchRequestAssertionMode assertionMode) {
