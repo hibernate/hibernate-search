@@ -26,11 +26,11 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchRequestFormatter;
 import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchResponseFormatter;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
@@ -39,6 +39,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
@@ -497,20 +498,22 @@ public class TestElasticsearchClient implements BeforeEachCallback, AfterEachCal
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
 		/*
-		 * We use a {@link ElasticsearchClientFactoryImpl} to create our low-level client.
+		 * We use a {@link ElasticsearchClientFactory} to create our low-level client.
 		 *
 		 * The main advantage is that we ensure we connect to Elasticsearch exactly the same way
 		 * as any test-created SearchFactory, enabling support for things like testing on AWS
 		 * (using the hibernate-search-elasticsearch-aws module).
 		 */
-		client = new ElasticsearchClientFactoryImpl().create( beanResolver, backendProperties,
-				threadPoolProvider.threadProvider(), "Client",
-				new DelegatingSimpleScheduledExecutor(
-						timeoutExecutorService,
-						threadPoolProvider.isScheduledExecutorBlocking()
-				),
-				GsonProvider.create( GsonBuilder::new, true )
-		);
+
+		client = getDiscoveredClientFactory( beanResolver ).get()
+				.create( beanResolver, backendProperties,
+						threadPoolProvider.threadProvider(), "Client",
+						new DelegatingSimpleScheduledExecutor(
+								timeoutExecutorService,
+								threadPoolProvider.isScheduledExecutorBlocking()
+						),
+						GsonProvider.create( GsonBuilder::new, true )
+				);
 	}
 
 	@Override
@@ -617,4 +620,14 @@ public class TestElasticsearchClient implements BeforeEachCallback, AfterEachCal
 		return JsonParser.parseString( jsonAsString );
 	}
 
+	public static BeanHolder<ElasticsearchClientFactory> getDiscoveredClientFactory(BeanResolver beanResolver) {
+		BeanReference<ElasticsearchClientFactory> reference = null;
+		for ( var entry : beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class ).entrySet() ) {
+			reference = entry.getValue();
+			if ( !ElasticsearchClientFactory.DEFAULT_BEAN_NAME.equals( entry.getKey() ) ) {
+				break;
+			}
+		}
+		return beanResolver.resolve( reference );
+	}
 }
