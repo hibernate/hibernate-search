@@ -68,11 +68,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -1054,32 +1050,6 @@ class ElasticsearchExtensionIT {
 				.hasMessageContainingAll(
 						"Invalid requested type for this backend: '" + String.class.getName() + "'",
 						"Elasticsearch backends can only be unwrapped to '" + ElasticsearchBackend.class.getName() + "'"
-				);
-	}
-
-	@Test
-	void backend_getClient() throws Exception {
-		Backend backend = integration.backend();
-		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
-		RestClient restClient = elasticsearchBackend.client( RestClient.class );
-
-		// Test that the client actually works
-		Response response = restClient.performRequest( new Request( "GET", "/" ) );
-		assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
-	}
-
-	@Test
-	void backend_getClient_error_invalidClass() {
-		Backend backend = integration.backend();
-		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
-
-		assertThatThrownBy( () -> elasticsearchBackend.client( HttpAsyncClient.class ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Invalid requested type for client",
-						HttpAsyncClient.class.getName(),
-						"The Elasticsearch low-level client can only be unwrapped to",
-						RestClient.class.getName()
 				);
 	}
 

@@ -261,7 +261,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			//                            .setSslContext(
 			//                                    SSLContextBuilder.create()
 			//                                            .loadTrustMaterial(null, new TrustAllStrategy())
-			//                                            .build()
+			//                                            .buildAsync()
 			//                            )
 			//                            .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
 			//                            .build()

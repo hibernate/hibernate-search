@@ -9,6 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient.getDiscoveredClientFactory;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -30,7 +31,6 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
@@ -215,10 +215,11 @@ class ElasticsearchContentLengthIT {
 		ConfigurationPropertySource clientPropertySource = AllAwareConfigurationPropertySource.fromMap( clientProperties );
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
-		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
-				threadPoolProvider.threadProvider(), "Client",
-				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
-				GsonProvider.create( GsonBuilder::new, true ) );
+		return getDiscoveredClientFactory( beanResolver ).get()
+				.create( beanResolver, clientPropertySource,
+						threadPoolProvider.threadProvider(), "Client",
+						new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
+						GsonProvider.create( GsonBuilder::new, true ) );
 	}
 
 	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, Collection<JsonObject> bodyParts) {
