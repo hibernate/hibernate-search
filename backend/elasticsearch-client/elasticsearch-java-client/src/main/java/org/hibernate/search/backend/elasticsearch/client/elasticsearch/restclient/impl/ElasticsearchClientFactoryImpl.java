@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.impl;
+package org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.impl;
 
 import java.net.SocketAddress;
 import java.util.List;
@@ -14,9 +14,9 @@ import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonPro
 import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.cfg.ElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.cfg.ElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.cfg.spi.ElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -27,6 +27,12 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder;
+import co.elastic.clients.transport.rest5_client.low_level.sniffer.ElasticsearchNodesSniffer;
+import co.elastic.clients.transport.rest5_client.low_level.sniffer.NodesSniffer;
+import co.elastic.clients.transport.rest5_client.low_level.sniffer.Sniffer;
+import co.elastic.clients.transport.rest5_client.low_level.sniffer.SnifferBuilder;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.config.ConnectionConfig;
@@ -40,12 +46,6 @@ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.net.NamedEndpoint;
 import org.apache.hc.core5.reactor.ssl.TransportSecurityLayer;
 import org.apache.hc.core5.util.Timeout;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.RestClientBuilder;
-import org.opensearch.client.sniff.NodesSniffer;
-import org.opensearch.client.sniff.OpenSearchNodesSniffer;
-import org.opensearch.client.sniff.Sniffer;
-import org.opensearch.client.sniff.SnifferBuilder;
 
 
 /**
@@ -53,9 +53,9 @@ import org.opensearch.client.sniff.SnifferBuilder;
  */
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>> CLIENT_INSTANCE =
+	private static final OptionalConfigurationProperty<BeanReference<? extends Rest5Client>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
-					.asBeanReference( RestClient.class )
+					.asBeanReference( Rest5Client.class )
 					.build();
 
 	private static final OptionalConfigurationProperty<List<String>> HOSTS =
@@ -149,10 +149,10 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
-		Optional<BeanHolder<? extends RestClient>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
+		Optional<BeanHolder<? extends Rest5Client>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
 				propertySource, beanResolver::resolve );
 
-		BeanHolder<? extends RestClient> restClientHolder;
+		BeanHolder<? extends Rest5Client> restClientHolder;
 		Sniffer sniffer;
 		if ( providedRestClientHolder.isPresent() ) {
 			restClientHolder = providedRestClientHolder.get();
@@ -173,10 +173,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		);
 	}
 
-	private BeanHolder<? extends RestClient> createClient(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
+	private BeanHolder<? extends Rest5Client> createClient(BeanResolver beanResolver,
+			ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ServerUris hosts, String pathPrefix) {
-		RestClientBuilder builder = RestClient.builder( hosts.asHostsArray() );
+		Rest5ClientBuilder builder = Rest5Client.builder( hosts.asHostsArray() );
 		if ( !pathPrefix.isEmpty() ) {
 			builder.setPathPrefix( pathPrefix );
 		}
@@ -184,7 +185,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig = CLIENT_CONFIGURER
 				.getAndMap( propertySource, beanResolver::resolve );
 
-		RestClient client = null;
+		Rest5Client client = null;
 		List<BeanReference<ElasticsearchHttpClientConfigurer>> httpClientConfigurerReferences =
 				beanResolver.allConfiguredForRole( ElasticsearchHttpClientConfigurer.class );
 		try ( BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurersHolder =
@@ -217,7 +218,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	}
 
 	private Sniffer createSniffer(ConfigurationPropertySource propertySource,
-			RestClient client, ServerUris hosts) {
+			Rest5Client client, ServerUris hosts) {
 		boolean discoveryEnabled = DISCOVERY_ENABLED.get( propertySource );
 		if ( discoveryEnabled ) {
 			SnifferBuilder builder = Sniffer.builder( client )
@@ -227,10 +228,10 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 			// https discovery support
 			if ( hosts.isSslEnabled() ) {
-				NodesSniffer hostsSniffer = new OpenSearchNodesSniffer(
+				NodesSniffer hostsSniffer = new ElasticsearchNodesSniffer(
 						client,
-						OpenSearchNodesSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec
-						OpenSearchNodesSniffer.Scheme.HTTPS );
+						ElasticsearchNodesSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec
+						ElasticsearchNodesSniffer.Scheme.HTTPS );
 				builder.setNodesSniffer( hostsSniffer );
 			}
 			return builder.build();
