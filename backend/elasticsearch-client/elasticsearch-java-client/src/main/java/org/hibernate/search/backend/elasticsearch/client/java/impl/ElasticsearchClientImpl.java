@@ -1,0 +1,277 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.search.backend.elasticsearch.client.java.impl;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchRequestLog;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.util.spi.ElasticsearchClientUtils;
+import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
+import org.hibernate.search.engine.common.timing.Deadline;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Futures;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import co.elastic.clients.transport.rest5_client.low_level.Request;
+import co.elastic.clients.transport.rest5_client.low_level.RequestOptions;
+import co.elastic.clients.transport.rest5_client.low_level.Response;
+import co.elastic.clients.transport.rest5_client.low_level.ResponseException;
+import co.elastic.clients.transport.rest5_client.low_level.ResponseListener;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
+import co.elastic.clients.transport.rest5_client.low_level.sniffer.Sniffer;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.impl.EnglishReasonPhraseCatalog;
+import org.apache.hc.core5.util.Timeout;
+
+public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
+
+	private final BeanHolder<? extends Rest5Client> restClientHolder;
+
+	private final Sniffer sniffer;
+
+	private final SimpleScheduledExecutor timeoutExecutorService;
+
+	private final Optional<Integer> requestTimeoutMs;
+	private final int connectionTimeoutMs;
+
+	private final Gson gson;
+	private final JsonLogHelper jsonLogHelper;
+
+	ElasticsearchClientImpl(BeanHolder<? extends Rest5Client> restClientHolder, Sniffer sniffer,
+			SimpleScheduledExecutor timeoutExecutorService,
+			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
+			Gson gson, JsonLogHelper jsonLogHelper) {
+		this.restClientHolder = restClientHolder;
+		this.sniffer = sniffer;
+		this.timeoutExecutorService = timeoutExecutorService;
+		this.requestTimeoutMs = requestTimeoutMs;
+		this.connectionTimeoutMs = connectionTimeoutMs;
+		this.gson = gson;
+		this.jsonLogHelper = jsonLogHelper;
+	}
+
+	@Override
+	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
+		CompletableFuture<ElasticsearchResponse> result = Futures.create( () -> send( request ) )
+				.thenApply( this::convertResponse );
+		if ( ElasticsearchRequestLog.INSTANCE.isDebugEnabled() ) {
+			long startTime = System.nanoTime();
+			result.thenAccept( response -> log( request, startTime, response ) );
+		}
+		return result;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T unwrap(Class<T> clientClass) {
+		if ( Rest5Client.class.isAssignableFrom( clientClass ) ) {
+			return (T) restClientHolder.get();
+		}
+		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, Rest5Client.class );
+	}
+
+	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
+		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+
+		HttpEntity entity;
+		try {
+			entity = GsonHttpEntity.toEntity( gson, elasticsearchRequest );
+		}
+		catch (IOException | RuntimeException e) {
+			completableFuture.completeExceptionally( e );
+			return completableFuture;
+		}
+
+		restClientHolder.get().performRequestAsync(
+				toRequest( elasticsearchRequest, entity ),
+				new ResponseListener() {
+					@Override
+					public void onSuccess(Response response) {
+						completableFuture.complete( response );
+					}
+
+					@Override
+					public void onFailure(Exception exception) {
+						if ( exception instanceof ResponseException ) {
+							/*
+							 * The client tries to guess what's an error and what's not, but it's too naive.
+							 * A 404 on DELETE is not always important to us, for instance.
+							 * Thus we ignore the exception and do our own checks afterwards.
+							 */
+							completableFuture.complete( ( (ResponseException) exception ).getResponse() );
+						}
+						else {
+							completableFuture.completeExceptionally( exception );
+						}
+					}
+				}
+		);
+
+		Deadline deadline = elasticsearchRequest.deadline();
+		if ( deadline == null && !requestTimeoutMs.isPresent() ) {
+			// no need to schedule a client side timeout
+			return completableFuture;
+		}
+
+		long currentTimeoutValue =
+				deadline == null ? Long.valueOf( requestTimeoutMs.get() ) : deadline.checkRemainingTimeMillis();
+
+		/*
+		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
+		 *  In any case, the RestClient doesn't return the Future<?> from Apache HTTP client,
+		 *  so we can't do much until this changes.
+		 */
+		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
+				() -> {
+					if ( !completableFuture.isDone() ) {
+						RuntimeException cause = ElasticsearchClientLog.INSTANCE.requestTimedOut(
+								Duration.ofNanos( TimeUnit.MILLISECONDS.toNanos( currentTimeoutValue ) ),
+								elasticsearchRequest );
+						completableFuture.completeExceptionally(
+								deadline != null ? deadline.forceTimeoutAndCreateException( cause ) : cause
+						);
+					}
+				},
+				currentTimeoutValue, TimeUnit.MILLISECONDS
+		);
+		completableFuture.thenRun( () -> timeout.cancel( false ) );
+
+		return completableFuture;
+	}
+
+	private Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity) {
+		Request request = new Request( elasticsearchRequest.method(), elasticsearchRequest.path() );
+		setPerRequestSocketTimeout( elasticsearchRequest, request );
+
+		for ( Entry<String, String> parameter : elasticsearchRequest.parameters().entrySet() ) {
+			request.addParameter( parameter.getKey(), parameter.getValue() );
+		}
+
+		request.setEntity( entity );
+
+		return request;
+	}
+
+	private void setPerRequestSocketTimeout(ElasticsearchRequest elasticsearchRequest, Request request) {
+		Deadline deadline = elasticsearchRequest.deadline();
+		if ( deadline == null ) {
+			return;
+		}
+
+		long timeToHardTimeout = deadline.checkRemainingTimeMillis();
+
+		// set a per-request socket timeout
+		int generalRequestTimeoutMs = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setConnectionRequestTimeout( Timeout.DISABLED ) //Disable lease handling for the connection pool! See also HSEARCH-2681
+				.setResponseTimeout( generalRequestTimeoutMs, TimeUnit.MILLISECONDS )
+				.build();
+
+		RequestOptions.Builder requestOptions = RequestOptions.DEFAULT.toBuilder()
+				.setRequestConfig( requestConfig );
+
+		request.setOptions( requestOptions );
+	}
+
+	private ElasticsearchResponse convertResponse(Response response) {
+		String reason = EnglishReasonPhraseCatalog.INSTANCE.getReason( response.getStatusCode(), Locale.ENGLISH );
+		try {
+
+			JsonObject body = parseBody( response );
+			return new ElasticsearchResponse(
+					response.getHost().toHostString(),
+					response.getStatusCode(),
+					reason,
+					body );
+		}
+		catch (IOException | RuntimeException e) {
+			throw ElasticsearchClientLog.INSTANCE.failedToParseElasticsearchResponse( response.getStatusCode(),
+					reason, e.getMessage(), e );
+		}
+	}
+
+	private JsonObject parseBody(Response response) throws IOException {
+		HttpEntity entity = response.getEntity();
+		if ( entity == null ) {
+			return null;
+		}
+
+		Charset charset = getCharset( entity );
+		try ( InputStream inputStream = entity.getContent();
+				Reader reader = new InputStreamReader( inputStream, charset ) ) {
+			return gson.fromJson( reader, JsonObject.class );
+		}
+	}
+
+	private static Charset getCharset(HttpEntity entity) {
+		ContentType contentType = ContentType.parse( entity.getContentType() );
+		Charset charset = contentType.getCharset();
+		return charset != null ? charset : StandardCharsets.UTF_8;
+	}
+
+	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
+		boolean successCode = ElasticsearchClientUtils.isSuccessCode( response.statusCode() );
+		if ( !ElasticsearchRequestLog.INSTANCE.isTraceEnabled() && successCode ) {
+			return;
+		}
+		long executionTimeNs = System.nanoTime() - start;
+		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
+		if ( successCode ) {
+			ElasticsearchRequestLog.INSTANCE.executedRequest( request.method(), response.host(), request.path(),
+					request.parameters(),
+					request.bodyParts().size(), executionTimeMs,
+					response.statusCode(), response.statusMessage(),
+					jsonLogHelper.toString( request.bodyParts() ),
+					jsonLogHelper.toString( response.body() ) );
+		}
+		else {
+			ElasticsearchRequestLog.INSTANCE.executedRequestWithFailure( request.method(), response.host(), request.path(),
+					request.parameters(),
+					request.bodyParts().size(), executionTimeMs,
+					response.statusCode(), response.statusMessage(),
+					jsonLogHelper.toString( request.bodyParts() ),
+					jsonLogHelper.toString( response.body() ) );
+		}
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			/*
+			 * There's no point waiting for timeouts: we'll just expect the RestClient to cancel all
+			 * currently running requests when closing.
+			 */
+			closer.push( Sniffer::close, this.sniffer );
+			// The BeanHolder is responsible for calling close() on the client if necessary.
+			closer.push( BeanHolder::close, this.restClientHolder );
+		}
+		catch (RuntimeException | IOException e) {
+			throw ElasticsearchClientLog.INSTANCE.unableToShutdownClient( e.getMessage(), e );
+		}
+	}
+
+}

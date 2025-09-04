@@ -11,8 +11,8 @@ import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBacken
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.lowlevel.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
