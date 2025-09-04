@@ -48,11 +48,11 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.cfg.ElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.cfg.spi.ElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.elasticsearch.restclient.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.java.cfg.ElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.java.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.java.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -895,7 +895,7 @@ class ElasticsearchClientFactoryImplElasticsearchJavaIT {
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	void authentication_error() {
 		String payload = "{ \"foo\": \"bar\" }";
-		String statusMessage = "StatusMessageUnauthorized";
+		String statusMessage = "Unauthorized";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
@@ -1075,6 +1075,7 @@ class ElasticsearchClientFactoryImplElasticsearchJavaIT {
 
 		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
+			properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, time );
 			properties.accept(
 					ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 					(ElasticsearchHttpClientConfigurer) context -> {
@@ -1082,7 +1083,6 @@ class ElasticsearchClientFactoryImplElasticsearchJavaIT {
 								.setConnectionManager( createPoolManager( usedConnections, connections, connections ) );
 					}
 			);
-			properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, time );
 		} ) ) {
 
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -1376,5 +1376,4 @@ class ElasticsearchClientFactoryImplElasticsearchJavaIT {
 			throw new AssertionFailure( "Unexpected exception", e );
 		}
 	}
-
 }
