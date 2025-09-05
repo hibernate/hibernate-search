@@ -45,7 +45,7 @@ import org.opensearch.client.ResponseListener;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.sniff.Sniffer;
 
-public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
+public class ClientOpenSearchElasticsearchClient implements ElasticsearchClientImplementor {
 
 	private final BeanHolder<? extends RestClient> restClientHolder;
 
@@ -54,20 +54,18 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final SimpleScheduledExecutor timeoutExecutorService;
 
 	private final Optional<Integer> requestTimeoutMs;
-	private final int connectionTimeoutMs;
 
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	ElasticsearchClientImpl(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
+	ClientOpenSearchElasticsearchClient(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
 			SimpleScheduledExecutor timeoutExecutorService,
-			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
+			Optional<Integer> requestTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClientHolder = restClientHolder;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = timeoutExecutorService;
 		this.requestTimeoutMs = requestTimeoutMs;
-		this.connectionTimeoutMs = connectionTimeoutMs;
 		this.gson = gson;
 		this.jsonLogHelper = jsonLogHelper;
 	}

@@ -2,10 +2,10 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.rest.cfg;
+package org.hibernate.search.backend.elasticsearch.client.opensearch.cfg;
 
 import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer;
 
 /**
  * Specific configuration properties for the Elasticsearch backend's rest client based on the Elasticsearch's low-level rest client.
@@ -15,9 +15,9 @@ import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpC
  *
  * @author Gunnar Morling
  */
-public final class ElasticsearchBackendClientSettings {
+public final class ClientOpenSearchElasticsearchBackendClientSettings {
 
-	private ElasticsearchBackendClientSettings() {
+	private ClientOpenSearchElasticsearchBackendClientSettings() {
 	}
 
 	/**

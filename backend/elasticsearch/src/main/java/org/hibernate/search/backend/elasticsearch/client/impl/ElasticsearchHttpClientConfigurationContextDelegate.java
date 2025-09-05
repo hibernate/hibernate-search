@@ -11,11 +11,11 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 
 @SuppressWarnings("removal")
-public class DelegatingElasticsearchHttpClientConfigurationContext implements ElasticsearchHttpClientConfigurationContext {
+public class ElasticsearchHttpClientConfigurationContextDelegate implements ElasticsearchHttpClientConfigurationContext {
 
 	private final org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext context;
 
-	public DelegatingElasticsearchHttpClientConfigurationContext(
+	public ElasticsearchHttpClientConfigurationContextDelegate(
 			org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext context) {
 		this.context = context;
 	}

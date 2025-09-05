@@ -7,12 +7,16 @@ package org.hibernate.search.backend.elasticsearch.client.rest;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 
 /**
  * The context passed to {@link ElasticsearchHttpClientConfigurer}.
  */
+@SuppressJQAssistant(
+		reason = "Apache HTTP Client 5 uses a lot of classes/interfaces in the impl packages to create builders/instances etc. "
+				+ "So while it is bad to expose impl types ... in this case it's what Apache Client expects users to do?")
 public interface ElasticsearchHttpClientConfigurationContext {
 
 	/**

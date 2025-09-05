@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEnco
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
@@ -42,6 +43,10 @@ import com.google.gson.JsonObject;
 				"""
 )
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
+@SuppressJQAssistant(
+		reason = "Apache HTTP Client 5 uses a lot of classes/interfaces in the impl packages to create builders/instances etc. "
+				+
+				"So while it is bad to expose impl types ... in this case it's what Apache Client expects users to do?")
 public interface ElasticsearchClientLog {
 	String CATEGORY_NAME = "org.hibernate.search.elasticsearch.client";
 
