@@ -1,1 +1,1 @@
-org.hibernate.search.backend.elasticsearch.client.java.impl.ElasticsearchClientBeanConfigurer
+org.hibernate.search.backend.elasticsearch.client.java.impl.ClientJavaElasticsearchClientBeanConfigurer

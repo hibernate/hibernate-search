@@ -2,21 +2,21 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.rest.impl;
+package org.hibernate.search.backend.elasticsearch.client.opensearch.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 
-final class ElasticsearchHttpClientConfigurationContextImpl
+final class ClientOpenSearchElasticsearchHttpClientConfigurationContext
 		implements ElasticsearchHttpClientConfigurationContext {
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource configurationPropertySource;
 	private final HttpAsyncClientBuilder clientBuilder;
 
-	ElasticsearchHttpClientConfigurationContextImpl(
+	ClientOpenSearchElasticsearchHttpClientConfigurationContext(
 			BeanResolver beanResolver,
 			ConfigurationPropertySource configurationPropertySource,
 			HttpAsyncClientBuilder clientBuilder) {
