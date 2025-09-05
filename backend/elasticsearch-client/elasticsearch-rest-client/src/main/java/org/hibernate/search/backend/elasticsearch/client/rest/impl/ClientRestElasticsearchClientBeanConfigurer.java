@@ -2,19 +2,19 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.opensearch.impl;
+package org.hibernate.search.backend.elasticsearch.client.rest.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
-public class ElasticsearchClientBeanConfigurer implements BeanConfigurer {
+public class ClientRestElasticsearchClientBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				ElasticsearchClientFactory.class, "opensearch-rest-client",
-				beanResolver -> BeanHolder.of( new ElasticsearchClientFactoryImpl() )
+				ElasticsearchClientFactory.class, "default",
+				beanResolver -> BeanHolder.of( new ClientRestElasticsearchClientFactory() )
 		);
 	}
 }

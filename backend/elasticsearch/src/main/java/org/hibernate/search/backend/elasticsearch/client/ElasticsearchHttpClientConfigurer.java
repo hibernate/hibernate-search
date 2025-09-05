@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.DelegatingElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchHttpClientConfigurationContextDelegate;
 
 /**
  * An extension point allowing fine tuning of the Apache HTTP Client used by the Elasticsearch integration.
@@ -44,7 +44,7 @@ public interface ElasticsearchHttpClientConfigurer
 	@Override
 	default void configure(
 			org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext context) {
-		configure( new DelegatingElasticsearchHttpClientConfigurationContext( context ) );
+		configure( new ElasticsearchHttpClientConfigurationContextDelegate( context ) );
 	}
 
 }
