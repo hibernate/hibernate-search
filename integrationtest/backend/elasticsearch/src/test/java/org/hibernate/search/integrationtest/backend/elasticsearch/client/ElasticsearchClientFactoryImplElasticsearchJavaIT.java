@@ -627,7 +627,7 @@ class ElasticsearchClientFactoryImplElasticsearchJavaIT {
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
 
 			wireMockRule1.resetRequests();
 			wireMockRule2.resetRequests();
@@ -874,6 +874,11 @@ class ElasticsearchClientFactoryImplElasticsearchJavaIT {
 		String password = "j@rV1s";
 
 		String payload = "{ \"foo\": \"bar\" }";
+
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 401 )
+						.withHeader( "www-authenticate", "Basic realm=\"IT Realm\"" ) ) );
 
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
 				.withBasicAuth( username, password )
