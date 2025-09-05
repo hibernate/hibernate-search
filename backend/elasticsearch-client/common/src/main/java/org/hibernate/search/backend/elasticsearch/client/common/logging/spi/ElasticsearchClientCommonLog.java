@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.client.common.logging.spi;
 
 import static org.jboss.logging.Logger.Level.TRACE;
 
+import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.annotations.LogMessage;
@@ -22,6 +23,10 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		// Exceptions for legacy messages from Search 5 (engine module)
 		@ValidIdRange(min = 35, max = 35),
 })
+@SuppressJQAssistant(
+		reason = "Apache HTTP Client 5 uses a lot of classes/interfaces in the impl packages to create builders/instances etc. "
+				+
+				"So while it is bad to expose impl types ... in this case it's what Apache Client expects users to do?")
 public interface ElasticsearchClientCommonLog
 		extends ElasticsearchRequestLog, ElasticsearchClientLog {
 

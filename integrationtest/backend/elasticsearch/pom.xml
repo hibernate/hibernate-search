@@ -103,8 +103,8 @@
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplElasticsearchJavaIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplOpensearchIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientJavaElasticsearchClientFactoryIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientOpenSearchElasticsearchClientFactoryIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ElasticsearchExtensionElasticsearchJavaIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ElasticsearchExtensionOpenSearchLowLevelIT</exclude>
                             </excludes>
@@ -128,8 +128,8 @@
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplElasticsearchJavaIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientJavaElasticsearchClientFactoryIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRestElasticsearchClientFactoryIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ElasticsearchExtensionLowLevelIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ElasticsearchExtensionElasticsearchJavaIT</exclude>
                             </excludes>
@@ -152,8 +152,8 @@
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ElasticsearchClientFactoryImplOpensearchIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRestElasticsearchClientFactoryIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientOpenSearchElasticsearchClientFactoryIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ElasticsearchExtensionLowLevelIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ElasticsearchExtensionOpenSearchLowLevelIT</exclude>
                             </excludes>

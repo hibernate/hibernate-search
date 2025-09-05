@@ -15,8 +15,8 @@ import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.Elas
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.java.cfg.ElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.java.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.java.cfg.ClientJavaElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.java.cfg.spi.ClientJavaElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -51,10 +51,10 @@ import org.apache.hc.core5.util.Timeout;
 /**
  * @author Gunnar Morling
  */
-public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
+public class ClientJavaElasticsearchClientFactory implements ElasticsearchClientFactory {
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends Rest5Client>> CLIENT_INSTANCE =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
+			ConfigurationProperty.forKey( ClientJavaElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( Rest5Client.class )
 					.build();
 
@@ -132,7 +132,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final OptionalConfigurationProperty<
 			BeanReference<? extends ElasticsearchHttpClientConfigurer>> CLIENT_CONFIGURER =
-					ConfigurationProperty.forKey( ElasticsearchBackendClientSettings.CLIENT_CONFIGURER )
+					ConfigurationProperty.forKey( ClientJavaElasticsearchBackendClientSettings.CLIENT_CONFIGURER )
 							.asBeanReference( ElasticsearchHttpClientConfigurer.class )
 							.build();
 
@@ -147,7 +147,6 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			SimpleScheduledExecutor timeoutExecutorService,
 			GsonProvider gsonProvider) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
-		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
 		Optional<BeanHolder<? extends Rest5Client>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
 				propertySource, beanResolver::resolve );
@@ -166,9 +165,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			sniffer = createSniffer( propertySource, restClientHolder.get(), hosts );
 		}
 
-		return new ElasticsearchClientImpl(
+		return new ClientJavaElasticsearchClient(
 				restClientHolder, sniffer, timeoutExecutorService,
-				requestTimeoutMs, connectionTimeoutMs,
+				requestTimeoutMs,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
 		);
 	}
@@ -301,8 +300,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			builder.setKeepAliveStrategy( new CustomConnectionKeepAliveStrategy( maxKeepAlive.get() ) );
 		}
 
-		ElasticsearchHttpClientConfigurationContextImpl clientConfigurationContext =
-				new ElasticsearchHttpClientConfigurationContextImpl( beanResolver, propertySource, builder );
+		ClientJavaElasticsearchHttpClientConfigurationContext clientConfigurationContext =
+				new ClientJavaElasticsearchHttpClientConfigurationContext( beanResolver, propertySource, builder );
 
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( clientConfigurationContext );

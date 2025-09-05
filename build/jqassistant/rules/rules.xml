@@ -282,6 +282,10 @@
                         WHEN 'hibernate-search-mapper-orm-outbox-polling' THEN 'OutboxPolling'
                         WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
                         WHEN 'hibernate-search-processor' THEN 'Processor'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-common' THEN 'ClientCommon'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-rest' THEN 'ClientRest'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-java' THEN 'ClientJava'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-opensearch' THEN 'ClientOpenSearch'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END
             RETURN
@@ -292,11 +296,14 @@
     <constraint id="hsearch:PublicTypesMayNotExposeInternalTypes">
         <requiresConcept refId="hsearch:Public" />
         <requiresConcept refId="hsearch:Impl" />
+        <requiresConcept refId="hsearch:SuppressJQAssistant" />
         <description>API/SPI types must not expose internal types.</description>
         <cypher><![CDATA[
             // supertypes
             MATCH
                 (type:Type:Public)-[:EXTENDS|IMPLEMENTS]->(superType:Type:Impl)
+            WHERE
+                NOT type:SuppressJQAssistant
             RETURN
                 type AS ExposingSite, superType.fqn AS ExposedType
 
@@ -306,6 +313,7 @@
                 (type:Type:Public)-[:DECLARES]->(method)-[:RETURNS]->(returnType:Type:Impl)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
+                AND NOT type:SuppressJQAssistant
             RETURN
                 ( method.signature + " (in " + type.fqn + ")" ) AS ExposingSite, returnType.fqn AS ExposedType
 
@@ -315,6 +323,7 @@
                 (type:Type:Public)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parameterType:Type:Impl)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
+                AND NOT type:SuppressJQAssistant
             RETURN
                 ( method.signature + " (in " + type.fqn + ")" ) AS ExposingSite, parameterType.fqn AS ExposedType
 
@@ -324,6 +333,7 @@
                 (type:Type:Public)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldType:Type:Impl)
             WHERE
                 (field.visibility="public" OR field.visibility="protected")
+                AND NOT type:SuppressJQAssistant
             RETURN
                 ( field.signature + " (in " + type.fqn + ")" ) AS ExposingSite, fieldType.fqn AS ExposedType
         ]]></cypher>
@@ -346,6 +356,7 @@
             - or the name of the declaring type ends with 'ConfigurationPropertySource'.
             - or the name of the declaring type ends with: 'ScrollableResultsAdapter'.
             - or the name of the declaring type ends with: '_$bundle'.
+            - or the name of the declaring type ends with: '_$logger'.
         </description>
         <cypher><![CDATA[
             MATCH
@@ -362,6 +373,7 @@
                 AND NOT type.name ENDS WITH "ConfigurationPropertySource"
                 AND NOT type.name ENDS WITH "ScrollableResultsAdapter"
                 AND NOT type.name ENDS WITH "_$bundle"
+                AND NOT type.name ENDS WITH "_$logger"
                 AND NOT type:SuppressJQAssistant
                 AND NOT type:e
             RETURN

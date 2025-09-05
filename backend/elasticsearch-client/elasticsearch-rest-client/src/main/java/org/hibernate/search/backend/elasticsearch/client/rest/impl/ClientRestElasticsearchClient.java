@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.java.impl;
+package org.hibernate.search.backend.elasticsearch.client.rest.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +11,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -34,22 +33,20 @@ import org.hibernate.search.util.common.impl.Futures;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import co.elastic.clients.transport.rest5_client.low_level.Request;
-import co.elastic.clients.transport.rest5_client.low_level.RequestOptions;
-import co.elastic.clients.transport.rest5_client.low_level.Response;
-import co.elastic.clients.transport.rest5_client.low_level.ResponseException;
-import co.elastic.clients.transport.rest5_client.low_level.ResponseListener;
-import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
-import co.elastic.clients.transport.rest5_client.low_level.sniffer.Sniffer;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.impl.EnglishReasonPhraseCatalog;
-import org.apache.hc.core5.util.Timeout;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.entity.ContentType;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.ResponseListener;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.Sniffer;
 
-public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
+public class ClientRestElasticsearchClient implements ElasticsearchClientImplementor {
 
-	private final BeanHolder<? extends Rest5Client> restClientHolder;
+	private final BeanHolder<? extends RestClient> restClientHolder;
 
 	private final Sniffer sniffer;
 
@@ -61,7 +58,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	ElasticsearchClientImpl(BeanHolder<? extends Rest5Client> restClientHolder, Sniffer sniffer,
+	ClientRestElasticsearchClient(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
 			SimpleScheduledExecutor timeoutExecutorService,
 			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {
@@ -88,10 +85,10 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> clientClass) {
-		if ( Rest5Client.class.isAssignableFrom( clientClass ) ) {
+		if ( RestClient.class.isAssignableFrom( clientClass ) ) {
 			return (T) restClientHolder.get();
 		}
-		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, Rest5Client.class );
+		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, RestClient.class );
 	}
 
 	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
@@ -185,10 +182,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		long timeToHardTimeout = deadline.checkRemainingTimeMillis();
 
 		// set a per-request socket timeout
-		int generalRequestTimeoutMs = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;
+		int socketTimeoutMs = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;
 		RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectionRequestTimeout( Timeout.DISABLED ) //Disable lease handling for the connection pool! See also HSEARCH-2681
-				.setResponseTimeout( generalRequestTimeoutMs, TimeUnit.MILLISECONDS )
+				.setConnectionRequestTimeout( 0 ) //Disable lease handling for the connection pool! See also HSEARCH-2681
+				.setSocketTimeout( socketTimeoutMs )
+				.setConnectTimeout( connectionTimeoutMs )
 				.build();
 
 		RequestOptions.Builder requestOptions = RequestOptions.DEFAULT.toBuilder()
@@ -198,19 +196,17 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private ElasticsearchResponse convertResponse(Response response) {
-		String reason = EnglishReasonPhraseCatalog.INSTANCE.getReason( response.getStatusCode(), Locale.ENGLISH );
 		try {
-
 			JsonObject body = parseBody( response );
 			return new ElasticsearchResponse(
 					response.getHost().toHostString(),
-					response.getStatusCode(),
-					reason,
+					response.getStatusLine().getStatusCode(),
+					response.getStatusLine().getReasonPhrase(),
 					body );
 		}
 		catch (IOException | RuntimeException e) {
-			throw ElasticsearchClientLog.INSTANCE.failedToParseElasticsearchResponse( response.getStatusCode(),
-					reason, e.getMessage(), e );
+			throw ElasticsearchClientLog.INSTANCE.failedToParseElasticsearchResponse( response.getStatusLine().getStatusCode(),
+					response.getStatusLine().getReasonPhrase(), e.getMessage(), e );
 		}
 	}
 
@@ -228,7 +224,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private static Charset getCharset(HttpEntity entity) {
-		ContentType contentType = ContentType.parse( entity.getContentType() );
+		ContentType contentType = ContentType.get( entity );
 		Charset charset = contentType.getCharset();
 		return charset != null ? charset : StandardCharsets.UTF_8;
 	}

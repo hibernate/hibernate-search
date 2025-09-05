@@ -46,9 +46,9 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.rest.cfg.ElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest.cfg.spi.ElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest.cfg.spi.ClientRestElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest.impl.ClientRestElasticsearchClientFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
@@ -112,7 +112,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
-class ElasticsearchClientFactoryImplIT {
+class ClientRestElasticsearchClientFactoryIT {
 
 	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
 	// even though no delay was configured.
@@ -135,7 +135,7 @@ class ElasticsearchClientFactoryImplIT {
 	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
-			BeanHolder.of( new EmbeddedThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " ) ) );
+			BeanHolder.of( new EmbeddedThreadProvider( ClientRestElasticsearchClientFactoryIT.class.getName() + ": " ) ) );
 
 	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
@@ -192,7 +192,7 @@ class ElasticsearchClientFactoryImplIT {
 		HttpResponseInterceptor responseInterceptor = spy( HttpResponseInterceptor.class );
 
 		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
-				ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+				ClientRestElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 				(org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer) context -> context
 						.clientBuilder()
 						.addInterceptorFirst( responseInterceptor )
@@ -1013,7 +1013,7 @@ class ElasticsearchClientFactoryImplIT {
 							.withBody( responseBody ) ) );
 
 			try ( ElasticsearchClientImplementor client = createClient( properties -> {
-				properties.accept( ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
+				properties.accept( ClientRestElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
 						BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
 				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -1069,7 +1069,7 @@ class ElasticsearchClientFactoryImplIT {
 		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
 			properties.accept(
-					ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+					ClientRestElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 					(org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer) context -> {
 						context.clientBuilder().setConnectionManager( createPoolManager( usedConnections ) );
 					}
@@ -1172,7 +1172,7 @@ class ElasticsearchClientFactoryImplIT {
 				AllAwareConfigurationPropertySource.fromMap( beanResolverConfiguration )
 
 		);
-		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
+		return new ClientRestElasticsearchClientFactory().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
 				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
 				GsonProvider.create( GsonBuilder::new, true )
