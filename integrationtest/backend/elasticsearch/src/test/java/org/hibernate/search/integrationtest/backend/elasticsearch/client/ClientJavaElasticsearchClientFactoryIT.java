@@ -48,11 +48,11 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.ElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.spi.ElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.opensearch.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.java.cfg.ClientJavaElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.java.cfg.spi.ClientJavaElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.java.impl.ClientJavaElasticsearchClientFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -91,6 +91,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
@@ -114,11 +115,10 @@ import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.opensearch.client.RestClient;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
-class ElasticsearchClientFactoryImplOpensearchIT {
+class ClientJavaElasticsearchClientFactoryIT {
 
 	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
 	// even though no delay was configured.
@@ -141,7 +141,8 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
-			BeanHolder.of( new EmbeddedThreadProvider( ElasticsearchClientFactoryImplOpensearchIT.class.getName() + ": " ) ) );
+			BeanHolder.of(
+					new EmbeddedThreadProvider( ClientJavaElasticsearchClientFactoryIT.class.getName() + ": " ) ) );
 
 	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
@@ -198,7 +199,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 		HttpResponseInterceptor responseInterceptor = spy( HttpResponseInterceptor.class );
 
 		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
-				ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+				ClientJavaElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 				(ElasticsearchHttpClientConfigurer) context -> context
 						.clientBuilder()
 						.addResponseInterceptorFirst( responseInterceptor )
@@ -626,7 +627,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
 
 			wireMockRule1.resetRequests();
 			wireMockRule2.resetRequests();
@@ -875,6 +876,11 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 		String payload = "{ \"foo\": \"bar\" }";
 
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 401 )
+						.withHeader( "www-authenticate", "Basic realm=\"IT Realm\"" ) ) );
+
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
 				.withBasicAuth( username, password )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
@@ -894,7 +900,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	void authentication_error() {
 		String payload = "{ \"foo\": \"bar\" }";
-		String statusMessage = "StatusMessageUnauthorized";
+		String statusMessage = "Unauthorized";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
@@ -1007,7 +1013,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 
 	@RetryExtension.TestWithRetry
 	void clientInstance() throws IOException, URISyntaxException {
-		try ( RestClient myRestClient = RestClient.builder( HttpHost.create( httpUrisFor( wireMockRule1 ) ) ).build() ) {
+		try ( Rest5Client myRestClient = Rest5Client.builder( HttpHost.create( httpUrisFor( wireMockRule1 ) ) ).build() ) {
 			String payload = "{ \"foo\": \"bar\" }";
 			String statusMessage = "OK";
 			String responseBody = "{ \"foo\": \"bar\" }";
@@ -1019,7 +1025,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 							.withBody( responseBody ) ) );
 
 			try ( ElasticsearchClientImplementor client = createClient( properties -> {
-				properties.accept( ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
+				properties.accept( ClientJavaElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
 						BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
 				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -1034,7 +1040,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 			}
 
 			// Hibernate Search must not close provided client instances
-			assertThat( myRestClient ).returns( true, RestClient::isRunning );
+			assertThat( myRestClient ).returns( true, Rest5Client::isRunning );
 		}
 	}
 
@@ -1076,7 +1082,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
 			properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, time );
 			properties.accept(
-					ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+					ClientJavaElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 					(ElasticsearchHttpClientConfigurer) context -> {
 						context.clientBuilder()
 								.setConnectionManager( createPoolManager( usedConnections, connections, connections ) );
@@ -1211,7 +1217,7 @@ class ElasticsearchClientFactoryImplOpensearchIT {
 				AllAwareConfigurationPropertySource.fromMap( beanResolverConfiguration )
 
 		);
-		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
+		return new ClientJavaElasticsearchClientFactory().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
 				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
 				GsonProvider.create( GsonBuilder::new, true )
