@@ -57,12 +57,15 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 		@Override
 		public K extract(AggregationExtractContext context) {
-			Long collector = context.getCollectorResults( collectorKey );
+			Long aggregatedSum = context.getCollectorResults( collectorKey );
+			if ( aggregatedSum == null ) {
+				return null;
+			}
 			Long counts = context.getCollectorResults( countCollectorKey );
-			Double avg = ( (double) collector / counts );
-			collector = NumberUtils.toLong( avg );
+			Double avg = ( (double) aggregatedSum / counts );
+			aggregatedSum = NumberUtils.toLong( avg );
 
-			E e = codec.getDomain().sortedDocValueToTerm( collector );
+			E e = codec.getDomain().sortedDocValueToTerm( aggregatedSum );
 			F decode = codec.decode( e );
 			return fromFieldValueConverter.fromDocumentValue( decode, context.fromDocumentValueConvertContext() );
 		}
@@ -103,9 +106,13 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 		@Override
 		public Double extract(AggregationExtractContext context) {
-			double collector = codec.sortedDocValueToDouble( context.getCollectorResults( collectorKey ) );
+			Long aggregatedSum = context.getCollectorResults( collectorKey );
+			if ( aggregatedSum == null ) {
+				return null;
+			}
+			double docValueSum = codec.sortedDocValueToDouble( aggregatedSum );
 			Long counts = context.getCollectorResults( countCollectorKey );
-			return ( collector / counts );
+			return ( docValueSum / counts );
 		}
 
 		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {
@@ -139,11 +146,14 @@ public class LuceneAvgNumericFieldAggregation<F, E extends Number, K>
 
 		@Override
 		public E extract(AggregationExtractContext context) {
-			Long collector = context.getCollectorResults( collectorKey );
+			Long aggregatedSum = context.getCollectorResults( collectorKey );
+			if ( aggregatedSum == null ) {
+				return null;
+			}
 			Long counts = context.getCollectorResults( countCollectorKey );
-			Double avg = ( (double) collector / counts );
-			collector = NumberUtils.toLong( avg );
-			return codec.getDomain().sortedDocValueToTerm( collector );
+			Double avg = ( (double) aggregatedSum / counts );
+			aggregatedSum = NumberUtils.toLong( avg );
+			return codec.getDomain().sortedDocValueToTerm( aggregatedSum );
 		}
 
 		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {

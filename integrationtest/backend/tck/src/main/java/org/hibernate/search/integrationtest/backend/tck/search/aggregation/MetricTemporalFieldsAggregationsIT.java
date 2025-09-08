@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Objects;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -22,6 +23,7 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -81,6 +83,35 @@ class MetricTemporalFieldsAggregationsIT {
 		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 5 );
 		assertThat( result.aggregation( avgDates ) ).isEqualTo( LocalDate.of( 2016, Month.DECEMBER, 10 ) );
 		assertThat( result.aggregation( avgConverted ) ).isEqualTo( "2016-12-10" );
+	}
+
+	@Test
+	void test_filteringNoResults() {
+		StubMappingScope scope = mainIndex.createScope();
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
+				.where( f -> f.match().field( "style" ).matching( "foobar" ) );
+		SearchQuery<DocumentReference> query = defineAggregations( options );
+
+		SearchResult<DocumentReference> result = query.fetch( 0 );
+		assertThat( result.aggregation( sumDates ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( LocalDate.class ) );
+		assertThat( result.aggregation( sumConverted ) )
+				.isEqualTo( Objects.toString(
+						TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( LocalDate.class ), null ) );
+		assertThat( result.aggregation( sumConvertedNoConversion ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( LocalDate.class ) );
+		assertThat( result.aggregation( sumFiltered ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( LocalDate.class ) );
+		assertThat( result.aggregation( minDates ) ).isNull();
+		assertThat( result.aggregation( minConverted ) ).isNull();
+		assertThat( result.aggregation( maxDates ) ).isNull();
+		assertThat( result.aggregation( maxConverted ) ).isNull();
+		assertThat( result.aggregation( countDates ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countConverted ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countDistinctDates ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( avgDates ) ).isNull();
+		assertThat( result.aggregation( avgConverted ) ).isNull();
 	}
 
 	@Test
@@ -165,7 +196,8 @@ class MetricTemporalFieldsAggregationsIT {
 		IndexBinding(IndexSchemaElement root) {
 			date = root.field( "date", f -> f.asLocalDate().aggregable( Aggregable.YES ) ).toReference();
 			converted = root.field( "converted", f -> f.asLocalDate().aggregable( Aggregable.YES )
-					.projectionConverter( String.class, (value, context) -> value.toString() ) ).toReference();
+					.projectionConverter( String.class, (value, context) -> value == null ? null : value.toString() ) )
+					.toReference();
 			style = root.field( "style", f -> f.asString() ).toReference();
 
 			IndexSchemaObjectField nested = root.objectField( "object", ObjectStructure.NESTED );
