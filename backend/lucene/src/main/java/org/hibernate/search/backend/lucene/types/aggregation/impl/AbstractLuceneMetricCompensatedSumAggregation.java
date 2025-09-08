@@ -124,7 +124,7 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 
 		@Override
 		Double convert(E extracted, FromDocumentValueConvertContext context) {
-			return extracted.doubleValue();
+			return extracted == null ? null : extracted.doubleValue();
 		}
 	}
 
@@ -137,7 +137,7 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 
 		@Override
 		T convert(E extracted, FromDocumentValueConvertContext context) {
-			return projectionConverter.fromDocumentValue( extracted, context );
+			return extracted == null ? null : projectionConverter.fromDocumentValue( extracted, context );
 		}
 	}
 
@@ -153,7 +153,7 @@ public abstract class AbstractLuceneMetricCompensatedSumAggregation<F, E extends
 
 		@Override
 		T convert(E extracted, FromDocumentValueConvertContext context) {
-			return projectionConverter.fromDocumentValue( codec.decode( extracted ), context );
+			return extracted == null ? null : projectionConverter.fromDocumentValue( codec.decode( extracted ), context );
 		}
 	}
 
