@@ -527,4 +527,31 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		values.add( null );
 		return collector.finish( collector.accumulateAll( collector.createInitial(), values ) );
 	}
+
+	@SuppressWarnings("unchecked") // because we ... did the equals check
+	@Override
+	public <T> T aggregatedSumNullValue(Class<T> clazz) {
+		if ( String.class.equals( clazz ) ) {
+			return (T) "0";
+		}
+		if ( Integer.class.equals( clazz ) ) {
+			return (T) Integer.valueOf( 0 );
+		}
+		if ( Float.class.equals( clazz ) ) {
+			return (T) Float.valueOf( 0.0f );
+		}
+		if ( Double.class.equals( clazz ) ) {
+			return (T) Double.valueOf( 0.0 );
+		}
+		if ( BigInteger.class.equals( clazz ) ) {
+			return (T) BigInteger.ZERO;
+		}
+		if ( BigDecimal.class.equals( clazz ) ) {
+			return (T) BigDecimal.ZERO.setScale( 2 );
+		}
+		if ( LocalDate.class.equals( clazz ) ) {
+			return (T) LocalDate.of( 1970, 1, 1 );
+		}
+		return super.aggregatedSumNullValue( clazz );
+	}
 }

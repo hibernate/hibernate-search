@@ -26,6 +26,7 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -149,6 +150,71 @@ class MetricNumericFieldsAggregationsIT {
 	}
 
 	@Test
+	void test_filteringNoResults() {
+		StubMappingScope scope = mainIndex.createScope();
+		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
+				.where( f -> f.match().field( "style" ).matching( "foobar" ) );
+		SearchQuery<DocumentReference> query = defineAggregations( options );
+
+		SearchResult<DocumentReference> result = query.fetch( 0 );
+		assertThat( result.aggregation( sumIntegers ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Integer.class ) );
+		assertThat( result.aggregation( sumIntegersAsString ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( String.class ) );
+		assertThat( result.aggregation( sumConverted ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( String.class ) );
+		assertThat( result.aggregation( sumConvertedNoConversion ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Integer.class ) );
+		assertThat( result.aggregation( sumFiltered ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Integer.class ) );
+		assertThat( result.aggregation( minIntegers ) ).isNull();
+		assertThat( result.aggregation( minIntegersAsString ) ).isNull();
+		assertThat( result.aggregation( minConverted ) ).isNull();
+		assertThat( result.aggregation( maxIntegers ) ).isNull();
+		assertThat( result.aggregation( maxIntegersAsString ) ).isNull();
+		assertThat( result.aggregation( maxConverted ) ).isNull();
+		assertThat( result.aggregation( countIntegers ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countConverted ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countDistinctIntegers ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countDistinctConverted ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( avgIntegers ) ).isNull();
+		assertThat( result.aggregation( avgIntegersAsString ) ).isNull();
+		assertThat( result.aggregation( avgConverted ) ).isNull();
+		assertThat( result.aggregation( avgIntegersAsDouble ) ).isNull();
+		assertThat( result.aggregation( avgIntegersAsDoubleRaw ) ).isNull();
+		assertThat( result.aggregation( avgIntegersAsDoubleFiltered ) ).isNull();
+		assertThat( result.aggregation( sumDoubles ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Double.class ) );
+		assertThat( result.aggregation( sumDoublesRaw ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Double.class ) );
+		assertThat( result.aggregation( sumFloats ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Float.class ) );
+		assertThat( result.aggregation( sumBigIntegers ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( BigInteger.class ) );
+		assertThat( result.aggregation( sumBigDecimals ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( BigDecimal.class ) );
+		assertThat( result.aggregation( avgDoubles ) ).isNull();
+		assertThat( result.aggregation( avgFloats ) ).isNull();
+		assertThat( result.aggregation( avgBigIntegers ) ).isNull();
+		assertThat( result.aggregation( avgBigDecimals ) ).isNull();
+		assertThat( result.aggregation( countDocuments ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countValuesIntegerMultiValued ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countDistinctValuesIntegerMultiValued ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countValuesNestedIntegerMultiValued ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( countDistinctValuesNestedIntegerMultiValued ) ).isEqualTo( 0 );
+		assertThat( result.aggregation( sumNestedIntegerMultiValued ) )
+				.isEqualTo( TckConfiguration.get().getBackendFeatures().aggregatedSumNullValue( Integer.class ) );
+		assertThat( result.aggregation( rangeWithNested ) ).containsExactly(
+				entry( Range.canonical( -100, 2 ), List.of( 0L, 0L, 0L ) ),
+				entry( Range.canonical( 2, 100 ), List.of( 0L, 0L, 0L ) )
+		);
+		assertThat( result.aggregation( rangeOnNested ) ).containsExactly(
+				entry( Range.canonical( -100, 2 ), List.of( 0L, 0L, 0L ) ),
+				entry( Range.canonical( 2, 100 ), List.of( 0L, 0L, 0L ) )
+		);
+	}
+
+	@Test
 	void test_allResults() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQueryOptionsStep<?, ?, DocumentReference, StubLoadingOptionsStep, ?, ?> options = scope.query()
@@ -258,7 +324,8 @@ class MetricNumericFieldsAggregationsIT {
 								.range( -100, 2 )
 								.range( 2, 100 )
 								.value( f.composite()
-										.from( f.count().documents(), f.count().field( "integer" ),
+										.from( f.count().documents(),
+												f.count().field( "integer" ),
 												f.count().field( "object.nestedIntegerMultiValued" ) )
 										.asList() ) )
 				.aggregation(
@@ -266,7 +333,8 @@ class MetricNumericFieldsAggregationsIT {
 								.range( -100, 2 )
 								.range( 2, 100 )
 								.value( f.composite()
-										.from( f.count().documents(), f.count().field( "integer" ),
+										.from( f.count().documents(),
+												f.count().field( "integer" ),
 												f.count().field( "object.nestedIntegerMultiValued" ) )
 										.asList() ) )
 				.toQuery();
@@ -325,7 +393,8 @@ class MetricNumericFieldsAggregationsIT {
 			integerMultiValued = root.field( "integerMultiValued", f -> f.asInteger().aggregable( Aggregable.YES ) )
 					.multiValued().toReference();
 			converted = root.field( "converted", f -> f.asInteger().aggregable( Aggregable.YES )
-					.projectionConverter( String.class, (value, context) -> value.toString() ) ).toReference();
+					.projectionConverter( String.class, (value, context) -> value == null ? null : value.toString() ) )
+					.toReference();
 			doubleF = root.field( "doubleF", f -> f.asDouble().aggregable( Aggregable.YES ) ).toReference();
 			floatF = root.field( "floatF", f -> f.asFloat().aggregable( Aggregable.YES ) ).toReference();
 			bigInteger = root.field( "bigInteger", f -> f.asBigInteger().decimalScale( 0 ).aggregable( Aggregable.YES ) )

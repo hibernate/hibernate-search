@@ -37,6 +37,9 @@ public class LuceneSumCompensatedSumAggregation<F, E extends Number, K>
 	@Override
 	E extractEncoded(AggregationExtractContext context, LuceneNumericDomain<E> numericDomain) {
 		Double sum = context.getCollectorResults( compensatedSumCollectorKey );
+		if ( sum == null ) {
+			return null;
+		}
 		return numericDomain.doubleToTerm( sum );
 	}
 
