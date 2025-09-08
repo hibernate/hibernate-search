@@ -71,11 +71,13 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 		@Override
 		public K extract(AggregationExtractContext context) {
-			Long collector = context.getCollectorResults( collectorKey );
-
-			E e = codec.getDomain().sortedDocValueToTerm( collector );
-			F decode = codec.decode( e );
-			return fromFieldValueConverter.fromDocumentValue( decode, context.fromDocumentValueConvertContext() );
+			Long aggregatedValue = context.getCollectorResults( collectorKey );
+			if ( aggregatedValue == null ) {
+				return null;
+			}
+			E e = codec.getDomain().sortedDocValueToTerm( aggregatedValue );
+			F decoded = codec.decode( e );
+			return fromFieldValueConverter.fromDocumentValue( decoded, context.fromDocumentValueConvertContext() );
 		}
 
 		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {
@@ -110,9 +112,12 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 
 		@Override
 		public Double extract(AggregationExtractContext context) {
-			Long collector = context.getCollectorResults( collectorKey );
+			Long aggregatedValue = context.getCollectorResults( collectorKey );
+			if ( aggregatedValue == null ) {
+				return null;
+			}
 
-			return codec.sortedDocValueToDouble( collector );
+			return codec.sortedDocValueToDouble( aggregatedValue );
 		}
 
 		private static class Builder<F, E extends Number> extends AbstractExtractorBuilder<F, E, Double> {
@@ -142,8 +147,11 @@ public abstract class AbstractLuceneMetricNumericFieldAggregation<F, E extends N
 		@SuppressWarnings("unchecked")
 		@Override
 		public K extract(AggregationExtractContext context) {
-			Long collector = context.getCollectorResults( collectorKey );
-			return (K) numericDomain.sortedDocValueToTerm( collector );
+			Long aggregatedValue = context.getCollectorResults( collectorKey );
+			if ( aggregatedValue == null ) {
+				return null;
+			}
+			return (K) numericDomain.sortedDocValueToTerm( aggregatedValue );
 		}
 
 		private static class Builder<F, E extends Number, K> extends AbstractExtractorBuilder<F, E, K> {

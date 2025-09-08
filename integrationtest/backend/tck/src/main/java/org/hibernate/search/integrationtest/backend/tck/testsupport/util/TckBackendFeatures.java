@@ -222,4 +222,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public <U, R> R accumulatedNullValue(ProjectionCollector.Provider<U, R> collector) {
 		return collector.get().empty();
 	}
+
+	public <T> T aggregatedSumNullValue(Class<T> clazz) {
+		return null;
+	}
 }
