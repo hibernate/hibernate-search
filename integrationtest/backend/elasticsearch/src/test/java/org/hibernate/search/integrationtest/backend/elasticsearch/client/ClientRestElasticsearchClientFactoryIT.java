@@ -419,8 +419,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" );
-						properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "99999" );
+						properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
+						properties.accept( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "99999" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -447,8 +447,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "99999" );
-						properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "1000" );
+						properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "99999" );
+						properties.accept( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -483,8 +483,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -520,8 +520,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -652,7 +652,7 @@ class ClientRestElasticsearchClientFactoryIT {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 					// Use a timeout much higher than 1s, because wiremock can be really slow...
-					properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -749,8 +749,8 @@ class ClientRestElasticsearchClientFactoryIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -805,8 +805,8 @@ class ClientRestElasticsearchClientFactoryIT {
 				properties -> {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ElasticsearchBackendClientCommonSettings.PROTOCOL, "https" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			/*
@@ -1036,7 +1036,7 @@ class ClientRestElasticsearchClientFactoryIT {
 	void maxKeepAliveNegativeValue() {
 		assertThatThrownBy( () -> createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, -1 );
+					properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, -1 );
 				}
 		) ).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -1074,7 +1074,7 @@ class ClientRestElasticsearchClientFactoryIT {
 						context.clientBuilder().setConnectionManager( createPoolManager( usedConnections ) );
 					}
 			);
-			properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, time );
+			properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, time );
 		} ) ) {
 
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
