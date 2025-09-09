@@ -157,7 +157,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to no request timeout.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#REQUEST_TIMEOUT} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#REQUEST_TIMEOUT} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String REQUEST_TIMEOUT = "request_timeout";
@@ -170,7 +170,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#READ_TIMEOUT}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#READ_TIMEOUT} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#READ_TIMEOUT} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String READ_TIMEOUT = "read_timeout";
@@ -183,7 +183,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#CONNECTION_TIMEOUT} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#CONNECTION_TIMEOUT} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String CONNECTION_TIMEOUT = "connection_timeout";
@@ -197,7 +197,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#MAX_CONNECTIONS} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#MAX_CONNECTIONS} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_CONNECTIONS = "max_connections";
@@ -210,7 +210,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#MAX_CONNECTIONS_PER_ROUTE} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#MAX_CONNECTIONS_PER_ROUTE} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
@@ -223,7 +223,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#DISCOVERY_ENABLED} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#DISCOVERY_ENABLED} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
@@ -236,7 +236,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#DISCOVERY_REFRESH_INTERVAL} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#DISCOVERY_REFRESH_INTERVAL} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
@@ -340,7 +340,7 @@ public final class ElasticsearchBackendSettings {
 	 * If this property is not set, only the {@code Keep-Alive} header is considered,
 	 * and if it's absent, idle connections will be kept forever.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#MAX_KEEP_ALIVE} instead.
+	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings#MAX_KEEP_ALIVE} instead.
 	 */
 	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_KEEP_ALIVE = "max_keep_alive";
@@ -386,32 +386,32 @@ public final class ElasticsearchBackendSettings {
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final String PATH_PREFIX = "";
 		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#READ_TIMEOUT} instead.
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#READ_TIMEOUT} instead.
 		 */
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int READ_TIMEOUT = 30000;
 		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#CONNECTION_TIMEOUT} instead.
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#CONNECTION_TIMEOUT} instead.
 		 */
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int CONNECTION_TIMEOUT = 1000;
 		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#MAX_CONNECTIONS} instead.
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#MAX_CONNECTIONS} instead.
 		 */
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int MAX_CONNECTIONS = 40;
 		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#MAX_CONNECTIONS_PER_ROUTE} instead.
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#MAX_CONNECTIONS_PER_ROUTE} instead.
 		 */
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int MAX_CONNECTIONS_PER_ROUTE = 20;
 		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#DISCOVERY_ENABLED} instead.
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#DISCOVERY_ENABLED} instead.
 		 */
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final boolean DISCOVERY_ENABLED = false;
 		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#DISCOVERY_REFRESH_INTERVAL} instead.
+		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#DISCOVERY_REFRESH_INTERVAL} instead.
 		 */
 		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
