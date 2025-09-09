@@ -316,6 +316,6 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 
 	@Override
 	public void releaseResources() {
-
+		close();
 	}
 }

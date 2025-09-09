@@ -14,6 +14,8 @@ import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonPro
 import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProvider;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.ClientOpenSearchElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.spi.ClientOpenSearchElasticsearchBackendClientSpiSettings;
@@ -185,8 +187,12 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 		RestClient client = null;
 		List<BeanReference<ElasticsearchHttpClientConfigurer>> httpClientConfigurerReferences =
 				beanResolver.allConfiguredForRole( ElasticsearchHttpClientConfigurer.class );
+		List<BeanReference<ElasticsearchRequestInterceptorProvider>> requestInterceptorProviderReferences =
+				beanResolver.allConfiguredForRole( ElasticsearchRequestInterceptorProvider.class );
 		try ( BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurersHolder =
-				beanResolver.resolve( httpClientConfigurerReferences ) ) {
+				beanResolver.resolve( httpClientConfigurerReferences );
+				BeanHolder<List<ElasticsearchRequestInterceptorProvider>> requestInterceptorProvidersHodler =
+						beanResolver.resolve( requestInterceptorProviderReferences ) ) {
 			client = builder
 					.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 					.setHttpClientConfigCallback(
@@ -194,7 +200,8 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 									b,
 									beanResolver, propertySource,
 									threadProvider, threadNamePrefix,
-									hosts, httpClientConfigurersHolder.get(), customConfig
+									hosts, httpClientConfigurersHolder.get(), requestInterceptorProvidersHodler.get(),
+									customConfig
 							)
 					)
 					.build();
@@ -242,6 +249,7 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 			BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ServerUris hosts, Iterable<ElasticsearchHttpClientConfigurer> configurers,
+			Iterable<ElasticsearchRequestInterceptorProvider> requestInterceptorProviders,
 			Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig) {
 		builder.setThreadFactory( threadProvider.createThreadFactory( threadNamePrefix + " - Transport thread" ) );
 
@@ -303,6 +311,13 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( clientConfigurationContext );
+		}
+		for ( ElasticsearchRequestInterceptorProvider interceptorProvider : requestInterceptorProviders ) {
+			Optional<ElasticsearchRequestInterceptor> requestInterceptor =
+					interceptorProvider.provide( clientConfigurationContext );
+			if ( requestInterceptor.isPresent() ) {
+				builder.addRequestInterceptorLast( new ClientOpenSearchHttpRequestInterceptor( requestInterceptor.get() ) );
+			}
 		}
 		if ( customConfig.isPresent() ) {
 			BeanHolder<? extends ElasticsearchHttpClientConfigurer> customConfigBeanHolder = customConfig.get();

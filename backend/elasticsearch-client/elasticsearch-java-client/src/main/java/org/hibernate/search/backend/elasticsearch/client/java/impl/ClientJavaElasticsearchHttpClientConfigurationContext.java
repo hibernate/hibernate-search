@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.java.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProviderContext;
 import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -11,7 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 
 final class ClientJavaElasticsearchHttpClientConfigurationContext
-		implements ElasticsearchHttpClientConfigurationContext {
+		implements ElasticsearchHttpClientConfigurationContext, ElasticsearchRequestInterceptorProviderContext {
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource configurationPropertySource;
 	private final HttpAsyncClientBuilder clientBuilder;
