@@ -8,13 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+
 
 final class HttpAsyncEntityProducerInputStream extends InputStream {
-	private final GsonHttpEntity entityProducer;
+	private final AsyncEntityProducer entityProducer;
 	private final ByteBuffer buffer;
 	private final ByteBufferDataStreamChannel contentEncoder;
 
-	public HttpAsyncEntityProducerInputStream(GsonHttpEntity entityProducer, int bufferSize) {
+	public HttpAsyncEntityProducerInputStream(AsyncEntityProducer entityProducer, int bufferSize) {
 		this.entityProducer = entityProducer;
 		this.buffer = ByteBuffer.allocate( bufferSize );
 		this.buffer.limit( 0 );
@@ -51,8 +53,8 @@ final class HttpAsyncEntityProducerInputStream extends InputStream {
 	}
 
 	@Override
-	public void close() throws IOException {
-		entityProducer.close();
+	public void close() {
+		entityProducer.releaseResources();
 	}
 
 	private void writeToBuffer() throws IOException {

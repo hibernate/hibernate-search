@@ -9,15 +9,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
-import org.apache.http.HttpEntity;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorContext;
+
 import software.amazon.awssdk.http.ContentStreamProvider;
 
 public class HttpEntityContentStreamProvider implements ContentStreamProvider, Closeable {
-	private final HttpEntity entity;
+	private final ElasticsearchRequestInterceptorContext requestContext;
 	private InputStream previousStream;
 
-	public HttpEntityContentStreamProvider(HttpEntity entity) {
-		this.entity = entity;
+	public HttpEntityContentStreamProvider(ElasticsearchRequestInterceptorContext requestContext) {
+		this.requestContext = requestContext;
+	}
+
+	public static HttpEntityContentStreamProvider create(ElasticsearchRequestInterceptorContext requestContext) {
+		if ( requestContext.hasContent() ) {
+			return new HttpEntityContentStreamProvider( requestContext );
+		}
+		return null;
 	}
 
 	@Override
@@ -25,7 +33,7 @@ public class HttpEntityContentStreamProvider implements ContentStreamProvider, C
 		try {
 			// Believe it or not, the AWS SDK expects us to close previous streams ourselves...
 			close();
-			InputStream newStream = entity.getContent();
+			InputStream newStream = requestContext.content();
 			previousStream = newStream;
 			return newStream;
 		}
