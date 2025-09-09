@@ -62,7 +62,7 @@
                             <module>
                                 <moduleInfo>
                                     <exports combine.self="override">
-                                        org.hibernate.search.*.impl to org.hibernate.search.util.common, org.hibernate.search.engine, org.hibernate.search.backend.lucene, org.hibernate.search.backend.elasticsearch, org.hibernate.search.backend.elasticsearch.aws, org.hibernate.search.mapper.pojo, org.hibernate.search.mapper.pojo.standalone, org.hibernate.search.mapper.orm, org.hibernate.search.mapper.orm.outboxpolling, org.hibernate.search.jakarta.batch.core, org.jboss.logging;
+                                        org.hibernate.search.*.impl to org.hibernate.search.util.common, org.hibernate.search.engine, org.hibernate.search.backend.lucene, org.hibernate.search.backend.elasticsearch,org.hibernate.search.backend.elasticsearch.client.common, org.hibernate.search.backend.elasticsearch.client.rest, org.hibernate.search.backend.elasticsearch.client.opensearch, org.hibernate.search.backend.elasticsearch.client.java, org.hibernate.search.backend.elasticsearch.aws, org.hibernate.search.mapper.pojo, org.hibernate.search.mapper.pojo.standalone, org.hibernate.search.mapper.orm, org.hibernate.search.mapper.orm.outboxpolling, org.hibernate.search.jakarta.batch.core, org.jboss.logging;
                                         *;
                                     </exports>
                                 </moduleInfo>
