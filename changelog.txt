@@ -1,6 +1,18 @@
 Hibernate Search Changelog
 ==========================
 
+8.1.2.Final (2025-09-09)
+-------------------------
+
+** Bug
+    * HSEARCH-5471 NPE for aggregations that are expected to return null when no field values available
+
+** Improvement
+    * HSEARCH-5465 Upgrade Elasticsearch client to 9.1.3
+
+** Task
+    * HSEARCH-5466 Test against the latest Elasticsearch 9.1.3
+
 8.1.1.Final (2025-08-14)
 -------------------------
 
