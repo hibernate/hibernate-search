@@ -90,44 +90,44 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 					.build();
 
 	private static final OptionalConfigurationProperty<Integer> REQUEST_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.REQUEST_TIMEOUT )
 					.asIntegerStrictlyPositive()
 					.build();
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT )
 					.asIntegerPositiveOrZeroOrNegative()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.READ_TIMEOUT )
+					.withDefault( ClientOpenSearchElasticsearchBackendClientSettings.Defaults.READ_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> CONNECTION_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.CONNECTION_TIMEOUT )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.CONNECTION_TIMEOUT )
 					.asIntegerPositiveOrZeroOrNegative()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.CONNECTION_TIMEOUT )
+					.withDefault( ClientOpenSearchElasticsearchBackendClientSettings.Defaults.CONNECTION_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.MAX_CONNECTIONS )
 					.asIntegerStrictlyPositive()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.MAX_CONNECTIONS )
+					.withDefault( ClientOpenSearchElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION_PER_ROUTE =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE )
 					.asIntegerStrictlyPositive()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
+					.withDefault( ClientOpenSearchElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DISCOVERY_ENABLED =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.DISCOVERY_ENABLED )
 					.asBoolean()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.DISCOVERY_ENABLED )
+					.withDefault( ClientOpenSearchElasticsearchBackendClientSettings.Defaults.DISCOVERY_ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<Integer> DISCOVERY_REFRESH_INTERVAL =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL )
 					.asIntegerStrictlyPositive()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
+					.withDefault( ClientOpenSearchElasticsearchBackendClientSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
 	private static final OptionalConfigurationProperty<
@@ -137,7 +137,7 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 							.build();
 
 	private static final OptionalConfigurationProperty<Long> MAX_KEEP_ALIVE =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE )
+			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSettings.MAX_KEEP_ALIVE )
 					.asLongStrictlyPositive()
 					.build();
 
