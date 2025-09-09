@@ -426,8 +426,8 @@ class ClientJavaElasticsearchClientFactoryIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" );
-						properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "99999" );
+						properties.accept( ClientJavaElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
+						properties.accept( ClientJavaElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "99999" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -454,8 +454,8 @@ class ClientJavaElasticsearchClientFactoryIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "99999" );
-						properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "1000" );
+						properties.accept( ClientJavaElasticsearchBackendClientSettings.READ_TIMEOUT, "99999" );
+						properties.accept( ClientJavaElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -490,8 +490,8 @@ class ClientJavaElasticsearchClientFactoryIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -527,8 +527,8 @@ class ClientJavaElasticsearchClientFactoryIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -659,7 +659,7 @@ class ClientJavaElasticsearchClientFactoryIT {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 					// Use a timeout much higher than 1s, because wiremock can be really slow...
-					properties.accept( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -756,8 +756,8 @@ class ClientJavaElasticsearchClientFactoryIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -812,8 +812,8 @@ class ClientJavaElasticsearchClientFactoryIT {
 				properties -> {
 					properties.accept( ElasticsearchBackendClientCommonSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ElasticsearchBackendClientCommonSettings.PROTOCOL, "https" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ElasticsearchBackendClientCommonSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			/*
@@ -1048,7 +1048,7 @@ class ClientJavaElasticsearchClientFactoryIT {
 	void maxKeepAliveNegativeValue() {
 		assertThatThrownBy( () -> createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, -1 );
+					properties.accept( ClientJavaElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, -1 );
 				}
 		) ).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -1080,7 +1080,7 @@ class ClientJavaElasticsearchClientFactoryIT {
 
 		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
-			properties.accept( ElasticsearchBackendClientCommonSettings.MAX_KEEP_ALIVE, time );
+			properties.accept( ClientJavaElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, time );
 			properties.accept(
 					ClientJavaElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 					(ElasticsearchHttpClientConfigurer) context -> {
@@ -1315,27 +1315,27 @@ class ClientJavaElasticsearchClientFactoryIT {
 	}
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS )
+			ConfigurationProperty.forKey( ClientJavaElasticsearchBackendClientSettings.MAX_CONNECTIONS )
 					.asIntegerStrictlyPositive()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.MAX_CONNECTIONS )
+					.withDefault( ClientJavaElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION_PER_ROUTE =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.MAX_CONNECTIONS_PER_ROUTE )
+			ConfigurationProperty.forKey( ClientJavaElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE )
 					.asIntegerStrictlyPositive()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
+					.withDefault( ClientJavaElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
 					.build();
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.READ_TIMEOUT )
+			ConfigurationProperty.forKey( ClientJavaElasticsearchBackendClientSettings.READ_TIMEOUT )
 					.asIntegerPositiveOrZeroOrNegative()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.READ_TIMEOUT )
+					.withDefault( ClientJavaElasticsearchBackendClientSettings.Defaults.READ_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> CONNECTION_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.CONNECTION_TIMEOUT )
+			ConfigurationProperty.forKey( ClientJavaElasticsearchBackendClientSettings.CONNECTION_TIMEOUT )
 					.asIntegerPositiveOrZeroOrNegative()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.CONNECTION_TIMEOUT )
+					.withDefault( ClientJavaElasticsearchBackendClientSettings.Defaults.CONNECTION_TIMEOUT )
 					.build();
 
 	private static BeanConfigurer elasticsearchSslBeanConfigurer(ConfigurationPropertySource propertySource) {
