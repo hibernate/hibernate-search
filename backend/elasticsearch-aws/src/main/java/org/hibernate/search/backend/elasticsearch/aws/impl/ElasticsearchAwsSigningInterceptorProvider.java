@@ -5,14 +5,16 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
-import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProviderContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -23,7 +25,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
-public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
+public class ElasticsearchAwsSigningInterceptorProvider implements ElasticsearchRequestInterceptorProvider {
 	private static final Pattern DISTRIBUTION_NAME_PATTERN = Pattern.compile( "([^\\d]+)?(?:(?<=^)|(?=$)|(?<=.):(?=.))(.+)?" );
 	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
@@ -59,12 +61,12 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.build();
 
 	@Override
-	public void configure(ElasticsearchHttpClientConfigurationContext context) {
+	public Optional<ElasticsearchRequestInterceptor> provide(ElasticsearchRequestInterceptorProviderContext context) {
 		ConfigurationPropertySource propertySource = context.configurationPropertySource();
 
 		if ( !SIGNING_ENABLED.get( propertySource ) ) {
 			AwsLog.INSTANCE.signingDisabled();
-			return;
+			return Optional.empty();
 		}
 
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, AwsLog.INSTANCE::missingPropertyForSigning );
@@ -91,10 +93,10 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 
 		AwsLog.INSTANCE.signingEnabled( region, service, credentialsProvider );
 
-		AwsSigningRequestInterceptor signingInterceptor =
-				new AwsSigningRequestInterceptor( region, service, credentialsProvider );
+		ElasticsearchAwsSigningRequestInterceptor signingInterceptor =
+				new ElasticsearchAwsSigningRequestInterceptor( region, service, credentialsProvider );
 
-		context.clientBuilder().addInterceptorLast( signingInterceptor );
+		return Optional.of( signingInterceptor );
 	}
 
 	private AwsCredentialsProvider createCredentialsProvider(BeanResolver beanResolver,
