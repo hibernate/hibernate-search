@@ -502,6 +502,20 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
+        <resources>
+            <resource>
+                <!-- The default resource dir: -->
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <!-- Extra dir to include the license file: -->
+                <directory>${rootProject.directory}</directory>
+                <includes>
+                    <include>LICENSE.txt</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <!--
