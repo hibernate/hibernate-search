@@ -1153,7 +1153,7 @@
                         <violationSeverity>error</violationSeverity>
                         <includeTestResources>true</includeTestResources>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
+                        <resourceIncludes>${project.basedir}/**/*.xml,${project.basedir}/**/*.properties</resourceIncludes>
                         <!-- generated respectively copied code -->
                         <excludes>
                             **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
