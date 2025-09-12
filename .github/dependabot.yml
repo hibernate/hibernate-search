@@ -132,7 +132,7 @@ updates:
       # Enable updates after JDK 21 upgrade (as of jsonassert 1.5.2 it requires JDK 21)
       - dependency-name: "org.skyscreamer:jsonassert"
       - dependency-name: "org.eclipse.jdt:ecj"
-        versions: [ "3.42.0" ]
+        versions: [ "3.42.0", "3.43.0" ]
   - package-ecosystem: "docker"
     registries:
       - dockerhub
