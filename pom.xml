@@ -308,13 +308,13 @@
             We want to keep patch updates for groovy enabled as those may contain compatibility with a more recent JDK versions.
             e.g. 4.0.13 won't work with JDK 23, while 4.0.26 is working just fine.
          -->
-        <version.org.apache.groovy.groovy-jsr223>5.0.0</version.org.apache.groovy.groovy-jsr223>
+        <version.org.apache.groovy.groovy-jsr223>5.0.1</version.org.apache.groovy.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>11.0.1</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.19.0</version.versions.plugin>
-        <version.maven-wrapper-plugin>3.3.3</version.maven-wrapper-plugin>
+        <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
-        <version.gitflow-incremental-builder>4.5.5</version.gitflow-incremental-builder>
+        <version.gitflow-incremental-builder>4.5.6</version.gitflow-incremental-builder>
         <version.spotless-maven-plugin>2.46.1</version.spotless-maven-plugin>
         <version.maven-antrun-plugin>3.1.0</version.maven-antrun-plugin>
 
