@@ -18,9 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpHost;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -76,7 +75,7 @@ class BulkWorkTest {
 		responseBody.add( "items", items );
 		items.add( new JsonObject() );
 		items.add( new JsonObject() );
-		ElasticsearchResponse response = new ElasticsearchResponse( new HttpHost( "mockHost:9200" ),
+		ElasticsearchResponse response = new ElasticsearchResponse( "mockHost:9200",
 				200, "OK", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();
@@ -120,7 +119,7 @@ class BulkWorkTest {
 
 		JsonObject responseBody = new JsonObject();
 		responseBody.addProperty( "someProperty", "someValue" );
-		ElasticsearchResponse response = new ElasticsearchResponse( new HttpHost( "mockHost:9200" ),
+		ElasticsearchResponse response = new ElasticsearchResponse( "mockHost:9200",
 				500, "SomeStatus", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();

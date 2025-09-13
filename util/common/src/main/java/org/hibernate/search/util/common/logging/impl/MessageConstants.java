@@ -45,6 +45,9 @@ public final class MessageConstants {
 	public static final int BACKEND_ES_AWS_ID_RANGE_MIN = 409000;
 	public static final int BACKEND_ES_AWS_ID_RANGE_MAX = 409999;
 
+	public static final int BACKEND_ES_CLIENT_ID_RANGE_MIN = 410000;
+	public static final int BACKEND_ES_CLIENT_ID_RANGE_MAX = 418999;
+
 	public static final int JAKARTA_BATCH_CORE_ID_RANGE_MIN = 500000;
 	public static final int JAKARTA_BATCH_CORE_ID_RANGE_MAX = 508999;
 

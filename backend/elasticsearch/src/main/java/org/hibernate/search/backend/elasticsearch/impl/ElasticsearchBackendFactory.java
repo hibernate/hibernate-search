@@ -4,17 +4,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.common.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
@@ -36,7 +37,9 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -57,7 +60,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
-			ConfigurationProperty.forKey( ElasticsearchBackendImplSettings.CLIENT_FACTORY )
+			ConfigurationProperty.forKey( ElasticsearchBackendClientSpiSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
 					.build();
 
@@ -76,7 +79,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		 * vice-versa, it doesn't need a Gson instance that was specially
 		 * configured for a particular Elasticsearch version.
 		 */
-		GsonProvider defaultGsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
+		GsonProvider defaultGsonProvider = GsonProviderHelper.create( GsonBuilder::new, logPrettyPrinting );
 
 		Optional<ElasticsearchVersion> configuredVersion = ElasticsearchLinkImpl.VERSION.get( propertySource );
 
@@ -87,15 +90,52 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		try {
 			threads = new BackendThreads( eventContext.render() );
 
+			// First, let's see if the factory was configured explicitly:
 			Optional<BeanHolder<? extends ElasticsearchClientFactory>> customClientFactoryHolderOptional =
 					CLIENT_FACTORY.getAndMap( propertySource, beanResolver::resolve );
 			if ( customClientFactoryHolderOptional.isPresent() ) {
 				clientFactoryHolder = customClientFactoryHolderOptional.get();
-				ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext.render() );
 			}
 			else {
-				clientFactoryHolder = BeanHolder.of( new ElasticsearchClientFactoryImpl() );
+				// otherwise let's find all client factories and pick
+				List<BeanReference<ElasticsearchClientFactory>> clientFactoryReferences =
+						beanResolver.allConfiguredForRole( ElasticsearchClientFactory.class );
+				if ( clientFactoryReferences.isEmpty() ) {
+					throw ConfigurationLog.INSTANCE.backendClientFactoryNotConfigured( eventContext.render() );
+				}
+				// if there's just one -- use it:
+				else if ( clientFactoryReferences.size() == 1 ) {
+					clientFactoryHolder = clientFactoryReferences.get( 0 ).resolve( beanResolver );
+				}
+				// if there are 2 of them, maybe one is the "default" one, if so -- use the other one
+				else if ( clientFactoryReferences.size() == 2 ) {
+					try {
+						BeanHolder<ElasticsearchClientFactory> defaultFactory =
+								beanResolver.resolve( ElasticsearchClientFactory.class, "default", BeanRetrieval.BUILTIN );
+
+						BeanHolder<ElasticsearchClientFactory> first = clientFactoryReferences.get( 0 ).resolve( beanResolver );
+						BeanHolder<ElasticsearchClientFactory> second =
+								clientFactoryReferences.get( 1 ).resolve( beanResolver );
+						if ( first == defaultFactory ) {
+							clientFactoryHolder = second;
+						}
+						else if ( second == defaultFactory ) {
+							clientFactoryHolder = first;
+						}
+					}
+					catch (SearchException e) {
+						// ignore and fail later;
+					}
+				}
+				if ( clientFactoryHolder == null ) {
+					throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
+							clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) )
+									.toList(),
+							eventContext.render()
+					);
+				}
 			}
+			ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext.render() );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(

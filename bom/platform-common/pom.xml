@@ -35,6 +35,11 @@
         <version.bom.jakarta.transaction>2.0.1</version.bom.jakarta.transaction>
         <version.bom.jakarta.xml.bind>4.0.2</version.bom.jakarta.xml.bind>
         <version.bom.org.jberet>3.1.0.Final</version.bom.org.jberet>
+        <version.bom.org.apache.httpcomponents.client5>5.5</version.bom.org.apache.httpcomponents.client5>
+        <version.bom.org.apache.httpcomponents.core5>5.3.5</version.bom.org.apache.httpcomponents.core5>
+        <version.bom.org.apache.httpcomponents.httpclient>4.5.14</version.bom.org.apache.httpcomponents.httpclient>
+        <version.bom.org.apache.httpcomponents.httpcore>4.4.16</version.bom.org.apache.httpcomponents.httpcore>
+        <version.bom.org.apache.httpcomponents.httpasyncclient>4.1.5</version.bom.org.apache.httpcomponents.httpasyncclient>
     </properties>
 
     <dependencyManagement>
@@ -61,6 +66,26 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -600,6 +625,119 @@
                 <artifactId>third-party</artifactId>
                 <version>${version.bom.software.amazon.awssdk}</version>
             </dependency>
+
+            <!-- Apache HttpClient 5.x Dependencies -->
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5-cache</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.client5}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5-fluent</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.client5}</version>
+            </dependency>
+            <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.client5}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-h2</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.core5}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-reactive</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.core5}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.core5}</version>
+            </dependency>
+            <!-- Apache HttpClient 4.x Dependencies -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>fluent-hc</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient-cache</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpasyncclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient-osgi</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpasyncclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpasyncclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-cache</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-osgi</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-win</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcomponents-asyncclient</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpasyncclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcomponents-client</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcomponents-core</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-ab</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-nio</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-osgi</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -874,6 +1012,26 @@
                                             <groupId>org.apache.avro</groupId>
                                             <artifactId>avro-codegen-test</artifactId>
                                             <version>${version.bom.org.apache.avro}</version>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.apache.httpcomponents.core5</groupId>
+                                            <artifactId>httpcore5-parent</artifactId>
+                                            <version>${version.bom.org.apache.httpcomponents.core5}</version>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.apache.httpcomponents.core5</groupId>
+                                            <artifactId>httpcore5-testing</artifactId>
+                                            <version>${version.bom.org.apache.httpcomponents.core5}</version>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.apache.httpcomponents.client5</groupId>
+                                            <artifactId>httpclient5-parent</artifactId>
+                                            <version>${version.bom.org.apache.httpcomponents.client5}</version>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.apache.httpcomponents.client5</groupId>
+                                            <artifactId>httpclient5-testing</artifactId>
+                                            <version>${version.bom.org.apache.httpcomponents.client5}</version>
                                         </dependency>
                                     </dependenciesToSkip>
                                 </dependencyManagementIncludesAllGroupIdArtifactsRule>
