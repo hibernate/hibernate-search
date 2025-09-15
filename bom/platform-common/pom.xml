@@ -18,7 +18,7 @@
         <deploy.skip>true</deploy.skip>
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
-        <version.bom.org.hibernate.orm>7.1.0.Final</version.bom.org.hibernate.orm>
+        <version.bom.org.hibernate.orm>7.1.1.Final</version.bom.org.hibernate.orm>
         <version.bom.org.elasticsearch.client>9.1.3</version.bom.org.elasticsearch.client>
         <version.bom.software.amazon.awssdk>2.33.0</version.bom.software.amazon.awssdk>
         <version.bom.io.smallrye>3.3.1</version.bom.io.smallrye>
