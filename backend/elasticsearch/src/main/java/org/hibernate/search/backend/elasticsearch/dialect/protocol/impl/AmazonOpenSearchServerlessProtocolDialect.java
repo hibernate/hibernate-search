@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.AmazonOpenSearchServerlessWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.util.common.annotation.Incubating;

@@ -22,7 +22,6 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
-import org.apache.http.HttpRequest;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.http.SdkHttpFullRequest;
@@ -72,7 +71,7 @@ public interface AwsLog extends BasicLogger {
 
 	@LogMessage(level = TRACE)
 	@Message(id = ID_OFFSET + 3, value = "HTTP request (before signing): %s")
-	void httpRequestBeforeSigning(HttpRequest request);
+	void httpRequestBeforeSigning(Object request);
 
 	@LogMessage(level = TRACE)
 	@Message(id = ID_OFFSET + 4, value = "AWS request (before signing): %s")
@@ -88,7 +87,7 @@ public interface AwsLog extends BasicLogger {
 
 	@LogMessage(level = TRACE)
 	@Message(id = ID_OFFSET + 7, value = "HTTP request (after signing): %s")
-	void awsRequestAfterSigning(HttpRequest request);
+	void awsRequestAfterSigning(Object request);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 8, value = "AWS request signing is disabled.")
