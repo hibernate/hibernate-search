@@ -50,6 +50,10 @@
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
         <version.org.elasticsearch.client>9.1.4</version.org.elasticsearch.client>
+        <!-- Various HTTP client versions that our own Elasticsearch client implementations depend on -->
+        <version.org.apache.httpcomponents.httpclient>4.5.14</version.org.apache.httpcomponents.httpclient>
+        <version.org.apache.httpcomponents.httpcore>4.4.16</version.org.apache.httpcomponents.httpcore>
+        <version.org.apache.httpcomponents.httpasyncclient>4.1.5</version.org.apache.httpcomponents.httpasyncclient>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest}</version.org.elasticsearch.compatible.main>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.compatible.main.majorVersion}.${parsed-version.org.elasticsearch.compatible.main.minorVersion}</documentation.org.elasticsearch.url>
@@ -423,6 +427,27 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>auth</artifactId>
                 <version>${version.software.amazon.awssdk}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${version.org.apache.httpcomponents.httpclient}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${version.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-nio</artifactId>
+                <version>${version.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient</artifactId>
+                <version>${version.org.apache.httpcomponents.httpasyncclient}</version>
             </dependency>
 
             <!-- Lucene backend -->
