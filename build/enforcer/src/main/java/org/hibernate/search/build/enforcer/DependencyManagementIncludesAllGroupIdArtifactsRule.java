@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,6 +48,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	 */
 	private static final String BASE_URL_FORMAT =
 			"https://search.maven.org/solrsearch/select?q=%s&core=gav&start=%d&rows=%d&wt=json";
+	private static final String CENTRAL_SEARCH_URL = "https://central.sonatype.com/api/internal/browse/components";
 	private static final String MAVEN_STATUS_URL = "https://status.maven.org/api/v2/summary.json";
 	private static final int ROWS_PER_PAGE = 100;
 	private static final int MAX_RETRIES = 5;
@@ -70,6 +74,8 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	 * set of "found" dependencies that can be ignored.
 	 */
 	private Set<Dependency> dependenciesToSkip = new HashSet<>();
+
+	private HttpClient client = HttpClient.newBuilder().build();
 
 	public void execute() throws EnforcerRuleException {
 		Set<String> dependencies = session.getCurrentProject()
@@ -123,27 +129,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 
 		if ( mavenStatus.isSearchAvailable() ) {
 			for ( Artifact filter : toQuery ) {
-				StringBuilder queryBuilder = new StringBuilder();
-				queryBuilder.append( "g:" ).append( encodeValue( filter.g ) );
-
-				if ( filter.a != null && !filter.a.trim().isEmpty() ) {
-					queryBuilder.append( "+AND+a:" ).append( encodeValue( filter.a ) );
-				}
-				if ( filter.v != null && !filter.v.trim().isEmpty() ) {
-					queryBuilder.append( "+AND+v:" ).append( encodeValue( filter.v ) );
-				}
-
-				int start = 0;
-				do {
-					String url = String.format( Locale.ROOT, BASE_URL_FORMAT, queryBuilder, start, ROWS_PER_PAGE );
-					SearchResponse response = fetch( gson, url, SearchResponse.class, SearchResponse::empty );
-					foundArtifacts.addAll( response.response.docs );
-					if ( response.response.start + response.response.docs.size() >= response.response.numFound ) {
-						break;
-					}
-					start += ROWS_PER_PAGE;
-				}
-				while ( true );
+				mavenCentralSearch( filter, gson, foundArtifacts );
 			}
 		}
 		else {
@@ -167,6 +153,45 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		}
 	}
 
+	private void mavenCentralSearch(Artifact filter, Gson gson, Set<Artifact> foundArtifacts) throws EnforcerRuleException {
+		CentralSearchRequest request = new CentralSearchRequest( filter );
+		getLog().info( "Fetching information for " + request );
+		do {
+			CentralSearchResponse response =
+					post( gson, client, CENTRAL_SEARCH_URL, request, CentralSearchResponse.class,
+							CentralSearchResponse::empty );
+			foundArtifacts.addAll( response.components.stream().map( Artifact::new ).toList() );
+			if ( request.nextPage() >= response.pageCount ) {
+				break;
+			}
+		}
+		while ( true );
+	}
+
+	private void legacyMavenSolrSearch(Artifact filter, Gson gson, Set<Artifact> foundArtifacts) throws EnforcerRuleException {
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append( "g:" ).append( encodeValue( filter.g ) );
+
+		if ( filter.a != null && !filter.a.trim().isEmpty() ) {
+			queryBuilder.append( "+AND+a:" ).append( encodeValue( filter.a ) );
+		}
+		if ( filter.v != null && !filter.v.trim().isEmpty() ) {
+			queryBuilder.append( "+AND+v:" ).append( encodeValue( filter.v ) );
+		}
+
+		int start = 0;
+		do {
+			String url = String.format( Locale.ROOT, BASE_URL_FORMAT, queryBuilder, start, ROWS_PER_PAGE );
+			SearchResponse response = fetch( gson, url, SearchResponse.class, SearchResponse::empty );
+			foundArtifacts.addAll( response.response.docs );
+			if ( response.response.start + response.response.docs.size() >= response.response.numFound ) {
+				break;
+			}
+			start += ROWS_PER_PAGE;
+		}
+		while ( true );
+	}
+
 	private static String dependencyString(Dependency d) {
 		return String.format( Locale.ROOT, GAV_FORMAT, d.getGroupId(), d.getArtifactId(), d.getVersion() );
 	}
@@ -181,16 +206,45 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	}
 
 	private <T> T fetch(Gson gson, String url, Class<T> klass, Supplier<T> empty) throws EnforcerRuleException {
+		return withRetry(
+				() -> {
+					try (
+							var stream = URI.create( url ).toURL().openStream(); var isr = new InputStreamReader( stream );
+							var reader = new JsonReader( isr )
+					) {
+						getLog().info( "Fetching from " + url );
+						return gson.fromJson( reader, klass );
+					}
+				}, empty
+		);
+	}
+
+	private <T> T post(Gson gson, HttpClient client, String url, CentralSearchRequest searchRequest, Class<T> klass,
+			Supplier<T> empty)
+			throws EnforcerRuleException {
+		return withRetry(
+				() -> {
+					HttpRequest request = HttpRequest.newBuilder()
+							.uri( URI.create( url ) )
+							.header( "Content-Type", "application/json" )
+							.POST( HttpRequest.BodyPublishers.ofString( gson.toJson( searchRequest ) ) )
+							.build();
+
+					HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
+
+					return gson.fromJson( response.body(), klass );
+				}, empty
+		);
+	}
+
+	private <T> T withRetry(ThrowingSupplier<T> action, Supplier<T> empty) throws EnforcerRuleException {
 		for ( int i = 0; i < MAX_RETRIES; i++ ) {
-			try (
-					var stream = URI.create( url ).toURL().openStream(); var isr = new InputStreamReader( stream );
-					var reader = new JsonReader( isr )
-			) {
-				getLog().info( "Fetching from " + url );
-				return gson.fromJson( reader, klass );
+			try {
+				return action.get();
+
 			}
 			catch (IOException e) {
-				getLog().warn( "Fetching from " + url + " failed. Retrying in " + RETRY_DELAY_SECONDS
+				getLog().warn( "Fetching failed. Retrying in " + RETRY_DELAY_SECONDS
 						+ "s... (Attempt " + ( i + 1 ) + "/" + ( MAX_RETRIES ) + "): " + e.getMessage() );
 				try {
 					TimeUnit.SECONDS.sleep( RETRY_DELAY_SECONDS );
@@ -200,8 +254,12 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 					throw new EnforcerRuleException( ie );
 				}
 			}
+			catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
+				throw new EnforcerRuleException( ie );
+			}
 		}
-		getLog().warn( "Fetching from " + url + " failed after " + ( MAX_RETRIES ) + " attempts." );
+		getLog().warn( "Fetching from failed after " + ( MAX_RETRIES ) + " attempts." );
 		return empty.get();
 	}
 
@@ -221,6 +279,12 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		}
 
 		public Artifact() {
+		}
+
+		public Artifact(CentralComponent centralComponent) {
+			this.g = centralComponent.namespace;
+			this.a = centralComponent.name;
+			this.v = centralComponent.version;
 		}
 
 		public String formattedString() {
@@ -319,5 +383,66 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 			statusSummary.components = List.of();
 			return statusSummary;
 		}
+	}
+
+	// Central search API DTOs:
+	static class CentralSearchRequest {
+		public int page;
+		public int size;
+		public String searchTerm;
+		public List<Object> filter;
+
+		CentralSearchRequest(Artifact filter) {
+			this.page = 0;
+			this.size = 20;
+			this.filter = null;
+			StringBuilder queryBuilder = new StringBuilder();
+			queryBuilder.append( "namespace:" ).append( filter.g );
+
+			if ( filter.a != null && !filter.a.trim().isEmpty() ) {
+				queryBuilder.append( " name:" ).append( filter.a );
+			}
+			if ( filter.v != null && !filter.v.trim().isEmpty() ) {
+				queryBuilder.append( " version:" ).append( filter.v );
+			}
+
+			this.searchTerm = queryBuilder.toString();
+		}
+
+		int nextPage() {
+			return this.page++;
+		}
+
+		@Override
+		public String toString() {
+			return searchTerm;
+		}
+	}
+
+	static class CentralSearchResponse {
+		public List<CentralComponent> components;
+		public int page;
+		public int pageSize;
+		public int pageCount;
+		public int totalResultCount;
+		public int totalCount;
+
+		static CentralSearchResponse empty() {
+			CentralSearchResponse res = new CentralSearchResponse();
+			res.components = List.of();
+			return res;
+		}
+	}
+
+	static class CentralComponent {
+		public String id;
+		public String namespace;
+		public String name;
+		public String version;
+	}
+
+	private interface ThrowingSupplier<T> {
+
+		T get() throws IOException, InterruptedException;
 	}
 }
