@@ -132,7 +132,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.25.1</version.log4j>
+        <version.log4j>2.25.2</version.log4j>
         <version.junit-jupiter>5.13.4</version.junit-jupiter>
         <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
@@ -140,8 +140,8 @@
         <version.testcontainers>1.21.3</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
-        <version.org.mockito>5.19.0</version.org.mockito>
-        <version.org.assertj.assertj-core>3.27.4</version.org.assertj.assertj-core>
+        <version.org.mockito>5.20.0</version.org.mockito>
+        <version.org.assertj.assertj-core>3.27.6</version.org.assertj.assertj-core>
         <!-- NOTE: Remove a Dependabot rule for 4.2.1 once the upgrade can be applied -->
         <version.org.awaitily>4.3.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
@@ -161,7 +161,7 @@
 
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.3.232</version.com.h2database>
-        <version.org.postgresql>42.7.7</version.org.postgresql>
+        <version.org.postgresql>42.7.8</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.6</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.4.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.2.0</version.com.ibm.db2.jcc>
