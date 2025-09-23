@@ -9,7 +9,6 @@ import static org.hibernate.search.build.enforcer.MavenProjectUtils.isAnyParentR
 import static org.hibernate.search.build.enforcer.MavenProjectUtils.isProjectDeploySkipped;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -33,7 +32,6 @@ import javax.inject.Named;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import org.apache.maven.enforcer.rule.api.AbstractEnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
@@ -47,8 +45,9 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	 * See <a href="https://central.sonatype.org/search/rest-api-guide/">Maven Central REST API</a>
 	 */
 	private static final String BASE_URL_FORMAT =
-			"https://search.maven.org/solrsearch/select?q=%s&core=gav&start=%d&rows=%d&wt=json";
-	private static final String CENTRAL_SEARCH_URL = "https://central.sonatype.com/api/internal/browse/components";
+			"https://central.sonatype.com/solrsearch/select?q=%s&core=gav&start=%d&rows=%d&wt=json";
+	// This one here is more for a test purpose rather than to be used in "prod":
+	private static final String CENTRAL_SEARCH_INTERNAL_URL = "https://central.sonatype.com/api/internal/browse/components";
 	private static final String MAVEN_STATUS_URL = "https://status.maven.org/api/v2/summary.json";
 	private static final int ROWS_PER_PAGE = 100;
 	private static final int MAX_RETRIES = 5;
@@ -129,7 +128,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 
 		if ( mavenStatus.isSearchAvailable() ) {
 			for ( Artifact filter : toQuery ) {
-				mavenCentralSearch( filter, gson, foundArtifacts );
+				mavenCentralSolrSearch( filter, gson, foundArtifacts );
 			}
 		}
 		else {
@@ -153,12 +152,13 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		}
 	}
 
-	private void mavenCentralSearch(Artifact filter, Gson gson, Set<Artifact> foundArtifacts) throws EnforcerRuleException {
+	private void mavenCentralInternalSearch(Artifact filter, Gson gson, Set<Artifact> foundArtifacts)
+			throws EnforcerRuleException {
 		CentralSearchRequest request = new CentralSearchRequest( filter );
 		getLog().info( "Fetching information for " + request );
 		do {
 			CentralSearchResponse response =
-					post( gson, client, CENTRAL_SEARCH_URL, request, CentralSearchResponse.class,
+					post( gson, client, CENTRAL_SEARCH_INTERNAL_URL, request, CentralSearchResponse.class,
 							CentralSearchResponse::empty );
 			foundArtifacts.addAll( response.components.stream().map( Artifact::new ).toList() );
 			if ( request.nextPage() >= response.pageCount ) {
@@ -168,7 +168,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		while ( true );
 	}
 
-	private void legacyMavenSolrSearch(Artifact filter, Gson gson, Set<Artifact> foundArtifacts) throws EnforcerRuleException {
+	private void mavenCentralSolrSearch(Artifact filter, Gson gson, Set<Artifact> foundArtifacts) throws EnforcerRuleException {
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append( "g:" ).append( encodeValue( filter.g ) );
 
@@ -180,14 +180,16 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		}
 
 		int start = 0;
+		int collectedSoFar = 0;
 		do {
 			String url = String.format( Locale.ROOT, BASE_URL_FORMAT, queryBuilder, start, ROWS_PER_PAGE );
 			SearchResponse response = fetch( gson, url, SearchResponse.class, SearchResponse::empty );
+			collectedSoFar += response.response.docs.size();
 			foundArtifacts.addAll( response.response.docs );
-			if ( response.response.start + response.response.docs.size() >= response.response.numFound ) {
+			if ( collectedSoFar == response.response.numFound || response.response.docs.isEmpty() ) {
 				break;
 			}
-			start += ROWS_PER_PAGE;
+			start++;
 		}
 		while ( true );
 	}
@@ -208,13 +210,16 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	private <T> T fetch(Gson gson, String url, Class<T> klass, Supplier<T> empty) throws EnforcerRuleException {
 		return withRetry(
 				() -> {
-					try (
-							var stream = URI.create( url ).toURL().openStream(); var isr = new InputStreamReader( stream );
-							var reader = new JsonReader( isr )
-					) {
-						getLog().info( "Fetching from " + url );
-						return gson.fromJson( reader, klass );
-					}
+					HttpRequest request = HttpRequest.newBuilder()
+							.uri( URI.create( url ) )
+							.header( "Content-Type", "application/json" )
+							.GET()
+							.build();
+
+					getLog().info( "Fetching from " + url );
+					HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
+
+					return gson.fromJson( response.body(), klass );
 				}, empty
 		);
 	}
