@@ -138,7 +138,7 @@
                                 </path>
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+                                    <artifactId>hibernate-search-backend-lucene-next</artifactId>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -177,6 +177,8 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <!-- Since there's only a Lucene execution, if it is skipped, there's nothing else to "verifY" -->
+                            <skip>${test.lucene.skip}</skip>
                             <summaryFiles>
                                 <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                             </summaryFiles>
