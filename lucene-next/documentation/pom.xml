@@ -127,6 +127,7 @@
                             </testIncludes>
                             <testExcludes combine.self="override" combine.children="override"></testExcludes>
                             <showWarnings>false</showWarnings>
+                            <annotationProcessorPathsUseDepMgmt>true</annotationProcessorPathsUseDepMgmt>
                             <annotationProcessors>
                                 <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor>
                             </annotationProcessors>
@@ -134,12 +135,10 @@
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
                                     <artifactId>hibernate-search-processor</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
                                     <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
