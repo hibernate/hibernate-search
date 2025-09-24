@@ -62,6 +62,7 @@
                         <id>default-testCompile</id>
                         <configuration>
                             <proc>full</proc>
+                            <annotationProcessorPathsUseDepMgmt>true</annotationProcessorPathsUseDepMgmt>
                             <annotationProcessors>
                                 <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor>
                             </annotationProcessors>
@@ -69,12 +70,10 @@
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
                                     <artifactId>hibernate-search-processor</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
                                     <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
