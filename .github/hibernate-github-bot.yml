@@ -69,3 +69,11 @@ licenseAgreement:
     # See the `build-dependencies` group in the Dependabot's configuration file
     - user: dependabot[bot]
       titlePattern: "Bump.*"
+branches:
+  enabled: true
+  titlePrefix: "[%s]"
+  label: "%s"
+  ignore:
+    # We ignore all dependabot PRs for a license check:
+    - user: dependabot[bot]
+      titlePattern: "Bump.*"
