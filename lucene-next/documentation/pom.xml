@@ -127,6 +127,7 @@
                             </testIncludes>
                             <testExcludes combine.self="override" combine.children="override"></testExcludes>
                             <showWarnings>false</showWarnings>
+                            <annotationProcessorPathsUseDepMgmt>true</annotationProcessorPathsUseDepMgmt>
                             <annotationProcessors>
                                 <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor>
                             </annotationProcessors>
@@ -134,12 +135,10 @@
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
                                     <artifactId>hibernate-search-processor</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-                                    <version>${project.version}</version>
+                                    <artifactId>hibernate-search-backend-lucene-next</artifactId>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -178,6 +177,8 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <!-- Since there's only a Lucene execution, if it is skipped, there's nothing else to "verifY" -->
+                            <skip>${test.lucene.skip}</skip>
                             <summaryFiles>
                                 <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                             </summaryFiles>

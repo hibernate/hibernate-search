@@ -22,17 +22,18 @@ The annotation processor has to be added to the build, e.g. for Maven:
         <execution>
             <id>default-compile</id>
             <configuration>
+                <annotationProcessorPathsUseDepMgmt>true</annotationProcessorPathsUseDepMgmt> <1>
                 <annotationProcessors>
-                    <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor> <1>
+                    <annotationProcessor>org.hibernate.search.processor.HibernateSearchProcessor</annotationProcessor> <2>
                 </annotationProcessors>
                 <annotationProcessorPaths>
                     <path>
                         <groupId>org.hibernate.search</groupId>
-                        <artifactId>hibernate-search-processor</artifactId> <2>
+                        <artifactId>hibernate-search-processor</artifactId> <3>
                     </path>
                     <path>
                         <groupId>org.hibernate.search</groupId>
-                        <artifactId>hibernate-search-backend-lucene</artifactId> <3>
+                        <artifactId>hibernate-search-backend-lucene</artifactId> <4>
                     </path>
                 </annotationProcessorPaths>
             </configuration>
@@ -41,9 +42,12 @@ The annotation processor has to be added to the build, e.g. for Maven:
 </plugin>
 ----
 
-<1> Provide the fully qualified class name of the annotation processor that generates the metamodel.
-<2> Add the `org.hibernate.search:hibernate-search-processor` dependency to the annotation processor path (a superset of the compile path), so the Java compiler can find the processor.
-<3> Add the backend dependency, in this example, the <<backend-lucene,Lucene backend>>, to the annotation processor path.
+<1> This setting is required for the annotation processor dependencies to be managed by the dependency management section.
+Particularly useful when using <<compatibility-search-dependencies-bom,Hibernate Search BOM>>.
+More information is available in https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#annotationProcessorPathsUseDepMgmt[Maven compiler plugin documentation].
+<2> Provide the fully qualified class name of the annotation processor that generates the metamodel.
+<3> Add the `org.hibernate.search:hibernate-search-processor` dependency to the annotation processor path (a superset of the compile path), so the Java compiler can find the processor.
+<4> Add the backend dependency, in this example, the <<backend-lucene,Lucene backend>>, to the annotation processor path.
 It is important to include the same backend that the application is using to make sure that the generated metamodel classes reflect all the backend specifics.
 For example, backends might have different defaults, resulting in a different set of <<mapping-inspect-traits,search traits>> per specific field, depending on the backend.
 
