@@ -38,16 +38,16 @@ env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3"
 jobs:
   build:
-    name: Build and test on Java 11
+    name: Build and test on Java 17
     runs-on: ubuntu-latest
     # Ignore dependabot PRs; we'll batch dependency upgrades manually in a single PR before we test them.
     if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
-      - name: Set up Java 11
+      - name: Set up Java 17
         uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # 4.7.0
         with:
-          java-version: 11
+          java-version: 17
           distribution: temurin
       - name: Get year/month for cache key
         id: get-date
@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
         if: failure()
         with:
-          name: test-reports-java11
+          name: test-reports-java17
           path: './**/*-reports/'
       - name: Docker cleanup
         if: always()
