@@ -13,6 +13,7 @@
 :html-meta-description: Hibernate Search, full text search for your entities - Migration Guide
 :html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
 :html-meta-canonical-link: https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/migration/html_single/
+:html-meta-version-family: {hibernateSearchVersionShort}
 
 [[introduction]]
 == [[_introduction]] Introduction

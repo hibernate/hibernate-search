@@ -37,7 +37,7 @@ disables indexing for instances of the `Book` class if their status is `ARCHIVED
 
 .Implementing and using a `RoutingBridge` for conditional indexing
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/conditionalindexing/BookStatusRoutingBinder.java[tags=binder]
 ----
@@ -51,7 +51,7 @@ for more information about declaring dependencies.
 <5> Pass the expected type of indexed entities.
 <6> Pass the routing bridge instance.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/conditionalindexing/BookStatusRoutingBinder.java[tags=bridge]
 ----
@@ -73,7 +73,7 @@ When necessary, Hibernate Search will follow each given route, look for document
 and delete them.
 <8> In this case, routing is very simple: there is only one possible previous route, so we only register that route.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/conditionalindexing/Book.java[tags=include;!getters-setters]
 ----
@@ -95,7 +95,7 @@ with the same mapping as the example below.
 
 .Implementing and using a `RoutingBridge` to control routing to index shards
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/routingkey/BookGenreRoutingBinder.java[tags=binder]
 ----
@@ -109,7 +109,7 @@ for more information about declaring dependencies.
 <5> Pass the expected type of indexed entities.
 <6> Pass the routing bridge instance.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/routingkey/BookGenreRoutingBinder.java[tags=bridge]
 ----
@@ -131,7 +131,7 @@ and delete them.
 so we tell Hibernate Search to follow all possible routes,
 one for every possible genre.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/routingkey/Book.java[tags=include;!getters-setters]
 ----
@@ -178,7 +178,7 @@ Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM 
 
 .Retrieving the ORM session from a `RoutingBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/ormcontext/MyEntityRoutingBinder.java[tags=include]
 ----
@@ -213,7 +213,7 @@ Just pass an instance of the binder.
 
 .Applying an `RoutingBinder` with `.binder(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/conditionalindexing/RoutingBridgeConditionalIndexingIT.java[tags=programmatic]
 ----

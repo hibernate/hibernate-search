@@ -145,7 +145,7 @@ Look for properties having a variant starting with a `hibernate.search.backend.i
 
 .Using the helper to build hibernate configuration
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/configuration/ElasticsearchConfigurationIT.java[tags=build-hibernate-configuration]
 ----
@@ -417,7 +417,7 @@ Hibernate Search will call the `handle` methods whenever a failure occurs.
 
 .Implementing and using a `FailureHandler`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/reporting/failurehandler/MyFailureHandler.java[tags=include]
 ----
@@ -432,7 +432,7 @@ the context also lists references to entities that could not be indexed correctl
 <8> Entity references may be converted to a human-readable string using `toString()`.
 <9> Use the context-provided information to report the failure in any relevant way.
 
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/reporting/failurehandler.properties[tags=include]
 ----
@@ -465,7 +465,7 @@ that should apply an operation to every tenant.
 
 The list of identifiers is defined through the following configuration property:
 
-[source]
+[source, properties]
 ----
 hibernate.search.multi_tenancy.tenant_ids = mytenant1,mytenant2,mytenant3
 ----

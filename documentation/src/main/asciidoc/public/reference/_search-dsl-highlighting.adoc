@@ -18,7 +18,7 @@ with an attribute configuration that allows it:
 [[search-dsl-highlighting-configuring-fields-for-highlighting]]
 .Configuring fields for highlighting
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/Book.java[tags=basics]
 ----
@@ -38,7 +38,7 @@ or <<backend-elasticsearch, Elasticsearch>> backends.
 [[search-dsl-highlighting-using-highlight-projection]]
 .Using a highlight projection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basics]
 ----
@@ -60,7 +60,7 @@ See <<search-dsl-highlighting-highlighter-options-no-match-size,no match size co
 Note that the result of applying a highlight projection is always a list of `String`.
 
 As an example, the result may look like:
-[source, JSON]
+[source, json]
 ----
 [
     ["The Boscombe Valley <em>Mystery</em>"], <1>
@@ -82,7 +82,7 @@ other projection types as well as with other highlight projections:
 [[search-dsl-highlighting-using-highlight-projection-composite]]
 .Using a composite highlight projection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=composite]
 ----
@@ -100,7 +100,7 @@ A highlighter definition is provided after a where clause of a query:
 [[search-dsl-highlighting-highlighter-confguring-default-highlighter-simple]]
 .Configuring a default highlighter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=very-basic-config]
 ----
@@ -118,7 +118,7 @@ Picking the highlighter type is the first step in a highlighter definition:
 
 .Specifying the plain highlighter type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-plain]
 ----
@@ -126,7 +126,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/High
 ====
 .Specifying the unified highlighter type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-unified]
 ----
@@ -134,7 +134,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/High
 ====
 .Specifying the fast vector highlighter type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-fvh]
 ----
@@ -188,7 +188,7 @@ i.e. the same name of a named highlighter can be passed to multiple highlight pr
 
 .Configuring both default and named highlighters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-config]
 ----
@@ -213,7 +213,7 @@ Usually, tags are a pair of HTML tags, but they can be a pair of any character s
 
 .Setting custom tags
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-tags]
 ----
@@ -224,7 +224,7 @@ The fast vector highlighter, which can handle multiple tags, has a few additiona
 
 .Setting multiple custom tags
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fvh-tags]
 ----
@@ -238,7 +238,7 @@ to use a predefined set of tags.
 
 .Setting a styled tags schema
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fvh-schema]
 ----
@@ -249,7 +249,7 @@ Using a styled tags schema is just a shortcut to defining tags as:
 
 .Setting tags as if the styled tags schema is used
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fvh-schema-alternative]
 ----
@@ -273,7 +273,7 @@ By default, a `HighlighterEncoder.DEFAULT` encoder is used, which keeps the text
 
 .Setting the HTML encoder
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-encoder]
 ----
@@ -295,7 +295,7 @@ By default, this option is set to `0` and text will only be returned if there's 
 
 .Setting the no match size
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=no-match-size]
 ----
@@ -332,7 +332,7 @@ A combination of these options can be helpful when highlighting large text field
 
 .Setting the fragment size and the number of fragments
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fragment-size]
 ----
@@ -354,7 +354,7 @@ By enabling the order by score option most relevant fragments will be returned a
 
 .Setting the fragment size and number of fragments
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-order]
 ----
@@ -370,7 +370,7 @@ that simply breaks up the text into same-sized fragments.
 
 .Setting the fragmenter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-fragmenter]
 ----
@@ -395,7 +395,7 @@ There are two ways to supply boundary scanner configuration to a highlighter.
 
 .Setting the boundary scanner with DSL
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=scanner-dsl]
 ----
@@ -408,7 +408,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/High
 
 .Setting the boundary scanner using lambda
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=scanner-lambda]
 ----
@@ -430,7 +430,7 @@ Character boundary scanner is a default option for the fast vector highlighters.
 
 .Setting the character boundary scanner
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=scanner-char]
 ----
@@ -476,7 +476,7 @@ highlighting every occurrence.
 
 .Setting the phrase limit
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=phrase-limit]
 ----

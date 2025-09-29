@@ -20,13 +20,13 @@ but all information in this section applies to other search DSLs as well:
 
 .Targeting a field using absolute paths
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=root]
 ----
 <1> Fields declared at the root of the index can simply be referenced by their name.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=nested_implicit]
 ----
@@ -34,7 +34,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsI
 must be referenced by their absolute path: the absolute path of the object field, followed by a dot,
 followed by the name of the targeted field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=nested_explicit]
 ----
@@ -57,7 +57,7 @@ you can create a new factory which interprets paths as relative to the object fi
 
 .Targeting a field using relative paths
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=withRoot]
 ----
@@ -66,7 +66,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsI
 <3> Call a reusable method to apply a predicate to the name of the book's artists.
 <4> Pass to that method a factory whose root will be the object field `artists`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=withRoot_method]
 ----

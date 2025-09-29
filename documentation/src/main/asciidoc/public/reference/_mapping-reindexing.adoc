@@ -73,11 +73,11 @@ is not mapped as such in Hibernate ORM (no `mappedBy`).
 
 .Mapping the inverse side of an association with `@AssociationInverseSide`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/associationinverseside/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/associationinverseside/BookEdition.java[tags=include;!getters-setters]
 ----
@@ -106,7 +106,7 @@ will give Hibernate Search the information it needs and allow <<architecture-hse
 
 .Mapping a derived value with `@IndexingDependency.derivedFrom`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/derivedfrom/Book.java[tags=include;!getters-setters]
 ----
@@ -149,11 +149,11 @@ For example, let's consider the (incorrect) mapping below:
 
 .A highly-asymmetric, unidirectional association
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/incorrect/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/incorrect/BookCategory.java[tags=include;!getters-setters]
 ----
@@ -184,7 +184,7 @@ See the modified mapping below:
 
 .Limiting reindexing to same-entity updates with `ReindexOnUpdate.SHALLOW`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/correct/Book.java[tags=include;!getters-setters]
 ----
@@ -220,7 +220,7 @@ For example, let's consider the mapping below:
 
 .A frequently-changing property
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/no/incorrect/Sensor.java[tags=include;!getters-setters]
 ----
@@ -249,7 +249,7 @@ See the modified mapping below:
 
 .Disabling listener-triggered reindexing for a particular property with `ReindexOnUpdate.NO`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/no/correct/Sensor.java[tags=include;!getters-setters]
 ----
@@ -272,7 +272,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Mapping the inverse side of an association with `.associationInverseSide(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/associationinverseside/AssociationInverseSideIT.java[tags=programmatic]
 ----
@@ -280,7 +280,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/as
 
 .Mapping a derived value with `.indexingDependency().derivedFrom(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/derivedfrom/DerivedFromIT.java[tags=programmatic]
 ----
@@ -288,7 +288,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/de
 
 .Limiting <<architecture-hsearch-indexing,triggering reindexing>> with `.indexingDependency().reindexOnUpdate(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/correct/ReindexOnUpdateShallowIT.java[tags=programmatic]
 ----

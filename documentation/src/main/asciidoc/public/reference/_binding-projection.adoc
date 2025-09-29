@@ -41,7 +41,7 @@ This is just to keep the example simple.
 
 .Implementing and using a `ProjectionBinder`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/simple/MyFieldProjectionBinder.java[tags=binder]
 ----
@@ -52,7 +52,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 <5> Pass the projection definition instance,
 which will create the projection at runtime.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/simple/MyFieldProjectionBinder.java[tags=definition]
 ----
@@ -67,7 +67,7 @@ i.e. the type of the constructor parameter.
 to define the appropriate projection.
 <4> Get the resulting projection by calling `.toProjection()` and return it.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/simple/MyBookProjection.java[tags=include]
 ----
@@ -76,7 +76,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 The book projection can then be used as any <<search-dsl-projection-mapped,custom projection type>>,
 and its `title` parameter will be initialized with values returned by the custom projection definition:
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/simple/ProjectionBinderSimpleIT.java[tags=call]
 ----
@@ -97,7 +97,7 @@ from which a projection collector can be obtained based on a container and eleme
 
 .Implementing and using a `ProjectionBinder` supporting multi-valued projections
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/multi/MyFieldProjectionBinder.java[tags=include]
 ----
@@ -114,7 +114,7 @@ and must configure returned projections accordingly.
 If the required collection type is not present in the `ProjectionCollector`,
 then a custom projection collector provider can be supplied.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/multi/MyBookProjection.java[tags=include]
 ----
@@ -123,7 +123,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 The book projection can then be used as any <<search-dsl-projection-mapped,custom projection type>>,
 and its `tags` parameter will be initialized with values returned by the custom projection definition:
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/multi/ProjectionBinderMultiIT.java[tags=call]
 ----
@@ -159,7 +159,7 @@ This is just to keep the example simple.
 
 .Implementing and using a `ProjectionBinder` that delegates to a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/composing/MyObjectFieldProjectionBinder.java[tags=include]
 ----
@@ -170,7 +170,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 This controls the same feature as <<search-dsl-projection-object-mapping-filters,`includePaths`/`excludePaths`/`includeDepths` in `@ObjectProjection`>>.
 <5> Call `definition(...)` and pass the definition created just above.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/composing/MyBookProjection.java[tags=include]
 ----
@@ -180,7 +180,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 The book projection can then be used as any <<search-dsl-projection-mapped,custom projection type>>,
 and its `author` parameter will be initialized with values returned by the custom projection definition:
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/composing/ProjectionBinderComposingIT.java[tags=call]
 ----
@@ -201,7 +201,7 @@ You can pass string parameters to the `@ProjectionBinderRef` annotation and then
 
 .Passing parameters to a `ProjectionBinder` using the `@ProjectionBinderRef` annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/string/MyFieldProjectionBinder.java[tags=include]
 ----
@@ -212,7 +212,7 @@ Alternatively, use `paramOptional` to get an `java.util.Optional` that will be e
 <2> Pass the parameter value as an argument to the definition constructor.
 <3> Use the parameter value in the projection definition.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/string/MyBookProjection.java[tags=include]
 ----
@@ -228,7 +228,7 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to a `PropertyBinder` using a custom annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/annotation/MyFieldProjectionBinding.java[tags=include]
 ----
@@ -253,7 +253,7 @@ setting its generic type argument to the type of the corresponding annotation.
 Here we're using a setter, but passing the data through the constructor would work, too.
 <10> Apply the binder to the constructor parameter.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/annotation/MyFieldProjectionBinder.java[tags=include]
 ----
@@ -263,7 +263,7 @@ Alternatively, we could expose a parameterized constructor.
 Here we pass the parameter value as an argument to the definition constructor.
 <3> Use the parameter value in the projection definition.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/annotation/MyBookProjection.java[tags=include]
 ----
@@ -298,7 +298,7 @@ Just pass an instance of the binder to `.projection(...)`. You can pass argument
 
 .Applying a `ProjectionBinder` with `.projection(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/annotation/ProjectionBinderParamAnnotationIT.java[tags=programmatic]
 ----
@@ -337,7 +337,7 @@ getting the constructor parameter name and using it as a field name.
 
 .Projecting on a field whose name is the same as the constructor parameter name in a `ProjectionBinder`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/constructorparameter/MyFieldProjectionBinder.java[tags=include]
 ----
@@ -345,7 +345,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/proje
 <2> Pass the name of the constructor parameter to the projection definition.
 <3> Use the name of the constructor parameter as the projected field name.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/constructorparameter/MyBookProjection.java[tags=include]
 ----

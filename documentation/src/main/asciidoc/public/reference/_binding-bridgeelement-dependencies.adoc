@@ -22,7 +22,7 @@ and declares a dependency to the paper author's last name and first name.
 
 .Declaring dependencies in a bridge
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/simple/AuthorFullNameBinder.java[tags=binder]
 ----
@@ -82,14 +82,14 @@ instead of just strings:
 
 .Declaring dependencies in a bridge with explicit container extractors
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/containers/simple/Book.java[tags=include;!getters-setters]
 ----
 <1> Apply a custom bridge to the `ScientificPaper` entity.
 <2> This (rather complex) map is the one we'll access in the custom bridge.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/containers/simple/BookEditionsForSaleTypeBinder.java[tags=include]
 ----
@@ -108,13 +108,13 @@ by passing a container extractor path as the first argument to `use(...)`:
 
 .Declaring dependencies in a bridge with explicit container extractors for the bridged property
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/containers/property/Book.java[tags=include;!getters-setters]
 ----
 <1> Apply a custom bridge to the `pricesByEdition` property of the `ScientificPaper` entity.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/containers/property/BookEditionsForSalePropertyBinder.java[tags=include]
 ----
@@ -153,13 +153,13 @@ you can simply declare the dependency from the other entity, as shown below.
 
 .Declaring dependencies in a bridge using the inverse path
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/containers/fromotherentity/ScientificPaper.java[tags=include;!getters-setters]
 ----
 <1> Apply a custom bridge to the `ScientificPaper` type.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/dependencies/containers/fromotherentity/ScientificPapersReferencedByBinder.java[tags=include]
 ----

@@ -21,7 +21,7 @@ a custom `BookId` type to its string representation and back:
 
 .Implementing and using an `IdentifierBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/simple/BookIdBridge.java[tags=include]
 ----
@@ -38,7 +38,7 @@ in particular for the <<search-dsl-predicate-id,ID predicate>>.
 and is expected to return the original property value.
 It is called when mapping search hits to the corresponding entity.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/simple/Book.java[tags=include;!getters-setters]
 ----
@@ -93,7 +93,7 @@ and returns `true` if that bridge can be expected to always behave the same as `
 
 .Implementing `isCompatibleWith` to support multi-index search
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/compatible/BookOrMagazineIdBridge.java[tags=include]
 ----
@@ -112,14 +112,14 @@ To address this, `parseIdentifierLiteral(..)` can be implemented.
 
 .Implementing `parseIdentifierLiteral(..)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/parse/BookIdBridge.java[tags=include]
 ----
 <1> Start implementing the identifier bridge as <<binding-identifierbridge-basics,usual>>.
 <2> Implement `parseIdentifierLiteral(..)` to convert a string value to a `BookId`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/parse/IdentifierBridgeSimpleIT.java[tags=include]
 ----
@@ -135,7 +135,7 @@ This binder will be able in particular to inspect the type of the property.
 
 .Implementing an `IdentifierBinder`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/binder/BookIdBinder.java[tags=include]
 ----
@@ -151,7 +151,7 @@ because it is more convenient,
 but you are obviously free to implement it as you wish:
 as a lambda expression, in a separate Java file...
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/binder/Book.java[tags=include;!getters-setters]
 ----
@@ -176,7 +176,7 @@ You can pass string parameters to the `@IdentifierBinderRef` annotation and then
 
 .Passing parameters to an `IdentifierBridge` using the `@IdentifierBinderRef` annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetIdentifierBridge.java[tags=include]
 ----
@@ -186,7 +186,7 @@ For example, with an offset of 1 and database identifiers starting at 0, index i
 <2> The bridge accepts one parameter in its constructors:
 the offset to apply to identifiers.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/string/OffsetIdentifierBinder.java[tags=include]
 ----
@@ -196,7 +196,7 @@ The `param` method will throw an exception if the parameter has not been defined
 Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
 <2> Pass the parameter value as an argument to the bridge constructor.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/string/Book.java[tags=include;!getters-setters]
 ----
@@ -212,7 +212,7 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to an `IdentifierBridge` using a custom annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetIdentifierBridge.java[tags=include]
 ----
@@ -222,7 +222,7 @@ For example, with an offset of 1 and database identifiers starting at 0, index i
 <2> The bridge accepts one parameter in its constructors:
 the offset to apply to identifiers.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetDocumentId.java[tags=include]
 ----
@@ -249,7 +249,7 @@ and pass the annotation attribute as constructor argument.
 Alternatively, we could pass an identifier binder instead,
 using the `identifierBinder()` method.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/Book.java[tags=include;!getters-setters]
 ----
@@ -266,7 +266,7 @@ Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM 
 
 .Retrieving the ORM session or session factory from an `IdentifierBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/ormcontext/MyDataIdentifierBridge.java[tags=include]
 ----
@@ -301,7 +301,7 @@ Just pass an instance of the bridge.
 
 .Applying an `IdentifierBridge` with `.identifierBridge(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/simple/IdentifierBridgeSimpleIT.java[tags=programmatic]
 ----
@@ -311,7 +311,7 @@ Similarly, you can pass a binder instance:
 
 .Applying an `IdentifierBinder` with `.identifierBinder(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/binder/IdentifierBinderIT.java[tags=programmatic]
 ----

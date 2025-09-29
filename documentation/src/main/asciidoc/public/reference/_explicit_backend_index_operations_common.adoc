@@ -10,7 +10,7 @@ This can be useful to test how these analyzers/normalizers work.
 
 .Inspecting tokens produced by a configured analyzer.
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNormalizerIT.java[tags=analyzer]
 ----
@@ -24,7 +24,7 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNo
 
 .Inspecting tokens produced by a configured normalizer.
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/ApplyAnalyzerNormalizerIT.java[tags=normalizer]
 ----
@@ -56,7 +56,7 @@ and can target one, several or all indexes:
 
 .Retrieving a `SearchWorkspace` from the `SearchMapping`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
 ----
@@ -70,7 +70,7 @@ Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the 
 
 .Retrieving a `SearchWorkspace` from the `SearchSession`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
 ----
@@ -154,7 +154,7 @@ Below is an example using a `SearchWorkspace` to purge several indexes.
 
 .Purging indexes using a `SearchWorkspace`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-purge]
 ----

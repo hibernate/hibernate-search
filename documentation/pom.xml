@@ -343,7 +343,7 @@
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
-                                <source-highlighter>coderay</source-highlighter>
+                                <source-highlighter>rouge</source-highlighter>
                             </attributes>
                         </configuration>
                     </execution>

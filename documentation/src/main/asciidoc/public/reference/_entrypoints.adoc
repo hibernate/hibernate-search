@@ -42,7 +42,7 @@ call `Search.mapping(...)` and pass the `EntityManagerFactory`/`SessionFactory`:
 
 .Retrieving the `SearchMapping` from a Hibernate ORM `SessionFactory`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchMapping-fromSessionFactory]
 ----
@@ -57,7 +57,7 @@ Still with the <<mapper-orm,Hibernate ORM integration>>, the same can be done fr
 
 .Retrieving the `SearchMapping` from a JPA `EntityManagerFactory`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchMapping-fromEntityManagerFactory]
 ----
@@ -109,7 +109,7 @@ call `Search.session(...)` and pass the `EntityManager`/`Session`:
 
 .Retrieving the `SearchSession` from a Hibernate ORM `Session`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchSession-fromSession]
 ----
@@ -124,7 +124,7 @@ Still with the <<mapper-orm,Hibernate ORM integration>>, the same can be done fr
 
 .Retrieving the `SearchSession` from a JPA `EntityManager`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchSession-fromEntityManager]
 ----
@@ -143,7 +143,7 @@ the `SearchSession` should be created and closed explicitly:
 
 .Creating the `SearchSession`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=searchSession-simple]
 ----
@@ -164,7 +164,7 @@ The `SearchSession` can also be configured with a few options:
 
 .Creating the `SearchSession` with options
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=searchSession-withOptions]
 ----
@@ -189,7 +189,7 @@ A `SearchScope` can be retrieved from a <<entrypoints-search-mapping,`SearchMapp
 
 .Retrieving a `SearchScope` from a `SearchMapping`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchScope-fromSearchMapping]
 ----
@@ -211,7 +211,7 @@ In both cases, the entity name is the simple name of the Java class by default.
 
 .Retrieving a `SearchScope` from a `SearchSession`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchScope-fromSearchSession]
 ----

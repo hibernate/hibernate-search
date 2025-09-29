@@ -50,7 +50,7 @@ at the cost of a few limitations:
 This strategy is enabled by default,
 but can also be selected explicitly with the following settings:
 
-[source]
+[source, properties]
 ----
 hibernate.search.coordination.strategy = none
 ----
@@ -167,7 +167,7 @@ at the cost of being only able to perform this indexing asynchronously.
 
 The `outbox-polling` strategy can be enabled with the following settings:
 
-[source]
+[source, properties]
 ----
 hibernate.search.coordination.strategy = outbox-polling
 ----
@@ -183,7 +183,7 @@ See <<coordination-outbox-polling-multi-tenancy>>.
 
 You will also need to add this dependency:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -305,7 +305,7 @@ To allow some flexibility in this area, Hibernate Search provides a set of confi
 to specify catalog/schema/table names and a custom UUID generator strategy/data type
 for outbox event and agent tables:
 
-[source]
+[source, properties]
 ----
 # Configure the agent mapping:
 hibernate.search.coordination.entity.mapping.agent.catalog=CUSTOM_CATALOG
@@ -443,7 +443,7 @@ and then re-indexes the corresponding entities when new events are found.
 
 The event processor can be configured using the following configuration properties:
 
-[source]
+[source, properties]
 ----
 hibernate.search.coordination.event_processor.enabled = true
 hibernate.search.coordination.event_processor.polling_interval = 100
@@ -538,7 +538,7 @@ Dynamic sharding does not accept any configuration beyond the
 If you want to configure sharding explicitly, you can use static sharding
 by setting the following configuration properties:
 
-[source]
+[source, properties]
 ----
 hibernate.search.coordination.event_processor.shards.total_count = 4
 hibernate.search.coordination.event_processor.shards.assigned = 0
@@ -572,7 +572,7 @@ For example, the following configuration with 4 application nodes
 would assign shard `0` to application node #0, shard `1` application node #1,
 and no shard at all to application nodes #2 and #3:
 
-[source]
+[source, properties]
 ----
 # Node #0
 hibernate.search.coordination.strategy = outbox-polling
@@ -580,7 +580,7 @@ hibernate.search.coordination.event_processor.shards.total_count = 2
 hibernate.search.coordination.event_processor.shards.assigned = 0
 ----
 
-[source]
+[source, properties]
 ----
 # Node #1
 hibernate.search.coordination.strategy = outbox-polling
@@ -588,14 +588,14 @@ hibernate.search.coordination.event_processor.shards.total_count = 2
 hibernate.search.coordination.event_processor.shards.assigned = 1
 ----
 
-[source]
+[source, properties]
 ----
 # Node #2
 hibernate.search.coordination.strategy = outbox-polling
 hibernate.search.coordination.event_processor.enabled = false
 ----
 
-[source]
+[source, properties]
 ----
 # Node #3
 hibernate.search.coordination.strategy = outbox-polling
@@ -608,7 +608,7 @@ hibernate.search.coordination.event_processor.enabled = false
 
 The order in which outbox events are processed can be tuned with a configuration property:
 
-[source]
+[source, properties]
 ----
 hibernate.search.coordination.event_processor.order = auto
 ----
@@ -679,7 +679,7 @@ event processors detect that and resume event processing.
 
 The mass indexer agent can be configured using the following configuration properties:
 
-[source]
+[source, properties]
 ----
 hibernate.search.coordination.mass_indexer.polling_interval = 100
 hibernate.search.coordination.mass_indexer.pulse_interval = 2000
@@ -757,7 +757,7 @@ See below for an example.
 ====
 Node 1:
 
-[source]
+[source, properties]
 ----
 hibernate.search.multi_tenancy.tenant_ids=tenant1,tenant2,tenant3,tenant4
 hibernate.search.coordination.strategy = outbox-polling
@@ -767,7 +767,7 @@ hibernate.search.coordination.tenants.tenant1.event_processor.enabled = false <1
 
 Node 2:
 
-[source]
+[source, properties]
 ----
 hibernate.search.multi_tenancy.tenant_ids=tenant1,tenant2,tenant3,tenant4
 hibernate.search.coordination.strategy = outbox-polling
@@ -789,7 +789,7 @@ Hibernate Search exposes some APIs to work on aborted events.
 
 .Use the API for the aborted events
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 OutboxPollingSearchMapping searchMapping = Search.mapping( sessionFactory ).extension( OutboxPollingExtension.get() ); // <1>
 long count = searchMapping.countAbortedEvents(); // <2>
@@ -807,7 +807,7 @@ the tenant id to target the tenant operations are performed on.
 
 .Use the API for the aborted events with multi-tenancy
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 long count = searchMapping.countAbortedEvents( tenantId ); // <1>
 searchMapping.reprocessAbortedEvents( tenantId ); // <2>

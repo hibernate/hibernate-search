@@ -18,11 +18,11 @@ This mapping will declare the following fields in the `Book` index:
 * `title`
 * ... and nothing else.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/none/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/none/Author.java[tags=include;!getters-setters]
 ----
@@ -55,11 +55,11 @@ This mapping will declare the following fields in the `Book` index:
 * `title`
 * `authors.name`
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/onelevel/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/onelevel/Author.java[tags=include;!getters-setters]
 ----
@@ -100,15 +100,15 @@ This mapping will declare the following fields in the `Book` index:
 * `authors.name`
 * `authors.placeOfBirth.country`
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/twolevels/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/twolevels/Author.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/twolevels/Address.java[tags=include;!getters-setters]
 ----
@@ -278,13 +278,13 @@ This mapping will declare the following fields in the `Employee` index:
 * `department.name`: implicitly included by `@IndexedEmbedded`.
 * `department.id`: explicitly inserted by `includeEmbeddedObjectId = true.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includeembeddedobjectid/Department.java[tags=include;!getters-setters]
 ----
 <1> The `Department` identifier is not mapped to an index field (not <<mapping-directfieldmapping,`@*Field` annotation>>).
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includeembeddedobjectid/Employee.java[tags=include;!getters-setters]
 ----
@@ -405,7 +405,7 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 * `parents.parents.parents.name`: *not* implicitly included because `includeDepth` is not set and defaults to `0`,
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.name`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includepaths/Human.java[tags=include;!getters-setters]
 ----
@@ -428,7 +428,7 @@ The following fields in particular are excluded:
 * `parents.parents.nickname`: *not* included because `excludePaths` explicitly excludes `parents.nickname`.
 * `parents.parents.parents`/`parents.parents.parents.<any-field>`: *not* included because `excludePaths` explicitly excludes `parents.parents` stopping any further traversing.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/excludepaths/Human.java[tags=include;!getters-setters]
 ----
@@ -464,7 +464,7 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 but `parents.parents.parents.parents` and subfields can only be included explicitly)
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.parents.name`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includepathsanddepth/Human.java[tags=include;!getters-setters]
 ----
@@ -497,14 +497,14 @@ meaning that the tree structure is not preserved.
 
 .`@IndexedEmbedded` with a flattened structure
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/flattened/Book.java[tags=include;!getters-setters]
 ----
 <1> Explicitly set the structure of indexed-embedded to `FLATTENED`.
 This is not strictly necessary, since `FLATTENED` is the default.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/flattened/Author.java[tags=include;!getters-setters]
 ----
@@ -531,7 +531,7 @@ even though "Ty Abraham" is not one of this book's authors:
 
 .Searching with a flattened structure
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/flattened/IndexedEmbeddedStructureFlattenedIT.java[tags=include]
 ----
@@ -549,13 +549,13 @@ for each indexed-embedded element.
 
 .`@IndexedEmbedded` with a nested structure
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/nested/Book.java[tags=include;!getters-setters]
 ----
 <1> Explicitly set the structure of indexed-embedded objects to `NESTED`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/nested/Author.java[tags=include;!getters-setters]
 ----
@@ -592,7 +592,7 @@ thanks to the `nested` predicate (which can only be used when indexing with the 
 
 .Searching with a nested structure
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/nested/IndexedEmbeddedStructureNestedIT.java[tags=include]
 ----
@@ -618,11 +618,11 @@ and <<mapping-reindexing-derivedfrom,`@IndexingDependency.derivedFrom`>>.
 
 .Filtered an `@IndexedEmbedded` association with a transient getter, `@AssociationInverseSide` and `@IndexingDependency.derivedFrom`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/filteredassociation/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/filteredassociation/BookEdition.java[tags=include;!getters-setters]
 ----
@@ -657,7 +657,7 @@ This mapping will declare the following fields in the `Book` index:
 * `title`
 * `authors.name`
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/onelevel/IndexedEmbeddedOneLevelIT.java[tags=programmatic]
 ----

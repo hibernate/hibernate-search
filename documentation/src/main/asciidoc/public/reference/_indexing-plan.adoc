@@ -169,7 +169,7 @@ The built-in strategies can be retrieved by calling:
 
 .Overriding the indexing plan synchronization strategy
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmIndexingPlanSynchronizationStrategyIT.java[tags=indexing-plan-synchronization-strategy-override]
 ----
@@ -206,7 +206,7 @@ and session-level filters to manage which types are tracked for changes and inde
 
 .Configuring an application-wide filter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=application-filter]
 ----
@@ -219,7 +219,7 @@ Configuring an application-wide filter requires an instance of the `SearchMappin
 
 .Configuring a session-level filter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter]
 ----
@@ -253,7 +253,7 @@ the application-wide filter disables indexing completely.
 
 .Disable all indexing within a session
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-all]
 ----
@@ -265,7 +265,7 @@ Configuring a session level filter is available through an instance of the `Sear
 
 .Enable indexing in the session while application-wide indexing is paused
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-include-all-application]
 ----

@@ -113,7 +113,7 @@ Below are examples of using `addOrUpdate` and `delete`.
 
 .Explicitly adding or updating an entity in the index using `SearchIndexingPlan`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-addOrUpdate]
 ----
@@ -129,7 +129,7 @@ or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO
 
 .Explicitly deleting an entity from the index using `SearchIndexingPlan`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-delete]
 ----
@@ -174,7 +174,7 @@ when not using Hibernate Search.
 
 .A batch process with JPA
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-clear]
 ----
@@ -218,7 +218,7 @@ from the last transaction that failed.
 
 .A batch process with Hibernate Search using multiple transactions
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-multiple-transactions]
 ----
@@ -274,7 +274,7 @@ and <<indexing-massindexer,reindex everything>>.
 
 .A batch process with Hibernate Search using `execute()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-execute-clear]
 ----

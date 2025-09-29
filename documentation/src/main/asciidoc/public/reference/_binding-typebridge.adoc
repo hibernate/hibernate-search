@@ -34,7 +34,7 @@ to a single `fullName` field.
 [[example-class-bridge]]
 .Implementing and using a `TypeBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/simple/FullNameBinder.java[tags=binder]
 ----
@@ -61,7 +61,7 @@ for more information about declaring index field types.
 <8> Pass the type bridge instance.
 <9> Pass a reference to the `fullName` field to the bridge.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/simple/FullNameBinder.java[tags=bridge]
 ----
@@ -81,7 +81,7 @@ and optionally transform it.
 Note the `fullName` field was declared at the root,
 so we call `addValue` directly on the `target` argument.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/simple/Author.java[tags=include;!getters-setters]
 ----
@@ -93,7 +93,7 @@ these are already handled by the bridge.
 
 Here is an example of what an indexed document would look like, with the Elasticsearch backend:
 
-[source, JSON]
+[source, json]
 ----
 {
   "fullName": "Asimov Isaac"
@@ -116,7 +116,7 @@ You can pass string parameters to the `@TypeBinderRef` annotation and then use t
 
 .Passing parameters to a `TypeBinder` using the `@TypeBinderRef` annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/string/FullNameBinder.java[tags=include]
 ----
@@ -131,7 +131,7 @@ defining the field name,
 defining a normalizer,custom annotation
 ...
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/string/Author.java[tags=include;!getters-setters]
 ----
@@ -147,7 +147,7 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to a `TypeBinder` using a custom annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/FullNameBinding.java[tags=include]
 ----
@@ -171,7 +171,7 @@ setting its generic type argument to the type of the corresponding annotation.
 Here we're using a setter, but passing the data through the constructor would work, too.
 <10> Apply the binder to the type.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/FullNameBinder.java[tags=include]
 ----
@@ -184,7 +184,7 @@ defining the field name,
 defining a normalizer,custom annotation
 ...
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/Author.java[tags=include;!getters-setters]
 ----
@@ -201,7 +201,7 @@ Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM 
 
 .Retrieving the ORM session from a `TypeBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/ormcontext/MyEntityTypeBinder.java[tags=include]
 ----
@@ -236,7 +236,7 @@ Just pass an instance of the binder. You can pass arguments either through the b
 
 .Applying a `TypeBinder` with `.binder(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/TypeBridgeParamAnnotationIT.java[tags=programmatic]
 ----

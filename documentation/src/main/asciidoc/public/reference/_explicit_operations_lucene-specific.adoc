@@ -11,7 +11,7 @@ can be retrieved from the Lucene backend.
 
 .Retrieving the Lucene analyzers by name from the backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromBackend]
 ----
@@ -34,7 +34,7 @@ delegating to the analyzer configured in the mapping for each field.
 
 .Retrieving the Lucene analyzers for a whole index
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromIndexManager]
 ----
@@ -56,7 +56,7 @@ The size of a Lucene index can be retrieved from the `LuceneIndexManager`.
 
 .Retrieving the index size from a Lucene index manager
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmanager/LuceneGetIndexSizeIT.java[tags=computeIndexSize]
 ----
@@ -74,7 +74,7 @@ The low-level `IndexReader` can be retrieved from the `LuceneIndexScope`.
 
 .Retrieving the index reader from a Lucene index scope
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/lowlevel/LuceneLowLevelIndexReaderIT.java[tags=indexReader]
 ----

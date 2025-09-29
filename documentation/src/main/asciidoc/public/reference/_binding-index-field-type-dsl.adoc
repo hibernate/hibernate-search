@@ -38,7 +38,7 @@ See below for an example.
 
 .Defining a field type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/fieldtypes/dsl/simple/ISBNBinder.java[tags=include]
 ----
@@ -109,7 +109,7 @@ See below for an example.
 
 .Assigning a DSL converter to a field type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/fieldtypes/dsl/dslconverter/ISBNBinder.java[tags=include]
 ----
@@ -119,7 +119,7 @@ This converter will be used transparently by the search DSLs.
 <3> Define the input type as `ISBN` by passing `ISBN.class` as the first parameter.
 <4> Define how to convert an `ISBN` to a `String` by passing a converter as the second parameter.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/fieldtypes/dsl/dslconverter/IndexFieldTypeDslDslConverterIT.java[tags=include]
 ----
@@ -159,7 +159,7 @@ See below for an example.
 
 .Assigning a projection converter to a field type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/fieldtypes/dsl/projectionconverter/ISBNBinder.java[tags=include]
 ----
@@ -169,7 +169,7 @@ This converter will be used transparently by the search DSLs.
 <3> Define the converted type as `ISBN` by passing `ISBN.class` as the first parameter.
 <4> Define how to convert a `String` to an `ISBN` by passing a converter as the second parameter.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/fieldtypes/dsl/projectionconverter/IndexFieldTypeDslProjectionConverterIT.java[tags=include]
 ----

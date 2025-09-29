@@ -43,7 +43,7 @@ As a result, any call to the DSL will be expected to pass an `AuthenticationOutc
 
 .Transparent conversion of DSL parameters
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-enabled]
 ----
@@ -65,7 +65,7 @@ and pass `ValueModel.INDEX`:
 
 .Disabling the DSL converter
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-disabled]
 ----
@@ -80,7 +80,7 @@ alternatively see how it can be <<binding-valuebridge-parse,customized with brid
 
 .Using the `STRING` DSL converter to work with string arguments
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-string]
 ----
@@ -97,7 +97,7 @@ Inspect the corresponding implementation of the `LuceneFieldCodec` to identify t
 
 .Using the `RAW` DSL converter to work with raw arguments
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-raw]
 ----
@@ -144,7 +144,7 @@ As a result, any projection on the `status` field will return an `OrderStatus` i
 
 .Transparent conversion of projections
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-enabled]
 ----
@@ -160,7 +160,7 @@ and pass `ValueModel.INDEX`:
 
 .Disabling the projection converter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-disabled]
 ----
@@ -177,7 +177,7 @@ Inspect the corresponding implementation of the `LuceneFieldCodec` to identify t
 
 .Using the `RAW` projection converter to work with raw projections
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-raw]
 ----

@@ -70,7 +70,7 @@ is also relevant for the OpenSearch distribution.
 
 If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
 as part of your dependency management to keep all its artifact versions aligned:
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencyManagement>
     <dependencies>
@@ -112,7 +112,7 @@ To leverage the dependency management provided by these platform files, use the 
 the <<compatibility-search-dependencies-bom,regular BOM>> file:
 
 .Importing the Hibernate Search platform BOM
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencyManagement>
     <dependencies>
@@ -190,7 +190,7 @@ so that Spring Boot passes along the properties to Hibernate ORM, which will pas
 +
 For example:
 +
-[source]
+[source, properties]
 ----
 spring.jpa.properties.hibernate.search.backend.hosts = elasticsearch.mycompany.com
 ----
@@ -208,7 +208,7 @@ With Maven, there are a few ways to override these versions depending on how Spr
 If your application's POM file is using `spring-boot-starter-parent` as its parent POM
 then simply adding version properties to your POM's `<properties>` should help:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <properties>
     <hibernate.version>{hibernateVersion}</hibernate.version>
@@ -229,7 +229,7 @@ then overriding the versions can be done either by importing a BOM listing the d
 or by explicitly listing a dependency with its version that we want to be used:
 
 .Override dependencies either with another BOM or explicitly
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencyManagement>
     <dependencies>

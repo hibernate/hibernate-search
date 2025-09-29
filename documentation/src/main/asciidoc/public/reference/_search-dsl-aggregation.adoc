@@ -29,7 +29,7 @@ Aggregations can be configured when building the search query:
 [[example-applying-faceting]]
 .Defining an aggregation in a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=entryPoint-lambdas]
 ----
@@ -49,7 +49,7 @@ Alternatively, if you don't want to use lambdas:
 
 .Defining an aggregation in a search query -- object-based syntax
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=entryPoint-objects]
 ----
@@ -90,7 +90,7 @@ The `terms` aggregation is not available on geo-point fields.
 
 .Counting hits grouped by the value of a field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms]
 ----
@@ -115,7 +115,7 @@ you can do it this way:
 
 .Counting hits grouped by the value of a field, without converting field values
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-noConverter]
 ----
@@ -131,7 +131,7 @@ You can customize the limit by calling `.maxTermCount(...)`:
 
 .Setting the maximum number of returned entries in a `terms` aggregation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-max-term-count]
 ----
@@ -150,7 +150,7 @@ To that end, just call `.minDocumentCount(0)`:
 
 .Including values from unmatched documents in a `terms` aggregation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-min-doc-count-zero]
 ----
@@ -160,7 +160,7 @@ This can also be used to omit entries with a document count that is too low to m
 
 .Excluding the rarest terms from a `terms` aggregation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-min-doc-count-high]
 ----
@@ -180,7 +180,7 @@ You can order entries by ascending term value:
 [[section-sorting-faceting-request]]
 .Ordering entries by ascending value in a `terms` aggregation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-order-term-ascending]
 ----
@@ -190,7 +190,7 @@ You can order entries by descending term value:
 
 .Ordering entries by descending value in a `terms` aggregation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-order-term-descending]
 ----
@@ -200,7 +200,7 @@ Finally, you can order entries by ascending document count:
 
 .Ordering entries by ascending count in a `terms` aggregation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-order-count-ascending]
 ----
@@ -221,7 +221,7 @@ The `.value(..)` accepts any other aggregation, which will be applied to the doc
 
 .Total price of books per category
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-sum]
 ----
@@ -249,7 +249,7 @@ The `range` aggregation is not available on geo-point fields.
 
 .Counting hits grouped by range of values for a field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range]
 ----
@@ -268,7 +268,7 @@ you can pass a single argument of type `Range`.
 
 .Counting hits grouped by range of values for a field -- passing `Range` objects
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-objects]
 ----
@@ -296,7 +296,7 @@ which is especially useful if ranges are defined dynamically (e.g. in a web inte
 
 .Counting hits grouped by range of values for a field -- passing a collection of `Range` objects
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-objects-collection]
 ----
@@ -319,7 +319,7 @@ you can do it this way:
 
 .Counting hits grouped by range of values for a field, without converting field values
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-noConverter]
 ----
@@ -336,7 +336,7 @@ The `.value(..)` accepts any other aggregation, which will be applied to the doc
 
 .Total price of books per category
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-avg]
 ----
@@ -370,7 +370,7 @@ The `sum` aggregation sums up the field values.
 
 .Sum the prices of all science fiction books
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=sums]
 ----
@@ -391,7 +391,7 @@ The `min` aggregation provides the minimum value among the field values.
 
 .Find the min release date among all the science fiction books
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=min]
 ----
@@ -404,7 +404,7 @@ The `max` aggregation provides the maximum value among the field values.
 
 .Find the max release date among all the science fiction books
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=max]
 ----
@@ -423,7 +423,7 @@ this aggregation can still be useful in defining aggregation values in other, mo
 
 .Count the number of the science fiction books
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count-documents]
 ----
@@ -437,7 +437,7 @@ For single-valued fields this aggregation would result in the number of document
 
 .Count the number of the science fiction books with prices
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count]
 ----
@@ -449,7 +449,7 @@ Additionally, it is possible to count only the distinct field values.
 
 .Count the number of all different price value among all the science fiction books
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=count-distinct]
 ----
@@ -464,7 +464,7 @@ The `avg` aggregation calculates the average value of a given numeric or tempora
 
 .Compute the average price of all science fiction books
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=avg]
 ----
@@ -502,7 +502,7 @@ Constructing composite aggregations is quite similar to <<search-dsl-projection-
 ====
 
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-customObject]
 ----
@@ -524,7 +524,7 @@ and will be set using `asList(...)` instead of `as(..,)`:
 
 .Returning custom object created from multiple aggregation values with `.composite().from(...).asList(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-customObject-asList]
 ----
@@ -544,7 +544,7 @@ you can do without the transformer by simply calling `asList()`:
 
 .Returning a `List` of aggregated values with `.composite().add(...).asList()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-list]
 ----
@@ -564,7 +564,7 @@ you can do without the transformer by calling `asArray()`:
 
 .Returning an array of aggregated values with `.composite(...).add(...).asArray()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-array]
 ----
@@ -584,7 +584,7 @@ you can use the shorter variant of `.composite(...)` that directly takes aggrega
 
 .Returning a `List` of aggregated values with `.composite(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=composite-list-singlestep]
 ----
@@ -607,7 +607,7 @@ That function will get called at query building time.
 
 .Creating an aggregation with query parameters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=with-parameters]
 ----
@@ -636,7 +636,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 
 .Defining a native Elasticsearch JSON aggregation as a `JsonObject`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/ElasticsearchAggregationDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
@@ -645,7 +645,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Elast
 
 .Defining a native Elasticsearch JSON aggregation as a JSON-formatted string
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/ElasticsearchAggregationDslIT.java[tags=elasticsearch-fromJson-string]
 ----
@@ -672,7 +672,7 @@ the price of e-book editions, for example, is ignored.
 
 .Counting hits grouped by range of values for a field, using a filter for nested objects
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=filter]
 ----

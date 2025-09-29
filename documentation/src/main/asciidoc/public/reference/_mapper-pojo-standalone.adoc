@@ -38,6 +38,7 @@ Starting up Hibernate Search with the Standalone POJO Mapper is explicit and inv
 
 .Starting up Hibernate Search with the Standalone POJO Mapper
 ====
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=setup]
 ----
@@ -64,7 +65,7 @@ You can shut down Hibernate Search with the Standalone POJO Mapper by calling th
 
 .Shutting down Hibernate Search with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=shutdown]
 ----
@@ -100,7 +101,7 @@ Multi-tenancy needs to be enabled explicitly when starting the Standalone POJO M
 
 .Enabling multi-tenancy with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/multitenancy/StandalonePojoMultiTenancyIT.java[tags=setup]
 ----
@@ -114,7 +115,7 @@ Once multi-tenancy is enabled, a tenant ID will have to be provided when creatin
 
 .Creating the `SearchSession` with a tenant identifier
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/multitenancy/StandalonePojoMultiTenancyIT.java[tags=searchSession]
 ----
@@ -128,7 +129,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/m
 ====
 When using non-string tenant identifiers, a custom `TenantIdentifierConverter` must be provided:
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/multitenancy/StandalonePojoMultiTenancyUuidIT.java[tags=setup]
 ----
@@ -225,7 +226,7 @@ The Standalone POJO Mapper `SearchMappingBuilder` can also take properties from 
 
 .Loading configuration properties from a file using a `Reader`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoReadPropertiesFromFileIT.java[tags=setup]
 ----

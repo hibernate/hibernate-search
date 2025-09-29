@@ -45,7 +45,7 @@ deleting the index and then reloading all entities from the database.
 
 .Reindexing everything using a `MassIndexer`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=simple]
 ----
@@ -79,7 +79,7 @@ and <<indexing-massindexer-tuning>> for details about key topics.
 
 .Using a tuned MassIndexer
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=parameters]
 ----
@@ -107,7 +107,7 @@ to reindex only these types (and their indexed subtypes, if any):
 
 .Reindexing selected types using a `MassIndexer`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=select-type]
 ----
@@ -127,7 +127,7 @@ and passing a collection of tenant identifiers:
 
 .Reindexing multiple tenants listed explicitly using a `MassIndexer`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerMultiTenancyIT.java[tags=explicitTenants]
 ----
@@ -146,7 +146,7 @@ and the resulting mass indexer will target all configured tenants:
 
 .Reindexing multiple tenants configured implicitly using a `MassIndexer`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerMultiTenancyIT.java[tags=implicitTenants]
 ----
@@ -168,7 +168,7 @@ to track the completion of mass indexing:
 
 .Reindexing asynchronously using a `MassIndexer`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=async]
 ----
@@ -193,7 +193,7 @@ Accessible entity properties are those of the entity being reindexed (and nothin
 
 .Use of conditional reindexing
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=reindexOnly]
 ----

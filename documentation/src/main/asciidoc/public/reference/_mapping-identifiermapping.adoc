@@ -34,7 +34,7 @@ just apply the `@DocumentId` annotation to that property:
 [[example-document-id-explicit]]
 .Mapping a property to the document identifier explicitly with `@DocumentId`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/naturalid/Book.java[tags=include;!getters-setters]
 ----
@@ -46,7 +46,7 @@ then refer to it in the `@DocumentId` annotation:
 
 .Mapping a property with unsupported type to the document identifier with `@DocumentId`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/customtype/Book.java[tags=include;!getters-setters]
 ----
@@ -158,7 +158,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Mapping a property to the document identifier explicitly with `.documentId()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/naturalid/IdentifierMappingNaturalIdIT.java[tags=programmatic]
 ----

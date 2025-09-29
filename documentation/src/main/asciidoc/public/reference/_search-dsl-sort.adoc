@@ -11,7 +11,7 @@ Other sorts, including the sort by field value, can be configured when building 
 
 .Using custom sorts
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-lambdas]
 ----
@@ -27,7 +27,7 @@ Alternatively, if you don't want to use lambdas:
 
 .Using custom sorts -- object-based syntax
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-objects]
 ----
@@ -65,7 +65,7 @@ but below is an example of how you can do it.
 
 .Sorting by relevance
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=score]
 ----
@@ -88,7 +88,7 @@ Use it when performance matters more than the order of hits.
 
 .Sorting according to the order of documents on storage
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=indexOrder]
 ----
@@ -130,7 +130,7 @@ For text fields, "lower" means "lower in the alphabetical order".
 
 .Sorting by field values
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field]
 ----
@@ -167,7 +167,7 @@ you need to mark the field as <<mapping-directfieldmapping-sortable,sortable>> i
 
 .Sorting by distance to a point
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=distance]
 ----
@@ -195,7 +195,7 @@ That function will get called at query building time.
 
 .Creating a sort with query parameters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=with-parameters]
 ----
@@ -212,7 +212,7 @@ It is useful when applying incomplete sorts.
 
 .Sorting by multiple composed sorts using `composite()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite]
 ----
@@ -233,7 +233,7 @@ Alternatively, you can append a sort to another simply by calling `.then()` afte
 
 .Sorting by multiple composed sorts using `then()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=then]
 ----
@@ -248,7 +248,7 @@ for example based on user input.
 
 .Easily composing sorts dynamically with the lambda syntax
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite_dynamicParameters]
 ----
@@ -275,7 +275,7 @@ and to append a `field` sort by id to your unstable sort:
 
 .Stabilizing a sort
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=stabilization]
 ----
@@ -301,7 +301,7 @@ include::../components/_lucene-api-warning.adoc[]
 
 .Sorting by a native `org.apache.lucene.search.Sort`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDslIT.java[tags=lucene-fromLuceneSort]
 ----
@@ -316,7 +316,7 @@ include::../components/_lucene-api-warning.adoc[]
 
 .Sorting by a native `org.apache.lucene.search.SortField`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDslIT.java[tags=lucene-fromLuceneSortField]
 ----
@@ -331,7 +331,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 
 .Sorting by a native Elasticsearch JSON sort provided as a `JsonObject`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/ElasticsearchSortDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
@@ -339,7 +339,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/Elasticsearc
 
 .Sorting by a native Elasticsearch JSON sort provided as a JSON-formatted string
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/ElasticsearchSortDslIT.java[tags=elasticsearch-fromJson-string]
 ----
@@ -363,7 +363,7 @@ Below are a few examples with the <<search-dsl-sort-field,field sort>>.
 
 .Sorting by field values in explicitly ascending order with `asc()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-asc]
 ----
@@ -371,7 +371,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 
 .Sorting by field values in explicitly descending order with `desc()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-desc]
 ----
@@ -379,7 +379,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 
 .Sorting by field values in explicitly descending order with `order(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-order]
 ----
@@ -422,7 +422,7 @@ Below are a few examples with the <<search-dsl-sort-field,field sort>>.
 
 .Sorting by field values, documents with no value in first position
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-first]
 ----
@@ -430,7 +430,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 
 .Sorting by field values, documents with no value in last position
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-last]
 ----
@@ -438,7 +438,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 
 .Sorting by field values, documents with no value using a given default value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-use]
 ----
@@ -502,7 +502,7 @@ Below is an example with the <<search-dsl-sort-field,field sort>>.
 
 .Sorting by field values using the average value for each document
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=mode-avg]
 ----
@@ -524,7 +524,7 @@ but only books of the "crime fiction" genre are considered:
 
 .Sorting by field values using a filter for nested objects
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=filter]
 ----

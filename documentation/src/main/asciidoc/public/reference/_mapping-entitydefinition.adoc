@@ -29,7 +29,7 @@ With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
 
 .Marking a class as an entity with `@SearchEntity`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entitydefinition/Book.java[tags=search-entity-default]
 ----
@@ -109,7 +109,7 @@ include::../components/_search-entity-orm-warning.adoc[]
 
 .Setting a custom entity name with `@SearchEntity(name = ...)`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entitydefinition/Author.java[tags=search-entity-explicitname]
 ----
@@ -138,7 +138,7 @@ include::../components/_search-entity-orm-warning.adoc[]
 
 .Assigning a mass loading strategy with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/Book.java[tags=include]
 ----
@@ -147,7 +147,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/l
 NOTE: Subclasses inherit the loading binder of their parent class,
 unless they override it with a loading binder of their own.
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/MyLoadingBinder.java[tags=include]
 ----
@@ -168,7 +168,7 @@ Below is an example of `MassLoadingStrategy` implementation for an imaginary dat
 
 .Implementing `MassLoadingStrategy`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/MyMassLoadingStrategy.java[tags=include]
 ----
@@ -225,7 +225,7 @@ they can be reindexed using the <<indexing-massindexer,mass indexer>>:
 
 .Mass indexing with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/StandalonePojoMassLoadingIT.java[tags=massIndexer]
 ----
@@ -257,7 +257,7 @@ include::../components/_search-entity-orm-warning.adoc[]
 
 .Assigning a selection loading strategy with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/mass/Book.java[tags=include]
 ----
@@ -266,7 +266,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/l
 NOTE: Subclasses inherit the loading binder of their parent class,
 unless they override it with a loading binder of their own.
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/selection/MyLoadingBinder.java[tags=include]
 ----
@@ -281,7 +281,7 @@ Below is an example of `SelectionLoadingStrategy` implementation for an imaginar
 
 .Implementing `SelectionLoadingStrategy`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/selection/MySelectionLoadingStrategy.java[tags=include]
 ----
@@ -310,7 +310,7 @@ they can be loaded as hits when <<search-dsl-query,querying>>:
 
 .Loading entities as search query hits with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/selection/StandalonePojoSelectionLoadingIT.java[tags=search]
 ----
@@ -341,7 +341,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Marking a type as an entity type with `.searchEntity()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entitydefinition/StandalonePojoSearchEntityIT.java[tags=programmatic]
 ----

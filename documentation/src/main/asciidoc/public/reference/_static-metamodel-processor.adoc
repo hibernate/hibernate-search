@@ -14,7 +14,7 @@ This annotation processor is located in the `org.hibernate.search:hibernate-sear
 The annotation processor has to be added to the build, e.g. for Maven:
 
 ====
-[source,XML,subs="+attributes"]
+[source,xml,subs="+attributes"]
 ----
 <plugin>
     <artifactId>maven-compiler-plugin</artifactId>
@@ -58,7 +58,7 @@ This way the generated metamodel classes will be based on the same backend that 
 The annotation processor options are passed as the compiler arguments with the `-A` key:
 
 ====
-[source,XML,subs="+attributes"]
+[source,xml,subs="+attributes"]
 ----
 <plugin>
     <artifactId>maven-compiler-plugin</artifactId>

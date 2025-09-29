@@ -14,7 +14,7 @@ Mapping a property to an index field looks like this:
 
 .Mapping properties to fields directly
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/Book.java[tags=direct-field-mapping]
 ----
@@ -682,7 +682,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Mapping properties to fields directly with `.genericField()`, `.fullTextField()`, ...
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=programmatic]
 ----

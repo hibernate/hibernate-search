@@ -27,7 +27,7 @@ then define bridges as shown below:
 
 .Defining default bridges with a mapping configurer
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/bridgeresolver/MyDefaultBridgesConfigurer.java[tags=include]
 ----
@@ -53,7 +53,7 @@ but instead are indexed as their label retrieved from an external service.
 
 .Assigning a single default binder to multiple types with a mapping configurer
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/bridgeresolver/MyDefaultBridgesConfigurer.java[tags=advanced]
 ----
