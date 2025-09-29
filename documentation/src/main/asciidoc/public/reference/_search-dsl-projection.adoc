@@ -15,7 +15,7 @@ Projections can be configured when building the search query:
 
 .Using projections to extract data from the index
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-lambdas]
 ----
@@ -30,7 +30,7 @@ Alternatively, if you don't want to use lambdas:
 
 .Using projections to extract data from the index -- object-based syntax
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-objects]
 ----
@@ -57,7 +57,7 @@ include::../components/_custom-projection-type-important.adoc[]
 
 .Using a custom record type to project data from the index
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
 ----
@@ -77,7 +77,7 @@ Multivalued projections <<mapping-projection-inner-inference-type,must be modele
 Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=entryPoint-mapped-record]
 ----
@@ -107,7 +107,7 @@ The `documentReference` projection returns a reference to the matched document a
 
 .Returning references to matched documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=documentReference]
 ----
@@ -125,7 +125,7 @@ use the `@DocumentReferenceProjection` annotation:
 
 .Returning references to matched documents within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookDocRefAndTitleProjection.java[tags=include]
 ----
@@ -135,7 +135,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBook
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-document-reference]
 ----
@@ -148,7 +148,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `DocumentRefer
 
 .Programmatic mapping of a `documentReference` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-document-reference-projection]
 ----
@@ -164,7 +164,7 @@ The `entityReference` projection returns a reference to the matched entity as an
 
 .Returning references to matched entities
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=reference]
 ----
@@ -181,7 +181,7 @@ use the `@EntityReferenceProjection` annotation:
 
 .Returning references to matched entities within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookEntityRefAndTitleProjection.java[tags=include]
 ----
@@ -191,7 +191,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBook
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity-reference]
 ----
@@ -204,7 +204,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityReferen
 
 .Programmatic mapping of an `entityReference` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-reference-projection]
 ----
@@ -220,7 +220,7 @@ The `id` projection returns the identifier of the matched entity.
 
 .Returning ids to matched entities, providing the identity type.
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-int]
 ----
@@ -233,7 +233,7 @@ You can omit the "identifier type" argument, but then you will get projections o
 
 .Returning ids to matched entities, without providing the identity type.
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-object]
 ----
@@ -247,7 +247,7 @@ use the `@IdProjection` annotation:
 
 .Returning ids to matched entities within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookIdAndTitleProjection.java[tags=include]
 ----
@@ -258,7 +258,7 @@ the type of the target entity's identifier.
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-id]
 ----
@@ -271,7 +271,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `IdProjectionB
 
 .Programmatic mapping of an `id` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-id-projection]
 ----
@@ -297,7 +297,7 @@ the `entity` projection will simply fail.
 
 .Returning matched entities loaded from the database
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entity]
 ----
@@ -321,7 +321,7 @@ the requested type matches the type of loaded entities.
 
 .Requesting a specific entity type when for the `entity` projection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entity-requested-type]
 ----
@@ -335,7 +335,7 @@ use the `@EntityProjection` annotation:
 
 .Returning matched entities loaded from the database within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookEntityAndTitleProjection.java[tags=include]
 ----
@@ -346,7 +346,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBook
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity]
 ----
@@ -359,7 +359,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityProject
 
 .Programmatic mapping of an `entity` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-projection]
 ----
@@ -381,7 +381,7 @@ so the code below will be enough for a single-valued field:
 
 .Returning field values from matched documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field]
 ----
@@ -394,7 +394,7 @@ You can omit the "field type" argument, but then you will get projections of typ
 
 .Returning field values from matched documents, without specifying the field type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-noType]
 ----
@@ -409,7 +409,7 @@ would have returned.
 
 .Returning field values from matched documents, for multivalued fields
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-multiValued]
 ----
@@ -432,7 +432,7 @@ you can do it this way:
 
 .Returning field values from matched documents, without converting the field value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-noProjectionConverter]
 ----
@@ -456,7 +456,7 @@ use the `@FieldProjection` annotation on the constructor parameter:
 
 .Returning field values from matched documents within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorNamesProjection.java[tags=include]
 ----
@@ -473,7 +473,7 @@ the type of the constructor parameter must be assignable from `List<T>`,
 where `T` is the type of the projected field or a supertype.
 See <<mapping-projection-inner-inference-type>> for more information.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-field]
 ----
@@ -500,7 +500,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `FieldProjecti
 
 .Programmatic mapping of a `field` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-field-projection]
 ----
@@ -516,7 +516,7 @@ The `score` projection returns the <<search-dsl-predicate-common-score,score>> o
 
 .Returning the score of matched documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=score]
 ----
@@ -542,7 +542,7 @@ use the `@ScoreProjection` annotation:
 
 .Returning the score of matched documents within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookScoreAndTitleProjection.java[tags=include]
 ----
@@ -552,7 +552,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBook
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-score]
 ----
@@ -565,7 +565,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `ScoreProjecti
 
 .Programmatic mapping of a `score` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-score-projection]
 ----
@@ -588,7 +588,7 @@ so the code below will be enough for a single-valued field:
 
 .Returning the distance to a point
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance]
 ----
@@ -601,7 +601,7 @@ The returned distance is in meters by default, but you can pick a different unit
 
 .Returning the distance to a point with a given distance unit
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-unit]
 ----
@@ -615,7 +615,7 @@ This will change the return type of the projection to `SomeContainer<Double>`.
 
 .Returning the distance to a point, for multivalued fields
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-multiValued]
 ----
@@ -629,7 +629,7 @@ use the `@DistanceProjection` annotation on the constructor parameter:
 
 .Returning distance from a center point defined as a parameter to the field value in matched documents within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyAuthorPlaceProjection.java[tags=include]
 ----
@@ -645,7 +645,7 @@ For multi-valued projections,
 the type of the constructor parameter must be assignable from `List<T>`,
 where `T` is `Double` or a supertype.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-distance]
 ----
@@ -679,7 +679,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `DistanceProje
 
 .Programmatic mapping of a `distance` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-distance-projection]
 ----
@@ -703,7 +703,7 @@ It will receive values returned by inner projections and return an object combin
 
 .Returning custom objects created from multiple projected values with `.composite().from(...).as(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject]
 ----
@@ -732,7 +732,7 @@ and will be set using `asList(...)` instead of `as(..,)`:
 
 .Returning custom objects created from multiple projected values with `.composite().from(...).asList(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject-asList]
 ----
@@ -756,7 +756,7 @@ you can do without the transformer by calling `asList()`:
 
 .Returning a `List` of projected values with `.composite().add(...).asList()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-list]
 ----
@@ -776,7 +776,7 @@ you can do without the transformer by calling `asArray()`:
 
 .Returning an array of projected values with `.composite(...).add(...).asArray()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-array]
 ----
@@ -796,7 +796,7 @@ you can use the shorter variant of `.composite(...)` that directly takes project
 
 .Returning a `List` of projected values with `.composite(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-list-singlestep]
 ----
@@ -819,7 +819,7 @@ include::../components/_custom-projection-type-important.adoc[]
 
 .Using a custom record type to project data from the index
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
 ----
@@ -839,7 +839,7 @@ Multivalued projections <<mapping-projection-inner-inference-type,must be modele
 Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=composite-mapped-record]
 ----
@@ -863,7 +863,7 @@ use the `@CompositeProjection` annotation on the constructor parameter:
 
 .Returning custom objects created from multiple projections within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookMiscInfoAndTitleProjection.java[tags=include]
 ----
@@ -874,7 +874,7 @@ See <<mapping-projection-inner-inference-type>> for more information.
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-composite]
 ----
@@ -887,7 +887,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `CompositeProj
 
 .Programmatic mapping of a `composite` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-composite-projection]
 ----
@@ -903,7 +903,7 @@ are available on `SearchProjectionFactory`, but they are deprecated.
 
 .Deprecated variant of `composite`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject-singlestep]
 ----
@@ -964,7 +964,7 @@ It will receive values returned by inner projections and return an object combin
 
 .Returning custom objects created from an object field with `.object(...).from(...).as(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject]
 ----
@@ -996,7 +996,7 @@ and will be set using `asList(...)` instead of `as(..,)`:
 
 .Returning custom objects created from an object field with `.object(...).from(...).asList(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject-asList]
 ----
@@ -1021,7 +1021,7 @@ Similarly, `asArray(...)` can be used to get passed an `Object[]` argument inste
 
 .Returning custom objects created from an object field with `.object(...).from(...).asArray(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject-asArray]
 ----
@@ -1050,7 +1050,7 @@ you can do without the transformer by calling `asList()`:
 
 .Returning a `List` of projected values with `.object(...).add(...).asList()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-list]
 ----
@@ -1073,7 +1073,7 @@ you can do without the transformer by calling `asArray()`:
 
 .Returning an array of projected values with `.object(...).add(...).asArray()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-array]
 ----
@@ -1102,7 +1102,7 @@ include::../components/_custom-projection-type-important.adoc[]
 
 .Using a custom record type to project data created from an object field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyAuthorProjection.java[tags=include]
 ----
@@ -1116,7 +1116,7 @@ Alternatively, the field projection can be configured explicitly with <<search-d
 +
 Most projections have a corresponding annotation that can be used on constructor parameters.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=object-mapped-record]
 ----
@@ -1148,7 +1148,7 @@ use the `@ObjectProjection` annotation on the constructor parameter:
 
 .Returning custom objects created from an object field within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorsProjection.java[tags=include]
 ----
@@ -1167,7 +1167,7 @@ See <<mapping-projection-inner-inference-type>> for more information.
 <6> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-object]
 ----
@@ -1198,7 +1198,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `ObjectProject
 
 .Programmatic mapping of an `object` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-object-projection]
 ----
@@ -1297,7 +1297,7 @@ All three examples are based on the following mapped entity
 that rely on <<mapping-indexedembedded,@IndexedEmbedded>>
 and the <<mapping-indexedembedded-filtering,very similar filters>> it provides:
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/Human.java[tags=include;!getters-setters]
 ----
@@ -1320,7 +1320,7 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 * `parents.parents.parents.name`: *not* implicitly included because `includeDepth` is not set and defaults to `0`,
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.name`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/includepaths/HumanProjection.java[tags=include]
 ----
@@ -1346,7 +1346,7 @@ The following fields in particular are excluded:
 * `parents.parents.nickname`: *not* included because `excludePaths` explicitly excludes `parents.nickname`.
 * `parents.parents.parents`/`parents.parents.parents.<any-field>`: *not* included because `excludePaths` explicitly excludes `parents.parents` stopping any further traversing.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/excludepaths/HumanProjection.java[tags=include]
 ----
@@ -1382,7 +1382,7 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 but `parents.parents.parents.parents` and subfields can only be included explicitly)
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.parents.name`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/filters/includepathsanddepth/HumanProjection.java[tags=include]
 ----
@@ -1404,7 +1404,7 @@ or an <<search-dsl-projection-object,`object` projection>>.
 
 .Returning a constant value for every single matched document
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=constant-incomposite]
 ----
@@ -1442,12 +1442,12 @@ highlighter configuration that can result in multiple text fragments with highli
 
 .Returning highlights for matched documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight]
 ----
 As an example, the result may look like:
-[source, JSON]
+[source, json]
 ----
 [
     ["The Automatic <em>Detective</em>"], <1>
@@ -1469,7 +1469,7 @@ This is only possible when the <<search-dsl-highlighting-highlighter-options-fra
 
 .Forcing a single-valued highlight projection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight-single-value]
 ----
@@ -1493,7 +1493,7 @@ Placing a highlight projection inside an <<search-dsl-projection-object,object p
 
 .Returning highlights for flattened objects from matched documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight-multiValued]
 ----
@@ -1506,7 +1506,7 @@ A highlighter can be fine-tuned through its options to change the highlighted ou
 
 .Configuring the default highlighter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-default]
 ----
@@ -1519,7 +1519,7 @@ can be used to override the default one.
 
 .Configuring default and named highlighters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-named]
 ----
@@ -1538,7 +1538,7 @@ use the `@HighlightProjection` annotation on the constructor parameter:
 
 .Returning highlights for matched documents within a projection constructor. Multiple highlighted fragments
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookTitleAndHighlightedDescriptionProjection.java[tags=include]
 ----
@@ -1549,7 +1549,7 @@ since we are expecting to return multiple highlighted fragments.
 <4> You can of course also declare other parameters with different projections;
 in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight]
 ----
@@ -1560,7 +1560,7 @@ populated with the requested highlights and field.
 
 .Returning highlights for matched documents within a projection constructor. Single highlighted fragment
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/MyBookHighlightedTitleProjection.java[tags=include]
 ----
@@ -1571,7 +1571,7 @@ since we are planning to return a single highlighted fragment.
 Note, that only a highlighter that calls the <<search-dsl-highlighting-highlighter-options-fragment-size,`.numberOfFragments(1)`>>
 can be used for single-valued highlight projections.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight-single]
 ----
@@ -1602,7 +1602,7 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `HighlightProj
 
 .Programmatic mapping of a `highlight` projection within a projection constructor
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-highlight-projection]
 ----
@@ -1618,7 +1618,7 @@ and trying to apply highlight projections in these scenarios will lead to an exc
 +
 .Illegal use of `.highlight(..)` projection within an `.object(..)` projection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-inside-object-projection-fail]
 ----
@@ -1629,7 +1629,7 @@ Doing so *will* lead to an *exception*.
 +
 .Illegal use of `.highlight(..)` projection within an `.object(..)` projection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-object-nested-field-fail]
 ----
@@ -1660,7 +1660,7 @@ The `withParameters` projection return type depends on the projection type confi
 
 .Creating a projection with query parameters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=with-parameters]
 ----
@@ -1692,7 +1692,7 @@ include::../components/_lucene-api-warning.adoc[]
 
 .Returning the matched document as a native `org.apache.lucene.document.Document`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-document]
 ----
@@ -1744,7 +1744,7 @@ include::../components/_lucene-api-warning.adoc[]
 
 .Returning the matched document as a `DocumentTree`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-document-tree]
 ----
@@ -1781,7 +1781,7 @@ include::../components/_lucene-api-warning.adoc[]
 
 .Returning the score explanation as a native `org.apache.lucene.search.Explanation`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-explanation]
 ----
@@ -1809,7 +1809,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 
 .Returning the matched document source as a `JsonObject`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-source]
 ----
@@ -1854,7 +1854,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 
 .Returning the score explanation as a `JsonObject`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-explanation]
 ----
@@ -1887,7 +1887,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 
 .Returning the Elasticsearch hit as a `JsonObject`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-jsonHit]
 ----

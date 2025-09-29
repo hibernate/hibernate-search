@@ -45,7 +45,7 @@ to several fields summarizing the invoice.
 [[example-field-bridge]]
 .Implementing and using a `PropertyBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/simple/InvoiceLineItemsSummaryBinder.java[tags=binder]
 ----
@@ -76,7 +76,7 @@ a subfield for the subtotal for `books`,
 and a subfield for the subtotal for `shipping`.
 Pass references to these fields to the bridge.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/simple/InvoiceLineItemsSummaryBinder.java[tags=bridge]
 ----
@@ -101,7 +101,7 @@ and `summary.shipping` fields.
 Note the fields were declared as subfields of `summary`,
 so we call `addValue` on `summaryValue` instead of `target`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/simple/Invoice.java[tags=include;!getters-setters]
 ----
@@ -109,7 +109,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/prope
 
 Here is an example of what an indexed document would look like, with the Elasticsearch backend:
 
-[source, JSON]
+[source, json]
 ----
 {
   "summary": {
@@ -138,7 +138,7 @@ You can pass string parameters to the `@PropertyBinderRef` annotation and then u
 [[example-passing-bridge-parameters]]
 .Passing parameters to a `PropertyBinder` using the `@PropertyBinderRef` annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/string/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
@@ -153,7 +153,7 @@ defining the field as sortable,
 defining a normalizer,
 ...
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/string/Invoice.java[tags=include;!getters-setters]
 ----
@@ -169,7 +169,7 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to a `PropertyBinder` using a custom annotation
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/InvoiceLineItemsSummaryBinding.java[tags=include]
 ----
@@ -194,7 +194,7 @@ setting its generic type argument to the type of the corresponding annotation.
 Here we're using a setter, but passing the data through the constructor would work, too.
 <10> Apply the binder to the property.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
@@ -207,7 +207,7 @@ defining the field as sortable,
 defining a normalizer,
 ...
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/Invoice.java[tags=include;!getters-setters]
 ----
@@ -224,7 +224,7 @@ Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM 
 
 .Retrieving the ORM session from a `PropertyBridge`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/ormcontext/MyDataPropertyBinder.java[tags=include]
 ----
@@ -259,7 +259,7 @@ Just pass an instance of the binder. You can pass arguments either through the b
 
 .Applying an `PropertyBinder` with `.binder(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/PropertyBridgeParamAnnotationIT.java[tags=programmatic]
 ----
@@ -288,14 +288,14 @@ getting the property name and using it as a field name.
 
 .Naming a field after the property being bound in a `PropertyBinder`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/bridgedelement/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
 <1> Use the binding context to get the bridged element.
 <2> Use the name of the property as the name of a newly declared index field.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/bridgedelement/Invoice.java[tags=include;!getters-setters]
 ----
@@ -303,7 +303,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/prope
 
 Here is an example of what an indexed document would look like, with the Elasticsearch backend:
 
-[source, JSON]
+[source, json]
 ----
 {
   "lineItems": {

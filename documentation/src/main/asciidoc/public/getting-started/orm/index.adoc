@@ -14,6 +14,7 @@
 :html-meta-description: Hibernate Search, full text search for your entities - Getting started with Hibernate Search in Hibernate ORM
 :html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
 :html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/search/getting-started/orm/en-US/html_single/
+:html-meta-version-family: {hibernateSearchVersionShort}
 
 :relfileprefix: ../../
 :relfilesuffix: /../en-US/html_single/index.html
@@ -54,7 +55,7 @@ The Hibernate Search artifacts can be found in Maven's http://central.sonatype.o
 If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
 as part of your dependency management to keep all its artifact versions aligned:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencyManagement>
     <dependencies>
@@ -91,7 +92,7 @@ storing the index on the local filesystem.
 +
 If you get Hibernate Search from Maven, use these dependencies:
 +
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencies>
     <!--
@@ -119,7 +120,7 @@ storing the index on a remote Elasticsearch or OpenSearch cluster (to be configu
 +
 If you get Hibernate Search from Maven, use these dependencies:
 +
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencies>
     <!--
@@ -167,7 +168,7 @@ but depending on your setup you might want to set the following:
 
 .Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Lucene" setup
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene]
 ----
@@ -177,7 +178,7 @@ By default, the backend will store indexes in the current working directory.
 
 .Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch/OpenSearch" setup
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch]
 ----
@@ -196,11 +197,11 @@ and you want to index them in order to search the books contained in your databa
 
 .Book and Author entities BEFORE adding Hibernate Search specific annotations
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withouthsearch/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withouthsearch/Author.java[tags=include;!getters-setters]
 ----
@@ -216,11 +217,11 @@ Below is an example of how the model above can be mapped.
 
 .Book and Author entities AFTER adding Hibernate Search specific annotations
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/Author.java[tags=include;!getters-setters]
 ----
@@ -306,7 +307,7 @@ To that end, you can use the mass indexer API, as shown in the following code:
 
 .Using Hibernate Search MassIndexer API to manually (re)index the already persisted data
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=manual-index]
 ----
@@ -328,7 +329,7 @@ Thus, this code would transparently populate your index:
 
 .Using Hibernate ORM to persist data, and implicitly indexing it through Hibernate Search
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing]
 ----
@@ -361,7 +362,7 @@ with the <<mapper-orm-getting-started-analysis-default-analyzer,default analyzer
 
 .Using Hibernate Search to query the indexes
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-lambdas]
 ----
@@ -381,7 +382,7 @@ but it will be a bit more verbose:
 
 .Using Hibernate Search to query the indexes -- object-based syntax
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-objects]
 ----
@@ -401,7 +402,7 @@ It is possible to get just the total hit count, using `fetchTotalHitCount()`.
 
 .Using Hibernate Search to count the matches
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=counting]
 ----
@@ -476,11 +477,11 @@ The examples below show how to define an analyzer with these components, dependi
 
 .Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Lucene" setup
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/customanalysis/MyLuceneAnalysisConfigurer.java[tags=include]
 ----
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene-analysis]
 ----
@@ -501,11 +502,11 @@ For more information about the format of bean references, see xref:{reference-do
 
 .Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch/OpenSearch" setup
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/customanalysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
 ----
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch-analysis]
 ----
@@ -530,11 +531,11 @@ Once analysis is configured, the mapping must be adapted to assign the relevant 
 
 .Book and Author entities after adding Hibernate Search specific annotations
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/customanalysis/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/customanalysis/Author.java[tags=include;!getters-setters]
 ----
@@ -558,7 +559,7 @@ will show up in the results.
 
 .Using Hibernate Search to query the indexes after analysis was configured
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=searching]
 ----

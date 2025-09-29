@@ -157,7 +157,7 @@ would be an alternative solution to achieve the same results.
 
 .Reinitializing indexes using a `SearchSchemaManager`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=simple]
 ----
@@ -173,7 +173,7 @@ to manage the indexes of these types only (and their indexed subtypes, if any):
 
 .Reinitializing only some indexes using a `SearchSchemaManager`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=select-type]
 ----
@@ -280,7 +280,7 @@ Resulting exports are not compared to or validated against the actual backend sc
 
 For Elasticsearch, the files provide the necessary information to create indexes (along with their settings and mapping).
 The file tree structure of an export is shown below:
-[source]
+[source, bash]
 ----
 # For the default backend the index schema will be written to:
 .../backend/indexes/<index-name>/create-index.json
@@ -292,7 +292,7 @@ The file tree structure of an export is shown below:
 
 .Exporting the schema to the filesystem
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=schema-export]
 ----
@@ -314,7 +314,7 @@ Resulting exports are not compared to or validated against the actual backend sc
 
 .Exporting to a custom collector
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=walking-the-schema]
 ----
@@ -327,7 +327,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/manage
 ====
 To access backend-specific functionality, an extension to `SchemaExport` can be applied:
 =====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/ElasticsearchHibernateOrmSchemaManagerIT.java[tags=walking-the-schema-extension]
 ----

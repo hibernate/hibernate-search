@@ -24,7 +24,7 @@ NOTE: While the default naming convention was described in this section,
 there are plans to provide more flexibility in this area to the users (see https://hibernate.atlassian.net/browse/HSEARCH-5366[HSEARCH-5366]) .
 
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=entryPoint]
 ----
@@ -43,7 +43,7 @@ subset of <<mapping-inspect-traits,search "trait">> interfaces defined in `org.h
 performing compile-time checks when building <<search-dsl,search queries>>.
 
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=compileCheck-pass]
 ----
@@ -60,7 +60,7 @@ as such field reference (for a filed with `Projectable.NO`) will not implement t
 The field reference also provides a way to quickly switch between <<search-dsl-argument-type,different value models>> when necessary.
 
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/metamodel/MetamodelIT.java[tags=valueModel]
 ----

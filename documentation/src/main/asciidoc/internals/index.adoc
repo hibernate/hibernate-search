@@ -13,6 +13,7 @@
 :html-meta-description: Hibernate Search, full text search for your entities - Internals of Hibernate Search
 :html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
 :html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/search/internals/html_single/
+:html-meta-version-family: {hibernateSearchVersionShort}
 
 This section is intended for new Hibernate Search contributors looking for an introduction
 to how Hibernate Search works.

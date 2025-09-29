@@ -35,7 +35,7 @@ Hibernate Search {hibernateSearchVersionShort} provides two variants of the <<ba
 
 The default, stable one, that works with JDK 17+ and uses Lucene {luceneVersion}:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
     <groupId>org.hibernate.search</groupId>
@@ -45,7 +45,7 @@ The default, stable one, that works with JDK 17+ and uses Lucene {luceneVersion}
 
 And an incubating one based on Lucene {luceneNextVersion}, that requires JDK 21+:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
     <groupId>org.hibernate.search</groupId>

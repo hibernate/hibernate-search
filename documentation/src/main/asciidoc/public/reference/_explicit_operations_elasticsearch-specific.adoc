@@ -16,7 +16,7 @@ See below for an example.
 
 .Accessing the low-level REST client
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/ElasticsearchGetClientIT.java[tags=client]
 ----

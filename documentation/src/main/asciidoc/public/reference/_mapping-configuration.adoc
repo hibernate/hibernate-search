@@ -177,7 +177,7 @@ define the programmatic mapping, for example:
 
 .Implementing a mapping configurer with the Hibernate ORM integration
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/programmatic/simple/MySearchMappingConfigurer.java[tags=include]
 ----
@@ -219,7 +219,7 @@ define the programmatic mapping, for example:
 
 .Implementing a mapping configurer with the Standalone POJO Mapper
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/mapping/config/MySearchMappingConfigurer.java[tags=include]
 ----

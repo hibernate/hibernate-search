@@ -171,7 +171,7 @@ Below are the options that affect this client.
 The following property configures the Elasticsearch host (or hosts)
 to send indexing requests and search queries to:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.hosts = localhost:9200
 ----
@@ -183,7 +183,7 @@ or a `Collection<String>` containing such host-and-port strings.
 
 You may change the protocol used to communicate with the hosts using this configuration property:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.protocol = http
 ----
@@ -194,7 +194,7 @@ This property may be set to either `http` or `https`.
 
 Alternatively, it is possible to define both the protocol and hosts as one or more URIs using a single property:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.uris = http://localhost:9200
 ----
@@ -223,7 +223,7 @@ If your setup is non-standard, for example because of a non-transparent proxy
 between the application and the Elasticsearch cluster,
 you can use a configuration similar to this:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.path_prefix = my/path
 ----
@@ -239,7 +239,7 @@ and will add those to the host list (see `hosts` in <<backend-elasticsearch-conf
 
 Automatic discovery is controlled by the following properties:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.discovery.enabled = false
 hibernate.search.backend.discovery.refresh_interval = 10
@@ -256,7 +256,7 @@ Expects a positive integer, in seconds. The default for this property is `10`.
 HTTP authentication is disabled by default,
 but may be enabled by setting the following configuration properties:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.username = ironman
 hibernate.search.backend.password = j@rv1s
@@ -286,7 +286,7 @@ you can enable it with an additional dependency and a bit of configuration.
 
 You will need to add this dependency:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -299,7 +299,7 @@ With that dependency in your classpath, you will still need to configure it.
 
 The following configuration is mandatory:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.aws.signing.enabled = true
 hibernate.search.backend.aws.region = us-east-1
@@ -320,7 +320,7 @@ https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html
 
 Optionally, you can set static credentials with the following options:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.aws.credentials.type = static
 hibernate.search.backend.aws.credentials.access_key_id = AKIDEXAMPLE
@@ -344,7 +344,7 @@ This property has no default and must be provided when the credentials type is s
 
 Timeouts::
 +
-[source]
+[source, properties]
 ----
 # hibernate.search.backend.request_timeout = 30000
 hibernate.search.backend.connection_timeout = 1000
@@ -364,7 +364,7 @@ These properties expect a positive <<configuration-property-types,Integer value>
 
 Connection pool::
 +
-[source]
+[source, properties]
 ----
 hibernate.search.backend.max_connections = 20
 hibernate.search.backend.max_connections_per_route = 10
@@ -398,7 +398,7 @@ To prevent that from happening consider having the maximum number of connections
 
 Keep Alive::
 +
-[source]
+[source, properties]
 ----
 hibernate.search.backend.max_keep_alive = 10000
 ----
@@ -432,7 +432,7 @@ for example `class:org.hibernate.search.documentation.backend.elasticsearch.clie
 
 .Implementing and using a `ElasticsearchHttpClientConfigurer`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/HttpClientConfigurer.java[tags=include]
 ----
@@ -444,7 +444,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/cl
 
 .Define a custom http client configurer in the properties
 ====
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/configuration/http-client-configurer.properties[tags=include]
 ----
@@ -541,7 +541,7 @@ in Hibernate Search.
 [[backend-elasticsearch-index-lifecycle]]
 For Elasticsearch specifically, some fine-tuning is available through the following options:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.schema_management.minimal_required_status = green
@@ -571,7 +571,7 @@ to an index with the same name in Elasticsearch.
 The index layout is how Hibernate Search index names are mapped to Elasticsearch indexes,
 and the strategy controlling that layout is set at the backend level:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.layout.strategy = simple
 ----
@@ -657,7 +657,7 @@ it will name the index `myindex-20171106-191900-000000000`.
 
 .Implementing a custom index layout strategy with the Elasticsearch backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/layout/CustomLayoutStrategy.java[tags=include]
 ----
@@ -670,7 +670,7 @@ Index or alias names used to read and write can be retrieved from the <<mapping-
 
 .Retrieving the index names from an Elasticsearch index manager
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/indexmanager/ElasticsearchIndexManagerIT.java[tags=readWriteName]
 ----
@@ -814,7 +814,7 @@ Below is an example of how to use the Elasticearch "native" type.
 
 .Using the Elasticearch "native" type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
 ----
@@ -839,7 +839,7 @@ or even to convert directly from POJOs to JSON using Gson.
 <7> For nicer projections, you can also implement this method to convert
 from `JsonElement` to the mapped type (here, `String`).
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include;!getters-setters]
 ----
@@ -861,7 +861,7 @@ and each has pros and cons.
 
 The strategy is set at the backend level:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.mapping.type_name.strategy = discriminator
 ----
@@ -918,7 +918,7 @@ since Hibernate Search usually works on declared schema fields only.
 For the other cases in which we need to change this setting,
 we can use the following index-level property to change the value.
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.dynamic_mapping = strict
@@ -948,7 +948,7 @@ However, it is possible to enable multi-tenancy manually.
 
 The multi-tenancy strategy is set at the backend level:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.multi_tenancy.strategy = none
 ----
@@ -1003,7 +1003,7 @@ In the worst case, it could not trigger any exception, but simply lead to incorr
 Exercise extreme caution.
 ====
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.schema_management.mapping_file = custom/index-mapping.json
@@ -1013,7 +1013,7 @@ hibernate.search.backend.indexes.<index-name>.schema_management.mapping_file = c
 
 .Possible content of `custom/index-mapping.json` file
 ====
-[source, JSON, indent=0, subs="+callouts"]
+[source, json, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/custom/index-mapping.json[]
 ----
@@ -1045,7 +1045,7 @@ In the example above, the resulting, merged mapping could look like this:
 
 .Possible resulting mapping after merging the content of `custom/index-mapping.json` with the Hibernate Search mapping
 ====
-[source, JSON, indent=0, subs="+callouts"]
+[source, json, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/custom/index-mapping-merged.json[]
 ----
@@ -1062,7 +1062,7 @@ For instance, you could pass a `custom/index-mapping.json` file like the followi
 
 .Possible content of `custom/index-mapping.json` file to disable the `_source` field
 ====
-[source, JSON, indent=0, subs="+callouts"]
+[source, json, indent=0, subs="+callouts"]
 ----
 {
   "_source": {
@@ -1121,7 +1121,7 @@ and the configurer will be able to take advantage of a DSL to define
 ====
 A different analysis configurer can be assigned to each index:
 
-[source]
+[source, properties]
 ----
 # To set the default configurer for all indexes:
 hibernate.search.backend.analysis.configurer = class:com.mycompany.MyAnalysisConfigurer
@@ -1186,7 +1186,7 @@ The context passed to the configurer exposes a DSL to define analyzers and norma
 
 .Implementing and using an analysis configurer to define analyzers and normalizers with the Elasticsearch backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
 ----
@@ -1200,7 +1200,7 @@ must be defined separately and assigned a name.
 <7> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
 <8> Multiple analyzers/normalizers can be defined in the same configurer.
 
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/analysis/elasticsearch-simple.properties[tags=include]
 ----
@@ -1211,7 +1211,7 @@ It is also possible to assign a name to a parameterized built-in analyzer:
 
 .Naming a parameterized built-in analyzer in the Elasticsearch backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedElasticsearchAnalysisConfigurer.java[tags=type]
 ----
@@ -1240,7 +1240,7 @@ by defining a <<backend-elasticsearch-analysis-analyzers,custom analyzer>> with 
 
 .Overriding the default analyzer in the Elasticsearch backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
 ----
@@ -1249,7 +1249,7 @@ Here we rely on constants from `org.hibernate.search.engine.backend.analysis.Ana
 but hardcoding `"default"` would work just as well.
 <2> Continue the analyzer definition <<backend-elasticsearch-analysis-analyzers,as we would for any other custom analyzer>>.
 
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/analysis/elasticsearch-default-override.properties[tags=include]
 ----
@@ -1262,7 +1262,7 @@ include::{resourcesdir}/analysis/elasticsearch-default-override.properties[tags=
 Hibernate Search can <<schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
 Should you need to set some link:{elasticsearchDocUrl}/index-modules.html#index-modules-settings[custom index settings], it is possible to provide these settings to Hibernate Search: it will include them when creating an index and take them into account when validating an index.
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.schema_management.settings_file = custom/index-settings.json
@@ -1272,7 +1272,7 @@ hibernate.search.backend.indexes.<index-name>.schema_management.settings_file = 
 
 .Possible content of `custom/index-settings.json` file
 ====
-[source, JSON, indent=0, subs="+callouts"]
+[source, json, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/custom/index-settings.json[]
 ----
@@ -1303,7 +1303,7 @@ and to schedule request timeouts.
 By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
 That can be changed using a configuration property:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.thread_pool.size = 4
 ----
@@ -1351,7 +1351,7 @@ It is possible to customize the queues in order to reduce the load on the Elasti
 or on the contrary to improve throughput.
 This is done through the following configuration properties:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.indexing.queue_count = 10
@@ -1456,7 +1456,7 @@ the scroll will be closed automatically and the next call to `next()` will fail.
 
 Use the following configuration property at the backend level to configure the timeout (in seconds):
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.scroll_timeout = 60
 ----
@@ -1474,7 +1474,7 @@ By default, Hibernate Search will check if any shards have failed while fetching
 
 Use the following configuration property at the backend level to change the default behaviour:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.query.shard_failure.ignore = true
 ----

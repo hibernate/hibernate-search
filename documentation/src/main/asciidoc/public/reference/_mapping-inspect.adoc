@@ -9,7 +9,7 @@ as shown in the example below.
 
 .Accessing indexed entities
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedentities/SearchMappingIndexedEntitiesIT.java[tags=indexedEntities]
 ----
@@ -29,7 +29,7 @@ as shown below.
 
 .Accessing the index metamodel
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedentities/SearchMappingIndexedEntitiesIT.java[tags=indexMetamodel]
 ----

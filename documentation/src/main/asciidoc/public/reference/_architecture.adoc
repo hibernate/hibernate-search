@@ -182,7 +182,7 @@ and all indexes need to live on the same server.
 To implement this architecture, use the following Maven dependencies:
 
 When <<mapper-orm,integrating with Hibernate ORM>>::
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -196,7 +196,7 @@ When <<mapper-orm,integrating with Hibernate ORM>>::
 </dependency>
 ----
 With the <<mapper-pojo-standalone,Standalone POJO Mapper>> (no Hibernate ORM)::
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -263,7 +263,7 @@ and won't perform very well if you need changes to be visible immediately after 
 To implement this architecture, use the following Maven dependencies:
 
 When <<mapper-orm,integrating with Hibernate ORM>>::
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -277,7 +277,7 @@ When <<mapper-orm,integrating with Hibernate ORM>>::
 </dependency>
 ----
 With the <<mapper-pojo-standalone,Standalone POJO Mapper>> (no Hibernate ORM)::
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -359,7 +359,7 @@ The `outbox-polling` coordination strategy requires an extra dependency.
 To implement this architecture, use the following Maven dependencies:
 
 When <<mapper-orm,integrating with Hibernate ORM>>::
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>

@@ -36,7 +36,7 @@ in `org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor
 
 .Mapping `Map` keys to an index field using explicit container extractor definition
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/Book.java[tags=explicit-extractor]
 ----
@@ -73,7 +73,7 @@ Set it as below to disable extraction altogether:
 
 .Disabling container extraction
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/Book.java[tags=no-extractor]
 ----
@@ -96,7 +96,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Mapping `Map` keys to an index field using `.extractor(...)`/`.extactors(...)` for explicit container extractor definition
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/ContainerExtractorIT.java[tags=programmatic-extractor]
 ----
@@ -106,7 +106,7 @@ Similarly, you can disable container extraction.
 
 .Disabling container extraction with `.noExtractors()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/ContainerExtractorIT.java[tags=programmatic-noExtractors]
 ----

@@ -10,7 +10,7 @@ Preparing and executing a query requires just a few lines:
 
 .Executing a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=entryPoint]
 ----
@@ -76,7 +76,7 @@ the search result will contain hits from any of the targeted types.
 
 .Targeting multiple entity types in a single search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=targeting-multiple]
 ----
@@ -107,7 +107,7 @@ to designate the <<concepts-entity,entity types>> targeted by the search:
 
 .Targeting entity types by name
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=targeting-entityName]
 ----
@@ -131,7 +131,7 @@ as shown in the example below.
 
 .Getting information from a `SearchResult`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-searchResult]
 ----
@@ -152,7 +152,7 @@ not the hits themselves:
 
 .Getting the total hit count directly
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-totalHitCount]
 ----
@@ -164,7 +164,7 @@ which can be handy if only the top hits are useful, and not the total hit count:
 
 .Getting the top hits directly
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-hits]
 ----
@@ -175,7 +175,7 @@ An exception will be thrown if more than one hits are returned.
 
 .Getting the only hit directly
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-singleHit]
 ----
@@ -207,7 +207,7 @@ due to internal safety mechanisms in the Elasticsearch cluster.
 
 .Getting all hits in a `SearchResult`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-all-searchResult]
 ----
@@ -215,7 +215,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 
 .Getting all hits directly
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-all-hits]
 ----
@@ -234,7 +234,7 @@ The total hit count is exact by default, but can be replaced with a lower-bound 
 
 .Working with the result total
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-resultTotal]
 ----
@@ -271,7 +271,7 @@ The optimization is enabled for `scroll(...)` calls with the Lucene backend, how
 
 .Defining a total hit count threshold
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-totalHitCountThreshold]
 ----
@@ -301,7 +301,7 @@ so you will usually want to compute it from the page number and page size this w
 
 .Pagination retrieving a `SearchResult`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-pagination-searchResult]
 ----
@@ -310,7 +310,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 
 .Pagination retrieving hits directly
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-pagination-hits]
 ----
@@ -351,7 +351,7 @@ See <<backend-elasticsearch-search-scroll-timeout,here>> for more information.
 
 .Scrolling to retrieve search results in small chunks
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-scrolling]
 ----
@@ -394,7 +394,7 @@ when building the query:
 
 .Routing a query to a subset of all shards
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/routingkey/RoutingBridgeRoutingKeyIT.java[tags=routing-single]
 ----
@@ -458,7 +458,7 @@ It is also possible to override the configured strategy on a per-query basis, as
 
 .Overriding the cache lookup strategy in a single search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=cacheLookupStrategy-persistenceContextThenSecondLevelCache]
 ----
@@ -489,7 +489,7 @@ It is also possible to override the configured fetch size on a per-query basis, 
 
 .Overriding the fetch size in a single search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetchSize]
 ----
@@ -519,7 +519,7 @@ for more information about entity graphs.
 
 .Applying an entity graph to a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=graph-byReference]
 ----
@@ -541,7 +541,7 @@ for more information about `@NamedEntityGraph`.
 
 .Applying a named entity graph to a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=graph-byName]
 ----
@@ -578,7 +578,7 @@ include::../components/_timeout-besteffort-note.adoc[]
 
 .Triggering a failure on timeout
 ====
-[source, JAVA]
+[source, java]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=failAfter]
 ----
@@ -606,7 +606,7 @@ include::../components/_timeout-besteffort-note.adoc[]
 
 .Truncating the results on timeout
 ====
-[source, JAVA]
+[source, java]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=truncateAfter]
 ----
@@ -633,7 +633,7 @@ Some query elements may leverage the use of query parameters. Call `.param(..)` 
 
 .Setting query parameters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=parameters]
 ----
@@ -660,7 +660,7 @@ To get a query object, just call `toQuery()` at the end of the query definition:
 
 .Getting a `SearchQuery` object
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=searchQuery]
 ----
@@ -680,7 +680,7 @@ or a `org.hibernate.query.Query` (native ORM API):
 
 .Turning a `SearchQuery` into a JPA or Hibernate ORM query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=searchQuery-toORM]
 ----
@@ -739,7 +739,7 @@ include::../components/_explanation-warning.adoc[]
 
 .Retrieving score explanation -- Lucene
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/LuceneQueryDslIT.java[tags=explain-lucene]
 ----
@@ -756,7 +756,7 @@ you can instead use the Lucene extension on the `SearchQuery` to convert it afte
 
 .Retrieving score explanation -- Elasticsearch
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=explain-elasticsearch]
 ----
@@ -775,7 +775,7 @@ you can instead use the Elasticsearch extension on the `SearchQuery` to convert 
 
 .Returning query execution time and whether a timeout occurred
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=took-timedOut]
 ----
@@ -805,7 +805,7 @@ Most simple use cases will only need to change the HTTP request slightly, as sho
 
 .Transforming the Elasticsearch request manually in a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=elasticsearch-requestTransformer]
 ----
@@ -823,7 +823,7 @@ For more complicated use cases, it is possible to access the raw JSON of the HTT
 
 .Accessing the Elasticsearch response body manually in a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=elasticsearch-responseBody]
 ----
@@ -846,7 +846,7 @@ Here we're extracting the result of the suggester we configured above.
 Gson's API for building JSON objects is quite verbose,
 so the example above relies on a small, custom helper method to make the code more readable:
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=elasticsearch-responseBody-helper]
 ----
@@ -867,7 +867,7 @@ This should only be useful to integrators, but is documented here for the sake o
 
 .Accessing low-level components in a Lucene search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/LuceneQueryDslIT.java[tags=lucene-lowLevel]
 ----

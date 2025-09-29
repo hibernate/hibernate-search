@@ -14,6 +14,7 @@
 :html-meta-description: Hibernate Search, full text search for your entities - Getting started with Hibernate Search’s Standalone POJO Mapper
 :html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
 :html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/search/getting-started/standalone/en-US/html_single/
+:html-meta-version-family: {hibernateSearchVersionShort}
 
 :relfileprefix: ../../
 :relfilesuffix: /../en-US/html_single/index.html
@@ -57,7 +58,7 @@ The Hibernate Search artifacts can be found in Maven's http://central.sonatype.o
 If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
 as part of your dependency management to keep all its artifact versions aligned:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencyManagement>
     <dependencies>
@@ -95,7 +96,7 @@ storing the index on the local filesystem.
 +
 If you get Hibernate Search from Maven, use these dependencies:
 +
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencies>
     <!--
@@ -124,7 +125,7 @@ storing the index on a remote Elasticsearch or OpenSearch cluster (to be configu
 +
 If you get Hibernate Search from Maven, use these dependencies:
 +
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependencies>
     <!--
@@ -158,7 +159,7 @@ are set programmatically when building the mapping.
 
 .Hibernate Search properties for a "Standalone POJO Mapper + Lucene" setup
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-lucene]
 ----
@@ -170,7 +171,7 @@ By default, the backend will store indexes in the current working directory.
 
 .Hibernate Search properties for a "Standalone POJO Mapper + Elasticsearch/OpenSearch" setup
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-elasticsearch]
 ----
@@ -208,11 +209,11 @@ and you want to index them in order to search for books.
 
 .Book and Author types BEFORE adding Hibernate Search specific annotations
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withouthsearch/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withouthsearch/Author.java[tags=include;!getters-setters]
 ----
@@ -231,11 +232,11 @@ Below is an example of how the model above can be mapped.
 
 .Book and Author entities AFTER adding Hibernate Search specific annotations
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/Author.java[tags=include;!getters-setters]
 ----
@@ -372,7 +373,7 @@ Use `add` when the entity is first added and you are absolutely certain it does 
 
 .Using the Standalone POJO Mapper to index data
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing]
 ----
@@ -382,7 +383,7 @@ Use `addOrUpdate` to add/update the entity when the entity may already exist in 
 
 .Using the Standalone POJO Mapper to index data
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing-addOrUpdate]
 ----
@@ -392,7 +393,7 @@ Add use `delete` to delete the entity from the index:
 
 .Using the Standalone POJO Mapper to index data
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing-delete]
 ----
@@ -412,7 +413,7 @@ with the <<mapper-pojo-standalone-getting-started-analysis-default-analyzer,defa
 
 .Using Hibernate Search to query the indexes
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-lambdas]
 ----
@@ -435,7 +436,7 @@ but it will be a bit more verbose:
 
 .Using Hibernate Search to query the indexes -- object-based syntax
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-objects]
 ----
@@ -458,7 +459,7 @@ It is possible to get just the total hit count, using `fetchTotalHitCount()`.
 
 .Using Hibernate Search to count the matches
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=counting]
 ----
@@ -533,11 +534,11 @@ The examples below show how to define an analyzer with these components, dependi
 
 .Analysis configurer implementation and configuration for a "Standalone POJO Mapper + Lucene" setup
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/MyLuceneAnalysisConfigurer.java[tags=include]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=setup-lucene]
 ----
@@ -558,11 +559,11 @@ For more information about the bean references, see xref:{reference-documentatio
 
 .Analysis configurer implementation and configuration for a "Standalone POJO Mapper + Elasticsearch/OpenSearch" setup
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
 ----
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=setup-elasticsearch]
 ----
@@ -587,11 +588,11 @@ Once analysis is configured, the mapping must be adapted to assign the relevant 
 
 .Book and Author entities after adding Hibernate Search specific annotations
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/Book.java[tags=include;!getters-setters]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/Author.java[tags=include;!getters-setters]
 ----
@@ -615,7 +616,7 @@ will show up in the results.
 
 .Using Hibernate Search to query the indexes after analysis was configured
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=searching]
 ----

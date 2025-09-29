@@ -29,7 +29,7 @@ The type of directory can be configured as follows:
 
 // Search 5 anchors backward compatibility
 [[example-configuring-directory-providers]]
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.type = local-filesystem
@@ -79,7 +79,7 @@ Each index is assigned a subdirectory under a root directory.
 By default, the root directory is the JVM's working directory.
 It can be configured as follows:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.root = /path/to/my/root
@@ -105,7 +105,7 @@ It should work well in most situations.
 For situations where a different filesystem access strategy is needed,
 Hibernate Search exposes a configuration property:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.filesystem_access.strategy = auto
@@ -165,7 +165,7 @@ Each directory type comes with a default locking strategy that should work well 
 For those (very) rare situations where a different locking strategy is needed,
 Hibernate Search exposes a configuration property:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.locking.strategy = native-filesystem
@@ -226,7 +226,7 @@ Multiple strategies are available:
 
 [[backend-lucene-configuration-sharding-strategy-hash]]`hash`::
 +
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.sharding.strategy = hash
@@ -252,7 +252,7 @@ to be brought down to a smaller number (e.g. "all integers").
 
 [[backend-lucene-configuration-sharding-strategy-explicit]]`explicit`::
 +
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.sharding.strategy = explicit
@@ -289,7 +289,7 @@ which should be stored on a different drive.
 
 This can be achieved by adding configuration properties for a specific shard:
 
-[source]
+[source, properties]
 ----
 # Default configuration for all shards an index:
 hibernate.search.backend.indexes.<index-name>.directory.root = /path/to/fast/drive/
@@ -335,7 +335,7 @@ the analyzers and other Lucene classes should conform their behavior.
 
 This configuration property is set at the backend level:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.lucene_version = LUCENE_8_1_1
 ----
@@ -480,7 +480,7 @@ Below is an example of how to use the Lucene "native" type.
 
 .Using the Lucene "native" type
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/PageRankValueBinder.java[tags=include]
 ----
@@ -503,7 +503,7 @@ The extractor will be called upon projecting to extract the projected value from
 <8> The value bridge is free to apply a preliminary conversion
 before passing the value to Hibernate Search, which will pass it along to the `LuceneFieldContributor`.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/WebPage.java[tags=include;!getters-setters]
 ----
@@ -531,7 +531,7 @@ However, it is possible to enable multi-tenancy manually.
 
 The multi-tenancy strategy is set at the backend level:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.multi_tenancy.strategy = none
 ----
@@ -648,7 +648,7 @@ The context passed to the configurer exposes a DSL to define analyzers and norma
 
 .Implementing and using an analysis configurer to define analyzers and normalizers with the Lucene backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysisConfigurer.java[tags=include]
 ----
@@ -660,7 +660,7 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysi
 <6> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
 <7> Multiple analyzers/normalizers can be defined in the same configurer.
 
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/analysis/lucene-simple.properties[tags=include]
 ----
@@ -699,7 +699,7 @@ This avoids string constants in your code, at the cost of having a direct compil
 
 .Analysis configurer implementation using Lucene factory classes
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/LuceneClassesAnalysisConfigurer.java[tags=include]
 ----
@@ -720,7 +720,7 @@ It is also possible to assign a name to an analyzer instance:
 
 .Naming an analyzer instance in the Lucene backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedLuceneAnalysisConfigurer.java[tags=instance]
 ----
@@ -737,7 +737,7 @@ by defining a <<backend-lucene-analysis-analyzers,custom analyzer>> with the sam
 
 .Overriding the default analyzer in the Lucene backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/DefaultOverridingLuceneAnalysisConfigurer.java[tags=include]
 ----
@@ -746,7 +746,7 @@ Here we rely on constants from `org.hibernate.search.engine.backend.analysis.Ana
 but hardcoding `"default"` would work just as well.
 <2> Continue the analyzer definition <<backend-lucene-analysis-analyzers,as we would for any other custom analyzer>>.
 
-[source, XML, indent=0, subs="+callouts"]
+[source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/analysis/lucene-default-override.properties[tags=include]
 ----
@@ -773,7 +773,7 @@ as explained in <<backend-lucene-analysis-analyzers>>.
 
 .Implementing an analysis configurer to change the Similarity with the Lucene backend
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/CustomSimilarityLuceneAnalysisConfigurer.java[tags=include]
 ----
@@ -797,7 +797,7 @@ The Lucene backend relies on an internal thread pool to execute write operations
 By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
 That can be changed using a configuration property:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.thread_pool.size = 4
 ----
@@ -837,7 +837,7 @@ It is possible to customize the queues in order to reduce resource consumption,
 or on the contrary to improve throughput.
 This is done through the following configuration properties:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.indexing.queue_count = 10
@@ -929,7 +929,7 @@ leading to much better performance.
 It is possible to control exactly how often Hibernate Search will commit
 by setting the commit interval (in milliseconds):
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.commit_interval = 1000
@@ -981,7 +981,7 @@ then the index reader will not be refreshed, even though it may be out-of-date.
 
 The refresh interval can be set this way:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.refresh_interval = 0
@@ -1004,7 +1004,7 @@ Below is a list of all index writer settings.
 They can all be set similarly through configuration properties;
 for example, `io.writer.ram_buffer_size` can be set like this:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.writer.ram_buffer_size = 32
@@ -1073,7 +1073,7 @@ Below is a list of all merge settings.
 They can all be set similarly through configuration properties;
 for example, `io.merge.factor` can be set like this:
 
-[source]
+[source, properties]
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.merge.factor = 10
@@ -1164,7 +1164,7 @@ it is possible for newly created segments to be slightly larger than `io.writer.
 So, for example, to be fairly confident no file grows larger than 15MB,
 use something like this:
 
-[source]
+[source, properties]
 ----
 hibernate.search.backend.io.writer.ram_buffer_size = 10
 hibernate.search.backend.io.merge.max_size = 7

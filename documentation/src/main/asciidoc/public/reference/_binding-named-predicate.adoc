@@ -20,7 +20,7 @@ in a property binder.
 
 .Declaring a named predicate
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/namedpredicate/SkuIdentifierBinder.java[tags=binder]
 ----
@@ -31,7 +31,7 @@ Since the predicate is assigned to an object field,
 callers will have to prefix the predicate name with the path to that object field.
 <3> The predicate definition will define how to create the predicate when searching.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/namedpredicate/SkuIdentifierBinder.java[tags=bridge]
 ----
@@ -42,7 +42,7 @@ as a lambda expression, in a separate Java file...
 <2> The bridge creates an object to hold the various components of the SKU identifier.
 <3> The bridge populates the various components of the SKU identifier.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/namedpredicate/SkuIdentifierBinder.java[tags=predicate-definition]
 ----
@@ -67,7 +67,7 @@ Here the path `departmentCode` will be understood as `<path to the object field>
 See also <<search-dsl-paths>>.
 <6> Do not forget to call `toPredicate()` to return a `SearchPredicate` instance.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/namedpredicate/ItemStock.java[tags=include;!getters-setters]
 ----

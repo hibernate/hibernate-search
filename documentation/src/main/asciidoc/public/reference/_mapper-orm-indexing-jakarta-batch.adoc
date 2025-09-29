@@ -24,7 +24,7 @@ As for other implementations, they can also be used, but will require
 
 If the runtime is JBeret, you need to add the following dependency:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -35,7 +35,7 @@ If the runtime is JBeret, you need to add the following dependency:
 
 For any other runtime, you need to add the following dependency:
 
-[source, XML, subs="+attributes"]
+[source, xml, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
@@ -48,7 +48,7 @@ Here is an example of how to run a batch instance:
 
 .Reindexing everything using a Jakarta Batch mass-indexing job
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmJakartaBatchIT.java[tags=simple]
 ----
@@ -170,7 +170,7 @@ Accessible entity properties are those of the entity being reindexed (and nothin
 
 .Conditional indexing using a `reindexOnly` HQL parameter
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmJakartaBatchIT.java[tags=reindexOnly]
 ----
@@ -217,7 +217,7 @@ in the same thread. The default number of threads used in Hibernate Search is 10
 it with your preferred number.
 
 ====
-[source, JAVA]
+[source, java]
 ----
 MassIndexingJob.parameters()
         .maxThreads( 5 )
@@ -239,7 +239,7 @@ Each partition consists of a fixed number of elements to index. You may tune exa
 a partition will hold with `rowsPerPartition`.
 
 ====
-[source, JAVA]
+[source, java]
 ----
 MassIndexingJob.parameters()
         .rowsPerPartition( 5000 )
@@ -290,7 +290,7 @@ When a job is restarted, it will resume from the last checkpoint.
 The size of each chunk is determined by the `checkpointInterval` parameter.
 
 ====
-[source, JAVA]
+[source, java]
 ----
 MassIndexingJob.parameters()
         .checkpointInterval( 1000 )
@@ -354,7 +354,7 @@ Note that entity manager factories will probably not be considered as beans by d
 you will have to register them yourself. You may use an application-scoped bean to do so:
 
 ====
-[source, JAVA]
+[source, java]
 ----
 @ApplicationScoped
 public class EntityManagerFactoriesProducer {

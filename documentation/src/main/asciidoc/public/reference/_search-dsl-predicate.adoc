@@ -13,7 +13,7 @@ The predicate is configured when building the search query:
 
 .Defining the predicate of a search query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=entryPoint-lambdas]
 ----
@@ -28,7 +28,7 @@ Alternatively, if you don't want to use lambdas:
 
 .Defining the predicate of a search query -- object-based syntax
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=entryPoint-objects]
 ----
@@ -45,7 +45,7 @@ The `matchAll` predicate simply matches all documents.
 
 .Matching all documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=matchAll]
 ----
@@ -58,7 +58,7 @@ Optionally, you can exclude a few documents from the hits:
 
 .Matching all documents except those matching a given predicate
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=matchAll-except]
 ----
@@ -77,7 +77,7 @@ The `matchNone` predicate is the inverse of `matchAll` and matches no documents.
 
 .Matching no documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=matchNone]
 ----
@@ -90,7 +90,7 @@ The `id` predicate matches documents by their identifier.
 
 .Matching a document with a given identifier
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=id]
 ----
@@ -100,7 +100,7 @@ You can also match multiple ids in a single predicate:
 
 .Matching all documents with an identifier among a given collection
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=id-matchingAny]
 ----
@@ -133,7 +133,7 @@ The `match` predicate matches documents for which a given field has a given valu
 
 .Matching a value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match]
 ----
@@ -177,7 +177,7 @@ See below for an example.
 
 .Matching normalized terms
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-normalized]
 ----
@@ -196,7 +196,7 @@ See below for an example.
 
 .Matching multiple terms
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-multipleTerms]
 ----
@@ -237,7 +237,7 @@ NOTE: This option is only available on text fields.
 
 .Matching a text value approximately
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fuzzy]
 ----
@@ -251,7 +251,7 @@ Values higher than 2 are not allowed.
 
 .Matching a text value approximately with explicit edit distance
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fuzzy-maxEditDistance]
 ----
@@ -264,7 +264,7 @@ for performance reasons.
 
 .Matching a text value approximately with exact prefix length
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fuzzy-exactPrefixLength]
 ----
@@ -280,7 +280,7 @@ as demonstrated below.
 
 .Fine-tuning matching requirements with `minimumShouldMatch`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-minimumShouldMatchNumber]
 ----
@@ -309,7 +309,7 @@ The `range` predicate matches documents for which a given field has a value with
 
 .Matching a range of values
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-between]
 ----
@@ -328,7 +328,7 @@ Different methods can be called instead of `between` in order to control the inc
 +
 .Matching values equal to or greater than a given value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atLeast]
 ----
@@ -337,7 +337,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 +
 .Matching values strictly greater than a given value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-greaterThan]
 ----
@@ -346,7 +346,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 +
 .Matching values equal to or less than a given value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atMost]
 ----
@@ -355,7 +355,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 +
 .Matching values strictly less than a given value
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-lessThan]
 ----
@@ -365,7 +365,7 @@ Alternatively, you can specify whether bounds are included or excluded explicitl
 
 .Matching a range of values with explicit bound inclusion/exclusion
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-between-advanced]
 ----
@@ -377,7 +377,7 @@ there is a simpler way to do that:
 
 .Matching values that are within any of the provided ranges
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-within-any]
 ----
@@ -424,7 +424,7 @@ NOTE: This predicate is only available on <<mapping-directfieldmapping-annotatio
 
 .Matching a sequence of words
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=phrase]
 ----
@@ -446,7 +446,7 @@ And similarly for higher slops and for phrases with more words.
 
 .Matching a sequence of words approximately with `slop(...)`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=phrase-slop]
 ----
@@ -479,7 +479,7 @@ The `exists` predicate matches documents for which a given field has a non-null 
 
 .Matching fields with content
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=exists]
 ----
@@ -503,7 +503,7 @@ In that case, it will match all documents for which at least one inner field of 
 
 .Matching object fields with content
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=exists-object]
 ----
@@ -537,7 +537,7 @@ The `wildcard` predicate matches documents for which a given field contains a wo
 
 .Matching a simple pattern
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=wildcard]
 ----
@@ -600,7 +600,7 @@ The `regexp` predicate matches documents for which a given field contains a word
 
 .Matching a regular expression pattern
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=regexp]
 ----
@@ -683,7 +683,7 @@ To enable some of them, it is possible to specify the `flags` attribute.
 
 .Matching a regular expression pattern with flags
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=regexp-flags]
 ----
@@ -731,7 +731,7 @@ NOTE: `matchingAny` expects to be passed *terms*, not just any string. The given
 
 .Matching any of the provided terms
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=terms-any]
 ----
@@ -756,7 +756,7 @@ However, keep in mind the limit is there for a reason: attempts to match very la
 
 .Matching all the provided terms
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=terms-any]
 ----
@@ -825,7 +825,7 @@ Matching "and" clauses are taken into account during <<search-dsl-predicate-comm
 
 .Matching a document that matches all the multiple given predicates (~`AND` operator)
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and]
 ----
@@ -847,7 +847,7 @@ for example based on user input.
 
 .Easily adding clauses dynamically using `.where(...)` and the lambda syntax
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and-dynamicParameters-root]
 ----
@@ -866,7 +866,7 @@ Another syntax relying on the method `with(...)` can be useful when the `and` pr
 
 .Easily adding clauses dynamically using `with(...)` and the lambda syntax
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and-dynamicParameters-with]
 ----
@@ -899,7 +899,7 @@ Matching `or` clauses are taken into account during <<search-dsl-predicate-commo
 
 .Matching a document that matches any of multiple given predicates (~`OR` operator)
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=or]
 ----
@@ -921,7 +921,7 @@ for example based on user input.
 
 .Easily adding clauses dynamically using `with(...)` and the lambda syntax
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=or-dynamicParameters-root]
 ----
@@ -952,7 +952,7 @@ The `not` predicate matches documents that are not matched by a given predicate.
 
 .Negating a `match` predicate
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=not]
 ----
@@ -1024,7 +1024,7 @@ In such case, using the simpler <<search-dsl-predicate-and,`and`>> syntax is rec
 
 .Matching a document that does *not* match a given predicate
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-mustNot]
 ----
@@ -1051,7 +1051,7 @@ they are ignored when computing the total <<search-dsl-predicate-common-score,sc
 
 .Matching a document that matches a given predicate without affecting the score
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-filter]
 ----
@@ -1082,7 +1082,7 @@ and their only purpose is to increase the score of documents that match these cl
 
 .Using optional `should` clauses to boost the score of some documents
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-mustAndShould]
 ----
@@ -1109,7 +1109,7 @@ as demonstrated below.
 
 .Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-minimumShouldMatchNumber]
 ----
@@ -1134,7 +1134,7 @@ consider using the <<search-dsl-predicate-and-lambda,`.where( (f, root) -> ... )
 
 .Easily adding clauses dynamically using `with(...)` and the lambda syntax
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters-with]
 ----
@@ -1158,7 +1158,7 @@ but it is deprecated.
 
 .Deprecated variant of `.bool`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters-deprecated]
 ----
@@ -1200,7 +1200,7 @@ The syntax includes three boolean operators:
 
 .Matching a simple query string: AND/OR operators
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-boolean]
 ----
@@ -1208,7 +1208,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 
 .Matching a simple query string: NOT operator
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-not]
 ----
@@ -1223,7 +1223,7 @@ you can call `.defaultOperator(...)`.
 
 .Matching a simple query string: AND as default operator
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-defaultOperator-and]
 ----
@@ -1236,7 +1236,7 @@ The syntax includes support for prefix predicates through the `*` wildcard.
 
 .Matching a simple query string: prefix
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-prefix]
 ----
@@ -1254,7 +1254,7 @@ Its behavior is similar to that of <<search-dsl-predicate-match-fuzzy,fuzzy matc
 
 .Matching a simple query string: fuzzy
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-fuzzy]
 ----
@@ -1268,7 +1268,7 @@ using quotes around the sequence of terms to match.
 
 .Matching a simple query string: phrase
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase]
 ----
@@ -1279,7 +1279,7 @@ using the NEAR operator `~`.
 
 .Matching a simple query string: phrase with slop
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase-slop]
 ----
@@ -1293,7 +1293,7 @@ You can pick the operators to enable explicitly through the `.flags(...)` method
 
 .Matching a simple query string: enabling only specific syntax constructs
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-flags]
 ----
@@ -1303,7 +1303,7 @@ If you wish, you can disable all syntax constructs:
 
 .Matching a simple query string: disabling all syntax constructs
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-flags-none]
 ----
@@ -1317,7 +1317,7 @@ It may be helpful to control how many `should` clauses must match to consider a 
 
 .Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-minimum-should-match]
 ----
@@ -1377,7 +1377,7 @@ will not match a book whose authors are "Jane Asimov" and "Isaac Deutscher".
 
 .Matching multiple predicates against a single nested object
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=nested]
 ----
@@ -1403,7 +1403,7 @@ See below for an example.
 [[search-dsl-predicate-nested-implicit-example]]
 .Using implicit nesting
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=nested-implicit-form]
 ----
@@ -1428,7 +1428,7 @@ but it is more verbose and deprecated.
 
 .Deprecated variant of `.nested`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=nested-deprecated]
 ----
@@ -1458,7 +1458,7 @@ With `.circle(...)`, the matched points must be within a given distance from a g
 
 .Matching points within a circle
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-circle]
 ----
@@ -1471,7 +1471,7 @@ You can also pass the coordinates of the center as two doubles (latitude, then l
 
 .Matching points within a circle: passing center coordinates as doubles
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-circle-doubles]
 ----
@@ -1485,7 +1485,7 @@ defined by its top-left and bottom-right corners.
 
 .Matching points within a box
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-box]
 ----
@@ -1496,7 +1496,7 @@ top-left latitude, top-left longitude, bottom-right latitude, bottom-right longi
 
 .Matching points within a box: passing corner coordinates as doubles
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-box-doubles]
 ----
@@ -1509,7 +1509,7 @@ With `.polygon(...)`, the matched points must be within a given polygon.
 
 .Matching points within a polygon
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-polygon]
 ----
@@ -1543,7 +1543,7 @@ Distance is measured based on the vector similarity configured for the given <<m
 
 .Simple K-Nearest Neighbors search
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn]
 ----
@@ -1566,7 +1566,7 @@ Optionally, the predicate can filter out some of the neighbors using the `.filte
 
 .K-Nearest Neighbors search with a filter
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-filter]
 ----
@@ -1580,7 +1580,7 @@ by increasing the score of documents that are more relevant based on vector embe
 
 .Enriching regular text search with K-Nearest Neighbors search
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-and-match]
 ----
@@ -1603,7 +1603,7 @@ Note that the expected value for this property is a distance value between two v
 
 .Filtering out irrelevant results
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-similarity]
 ----
@@ -1617,7 +1617,7 @@ a score based filter instead.
 
 .Filtering out irrelevant results with score
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=knn-score]
 ----
@@ -1673,7 +1673,7 @@ guides.
 
 .Matching a query string
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-query]
 ----
@@ -1698,7 +1698,7 @@ you can call `.defaultOperator(...)`.
 
 .Matching a query string: AND as default operator
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-defaultOperator-and]
 ----
@@ -1713,7 +1713,7 @@ With query predicate, this option can be set in the query string itself.
 
 .Matching a query string: phrase slop as part of query string itself
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-phrase-slop-through-query]
 ----
@@ -1723,7 +1723,7 @@ Alternatively, `.phraseSlop(...)` can be applied to a query string predicate.
 
 .Matching a query string: phrase slop as predicate option
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-phrase-slop-through-parameter]
 ----
@@ -1733,7 +1733,7 @@ Note that passing the value to `.phraseSlop(...)` sets the default phrase slop v
 
 .Matching a query string: phrase slop as predicate option overridden by query
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-phrase-slop-through-parameter-overridden]
 ----
@@ -1752,7 +1752,7 @@ with a `false` value to disallow such queries.
 
 .Matching a query string: disallowing leading wildcards
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-allow-leading-wildcard]
 ----
@@ -1778,7 +1778,7 @@ with disabled position increments, phrase query `"book shelve"` will not match s
 
 .Matching a query string: disabling position increments
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-enable-position-increments]
 ----
@@ -1803,7 +1803,7 @@ To learn more about them, please refer to your backend's guide
 
 .Matching a query string: rewrite method
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=queryString-rewrite-method]
 ----
@@ -1817,7 +1817,7 @@ It may be helpful to control how many `should` clauses must match to consider a 
 
 .Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-minimum-should-match]
 ----
@@ -1872,7 +1872,7 @@ The `prefix` predicate matches documents for which a given field has a value sta
 
 .Matching a simple prefix
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=prefix]
 ----
@@ -1917,7 +1917,7 @@ from the example of section <<binding-named-predicate>>.
 
 .Calling a named predicate
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/namedpredicate/NamedPredicateIT.java[tags=named-predicate]
 ----
@@ -1945,7 +1945,7 @@ That function will get called at query building time.
 
 .Creating a predicate with query parameters
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=with-parameters]
 ----
@@ -1975,7 +1975,7 @@ include::../components/_lucene-api-warning.adoc[]
 
 .Matching a native `org.apache.lucene.search.Query`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/LucenePredicateDslIT.java[tags=lucene-fromLuceneQuery]
 ----
@@ -1993,7 +1993,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 
 .Matching a native Elasticsearch JSON query provided as a `JsonObject`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/ElasticsearchPredicateDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
@@ -2005,7 +2005,7 @@ but using the Lucene extension so that Lucene-specific options are available.
 
 .Matching a native Elasticsearch JSON query provided as a JSON-formatted string
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/ElasticsearchPredicateDslIT.java[tags=elasticsearch-fromJson-string]
 ----
@@ -2028,11 +2028,11 @@ Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
 
 .Matching a value in any of multiple fields
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=multipleFields-fieldOrField]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=multipleFields-fields]
 ----
@@ -2070,7 +2070,7 @@ Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
 
 .Boosting on a per-predicate basis
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=score-boost]
 ----
@@ -2084,7 +2084,7 @@ Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
 
 .Boosting on a per-field basis
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=score-boost-multipleFields]
 ----
@@ -2114,7 +2114,7 @@ Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
 
 .Making the score of a predicate constant
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=score-constantScore]
 ----
@@ -2140,7 +2140,7 @@ on your field instead. Then you won't need to use `.analyzer(...)` when searchin
 
 .Matching a value, analyzing it with a different analyzer
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=overrideAnalysis-analyzer]
 ----
@@ -2151,7 +2151,7 @@ call `.skipAnalysis()`.
 
 .Matching a value without analyzing it
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=overrideAnalysis-skipAnalysis]
 ----

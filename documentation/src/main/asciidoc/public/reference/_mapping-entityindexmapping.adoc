@@ -10,7 +10,7 @@ In order to index an entity, it must be annotated with `@Indexed`.
 
 .Marking a class for indexing with `@Indexed`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/Book.java[tags=indexed-default]
 ----
@@ -54,7 +54,7 @@ Note that index names must be unique in a given application.
 
 .Explicit index name with `@Indexed.index`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/Author.java[tags=indexed-explicitindexname]
 ----
@@ -67,7 +67,7 @@ This may be useful if your model has clearly defined sub-parts with very differe
 
 .Explicit backend with `@Indexed.backend`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/User.java[tags=indexed-explicitbackend]
 ----
@@ -80,7 +80,7 @@ For example, with the mappings defined above,
 the following code will throw an exception
 because `Author` and `User` are indexed in different backends:
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/HibernateOrmIndexedIT.java[tags=cross-backend-search]
 ----
@@ -113,7 +113,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Marking a class for indexing with `.indexed()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/HibernateOrmIndexedIT.java[tags=programmatic]
 ----

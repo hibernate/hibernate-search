@@ -25,7 +25,7 @@ and then write to that field in a property bridge.
 
 .Declaring a simple index field and writing to that field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/ISBNBinder.java[tags=bind]
 ----
@@ -40,7 +40,7 @@ See <<binding-index-field-type-dsl>> for more information.
 <7> Pass the expected type of values.
 <8> Pass the bridge instance.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/ISBNBinder.java[tags=write]
 ----
@@ -60,7 +60,7 @@ that can be re-used in multiple field declarations.
 
 .Re-using an index field type in multiple field declarations
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/SingleValuedNamesBinder.java[tags=bind]
 ----
@@ -82,7 +82,7 @@ this field must be marked as multivalued during its declaration:
 
 .Declaring a field as multivalued
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/MultiValuedNamesBinder.java[tags=bind]
 ----
@@ -106,7 +106,7 @@ as shown below.
 
 .Declaring an object field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/object/InvoiceLineItemsSummaryBinder.java[tags=bind]
 ----
@@ -135,7 +135,7 @@ as shown in the example below.
 
 .Writing to an object field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/object/InvoiceLineItemsSummaryBinder.java[tags=write]
 ----
@@ -159,7 +159,7 @@ without any change to the `write` method of the bridge.
 
 .Declaring an object field as nested
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/object/InvoiceLineItemsDetailBinder.java[tags=bind]
 ----
@@ -204,7 +204,7 @@ and then write to that field in a property bridge.
 
 .Declaring a field template and writing to a dynamic field
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/UserMetadataBinder.java[tags=bind]
 ----
@@ -219,7 +219,7 @@ because you won't need it when writing to the document.
 <6> Get a reference to the declared object field
 and pass it to the bridge for later use.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/UserMetadataBinder.java[tags=write]
 ----
@@ -243,7 +243,7 @@ as shown below.
 
 .Declaring multiple field templates with different types
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/MultiTypeUserMetadataBinder.java[tags=bind]
 ----
@@ -255,7 +255,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/docum
 <6> Declare another field template,
 so that fields are considered as english text if they do not match the previous template.
 
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/MultiTypeUserMetadataBinder.java[tags=write]
 ----

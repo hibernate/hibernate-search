@@ -37,11 +37,11 @@ and use simple <<mapping-directfieldmapping,property/field mapping>> with `@Gene
 
 .Mapping spatial coordinates by implementing `GeoPoint` and using `@GenericField`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/genericfield/MyCoordinates.java[tags=include]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/genericfield/Author.java[tags=include;!getters-setters]
 ----
@@ -84,7 +84,7 @@ it can map the coordinates of any type that declares a latitude and longitude of
 
 .Mapping spatial coordinates using `@GeoPointBinding`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/type/Author.java[tags=include;!getters-setters]
 ----
@@ -99,11 +99,11 @@ in which case the `@Latitude` and `@Longitude` must be applied to properties of 
 
 .Mapping spatial coordinates using `@GeoPointBinding` on a property
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/property/MyCoordinates.java[tags=include]
 ----
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/property/Author.java[tags=include;!getters-setters]
 ----
@@ -123,7 +123,7 @@ and setting the `markerSet` attribute to a unique value:
 [[spatial-multiplecoordinates]]
 .Mapping multiple sets of spatial coordinates using `@GeoPointBinding`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/multiple/Author.java[tags=include;!getters-setters]
 ----
@@ -150,7 +150,7 @@ Behavior and options are identical to annotation-based mapping.
 
 .Mapping spatial coordinates by implementing `GeoPoint` and using `.genericField()`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/genericfield/GeoPointGenericFieldIT.java[tags=programmatic]
 ----
@@ -158,7 +158,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/gener
 
 .Mapping spatial coordinates using `GeoPointBinder`
 ====
-[source, JAVA, indent=0, subs="+callouts"]
+[source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/type/GeoPointBindingTypeIT.java[tags=programmatic]
 ----
