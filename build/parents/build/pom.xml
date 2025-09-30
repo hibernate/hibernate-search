@@ -160,7 +160,7 @@
         <version.org.jboss.weld>5.1.6.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
-        <version.com.h2database>2.3.232</version.com.h2database>
+        <version.com.h2database>2.4.240</version.com.h2database>
         <version.org.postgresql>42.7.8</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.6</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.4.0</version.mysql.mysql-connector-j>
