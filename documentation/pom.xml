@@ -32,7 +32,7 @@
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
 
         <html.meta.project-key>search</html.meta.project-key>
-        <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
+        <html-outdated-content-project-key>${html.meta.project-key}</html-outdated-content-project-key>
     </properties>
 
     <dependencies>
@@ -342,7 +342,7 @@
                                 <imagesdir>images</imagesdir>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
-                                <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                                <iconfont-name>font-awesome/css/solid</iconfont-name>
                                 <source-highlighter>rouge</source-highlighter>
                             </attributes>
                         </configuration>
@@ -353,7 +353,7 @@
                     <attributes>
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
                         <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
-                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
+                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/hibernate</docinfodir>
                         <icons>font</icons>
                         <tabsize>4</tabsize>
 
@@ -489,6 +489,7 @@
                                     <sourceDirectory>src/main/asciidoc</sourceDirectory>
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
                                     <preserveDirectories>true</preserveDirectories>
+                                    <requires>${asciidoctor.aggregated-resources-dir}/theme/hibernate.rb</requires>
                                     <attributes>
                                         <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                         <pdf-themesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-themesdir>
@@ -496,7 +497,8 @@
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
                                         <idseparator>-</idseparator>
-                                        <source-highlighter>coderay</source-highlighter>
+                                        <source-highlighter>rouge</source-highlighter>
+                                        <rouge-style>hibernate</rouge-style>
                                     </attributes>
                                 </configuration>
                             </execution>
