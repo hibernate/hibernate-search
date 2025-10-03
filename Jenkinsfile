@@ -133,7 +133,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *         pr: ...
  */
 
-@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 21 Latest'
+@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 25 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -174,8 +174,7 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
-							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
+							condition: TestCondition.AFTER_MERGE),
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
@@ -184,15 +183,10 @@ stage('Configure') {
 					// they require the use of -Dnet.bytebuddy.experimental=true.
 					// Make sure to remove that argument as soon as possible
 					// -- generally that requires upgrading bytebuddy in Hibernate ORM after the JDK goes GA.
-					new JdkBuildEnvironment(version: '23', testCompilerTool: 'OpenJDK 23 Latest',
-							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(version: '24', testCompilerTool: 'OpenJDK 24 Latest',
-							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '25', testCompilerTool: 'OpenJDK 25 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
 					new JdkBuildEnvironment(version: '26', testCompilerTool: 'OpenJDK 26 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
 							condition: TestCondition.AFTER_MERGE)
