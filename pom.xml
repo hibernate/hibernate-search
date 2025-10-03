@@ -1348,26 +1348,10 @@
         </profile>
 
         <profile>
-            <id>testWithJdk24</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>24</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- Spring Boot 3 isn't ready for JDK24 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>testWithJdk25</id>
             <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>25</value>
-                </property>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[25,)</jdk>
             </activation>
             <properties>
                 <!-- Spring Boot 3 isn't ready for JDK25 yet -->
