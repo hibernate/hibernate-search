@@ -208,7 +208,7 @@
 
         <!-- JDK version required for the build; we target 17 but require at least 21 for the build -->
         <!-- Adjust contributing guide when changing the minimum required JDK version -->
-        <jdk.min.version>21</jdk.min.version>
+        <jdk.min.version>25</jdk.min.version>
         <!-- The lowest supported version of Java for applications using Hibernate Search -->
         <!-- Set statically, independently from the current JDK: we want our code to comply with this version -->
         <!-- Adjust the contributing guide when changing the release Java version -->
@@ -216,7 +216,7 @@
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The versions of Java documented as supported for applications using Hibernate Search -->
-        <java-version.main.compatible.expected.text>17, 21 or 23</java-version.main.compatible.expected.text>
+        <java-version.main.compatible.expected.text>17, 21 or 25</java-version.main.compatible.expected.text>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
         <!-- Set to the expected version of the JDK running Maven by default, but overridden on CI -->
         <java-version.test.release>${jdk.min.version}</java-version.test.release>

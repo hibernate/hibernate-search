@@ -6,7 +6,7 @@
 @Library('hibernate-jenkins-pipeline-helpers') _
 
 def withMavenWorkspace(Closure body) {
-	withMaven(jdk: 'OpenJDK 21 Latest', maven: 'Apache Maven 3.9',
+	withMaven(jdk: 'OpenJDK 25 Latest', maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
 			options: [
 					// Artifacts are not needed and take up disk space
