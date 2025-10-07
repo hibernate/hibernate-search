@@ -133,6 +133,10 @@ updates:
       - dependency-name: "org.skyscreamer:jsonassert"
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ "3.42.0", "3.43.0" ]
+      # We depend on the JUnit version in ORM, hence we cannot just bump to a next major/minor
+      - dependency-name: "org.junit:*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+
   - package-ecosystem: "docker"
     registries:
       - dockerhub
