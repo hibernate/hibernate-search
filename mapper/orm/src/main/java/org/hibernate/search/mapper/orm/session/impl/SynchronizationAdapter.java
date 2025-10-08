@@ -9,7 +9,6 @@ import jakarta.transaction.Synchronization;
 
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 
@@ -45,7 +44,7 @@ class SynchronizationAdapter
 	}
 
 	@Override
-	public void doBeforeTransactionCompletion(SessionImplementor sessionImplementor) {
+	public void doBeforeTransactionCompletion(SharedSessionContractImplementor session) {
 		try {
 			doBeforeCompletion();
 		}

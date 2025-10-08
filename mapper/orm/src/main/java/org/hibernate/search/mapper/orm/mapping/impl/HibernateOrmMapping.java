@@ -11,11 +11,13 @@ import java.util.concurrent.CompletableFuture;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceException;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
@@ -374,28 +376,34 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoTypeIndexingPlan currentIndexingPlanIfTypeIncluded(SessionImplementor session,
+	public PojoTypeIndexingPlan currentIndexingPlanIfTypeIncluded(
+			SharedSessionContractImplementor sessionImplementor,
 			PojoRawTypeIdentifier<?> typeIdentifier) {
-		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
-		if ( searchSession != null ) {
-			// If the session exist, rely on the session-level filter
-			if ( searchSession.configuredIndexingPlanFilter().isIncluded( typeIdentifier ) ) {
-				return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
+		try {
+			SessionImplementor session = sessionImplementor.unwrap( SessionImplementor.class );
+			HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
+			if ( searchSession != null ) {
+				// If the session exist, rely on the session-level filter
+				if ( searchSession.configuredIndexingPlanFilter().isIncluded( typeIdentifier ) ) {
+					return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
+				}
+				else {
+					return null;
+				}
 			}
 			else {
+				// If the search session doesn't exist yet, we can safely rely on the global filter
+				if ( applicationIndexingPlanFilter.isIncluded( typeIdentifier ) ) {
+					searchSession = HibernateOrmSearchSession.get( this, session, true );
+					if ( searchSession != null ) {
+						return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
+					}
+				}
 				return null;
 			}
 		}
-		else {
-			// If the search session doesn't exist yet, we can safely rely on the global filter
-			if ( applicationIndexingPlanFilter.isIncluded( typeIdentifier ) ) {
-				searchSession = HibernateOrmSearchSession.get( this, session, true );
-				return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
-			}
-			else {
-				return null;
-			}
-
+		catch (PersistenceException e) {
+			throw OrmMiscLog.INSTANCE.unsupportedSessionType( sessionImplementor.getClass() );
 		}
 	}
 

@@ -209,7 +209,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 			}
 		}
 
-		TypeQueryFactory<E, I> actualQueryFactory = createFactory( commonSuperType );
+		TypeQueryFactory<E, I> actualQueryFactory = createFactory( sessionFactory, commonSuperType );
 
 		if ( !conditionalExpressions.isEmpty() || order != null ) {
 			if ( typeContexts.size() != 1 ) {
@@ -225,13 +225,16 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		return new HibernateOrmQueryLoaderImpl<>( actualQueryFactory, includedTypesFilter );
 	}
 
-	protected abstract TypeQueryFactory<E, I> createFactory(Class<E> entityClass, String ormEntityName,
+	protected abstract TypeQueryFactory<E, I> createFactory(
+			SessionFactoryImplementor sessionFactoryImplementor, Class<E> entityClass, String ormEntityName,
 			Class<I> uniquePropertyType, String uniquePropertyName);
 
 	@SuppressWarnings("unchecked")
-	protected TypeQueryFactory<E, I> createFactory(EntityMappingType entityMappingType) {
-		return createFactory( (Class<E>) entityMappingType.getJavaType().getJavaTypeClass(), entityMappingType.getEntityName(),
-				uniquePropertyType, uniquePropertyName );
+	protected TypeQueryFactory<E, I> createFactory(SessionFactoryImplementor sessionFactoryImplementor,
+			EntityMappingType entityMappingType) {
+		return createFactory( sessionFactoryImplementor, (Class<E>) entityMappingType.getJavaType().getJavaTypeClass(),
+				entityMappingType.getEntityName(), uniquePropertyType, uniquePropertyName
+		);
 	}
 
 	protected static EntityMappingType toMostSpecificCommonEntitySuperType(

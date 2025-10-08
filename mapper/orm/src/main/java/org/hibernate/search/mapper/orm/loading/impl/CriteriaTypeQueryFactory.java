@@ -5,8 +5,10 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.FindOption;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
@@ -77,8 +79,15 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 		return session.createQuery( criteriaQuery );
 	}
 
+	@SuppressWarnings("removal")
+	@Deprecated(forRemoval = true, since = "8.2")
 	@Override
 	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
 		return session.byMultipleIds( entityClass );
+	}
+
+	@Override
+	public List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options) {
+		return session.findMultiple( entityClass, ids, options );
 	}
 }

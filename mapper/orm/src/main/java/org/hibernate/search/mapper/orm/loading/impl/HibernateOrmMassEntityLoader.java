@@ -55,10 +55,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 	}
 
 	private List<E> multiLoad(List<I> identifiers) {
-		return typeQueryLoader.createMultiIdentifierLoadAccess( session )
-				.with( options.cacheMode() )
-				.with( LockMode.NONE )
-				.multiLoad( identifiers );
+		return typeQueryLoader.findMultiple( session, identifiers, options.cacheMode(), LockMode.NONE );
 	}
 
 	private List<E> queryByIds(List<I> identifiers) {

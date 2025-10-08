@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.util.TimeZone;
 import java.util.function.UnaryOperator;
 
+import org.hibernate.CacheMode;
 import org.hibernate.ConnectionAcquisitionMode;
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.FlushMode;
@@ -75,6 +76,12 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	}
 
 	@Override
+	public FullTextSharedSessionBuilder noSessionInterceptorCreation() {
+		builder.noSessionInterceptorCreation();
+		return this;
+	}
+
+	@Override
 	public FullTextSharedSessionBuilder connection(Connection connection) {
 		builder.connection( connection );
 		return this;
@@ -100,6 +107,18 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	}
 
 	@Override
+	public FullTextSharedSessionBuilder defaultBatchFetchSize(int defaultBatchFetchSize) {
+		builder.defaultBatchFetchSize( defaultBatchFetchSize );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder subselectFetchEnabled(boolean subselectFetchEnabled) {
+		builder.subselectFetchEnabled( subselectFetchEnabled );
+		return this;
+	}
+
+	@Override
 	public FullTextSession openSession() {
 		return Search.getFullTextSession( builder.openSession() );
 	}
@@ -114,6 +133,18 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	@Override
 	public FullTextSharedSessionBuilder tenantIdentifier(Object tenantIdentifier) {
 		builder.tenantIdentifier( tenantIdentifier );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder readOnly(boolean readOnly) {
+		builder.readOnly( readOnly );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder initialCacheMode(CacheMode cacheMode) {
+		builder.initialCacheMode( cacheMode );
 		return this;
 	}
 
@@ -138,6 +169,18 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	@Override
 	public FullTextSharedSessionBuilder statementInspector(UnaryOperator<String> operator) {
 		builder.statementInspector( operator );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder statementInspector() {
+		builder.statementInspector();
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder noStatementInspector() {
+		builder.noStatementInspector();
 		return this;
 	}
 
