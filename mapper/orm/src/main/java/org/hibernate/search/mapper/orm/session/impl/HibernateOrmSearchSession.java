@@ -353,16 +353,16 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		boolean isLocal = isLocalTransaction( sessionImplementor );
 		if ( isLocal ) {
 			//if local tx never use Synchronization
-			actionQueue.registerProcess( (BeforeTransactionCompletionProcess) adapter );
+			actionQueue.registerCallback( (BeforeTransactionCompletionProcess) adapter );
 		}
 		else {
 			//TODO could we remove the action queue registration in this case?
-			actionQueue.registerProcess( (BeforeTransactionCompletionProcess) adapter );
+			actionQueue.registerCallback( (BeforeTransactionCompletionProcess) adapter );
 			sessionImplementor.accessTransaction().registerSynchronization( adapter );
 		}
 
 		//executed in all environments
-		actionQueue.registerProcess( (AfterTransactionCompletionProcess) adapter );
+		actionQueue.registerCallback( (AfterTransactionCompletionProcess) adapter );
 	}
 
 	private boolean isLocalTransaction(SessionImplementor sessionImplementor) {

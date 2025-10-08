@@ -230,6 +230,8 @@
 
                                 <argument>^org\.hibernate\.dialect\.lock\.spi\.LockingSupport$</argument>
 
+                                <argument>^org\.hibernate\.engine\.creation\.CommonBuilder$</argument>
+
                                 <argument>^org\.hibernate\.metamodel\.MappingMetamodel$</argument>
                                 <argument>^org\.hibernate\.metamodel\.mapping\.Bindable$</argument>
                                 <argument>^org\.hibernate\.metamodel\.mapping\.SelectableMapping$</argument>

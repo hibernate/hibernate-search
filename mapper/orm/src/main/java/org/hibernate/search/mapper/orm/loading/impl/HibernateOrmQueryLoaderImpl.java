@@ -7,6 +7,8 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.FindOption;
+
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -61,9 +63,16 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 		return queryFactory.createQueryForLoadByUniqueProperty( session, idParameterName );
 	}
 
+	@SuppressWarnings("removal")
+	@Deprecated(forRemoval = true, since = "8.2")
 	@Override
 	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
 		return queryFactory.createMultiIdentifierLoadAccess( session );
+	}
+
+	@Override
+	public List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options) {
+		return queryFactory.findMultiple( session, ids, options );
 	}
 
 	@Override

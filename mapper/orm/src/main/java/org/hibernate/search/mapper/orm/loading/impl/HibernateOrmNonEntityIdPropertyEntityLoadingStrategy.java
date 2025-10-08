@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
@@ -96,10 +97,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	protected TypeQueryFactory<E, I> createFactory(Class<E> entityClass, String ormEntityName,
+	protected TypeQueryFactory<E, I> createFactory(
+			SessionFactoryImplementor sessionFactoryImplementor, Class<E> entityClass, String ormEntityName,
 			Class<I> uniquePropertyType, String uniquePropertyName) {
-		return TypeQueryFactory.create(
-				entityClass, ormEntityName, uniquePropertyType, uniquePropertyName, uniquePropertyIsTheEntityId );
+		return TypeQueryFactory.create( sessionFactoryImplementor, entityClass, ormEntityName, uniquePropertyType,
+				uniquePropertyName, uniquePropertyIsTheEntityId );
 	}
 
 	private PojoSelectionEntityLoader<E> doCreate(PojoLoadingTypeContext<? extends E> targetEntityTypeContext,
@@ -121,7 +123,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		@SuppressWarnings("unchecked")
 		PojoSelectionEntityLoader<E> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
 				entityMapping, (PojoLoadingTypeContext<E>) targetEntityTypeContext,
-				createFactory( entityMapping ),
+				createFactory( sessionFactory, entityMapping ),
 				documentIdSourcePropertyName, documentIdSourceHandle,
 				sessionContext, loadingOptions
 		);
