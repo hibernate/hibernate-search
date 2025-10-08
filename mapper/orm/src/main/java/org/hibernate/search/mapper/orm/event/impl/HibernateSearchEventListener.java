@@ -10,6 +10,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.AutoFlushEvent;
@@ -289,7 +290,8 @@ public final class HibernateSearchEventListener
 		}
 	}
 
-	private PojoTypeIndexingPlan getCurrentIndexingPlanIfTypeIncluded(SessionImplementor sessionImplementor,
+	private PojoTypeIndexingPlan getCurrentIndexingPlanIfTypeIncluded(
+			SharedSessionContractImplementor sessionImplementor,
 			HibernateOrmListenerTypeContext typeContext) {
 		return contextProvider.currentIndexingPlanIfTypeIncluded( sessionImplementor, typeContext.typeIdentifier() );
 	}

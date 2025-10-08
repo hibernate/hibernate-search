@@ -7,6 +7,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.Set;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -89,9 +90,11 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHib
 	}
 
 	@Override
-	protected TypeQueryFactory<E, I> createFactory(Class<E> entityClass, String ormEntityName,
+	protected TypeQueryFactory<E, I> createFactory(
+			SessionFactoryImplementor sessionFactoryImplementor, Class<E> entityClass, String ormEntityName,
 			Class<I> uniquePropertyType, String uniquePropertyName) {
-		return TypeQueryFactory.create( entityClass, ormEntityName, uniquePropertyType, uniquePropertyName, true );
+		return TypeQueryFactory.create( sessionFactoryImplementor, entityClass, ormEntityName, uniquePropertyType,
+				uniquePropertyName, true );
 	}
 
 	private PojoSelectionEntityLoader<?> doCreate(EntityMappingType entityMappingType,
@@ -142,7 +145,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHib
 		// even if we know we actually want instances from the most specific entity type,
 		// because that exception cannot be recovered from.
 		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityMappingType,
-				createFactory( entityMappingType ),
+				createFactory( sessionFactory, entityMappingType ),
 				sessionContext,
 				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
 	}
