@@ -158,4 +158,8 @@ public interface OrmMiscLog {
 	@LogMessage(level = Logger.Level.TRACE)
 	@Message(id = ID_OFFSET + 133, value = "Transaction's afterCompletion() phase already been processed, ignoring: %s")
 	void syncAdapterIgnoringAfterCompletionAlreadyExecuted(Synchronization delegate);
+
+	@Message(id = ID_OFFSET + 143,
+			value = "Hibernate Search does not support working with %s session type")
+	SearchException unsupportedSessionType(Class<?> session);
 }
