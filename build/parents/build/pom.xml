@@ -133,8 +133,7 @@
 
         <!-- >>> Common -->
         <version.log4j>2.25.2</version.log4j>
-        <version.junit-jupiter>5.13.4</version.junit-jupiter>
-        <version.junit-platform-suite-engine>1.10.0</version.junit-platform-suite-engine>
+        <version.junit-jupiter>6.0.0</version.junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
         <version.testcontainers>2.0.1</version.testcontainers>
