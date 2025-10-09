@@ -93,6 +93,9 @@
                                      Those few cases that are acceptable are tested by an outbox polling specific test. -->
                                 <exclude>SessionIndexingPlanFilterIT</exclude>
                             </excludes>
+                            <systemPropertyVariables combine.self="append">
+                                <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
+                            </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>
