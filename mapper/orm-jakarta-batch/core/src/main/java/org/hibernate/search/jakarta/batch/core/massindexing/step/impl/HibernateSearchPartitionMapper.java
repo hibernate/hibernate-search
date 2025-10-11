@@ -6,7 +6,11 @@ package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Properties;
 
 import jakarta.batch.api.BatchProperty;
@@ -16,20 +20,18 @@ import jakarta.batch.api.partition.PartitionPlanImpl;
 import jakarta.batch.runtime.context.JobContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.LockModeType;
 
 import org.hibernate.StatelessSession;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
-import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.BatchCoreEntityTypeDescriptor;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PartitionBound;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
-import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchIdentifierLoadingOptions;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchReindexCondition;
 
 /**
  * This partition mapper provides a dynamic partition plan for chunk processing.
@@ -131,15 +133,15 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			);
 			int checkpointInterval =
 					MassIndexingJobParameters.Defaults.checkpointInterval( checkpointIntervalRaw, rowsPerPartition );
-			ConditionalExpression reindexOnly =
+			HibernateOrmBatchReindexCondition reindexOnly =
 					SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
 
-			List<EntityTypeDescriptor<?, ?>> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
+			List<BatchCoreEntityTypeDescriptor<?, ?>> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 
-			for ( EntityTypeDescriptor<?, ?> entityTypeDescriptor : entityTypeDescriptors ) {
-				partitionBounds.addAll( buildPartitionUnitsFrom( ss, entityTypeDescriptor,
-						maxResults, rowsPerPartition, reindexOnly ) );
+			for ( BatchCoreEntityTypeDescriptor<?, ?> entityTypeDescriptor : entityTypeDescriptors ) {
+				partitionBounds.addAll(
+						buildPartitionUnitsFrom( ss, entityTypeDescriptor, maxResults, rowsPerPartition, reindexOnly ) );
 			}
 
 			// Build partition plan
@@ -178,18 +180,27 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		}
 	}
 
-	private <I> List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
-			EntityTypeDescriptor<?, I> type,
-			Integer maxResults, int rowsPerPartition, ConditionalExpression reindexOnly) {
+	private <E, I> List<PartitionBound> buildPartitionUnitsFrom(StatelessSession session,
+			BatchCoreEntityTypeDescriptor<E, I> type,
+			Integer maxResults, int rowsPerPartition, HibernateOrmBatchReindexCondition reindexOnly) {
 		List<PartitionBound> partitionUnits = new ArrayList<>();
 
 		int index = 0;
 		Object lowerBound = null;
-		Object upperBound;
+		Object upperBound = null;
 		// If there are no results or fewer than "rowsPerPartition" results,
 		// we'll just create one partition with two null bounds.
 		do {
-			upperBound = selectNextId( type, reindexOnly, ss, lowerBound, rowsPerPartition );
+			var options = new LoadingOptions( session, rowsPerPartition, lowerBound, reindexOnly );
+			try ( var identifierLoader = type.batchLoadingStrategy().createIdentifierLoader( type, options ) ) {
+				if ( identifierLoader.hasNext() ) {
+					upperBound = identifierLoader.next();
+				}
+				else {
+					upperBound = null;
+				}
+			}
+
 			partitionUnits.add( new PartitionBound( type, lowerBound, upperBound ) );
 			index += rowsPerPartition;
 			lowerBound = upperBound;
@@ -199,24 +210,70 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		return partitionUnits;
 	}
 
-	private <I> I selectNextId(EntityTypeDescriptor<?, I> type, ConditionalExpression reindexOnly,
-			StatelessSession ss, Object lowerId, int offset) {
-		List<ConditionalExpression> conditions = new ArrayList<>();
-		if ( reindexOnly != null ) {
-			conditions.add( reindexOnly );
+	private static class LoadingOptions implements HibernateOrmBatchIdentifierLoadingOptions {
+		private final HibernateOrmBatchReindexCondition reindexOnly;
+		private final Map<Class<?>, Object> contextData;
+		private final int offset;
+		private final Object lowerBound;
+
+		LoadingOptions(StatelessSession session,
+				int offset,
+				Object lowerBound,
+				HibernateOrmBatchReindexCondition reindexOnly) {
+			this.offset = offset;
+			this.lowerBound = lowerBound;
+			this.reindexOnly = reindexOnly;
+
+			this.contextData = new HashMap<>();
+
+			this.contextData.put( StatelessSession.class, session );
 		}
-		if ( lowerId != null ) {
-			conditions.add( type.idOrder()
-					.idGreater( "HIBERNATE_SEARCH_PARTITION_LOWER_BOUND_", lowerId ) );
+
+		@Override
+		public int fetchSize() {
+			return 1;
 		}
-		SelectionQuery<I> query = type.createIdentifiersQuery( (SharedSessionContractImplementor) ss, conditions )
-				.setFetchSize( 1 )
-				.setReadOnly( true )
-				.setCacheable( false )
-				.setLockMode( LockModeType.NONE );
-		query.setFirstResult( offset );
-		query.setMaxResults( 1 );
-		return query.getSingleResultOrNull();
+
+		@Override
+		public OptionalInt maxResults() {
+			return OptionalInt.of( 1 );
+		}
+
+		@Override
+		public OptionalInt offset() {
+			return OptionalInt.of( offset );
+		}
+
+		@Override
+		public Optional<HibernateOrmBatchReindexCondition> reindexOnlyCondition() {
+			return Optional.ofNullable( reindexOnly );
+		}
+
+		@Override
+		public Optional<Object> upperBound() {
+			return Optional.empty();
+		}
+
+		@Override
+		public boolean upperBoundInclusive() {
+			return false;
+		}
+
+		@Override
+		public Optional<Object> lowerBound() {
+			return Optional.ofNullable( lowerBound );
+		}
+
+		@Override
+		public boolean lowerBoundInclusive() {
+			return false;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T context(Class<T> contextType) {
+			return (T) contextData.get( contextType );
+		}
 	}
 
 }
