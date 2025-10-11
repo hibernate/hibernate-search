@@ -1109,6 +1109,8 @@
                                     <bundledSignature>jdk-deprecated-20</bundledSignature>
                                     <bundledSignature>jdk-deprecated-21</bundledSignature>
                                     <bundledSignature>jdk-deprecated-22</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-23</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-24</bundledSignature>
 
                                     <bundledSignature>jdk-internal-17</bundledSignature>
                                     <bundledSignature>jdk-internal-18</bundledSignature>
@@ -1116,6 +1118,8 @@
                                     <bundledSignature>jdk-internal-20</bundledSignature>
                                     <bundledSignature>jdk-internal-21</bundledSignature>
                                     <bundledSignature>jdk-internal-22</bundledSignature>
+                                    <bundledSignature>jdk-internal-23</bundledSignature>
+                                    <bundledSignature>jdk-internal-24</bundledSignature>
                                 </bundledSignatures>
                                 <signaturesArtifacts>
                                     <signaturesArtifact>
@@ -1149,6 +1153,7 @@
                         <execution>
                             <id>verify-forbidden-apis-main-internal</id>
                             <configuration>
+                                <releaseVersion>24</releaseVersion>
                                 <bundledSignatures>
                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
                                     <bundledSignature>jdk-unsafe</bundledSignature>
@@ -1175,6 +1180,7 @@
                         <execution>
                             <id>verify-forbidden-apis-tests</id>
                             <configuration>
+                                <testReleaseVersion>24</testReleaseVersion>
                                 <bundledSignatures>
                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
                                     <bundledSignature>jdk-unsafe</bundledSignature>
