@@ -20,6 +20,8 @@
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
         <version.bom.org.hibernate.orm>7.2.0.CR2</version.bom.org.hibernate.orm>
         <version.bom.org.elasticsearch.client>9.2.0</version.bom.org.elasticsearch.client>
+        <version.bom.org.elasticsearch.java.client>9.2.0</version.bom.org.elasticsearch.java.client>
+        <version.bom.org.opensearch.client>3.3.1</version.bom.org.opensearch.client>
         <version.bom.software.amazon.awssdk>2.38.3</version.bom.software.amazon.awssdk>
         <version.bom.io.smallrye>3.3.1</version.bom.io.smallrye>
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
@@ -258,6 +260,33 @@
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-client-sniffer</artifactId>
                 <version>${version.bom.org.elasticsearch.client}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${version.bom.org.elasticsearch.java.client}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-client</artifactId>
+                <version>${version.bom.org.opensearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-client-sniffer</artifactId>
+                <version>${version.bom.org.opensearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-java</artifactId>
+                <version>${version.bom.org.opensearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-high-level-client</artifactId>
+                <version>${version.bom.org.opensearch.client}</version>
             </dependency>
 
             <!--Other transitive dependencies: -->
@@ -1046,6 +1075,11 @@
                                             <groupId>org.apache.httpcomponents.client5</groupId>
                                             <artifactId>httpclient5-testing</artifactId>
                                             <version>${version.bom.org.apache.httpcomponents.client5}</version>
+                                        </dependency>
+                                        <dependency>
+                                            <groupId>org.opensearch.client</groupId>
+                                            <artifactId>client-benchmarks</artifactId>
+                                            <version>${version.bom.org.opensearch.client}</version>
                                         </dependency>
                                     </dependenciesToSkip>
                                 </dependencyManagementIncludesAllGroupIdArtifactsRule>
