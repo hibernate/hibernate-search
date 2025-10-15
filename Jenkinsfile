@@ -172,7 +172,7 @@ stage('Configure') {
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					// We want to enable preview features when testing newer builds of OpenJDK:
