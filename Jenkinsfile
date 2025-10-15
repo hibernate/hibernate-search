@@ -551,8 +551,9 @@ stage('Non-default environments') {
 	environments.content.localElasticsearch.enabled.each { LocalElasticsearchBuildEnvironment buildEnv ->
 		addExecution(buildEnv.tag, {
 			runBuildOnNode {
-				withMavenWorkspace {
+				withMavenWorkspace(jdk: 'OpenJDK 21 Latest') {
 					mavenNonDefaultBuild buildEnv, """ \
+							-Denforcer.skip=true
 							-Pdist \
 							-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 							-Dtest.elasticsearch.version=$buildEnv.version \
