@@ -265,7 +265,7 @@ public class ElasticsearchDialectFactory {
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV3(ElasticsearchVersion version, int minor) {
-		if ( minor > 2 ) {
+		if ( minor > 3 ) {
 			VersionLog.INSTANCE.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch70ProtocolDialect();
