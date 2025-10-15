@@ -174,7 +174,7 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE),
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
