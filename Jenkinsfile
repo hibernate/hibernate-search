@@ -497,10 +497,12 @@ stage('Non-default environments') {
 	environments.content.compiler.enabled.each { CompilerBuildEnvironment buildEnv ->
 		addExecution(buildEnv.tag, {
 			runBuildOnNode {
-				withMavenWorkspace {
+				withMavenWorkspace(jdk: 'OpenJDK 21 Latest') {
 					// NOTE: we are not relying on incremental build in this case as
 					// we'd better recompile everything with the same compiler rather than get some strange errors
 					mavenNonDefaultBuild buildEnv, """ \
+							-Djava-version.test.release=21 \
+							-Pskip-checks \
 							-DskipTests -DskipITs \
 							-P${buildEnv.mavenProfile},!javaModuleITs,!metamodelITs -pl '!:hibernate-search-documentation,!:hibernate-search-documentation-lucene-next,!:hibernate-search-reports' \
 							-Dgib.buildAll=true \
