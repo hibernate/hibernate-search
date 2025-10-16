@@ -52,6 +52,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>
