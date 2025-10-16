@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.documentation.backend.elasticsearch.client;
+package org.hibernate.search.documentation.backend.elasticsearch.client.rest;
 
 import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer;
@@ -27,8 +27,8 @@ public class HttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
 	public void configure(ElasticsearchHttpClientConfigurationContext context) { // <2>
 		HttpAsyncClientBuilder clientBuilder = context.clientBuilder(); // <3>
 		clientBuilder.setMaxConnPerRoute( 7 ); // <4>
-		clientBuilder.addInterceptorFirst( (HttpResponseInterceptor) (request, httpContext) -> {
-			long contentLength = request.getEntity().getContentLength();
+		clientBuilder.addInterceptorFirst( (HttpResponseInterceptor) (response, httpContext) -> {
+			long contentLength = response.getEntity().getContentLength();
 			// doing some stuff with contentLength
 		} );
 	}

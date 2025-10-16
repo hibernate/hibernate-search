@@ -22,6 +22,10 @@
         <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
         <failsafe.elasticsearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch</failsafe.elasticsearch.reportsDirectory>
         <failsafe.elasticsearch.summaryFile>${failsafe.elasticsearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.summaryFile>
+        <failsafe.elasticsearch.java.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-java</failsafe.elasticsearch.java.reportsDirectory>
+        <failsafe.elasticsearch.java.summaryFile>${failsafe.elasticsearch.java.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.java.summaryFile>
+        <failsafe.elasticsearch.opensearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-opensearch</failsafe.elasticsearch.opensearch.reportsDirectory>
+        <failsafe.elasticsearch.opensearch.summaryFile>${failsafe.elasticsearch.opensearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.opensearch.summaryFile>
         <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
         <failsafe.jvm.args.jacoco.elasticsearch></failsafe.jvm.args.jacoco.elasticsearch>
 
@@ -59,6 +63,16 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -195,13 +209,65 @@
                             <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
                             <excludes>
                                 <exclude>**/Lucene*IT</exclude>
+                                <exclude>**/client/java/*IT</exclude>
+                                <exclude>**/client/opensearch/*IT</exclude>
                             </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-elasticsearch-java</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch}</argLine>
+                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-java</reportNameSuffix>
+                            <reportsDirectory>${failsafe.elasticsearch.java.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.elasticsearch.java.summaryFile}</summaryFile>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                            <systemPropertyVariables>
+                                <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>**/client/java/*IT</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-elasticsearch-opensearch</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch}</argLine>
+                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-opensearch</reportNameSuffix>
+                            <reportsDirectory>${failsafe.elasticsearch.opensearch.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.elasticsearch.opensearch.summaryFile}</summaryFile>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                            <systemPropertyVariables>
+                                <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>**/client/opensearch/*IT</include>
+                            </includes>
                         </configuration>
                     </execution>
                     <execution>
@@ -213,6 +279,8 @@
                             <summaryFiles>
                                 <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                                 <summaryFile>${failsafe.elasticsearch.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.elasticsearch.java.summaryFile}</summaryFile>
+                                <summaryFile>${failsafe.elasticsearch.opensearch.summaryFile}</summaryFile>
                             </summaryFiles>
                         </configuration>
                     </execution>

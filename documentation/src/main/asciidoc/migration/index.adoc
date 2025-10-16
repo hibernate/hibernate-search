@@ -84,6 +84,13 @@ are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVers
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 in Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+But, there are some deprecations:
+
+* `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer` is deprecated for removal.
+With introduction of the pluggable Elasticsearch backend clients, configurers are a part of the particular client
+and expose client-specific configuration knobs.
+* `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext` is also up for removal,
+as it's a part of the configurer API.
 
 [[spi]]
 == SPI
