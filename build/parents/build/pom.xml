@@ -50,7 +50,11 @@
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
         <version.org.elasticsearch.client>9.1.5</version.org.elasticsearch.client>
+        <version.org.elasticsearch.java.client>9.1.5</version.org.elasticsearch.java.client>
+        <version.org.opensearch.client>3.2.0</version.org.opensearch.client>
         <!-- Various HTTP client versions that our own Elasticsearch client implementations depend on -->
+        <version.org.apache.httpcomponents.client5>5.5</version.org.apache.httpcomponents.client5>
+        <version.org.apache.httpcomponents.core5>5.3.5</version.org.apache.httpcomponents.core5>
         <version.org.apache.httpcomponents.httpclient>4.5.14</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.4.16</version.org.apache.httpcomponents.httpcore>
         <version.org.apache.httpcomponents.httpasyncclient>4.1.5</version.org.apache.httpcomponents.httpasyncclient>
@@ -149,6 +153,7 @@
         <version.org.wiremock.wiremock>3.13.1</version.org.wiremock.wiremock>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.commons-codec>1.19.0</version.commons-codec>
+        <version.commons-logging>1.3.5</version.commons-logging>
         <!--
             When upgrading Avro:
                 - make sure to create a new payload in EventPayloadSerializationUtilsTest
@@ -293,6 +298,26 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -451,6 +476,33 @@
                 <version>${version.org.apache.httpcomponents.httpasyncclient}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-client</artifactId>
+                <version>${version.org.opensearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-client-sniffer</artifactId>
+                <version>${version.org.opensearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${version.org.elasticsearch.java.client}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${version.org.apache.httpcomponents.client5}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>${version.org.apache.httpcomponents.core5}</version>
+            </dependency>
+
             <!-- Lucene backend -->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
@@ -494,6 +546,12 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${version.commons-codec}</version>
+            </dependency>
+            <!-- To align versions between different ES rest clients -->
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${version.commons-logging}</version>
             </dependency>
 
             <!-- JakartaEE dependencies -->

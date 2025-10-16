@@ -16,8 +16,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpHost;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -116,7 +115,7 @@ class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 		// which doesn't allow retrieving the version.
 		when( clientMock.submit( any() ) )
 				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
-						new HttpHost( "mockHost:9200" ), 404, "", null ) ) );
+						"mockHost:9200", 404, "", null ) ) );
 		ElasticsearchVersion version = ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock );
 		assertThat( version ).isNull();
 	}
@@ -131,6 +130,6 @@ class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 		responseBody.add( "version", versionObject );
 		when( clientMock.submit( any() ) )
 				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
-						new HttpHost( "mockHost:9200" ), 200, "", responseBody ) ) );
+						"mockHost:9200", 200, "", responseBody ) ) );
 	}
 }

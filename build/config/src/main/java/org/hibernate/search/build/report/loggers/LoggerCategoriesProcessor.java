@@ -78,7 +78,7 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 								if ( description != null && !description.isBlank() ) {
 									if ( categories.put( category, description ) != null ) {
 										messager.printMessage( Diagnostic.Kind.ERROR,
-												"Logging category %sis already defined in this module. Failed on logger: %s"
+												"Logging category %s is already defined in this module. Failed on logger: %s"
 														.formatted( category, logger ) );
 									}
 								}
