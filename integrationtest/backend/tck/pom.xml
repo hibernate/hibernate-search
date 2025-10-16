@@ -12,6 +12,11 @@
     <name>Hibernate Search ITs - Backend TCK</name>
     <description>Hibernate Search backend TCK, including tests for every feature common to all the backends</description>
 
+    <properties>
+        <surefire.jvm.args.module>
+            ${test.mockito.agent.jvm.args}
+        </surefire.jvm.args.module>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>

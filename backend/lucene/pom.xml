@@ -18,6 +18,10 @@
         <!-- This is a publicly distributed module that should be published: -->
         <deploy.skip>false</deploy.skip>
         <java.module.name>org.hibernate.search.backend.lucene</java.module.name>
+
+        <surefire.jvm.args.module>
+            ${test.mockito.agent.jvm.args}
+        </surefire.jvm.args.module>
     </properties>
 
     <dependencies>

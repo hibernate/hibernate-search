@@ -16,6 +16,7 @@
         <surefire.jvm.args.module>
             ${test.elasticsearch.connection.jvm.args}
             ${test.weld.jvm.args}
+            ${test.mockito.agent.jvm.args}
         </surefire.jvm.args.module>
 
         <failsafe.lucene-jbatch.reportsDirectory>${project.build.directory}/failsafe-reports/lucene-jbatch</failsafe.lucene-jbatch.reportsDirectory>
