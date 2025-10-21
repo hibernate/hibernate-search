@@ -25,7 +25,7 @@
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
         <version.bom.org.jboss.logging>3.6.1.Final</version.bom.org.jboss.logging>
         <version.bom.org.hibernate.models>1.0.1</version.bom.org.hibernate.models>
-        <version.bom.org.apache.avro>1.12.0</version.bom.org.apache.avro>
+        <version.bom.org.apache.avro>1.12.1</version.bom.org.apache.avro>
         <version.bom.com.carrotsearch>0.10.0</version.bom.com.carrotsearch>
         <version.bom.com.google.code.gson>2.13.2</version.bom.com.google.code.gson>
         <version.bom.jakarta.batch>2.1.1</version.bom.jakarta.batch>
