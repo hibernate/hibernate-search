@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.logging.impl;
+package org.hibernate.search.backend.elasticsearch.logging.spi;
 
 import static org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLog.ID_OFFSET;
 import static org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLog.ID_OFFSET_LEGACY_ES;
@@ -127,17 +127,17 @@ public interface ConfigurationLog {
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 192,
-			value = "Elasticsearch backend will use client factory '%s'. Context: %s")
-	void backendClientFactory(BeanHolder<?> clientFactoryHolder, String eventContext);
+			value = "Elasticsearch backend will use client factory '%s'.")
+	void backendClientFactory(BeanHolder<?> clientFactoryHolder, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 194,
-			value = "Elasticsearch backend have found no client factories. Please make one of the client factory implementations available. Context: %s")
-	SearchException backendClientFactoryNotConfigured(String eventContext);
+			value = "Elasticsearch backend have found no client factories. Please make one of the client factory implementations available.")
+	SearchException backendClientFactoryNotConfigured(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 195,
-			value = "Elasticsearch backend have found multiple client factories: %s. Please make just one of the client factory implementations available. Context: %s")
+			value = "Elasticsearch backend have found multiple client factories: %s. Please make just one of the client factory implementations available.")
 	SearchException backendClientFactoryMultipleConfigured(List<BeanHolder<ElasticsearchClientFactory>> factories,
-			String eventContext);
+			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 196, value = "Invalid uri: '%1$s'. Reason: %2$s")
 	SearchException invalidUri(String uri, String reason, @Cause Exception e);
