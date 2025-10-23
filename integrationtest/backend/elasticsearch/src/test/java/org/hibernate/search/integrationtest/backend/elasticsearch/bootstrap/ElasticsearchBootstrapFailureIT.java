@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
@@ -42,7 +42,7 @@ class ElasticsearchBootstrapFailureIT {
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
-								ElasticsearchBackendClientCommonSettings.URIS,
+								ElasticsearchBackendSettings.URIS,
 								// We just need a closed port, hopefully this one will generally be closed
 								"http://localhost:9199"
 						)

@@ -7,7 +7,7 @@ package org.hibernate.search.integrationtest.jakarta.batch.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchBackendContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
@@ -21,7 +21,7 @@ public final class HibernateSearchBatchTestConnectionProperties {
 		// if we run the ES version of the tests we have to set correct connection info based on testcontainer:
 		if ( "elasticsearch_pu".equals( PersistenceUnitTestUtil.getPersistenceUnitName() ) ) {
 			properties.put(
-					BackendSettings.backendKey( ElasticsearchBackendClientCommonSettings.URIS ),
+					BackendSettings.backendKey( ElasticsearchBackendSettings.URIS ),
 					SearchBackendContainer.connectionUrl()
 			);
 		}

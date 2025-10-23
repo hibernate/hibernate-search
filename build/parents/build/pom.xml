@@ -305,11 +305,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
@@ -205,12 +205,12 @@ class ElasticsearchContentLengthIT {
 		Map<String, Object> clientProperties = new HashMap<>( defaultBackendProperties );
 
 		// We won't target the provided ES instance, but Wiremock
-		clientProperties.remove( ElasticsearchBackendClientCommonSettings.HOSTS );
-		clientProperties.remove( ElasticsearchBackendClientCommonSettings.PROTOCOL );
-		clientProperties.remove( ElasticsearchBackendClientCommonSettings.URIS );
+		clientProperties.remove( ElasticsearchBackendSettings.HOSTS );
+		clientProperties.remove( ElasticsearchBackendSettings.PROTOCOL );
+		clientProperties.remove( ElasticsearchBackendSettings.URIS );
 
 		// Target the Wiremock server using HTTP
-		clientProperties.put( ElasticsearchBackendClientCommonSettings.URIS, httpUriFor( wireMockRule ) );
+		clientProperties.put( ElasticsearchBackendSettings.URIS, httpUriFor( wireMockRule ) );
 
 		ConfigurationPropertySource clientPropertySource = AllAwareConfigurationPropertySource.fromMap( clientProperties );
 

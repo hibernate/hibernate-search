@@ -18,12 +18,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
-import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
-import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchRequestLog;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.ElasticsearchClientUtils;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestLog;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -235,7 +235,7 @@ public class ClientOpenSearchElasticsearchClient implements ElasticsearchClientI
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( successCode ) {
-			ElasticsearchRequestLog.INSTANCE.executedRequest( request.method(), response.host(), request.path(),
+			ElasticsearchRequestLog.INSTANCE.executedRequest( request.method(), response.hostAndPort(), request.path(),
 					request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
@@ -243,7 +243,8 @@ public class ClientOpenSearchElasticsearchClient implements ElasticsearchClientI
 					jsonLogHelper.toString( response.body() ) );
 		}
 		else {
-			ElasticsearchRequestLog.INSTANCE.executedRequestWithFailure( request.method(), response.host(), request.path(),
+			ElasticsearchRequestLog.INSTANCE.executedRequestWithFailure( request.method(), response.hostAndPort(),
+					request.path(),
 					request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
