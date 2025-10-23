@@ -49,10 +49,7 @@ public final class ElasticsearchBackendSettings {
 	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
 	 * <p>
 	 * Defaults to {@link Defaults#HOSTS}.
-	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#HOSTS} instead.
 	 */
-	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String HOSTS = "hosts";
 
 	/**
@@ -63,10 +60,7 @@ public final class ElasticsearchBackendSettings {
 	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
 	 * <p>
 	 * Defaults to {@link Defaults#PROTOCOL}.
-	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#PROTOCOL} instead.
 	 */
-	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String PROTOCOL = "protocol";
 
 	/**
@@ -82,10 +76,7 @@ public final class ElasticsearchBackendSettings {
 	 * Setting this property at the same time as {@link #HOSTS} or {@link #PROTOCOL} will lead to an exception being thrown on startup.
 	 * <p>
 	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
-	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#URIS} instead.
 	 */
-	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String URIS = "uris";
 
 	/**
@@ -93,10 +84,7 @@ public final class ElasticsearchBackendSettings {
 	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
 	 * <p>
 	 * Defaults to {@link Defaults#PATH_PREFIX}.
-	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#PATH_PREFIX} instead.
 	 */
-	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String PATH_PREFIX = "path_prefix";
 
 	/**
@@ -129,10 +117,7 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no username (anonymous access).
-	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#USERNAME} instead.
 	 */
-	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String USERNAME = "username";
 
 	/**
@@ -141,10 +126,7 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no username (anonymous access).
-	 *
-	 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings#PASSWORD} instead.
 	 */
-	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String PASSWORD = "password";
 
 	/**
@@ -370,20 +352,8 @@ public final class ElasticsearchBackendSettings {
 		private Defaults() {
 		}
 
-		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#HOSTS} instead.
-		*/
-		@Deprecated(since = "8.2", forRemoval = true)
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
-		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#PROTOCOL} instead.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
 		public static final String PROTOCOL = "http";
-		/**
-		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings.Defaults#PATH_PREFIX} instead.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
 		public static final String PATH_PREFIX = "";
 		/**
 		 * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings.Defaults#READ_TIMEOUT} instead.

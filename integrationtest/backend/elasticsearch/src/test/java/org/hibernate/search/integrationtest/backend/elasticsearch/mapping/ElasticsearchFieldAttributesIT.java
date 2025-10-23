@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Norms;
@@ -19,7 +19,6 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import com.google.gson.JsonObject;
 
 class ElasticsearchFieldAttributesIT {
-
-	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -113,7 +110,7 @@ class ElasticsearchFieldAttributesIT {
 		);
 
 		setupHelper.start()
-				.withBackendProperty( ElasticsearchBackendClientSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference() )
+				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference() )
 				.withIndex( index )
 				.setup();
 

@@ -92,11 +92,6 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
             <scope>compile</scope>
         </dependency>

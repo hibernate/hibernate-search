@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.opensearch.cfg;
 
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer;
 
 /**
@@ -112,7 +112,7 @@ public final class ClientOpenSearchElasticsearchBackendClientSettings {
 	* A {@link ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
 	* <p>
 	* It can be used for example to tune the SSL context to accept self-signed certificates.
-	* It allows overriding other HTTP client settings, such as {@link ElasticsearchBackendClientCommonSettings#USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
+	* It allows overriding other HTTP client settings, such as {@link ElasticsearchBackendSettings#USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
 	* <p>
 	* Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
 	* <p>

@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-common</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opensearch.client</groupId>

@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
@@ -19,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.ClientOpenSearchElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.spi.ClientOpenSearchElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -61,33 +61,33 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 					.build();
 
 	private static final OptionalConfigurationProperty<List<String>> HOSTS =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.HOSTS )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
 					.asString().multivalued()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> PROTOCOL =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.PROTOCOL )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PROTOCOL )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<List<String>> URIS =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.URIS )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.URIS )
 					.asString().multivalued()
 					.build();
 
 	private static final ConfigurationProperty<String> PATH_PREFIX =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.PATH_PREFIX )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PATH_PREFIX )
 					.asString()
-					.withDefault( ElasticsearchBackendClientCommonSettings.Defaults.PATH_PREFIX )
+					.withDefault( ElasticsearchBackendSettings.Defaults.PATH_PREFIX )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> USERNAME =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.USERNAME )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.USERNAME )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> PASSWORD =
-			ConfigurationProperty.forKey( ElasticsearchBackendClientCommonSettings.PASSWORD )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PASSWORD )
 					.asString()
 					.build();
 
@@ -289,7 +289,7 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 		if ( username.isPresent() ) {
 			Optional<char[]> password = PASSWORD.get( propertySource ).map( String::toCharArray );
 			if ( password.isPresent() && !hosts.isSslEnabled() ) {
-				ElasticsearchClientConfigurationLog.INSTANCE.usingPasswordOverHttp();
+				ConfigurationLog.INSTANCE.usingPasswordOverHttp();
 			}
 
 			BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();

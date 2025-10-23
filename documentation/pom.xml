@@ -187,6 +187,9 @@
                             <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-java</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>

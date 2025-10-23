@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.spi.ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
@@ -58,7 +58,7 @@ class ElasticsearchSearchQueryIT {
 	public void init(Object layoutStrategy, URLEncodedString readName) {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendClientSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy

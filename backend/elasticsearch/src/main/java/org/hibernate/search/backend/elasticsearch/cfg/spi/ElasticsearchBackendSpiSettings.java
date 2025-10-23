@@ -9,6 +9,7 @@ import static org.hibernate.search.backend.elasticsearch.resources.impl.DefaultE
 import org.hibernate.search.backend.elasticsearch.work.spi.ElasticsearchWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
@@ -28,6 +29,9 @@ public final class ElasticsearchBackendSpiSettings {
 	 */
 	public static final String BACKEND_WORK_EXECUTOR_PROVIDER = PREFIX + Radicals.BACKEND_WORK_EXECUTOR_PROVIDER;
 
+	@Incubating
+	public static final String CLIENT_FACTORY = PREFIX + Radicals.CLIENT_FACTORY;
+
 	private ElasticsearchBackendSpiSettings() {
 	}
 
@@ -40,6 +44,7 @@ public final class ElasticsearchBackendSpiSettings {
 		}
 
 		public static final String BACKEND_WORK_EXECUTOR_PROVIDER = "backend_work_executor_provider";
+		public static final String CLIENT_FACTORY = "client_factory";
 	}
 
 	public static final class Defaults {

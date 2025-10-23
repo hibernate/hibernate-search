@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.client.common.cfg.ElasticsearchBackendClientCommonSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
 
 import org.apache.hc.core5.http.HttpHost;
 
@@ -29,20 +29,20 @@ final class ServerUris {
 			Optional<List<String>> uris) {
 		if ( !uris.isPresent() ) {
 			String protocolValue =
-					( protocol.isPresent() ) ? protocol.get() : ElasticsearchBackendClientCommonSettings.Defaults.PROTOCOL;
+					( protocol.isPresent() ) ? protocol.get() : ElasticsearchBackendSettings.Defaults.PROTOCOL;
 			List<String> hostAndPortValues =
 					( hostAndPortStrings.isPresent() )
 							? hostAndPortStrings.get()
-							: ElasticsearchBackendClientCommonSettings.Defaults.HOSTS;
+							: ElasticsearchBackendSettings.Defaults.HOSTS;
 			return fromStrings( protocolValue, hostAndPortValues );
 		}
 
 		if ( protocol.isPresent() ) {
-			throw ElasticsearchClientConfigurationLog.INSTANCE.uriAndProtocol( uris.get(), protocol.get() );
+			throw ConfigurationLog.INSTANCE.uriAndProtocol( uris.get(), protocol.get() );
 		}
 
 		if ( hostAndPortStrings.isPresent() ) {
-			throw ElasticsearchClientConfigurationLog.INSTANCE.uriAndHosts( uris.get(), hostAndPortStrings.get() );
+			throw ConfigurationLog.INSTANCE.uriAndHosts( uris.get(), hostAndPortStrings.get() );
 		}
 
 		return fromStrings( uris.get() );
@@ -50,7 +50,7 @@ final class ServerUris {
 
 	private static ServerUris fromStrings(List<String> serverUrisStrings) {
 		if ( serverUrisStrings.isEmpty() ) {
-			throw ElasticsearchClientConfigurationLog.INSTANCE.emptyListOfUris();
+			throw ConfigurationLog.INSTANCE.emptyListOfUris();
 		}
 
 		HttpHost[] hosts = new HttpHost[serverUrisStrings.size()];
@@ -66,11 +66,11 @@ final class ServerUris {
 					https = currentHttps;
 				}
 				else if ( currentHttps != https ) {
-					throw ElasticsearchClientConfigurationLog.INSTANCE.differentProtocolsOnUris( serverUrisStrings );
+					throw ConfigurationLog.INSTANCE.differentProtocolsOnUris( serverUrisStrings );
 				}
 			}
 			catch (URISyntaxException e) {
-				throw ElasticsearchClientConfigurationLog.INSTANCE.invalidUri( uri, e.getMessage(), e );
+				throw ConfigurationLog.INSTANCE.invalidUri( uri, e.getMessage(), e );
 			}
 		}
 
@@ -79,7 +79,7 @@ final class ServerUris {
 
 	private static ServerUris fromStrings(String protocol, List<String> hostAndPortStrings) {
 		if ( hostAndPortStrings.isEmpty() ) {
-			throw ElasticsearchClientConfigurationLog.INSTANCE.emptyListOfHosts();
+			throw ConfigurationLog.INSTANCE.emptyListOfHosts();
 		}
 
 		HttpHost[] hosts = new HttpHost[hostAndPortStrings.size()];
@@ -95,7 +95,7 @@ final class ServerUris {
 
 	private static HttpHost createHttpHost(String scheme, String hostAndPort) {
 		if ( hostAndPort.indexOf( "://" ) >= 0 ) {
-			throw ElasticsearchClientConfigurationLog.INSTANCE.invalidHostAndPort( hostAndPort, null );
+			throw ConfigurationLog.INSTANCE.invalidHostAndPort( hostAndPort, null );
 		}
 		String host;
 		int port = -1;
@@ -108,7 +108,7 @@ final class ServerUris {
 				port = Integer.parseInt( hostAndPort.substring( portIdx + 1 ) );
 			}
 			catch (final NumberFormatException e) {
-				throw ElasticsearchClientConfigurationLog.INSTANCE.invalidHostAndPort( hostAndPort, e );
+				throw ConfigurationLog.INSTANCE.invalidHostAndPort( hostAndPort, e );
 			}
 			host = hostAndPort.substring( 0, portIdx );
 		}
