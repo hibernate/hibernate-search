@@ -284,7 +284,7 @@
         <version.dependency.plugin>3.9.0</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>12.1.8</version.dependency-check.plugin>
-        <version.exec.plugin>3.6.1</version.exec.plugin>
+        <version.exec.plugin>3.6.2</version.exec.plugin>
         <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.5.0</version.jandex.plugin>
@@ -308,15 +308,15 @@
             We want to keep patch updates for groovy enabled as those may contain compatibility with a more recent JDK versions.
             e.g. 4.0.13 won't work with JDK 23, while 4.0.26 is working just fine.
          -->
-        <version.org.apache.groovy.groovy-jsr223>5.0.1</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>12.0.1</version.com.puppycrawl.tools.checkstyle>
+        <version.org.apache.groovy.groovy-jsr223>5.0.2</version.org.apache.groovy.groovy-jsr223>
+        <version.com.puppycrawl.tools.checkstyle>12.1.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.19.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
         <version.gitflow-incremental-builder>4.5.6</version.gitflow-incremental-builder>
         <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
-        <version.maven-antrun-plugin>3.1.0</version.maven-antrun-plugin>
+        <version.maven-antrun-plugin>3.2.0</version.maven-antrun-plugin>
 
         <!-- Repository Deployment URLs -->
 
@@ -360,7 +360,7 @@
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.0.4.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.2.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>2.3.20</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.21</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!--
             Defines what to do with dependency management section of the flattened pom.
