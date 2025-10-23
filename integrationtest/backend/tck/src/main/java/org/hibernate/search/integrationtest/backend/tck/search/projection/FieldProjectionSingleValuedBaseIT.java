@@ -182,7 +182,7 @@ class FieldProjectionSingleValuedBaseIT<F> {
 						Collections.singletonList( dataSet.getFieldValue( 2 ) ),
 						Collections.singletonList( dataSet.getFieldValue( 3 ) ),
 						// Empty document
-						TckConfiguration.get().getBackendFeatures().projectionPreservesNulls()
+						TckConfiguration.get().getBackendFeatures().projectionPreservesNulls( fieldType )
 								? Collections.singletonList( null )
 								: Collections.emptyList()
 				);

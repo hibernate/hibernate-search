@@ -35,8 +35,10 @@ import org.hibernate.search.engine.cfg.spi.FormatUtils;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigDecimalFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.ByteVectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FloatVectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.InstantFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LocalDateFieldTypeDescriptor;
@@ -92,6 +94,17 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean nonCanonicalRangeInAggregations() {
 		// Elasticsearch only supports [a, b), (-Infinity, b), [a, +Infinity), but not [a, b] for example.
 		return false;
+	}
+
+	public boolean projectionPreservesNulls(FieldTypeDescriptor<?, ?> fieldType) {
+		if ( ByteVectorFieldTypeDescriptor.INSTANCE.equals( fieldType )
+				|| FloatVectorFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
+			return isActualVersion(
+					esVersion -> esVersion.isLessThan( "9.2.0" ),
+					osVersion -> true
+			);
+		}
+		return projectionPreservesNulls();
 	}
 
 	@Override

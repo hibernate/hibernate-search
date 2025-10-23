@@ -36,6 +36,10 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 		return true;
 	}
 
+	public boolean projectionPreservesNulls(FieldTypeDescriptor<?, ?> fieldType) {
+		return projectionPreservesNulls();
+	}
+
 	public abstract boolean fieldsProjectableByDefault();
 
 	public boolean supportsTotalHitsThresholdForScroll() {
