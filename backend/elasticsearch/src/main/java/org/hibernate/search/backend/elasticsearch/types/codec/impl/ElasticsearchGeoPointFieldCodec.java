@@ -4,9 +4,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.Gson;

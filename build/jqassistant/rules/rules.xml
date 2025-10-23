@@ -282,7 +282,6 @@
                         WHEN 'hibernate-search-mapper-orm-outbox-polling' THEN 'OutboxPolling'
                         WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
                         WHEN 'hibernate-search-processor' THEN 'Processor'
-                        WHEN 'hibernate-search-backend-elasticsearch-client-common' THEN 'ClientCommon'
                         WHEN 'hibernate-search-backend-elasticsearch-client-rest' THEN 'ClientRest'
                         WHEN 'hibernate-search-backend-elasticsearch-client-java' THEN 'ClientJava'
                         WHEN 'hibernate-search-backend-elasticsearch-client-opensearch' THEN 'ClientOpenSearch'
