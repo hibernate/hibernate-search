@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.rest.cfg.spi.ClientRestElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -275,8 +275,8 @@ public class ClientRestElasticsearchClientFactory implements ElasticsearchClient
 			builder.setKeepAliveStrategy( new CustomConnectionKeepAliveStrategy( maxKeepAlive.get() ) );
 		}
 
-		ClientRestElasticsearchHttpClientConfigurationContext clientConfigurationContext =
-				new ClientRestElasticsearchHttpClientConfigurationContext( beanResolver, propertySource, builder );
+		ElasticsearchHttpClientConfigurationContext clientConfigurationContext =
+				new ElasticsearchHttpClientConfigurationContext( beanResolver, propertySource, builder );
 
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( clientConfigurationContext );

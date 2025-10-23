@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
@@ -38,7 +38,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -100,7 +99,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				List<BeanReference<ElasticsearchClientFactory>> clientFactoryReferences =
 						beanResolver.allConfiguredForRole( ElasticsearchClientFactory.class );
 				if ( clientFactoryReferences.isEmpty() ) {
-					throw ConfigurationLog.INSTANCE.backendClientFactoryNotConfigured( eventContext.render() );
+					throw ConfigurationLog.INSTANCE.backendClientFactoryNotConfigured( eventContext );
 				}
 				// if there's just one -- use it:
 				else if ( clientFactoryReferences.size() == 1 ) {
@@ -108,32 +107,26 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				}
 				// if there are 2 of them, maybe one is the "default" one, if so -- use the other one
 				else if ( clientFactoryReferences.size() == 2 ) {
-					try {
-						var defaultFactoryReference = beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class )
-								.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME );
+					var defaultFactoryReference = beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class )
+							.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME );
 
-						var first = clientFactoryReferences.get( 0 );
-						var second = clientFactoryReferences.get( 1 );
-						if ( first == defaultFactoryReference ) {
-							clientFactoryHolder = second.resolve( beanResolver );
-						}
-						else if ( second == defaultFactoryReference ) {
-							clientFactoryHolder = first.resolve( beanResolver );
-						}
+					var first = clientFactoryReferences.get( 0 );
+					var second = clientFactoryReferences.get( 1 );
+					if ( first == defaultFactoryReference ) {
+						clientFactoryHolder = second.resolve( beanResolver );
 					}
-					catch (SearchException e) {
-						// ignore and fail later;
+					else if ( second == defaultFactoryReference ) {
+						clientFactoryHolder = first.resolve( beanResolver );
 					}
 				}
 				if ( clientFactoryHolder == null ) {
 					throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
-							clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) )
-									.toList(),
-							eventContext.render()
+							clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) ).toList(),
+							eventContext
 					);
 				}
 			}
-			ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext.render() );
+			ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(

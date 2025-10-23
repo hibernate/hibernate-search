@@ -156,6 +156,7 @@
                 type.fqn =~ ".*\\.impl\\..*"
                 // Apache HTTP Client uses an impl package, but puts public classes in there... Such as the client builder.
                 AND NOT type.fqn STARTS WITH "org.apache.http.impl."
+                AND NOT type.fqn STARTS WITH "org.apache.hc.client5.http.impl."
                 OR type.visibility <> "public"
             SET
                 type:Impl

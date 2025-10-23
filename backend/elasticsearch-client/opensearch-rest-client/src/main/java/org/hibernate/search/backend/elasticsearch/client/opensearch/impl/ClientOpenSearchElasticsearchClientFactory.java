@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.ClientOpenSearchElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.cfg.spi.ClientOpenSearchElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
