@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 
 /**
  * A simple layout strategy for indexes:

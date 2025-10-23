@@ -7,6 +7,9 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.jboss.logging.Logger.Level.TRACE;
 
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchRequestLog;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.annotations.LogMessage;

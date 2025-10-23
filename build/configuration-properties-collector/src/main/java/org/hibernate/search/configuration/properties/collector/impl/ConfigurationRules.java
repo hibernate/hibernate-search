@@ -47,6 +47,9 @@ public final class ConfigurationRules {
 		if ( className.endsWith( "BackendSettings" ) ) {
 			return Arrays.asList( "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." );
 		}
+		else if ( className.endsWith( "BackendClientSettings" ) ) {
+			return Arrays.asList( "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." );
+		}
 		else if ( className.endsWith( "IndexSettings" ) ) {
 			return Arrays.asList(
 					"hibernate.search.backend.",

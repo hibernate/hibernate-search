@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 
 import org.apache.hc.core5.http.HttpHost;
 
