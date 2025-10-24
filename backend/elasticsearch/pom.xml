@@ -35,7 +35,7 @@
         <!-- To be removed/changed in the future versions? Users should pick their own desired client? -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-rest4</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>

@@ -44,17 +44,17 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-rest4</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-rest5</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-opensearch-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

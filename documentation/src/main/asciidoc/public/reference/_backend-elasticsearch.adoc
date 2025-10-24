@@ -165,14 +165,14 @@ which needs to be enabled explicitly.
 An Elasticsearch backend communicates with an Elasticsearch cluster through a REST client.
 Hibernate Search comes with a range of pluggable Elasticsearch REST clients that the user can pick from:
 
-[[backend-elasticsearch-configuration-client-elasticsearch-client-rest]]
-`hibernate-search-backend-elasticsearch-client-rest`::
+[[backend-elasticsearch-configuration-client-elasticsearch-client-rest4]]
+`hibernate-search-backend-elasticsearch-client-rest4`::
   Description::: The Elasticsearch low level client based implementation (`org.elasticsearch.client:elasticsearch-rest-client`).
 Currently, the default REST client used by the Elasticsearch backend.
   Underlying HTTP Client::: Apache HTTP Client 4
 
-[[backend-elasticsearch-configuration-client-elasticsearch-client-java]]
-`hibernate-search-backend-elasticsearch-client-java`::
+[[backend-elasticsearch-configuration-client-elasticsearch-client-rest5]]
+`hibernate-search-backend-elasticsearch-client-rest5`::
   Description::: The Elasticsearch Java client based implementation (`co.elastic.clients:elasticsearch-java`).
   Underlying HTTP Client::: Apache HTTP Client 5
 
@@ -468,7 +468,7 @@ the SSL key/trust store settings and many other client configurations.
 
 Configuring the HTTP client directly requires two steps:
 
-. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer` interface.
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer` interface.
 . Configure Hibernate Search to use that implementation by setting the configuration property
 `hibernate.search.backend.client.configurer`
 to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
@@ -500,10 +500,10 @@ include::{resourcesdir}/configuration/http-client-configurer.properties[tags=inc
 Any setting defined by a custom http client configurer will override any other setting defined by Hibernate Search.
 ====
 
-[[backend-elasticsearch-configuration-http-client-elasticsearch-java]]
+[[backend-elasticsearch-configuration-http-client-elasticsearch-rest5]]
 === Elasticsearch java client
 It is possible to directly configure the underlying Apache HTTP 5 client of the
-<<backend-elasticsearch-configuration-client-elasticsearch-client-java,Elasticsearch java client>>
+<<backend-elasticsearch-configuration-client-elasticsearch-client-rest5,Elasticsearch java client>>
 using an instance of `org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder`.
 
 With this API you can add interceptors, change the keep alive, the max connections,
@@ -511,7 +511,7 @@ the SSL key/trust store settings and many other client configurations.
 
 Configuring the HTTP client directly requires two steps:
 
-. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurer` interface.
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurer` interface.
 . Configure Hibernate Search to use that implementation by setting the configuration property
 `hibernate.search.backend.client.configurer`
 to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
@@ -546,7 +546,7 @@ Any setting defined by a custom http client configurer will override any other s
 [[backend-elasticsearch-configuration-http-client-elasticsearch-opensearch]]
 === OpenSearch low level client
 It is possible to directly configure the underlying Apache HTTP 5 client of the
-<<backend-elasticsearch-configuration-client-elasticsearch-client-java,OpenSearch low level client>>
+<<backend-elasticsearch-configuration-client-elasticsearch-client-opensearch,OpenSearch low level client>>
 using an instance of `org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder`.
 
 With this API you can add interceptors, change the keep alive, the max connections,
@@ -554,7 +554,7 @@ the SSL key/trust store settings and many other client configurations.
 
 Configuring the HTTP client directly requires two steps:
 
-. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.opensearch.ElasticsearchHttpClientConfigurer` interface.
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.opensearch.rest.ElasticsearchHttpClientConfigurer` interface.
 . Configure Hibernate Search to use that implementation by setting the configuration property
 `hibernate.search.backend.client.configurer`
 to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,

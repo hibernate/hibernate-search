@@ -8,10 +8,10 @@ Configuration properties from this section are applicable to the following clien
 |===
 |Client |Configuration property applicability
 
-|<<backend-elasticsearch-configuration-client-elasticsearch-client-rest,Elasticsearch low level client>>
+|<<backend-elasticsearch-configuration-client-elasticsearch-client-rest4,Elasticsearch low level REST client>>
 ^| ✔
 
-|<<backend-elasticsearch-configuration-client-elasticsearch-client-java,Elasticsearch Java client>>
+|<<backend-elasticsearch-configuration-client-elasticsearch-client-rest5,Elasticsearch low level REST 5 client>>
 ^| ✔
 
 |<<backend-elasticsearch-configuration-client-elasticsearch-client-opensearch,OpenSearch low level client>>

@@ -23,7 +23,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchHttpC
 @SuppressWarnings("removal")
 @Deprecated(since = "8.2", forRemoval = true)
 public interface ElasticsearchHttpClientConfigurer
-		extends org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer {
+		extends org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer {
 
 	/**
 	 * Configure the HTTP Client.
@@ -43,7 +43,7 @@ public interface ElasticsearchHttpClientConfigurer
 
 	@Override
 	default void configure(
-			org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext context) {
+			org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurationContext context) {
 		configure( new ElasticsearchHttpClientConfigurationContextDelegate( context ) );
 	}
 

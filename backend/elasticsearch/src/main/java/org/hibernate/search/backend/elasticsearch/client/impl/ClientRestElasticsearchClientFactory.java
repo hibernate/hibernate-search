@@ -13,9 +13,9 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProvider;
-import org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.rest.cfg.ClientRestElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest.cfg.spi.ClientRestElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRestElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.spi.ClientRestElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;

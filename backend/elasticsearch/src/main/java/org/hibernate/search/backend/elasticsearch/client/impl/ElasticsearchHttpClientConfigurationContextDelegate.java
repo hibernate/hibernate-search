@@ -13,10 +13,10 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 @SuppressWarnings("removal")
 public class ElasticsearchHttpClientConfigurationContextDelegate implements ElasticsearchHttpClientConfigurationContext {
 
-	private final org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext context;
+	private final org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurationContext context;
 
 	public ElasticsearchHttpClientConfigurationContextDelegate(
-			org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext context) {
+			org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurationContext context) {
 		this.context = context;
 	}
 
