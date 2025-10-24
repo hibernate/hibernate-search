@@ -14,9 +14,9 @@ import org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttp
  *
  * @author Gunnar Morling
  */
-public final class ClientRestElasticsearchBackendClientSettings {
+public final class ClientRest4ElasticsearchBackendClientSettings {
 
-	private ClientRestElasticsearchBackendClientSettings() {
+	private ClientRest4ElasticsearchBackendClientSettings() {
 	}
 
 	/**

@@ -51,8 +51,8 @@ import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEnco
 import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.rest5.cfg.ClientJavaElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest5.cfg.spi.ClientJavaElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest5.impl.ClientJavaElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.rest5.cfg.spi.ClientRest5ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest5.impl.ClientRest5ElasticsearchClientFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -118,7 +118,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
-class ClientJavaElasticsearchClientFactoryIT {
+class ClientRest5ElasticsearchClientFactoryIT {
 
 	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
 	// even though no delay was configured.
@@ -142,7 +142,7 @@ class ClientJavaElasticsearchClientFactoryIT {
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
 			BeanHolder.of(
-					new EmbeddedThreadProvider( ClientJavaElasticsearchClientFactoryIT.class.getName() + ": " ) ) );
+					new EmbeddedThreadProvider( ClientRest5ElasticsearchClientFactoryIT.class.getName() + ": " ) ) );
 
 	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
@@ -1025,7 +1025,7 @@ class ClientJavaElasticsearchClientFactoryIT {
 							.withBody( responseBody ) ) );
 
 			try ( ElasticsearchClientImplementor client = createClient( properties -> {
-				properties.accept( ClientJavaElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
+				properties.accept( ClientRest5ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
 						BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
 				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -1217,7 +1217,7 @@ class ClientJavaElasticsearchClientFactoryIT {
 				AllAwareConfigurationPropertySource.fromMap( beanResolverConfiguration )
 
 		);
-		return new ClientJavaElasticsearchClientFactory().create( beanResolver, clientPropertySource,
+		return new ClientRest5ElasticsearchClientFactory().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
 				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
 				GsonProvider.create( GsonBuilder::new, true )

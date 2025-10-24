@@ -47,8 +47,8 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.ClientRestElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRestElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.spi.ClientRestElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRest4ElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.spi.ClientRest4ElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
@@ -192,7 +192,7 @@ class ClientRestElasticsearchClientFactoryIT {
 		HttpResponseInterceptor responseInterceptor = spy( HttpResponseInterceptor.class );
 
 		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
-				ClientRestElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+				ClientRest4ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 				(org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer) context -> context
 						.clientBuilder()
 						.addInterceptorFirst( responseInterceptor )
@@ -419,8 +419,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
-						properties.accept( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "99999" );
+						properties.accept( ClientRest4ElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
+						properties.accept( ClientRest4ElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "99999" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -447,8 +447,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		assertThatThrownBy( () -> {
 			try ( ElasticsearchClientImplementor client = createClient(
 					properties -> {
-						properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "99999" );
-						properties.accept( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" );
+						properties.accept( ClientRest4ElasticsearchBackendClientSettings.READ_TIMEOUT, "99999" );
+						properties.accept( ClientRest4ElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" );
 					}
 			) ) {
 				doPost( client, "/myIndex/myType", payload );
@@ -483,8 +483,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -520,8 +520,8 @@ class ClientRestElasticsearchClientFactoryIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
@@ -652,7 +652,7 @@ class ClientRestElasticsearchClientFactoryIT {
 					properties.accept( ElasticsearchBackendSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 					// Use a timeout much higher than 1s, because wiremock can be really slow...
-					properties.accept( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -749,8 +749,8 @@ class ClientRestElasticsearchClientFactoryIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -805,8 +805,8 @@ class ClientRestElasticsearchClientFactoryIT {
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ElasticsearchBackendSettings.PROTOCOL, "https" );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
-					properties.accept( ClientRestElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
 			/*
@@ -1013,7 +1013,7 @@ class ClientRestElasticsearchClientFactoryIT {
 							.withBody( responseBody ) ) );
 
 			try ( ElasticsearchClientImplementor client = createClient( properties -> {
-				properties.accept( ClientRestElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
+				properties.accept( ClientRest4ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
 						BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
 				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -1036,7 +1036,7 @@ class ClientRestElasticsearchClientFactoryIT {
 	void maxKeepAliveNegativeValue() {
 		assertThatThrownBy( () -> createClient(
 				properties -> {
-					properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, -1 );
+					properties.accept( ClientRest4ElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, -1 );
 				}
 		) ).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -1069,12 +1069,12 @@ class ClientRestElasticsearchClientFactoryIT {
 		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
 		try ( ElasticsearchClientImplementor client = createClient( properties -> {
 			properties.accept(
-					ClientRestElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
+					ClientRest4ElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 					(org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer) context -> {
 						context.clientBuilder().setConnectionManager( createPoolManager( usedConnections ) );
 					}
 			);
-			properties.accept( ClientRestElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, time );
+			properties.accept( ClientRest4ElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, time );
 		} ) ) {
 
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
