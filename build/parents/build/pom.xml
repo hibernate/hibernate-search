@@ -486,7 +486,7 @@
             </dependency>
             <dependency>
                 <groupId>co.elastic.clients</groupId>
-                <artifactId>elasticsearch-java</artifactId>
+                <artifactId>elasticsearch-rest5-client</artifactId>
                 <version>${version.org.elasticsearch.java.client}</version>
             </dependency>
 

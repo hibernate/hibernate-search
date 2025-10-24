@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>co.elastic.clients</groupId>
-            <artifactId>elasticsearch-java</artifactId>
+            <artifactId>elasticsearch-rest5-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
