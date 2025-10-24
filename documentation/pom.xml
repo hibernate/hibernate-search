@@ -22,8 +22,8 @@
         <failsafe.lucene.summaryFile>${failsafe.lucene.reportsDirectory}/failsafe-summary.xml</failsafe.lucene.summaryFile>
         <failsafe.elasticsearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch</failsafe.elasticsearch.reportsDirectory>
         <failsafe.elasticsearch.summaryFile>${failsafe.elasticsearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.summaryFile>
-        <failsafe.elasticsearch.rest5.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-java</failsafe.elasticsearch.rest5.reportsDirectory>
-        <failsafe.elasticsearch.rest5.summaryFile>${failsafe.elasticsearch.java.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.rest5.summaryFile>
+        <failsafe.elasticsearch.rest5.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-rest5</failsafe.elasticsearch.rest5.reportsDirectory>
+        <failsafe.elasticsearch.rest5.summaryFile>${failsafe.elasticsearch.rest5.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.rest5.summaryFile>
         <failsafe.elasticsearch.opensearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-opensearch</failsafe.elasticsearch.opensearch.reportsDirectory>
         <failsafe.elasticsearch.opensearch.summaryFile>${failsafe.elasticsearch.opensearch.reportsDirectory}/failsafe-summary.xml</failsafe.elasticsearch.opensearch.summaryFile>
         <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
@@ -611,6 +611,8 @@
             </activation>
             <properties>
                 <failsafe.elasticsearch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch.summaryFile>
+                <failsafe.elasticsearch.rest5.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch.rest5.summaryFile>
+                <failsafe.elasticsearch.opensearch.summaryFile>${rootProject.empty.failsafe.summaryFile}</failsafe.elasticsearch.opensearch.summaryFile>
             </properties>
         </profile>
         <profile>

@@ -9,7 +9,7 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 /**
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
  */
-public final class ClientRestElasticsearchBackendClientSpiSettings {
+public final class ClientRest4ElasticsearchBackendClientSpiSettings {
 
 	/**
 	 * The prefix expected for the key of every Hibernate Search configuration property.
@@ -35,7 +35,7 @@ public final class ClientRestElasticsearchBackendClientSpiSettings {
 	 */
 	public static final String CLIENT_INSTANCE = "client.instance";
 
-	private ClientRestElasticsearchBackendClientSpiSettings() {
+	private ClientRest4ElasticsearchBackendClientSpiSettings() {
 	}
 
 	/**

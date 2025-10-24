@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProvider;
 import org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRestElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.spi.ClientRestElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRest4ElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.spi.ClientRest4ElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -43,10 +43,10 @@ import org.elasticsearch.client.sniff.SnifferBuilder;
 /**
  * @author Gunnar Morling
  */
-public class ClientRestElasticsearchClientFactory implements ElasticsearchClientFactory {
+public class ClientRest4ElasticsearchClientFactory implements ElasticsearchClientFactory {
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>> CLIENT_INSTANCE =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( RestClient.class )
 					.build();
 
@@ -82,54 +82,54 @@ public class ClientRestElasticsearchClientFactory implements ElasticsearchClient
 					.build();
 
 	private static final OptionalConfigurationProperty<Integer> REQUEST_TIMEOUT =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.REQUEST_TIMEOUT )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.REQUEST_TIMEOUT )
 					.asIntegerStrictlyPositive()
 					.build();
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.READ_TIMEOUT )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.READ_TIMEOUT )
 					.asIntegerPositiveOrZeroOrNegative()
-					.withDefault( ClientRestElasticsearchBackendClientSettings.Defaults.READ_TIMEOUT )
+					.withDefault( ClientRest4ElasticsearchBackendClientSettings.Defaults.READ_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> CONNECTION_TIMEOUT =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.CONNECTION_TIMEOUT )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.CONNECTION_TIMEOUT )
 					.asIntegerPositiveOrZeroOrNegative()
-					.withDefault( ClientRestElasticsearchBackendClientSettings.Defaults.CONNECTION_TIMEOUT )
+					.withDefault( ClientRest4ElasticsearchBackendClientSettings.Defaults.CONNECTION_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.MAX_CONNECTIONS )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.MAX_CONNECTIONS )
 					.asIntegerStrictlyPositive()
-					.withDefault( ClientRestElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS )
+					.withDefault( ClientRest4ElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION_PER_ROUTE =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE )
 					.asIntegerStrictlyPositive()
-					.withDefault( ClientRestElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
+					.withDefault( ClientRest4ElasticsearchBackendClientSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DISCOVERY_ENABLED =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.DISCOVERY_ENABLED )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.DISCOVERY_ENABLED )
 					.asBoolean()
-					.withDefault( ClientRestElasticsearchBackendClientSettings.Defaults.DISCOVERY_ENABLED )
+					.withDefault( ClientRest4ElasticsearchBackendClientSettings.Defaults.DISCOVERY_ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<Integer> DISCOVERY_REFRESH_INTERVAL =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL )
 					.asIntegerStrictlyPositive()
-					.withDefault( ClientRestElasticsearchBackendClientSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
+					.withDefault( ClientRest4ElasticsearchBackendClientSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
 	private static final OptionalConfigurationProperty<
 			BeanReference<? extends ElasticsearchHttpClientConfigurer>> CLIENT_CONFIGURER =
-					ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.CLIENT_CONFIGURER )
+					ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.CLIENT_CONFIGURER )
 							.asBeanReference( ElasticsearchHttpClientConfigurer.class )
 							.build();
 
 	private static final OptionalConfigurationProperty<Long> MAX_KEEP_ALIVE =
-			ConfigurationProperty.forKey( ClientRestElasticsearchBackendClientSettings.MAX_KEEP_ALIVE )
+			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSettings.MAX_KEEP_ALIVE )
 					.asLongStrictlyPositive()
 					.build();
 
@@ -158,7 +158,7 @@ public class ClientRestElasticsearchClientFactory implements ElasticsearchClient
 			sniffer = createSniffer( propertySource, restClientHolder.get(), hosts );
 		}
 
-		return new ClientRestElasticsearchClient(
+		return new ClientRest4ElasticsearchClient(
 				restClientHolder, sniffer, timeoutExecutorService,
 				requestTimeoutMs, connectionTimeoutMs,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
