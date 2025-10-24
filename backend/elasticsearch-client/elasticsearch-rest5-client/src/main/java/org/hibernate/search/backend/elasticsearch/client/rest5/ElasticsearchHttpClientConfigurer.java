@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.rest5;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * An extension point allowing fine tuning of the Apache HTTP Client used by the Elasticsearch integration.
  * <p>
@@ -16,6 +18,7 @@ package org.hibernate.search.backend.elasticsearch.client.rest5;
  * Note that you don't have to configure the client unless you have specific needs:
  * the default configuration should work just fine for an on-premise Elasticsearch server.
  */
+@Incubating
 public interface ElasticsearchHttpClientConfigurer {
 
 	/**
