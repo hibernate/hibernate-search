@@ -53,12 +53,17 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch-rest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-rest5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-rest4</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
