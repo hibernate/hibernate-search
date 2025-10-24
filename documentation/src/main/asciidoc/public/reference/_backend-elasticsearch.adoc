@@ -163,25 +163,50 @@ which needs to be enabled explicitly.
 == Client configuration
 
 An Elasticsearch backend communicates with an Elasticsearch cluster through a REST client.
-Hibernate Search comes with a range of pluggable Elasticsearch REST clients that the user can pick from:
+Hibernate Search comes with a range of pluggable Elasticsearch REST clients that you can pick from.
+
+Currently, the default one is the <<backend-elasticsearch-configuration-client-elasticsearch-client-rest4,`hibernate-search-backend-elasticsearch-client-rest4`>>,
+which may change in future versions of Hibernate Search.
+You should explicitly define the REST client in the application dependencies,
+if it matters which one the Elasticsearch backend will pick.
+
+=== Available clients
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-rest4]]
-`hibernate-search-backend-elasticsearch-client-rest4`::
-  Description::: The Elasticsearch low level client based implementation (`org.elasticsearch.client:elasticsearch-rest-client`).
+==== Elasticsearch low level REST client (Apache HTTP Client 4)
+
+Coordinates::
+GroupID::: `org.hibernate.search`
+ArtifactID::: `hibernate-search-backend-elasticsearch-client-rest4`
+Underlying HTTP Client::: Apache HTTP Client 4
+
+This Elasticsearch backend REST client is based on the Elasticsearch low level client (`org.elasticsearch.client:elasticsearch-rest-client`).
 Currently, the default REST client used by the Elasticsearch backend.
-  Underlying HTTP Client::: Apache HTTP Client 4
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-rest5]]
-`hibernate-search-backend-elasticsearch-client-rest5`::
-  Description::: The Elasticsearch Java client based implementation (`co.elastic.clients:elasticsearch-java`).
-  Underlying HTTP Client::: Apache HTTP Client 5
+==== Elasticsearch low level REST client (Apache HTTP Client 5)
+
+include::../components/_incubating-warning.adoc[]
+
+Coordinates::
+GroupID::: `org.hibernate.search`
+ArtifactID::: `hibernate-search-backend-elasticsearch-client-rest5`
+Underlying HTTP Client::: Apache HTTP Client 5
+
+This Elasticsearch backend REST client is based on the newer Elasticsearch low level client (`co.elastic.clients:elasticsearch-rest5-client`),
+which is also used in the `co.elastic.clients:elasticsearch-java`.
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-opensearch]]
-`hibernate-search-backend-elasticsearch-client-opensearch`::
-  Description::: The OpenSearch low level client based implementation (`org.opensearch.client:opensearch-rest-client`).
-  Underlying HTTP Client::: Apache HTTP Client 5
+==== OpenSearch low level REST client (Apache HTTP Client 5)
 
-Below are the options that affect these clients.
+include::../components/_incubating-warning.adoc[]
+
+Coordinates::
+GroupID::: `org.hibernate.search`
+ArtifactID::: `hibernate-search-backend-elasticsearch-client-opensearch-rest`
+Underlying HTTP Client::: Apache HTTP Client 5
+
+This Elasticsearch backend REST client is based on the OpenSearch low level client (`org.opensearch.client:opensearch-rest-client`).
 
 [[backend-elasticsearch-configuration-hosts]]
 === Target hosts
