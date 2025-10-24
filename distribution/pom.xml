@@ -92,17 +92,17 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-rest</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-rest4</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-java</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-rest5</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch</artifactId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-opensearch-rest</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -272,8 +272,8 @@
                                 ${basedir}/../mapper/pojo-standalone/src/main/java;
                                 ${basedir}/../backend/elasticsearch/src/main/java;
                                 ${basedir}/../backend/elasticsearch-client/common/src/main/java;
-                                ${basedir}/../backend/elasticsearch-client/elasticsearch-rest-client/src/main/java;
-                                ${basedir}/../backend/elasticsearch-client/elasticsearch-java-client/src/main/java;
+                                ${basedir}/../backend/elasticsearch-client/elasticsearch-rest4-client/src/main/java;
+                                ${basedir}/../backend/elasticsearch-client/elasticsearch-rest5-client/src/main/java;
                                 ${basedir}/../backend/elasticsearch-client/opensearch-rest-client/src/main/java;
                                 ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
@@ -288,9 +288,9 @@
                                 ${basedir}/../mapper/pojo-standalone/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-client/common/target/generated-sources/annotations;
-                                ${basedir}/../backend/elasticsearch-client/elasticsearch-rest-client/target/generated-sources/annotations;
+                                ${basedir}/../backend/elasticsearch-client/elasticsearch-rest4-client/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-client/opensearch-rest-client/target/generated-sources/annotations;
-                                ${basedir}/../backend/elasticsearch-client/elasticsearch-java-client/target/generated-sources/annotations;
+                                ${basedir}/../backend/elasticsearch-client/elasticsearch-rest5-client/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-aws/target/generated-sources/annotations;
                                 ${basedir}/../backend/lucene/target/generated-sources/annotations;
                                 ${basedir}/../mapper/orm-outbox-polling/src/main/avro/generated;

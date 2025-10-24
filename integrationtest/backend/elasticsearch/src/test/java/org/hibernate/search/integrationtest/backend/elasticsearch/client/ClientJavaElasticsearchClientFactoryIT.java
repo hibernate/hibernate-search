@@ -48,11 +48,11 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.client.java.cfg.ClientJavaElasticsearchBackendClientSettings;
-import org.hibernate.search.backend.elasticsearch.client.java.cfg.spi.ClientJavaElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.java.impl.ClientJavaElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.rest5.cfg.ClientJavaElasticsearchBackendClientSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest5.cfg.spi.ClientJavaElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest5.impl.ClientJavaElasticsearchClientFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;

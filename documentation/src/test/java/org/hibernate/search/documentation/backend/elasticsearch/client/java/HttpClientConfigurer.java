@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.documentation.backend.elasticsearch.client.java;
 
-import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.java.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;

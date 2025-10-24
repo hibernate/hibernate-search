@@ -18,7 +18,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 @Deprecated(since = "8.2", forRemoval = true)
 public interface ElasticsearchHttpClientConfigurationContext
 		extends
-		org.hibernate.search.backend.elasticsearch.client.rest.ElasticsearchHttpClientConfigurationContext {
+		org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurationContext {
 
 	/**
 	 * @return The version of Elasticsearch/OpenSearch configured on the backend.
