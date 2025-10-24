@@ -11,7 +11,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
  */
 @Incubating
-public final class ClientJavaElasticsearchBackendClientSpiSettings {
+public final class ClientRest5ElasticsearchBackendClientSpiSettings {
 
 	/**
 	 * The prefix expected for the key of every Hibernate Search configuration property.
@@ -37,7 +37,7 @@ public final class ClientJavaElasticsearchBackendClientSpiSettings {
 	 */
 	public static final String CLIENT_INSTANCE = "client.instance";
 
-	private ClientJavaElasticsearchBackendClientSpiSettings() {
+	private ClientRest5ElasticsearchBackendClientSpiSettings() {
 	}
 
 	/**

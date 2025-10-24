@@ -47,7 +47,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.impl.EnglishReasonPhraseCatalog;
 import org.apache.hc.core5.util.Timeout;
 
-public class ClientJavaElasticsearchClient implements ElasticsearchClientImplementor {
+public class ClientRest5ElasticsearchClient implements ElasticsearchClientImplementor {
 
 	private final BeanHolder<? extends Rest5Client> restClientHolder;
 
@@ -60,7 +60,7 @@ public class ClientJavaElasticsearchClient implements ElasticsearchClientImpleme
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	ClientJavaElasticsearchClient(BeanHolder<? extends Rest5Client> restClientHolder, Sniffer sniffer,
+	ClientRest5ElasticsearchClient(BeanHolder<? extends Rest5Client> restClientHolder, Sniffer sniffer,
 			SimpleScheduledExecutor timeoutExecutorService,
 			Optional<Integer> requestTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {

@@ -11,13 +11,13 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 
-final class ClientJavaElasticsearchHttpClientConfigurationContext
+final class ClientRest5ElasticsearchHttpClientConfigurationContext
 		implements ElasticsearchHttpClientConfigurationContext, ElasticsearchRequestInterceptorProviderContext {
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource configurationPropertySource;
 	private final HttpAsyncClientBuilder clientBuilder;
 
-	ClientJavaElasticsearchHttpClientConfigurationContext(
+	ClientRest5ElasticsearchHttpClientConfigurationContext(
 			BeanResolver beanResolver,
 			ConfigurationPropertySource configurationPropertySource,
 			HttpAsyncClientBuilder clientBuilder) {

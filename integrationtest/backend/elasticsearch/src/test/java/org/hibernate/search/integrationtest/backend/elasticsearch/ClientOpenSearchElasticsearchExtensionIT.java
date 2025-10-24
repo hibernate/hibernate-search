@@ -21,17 +21,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import org.apache.http.nio.client.HttpAsyncClient;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
+import org.apache.hc.client5.http.async.HttpAsyncClient;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
+import org.opensearch.client.RestClient;
 
-class ElasticsearchExtensionLowLevelIT {
+class ClientOpenSearchElasticsearchExtensionIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+
 
 	private SearchIntegration integration;
 

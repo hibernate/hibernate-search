@@ -14,7 +14,7 @@ public class ElasticsearchClientBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				ElasticsearchClientFactory.class, ElasticsearchClientFactory.DEFAULT_BEAN_NAME,
-				beanResolver -> BeanHolder.of( new ClientRestElasticsearchClientFactory() )
+				beanResolver -> BeanHolder.of( new ClientRest4ElasticsearchClientFactory() )
 		);
 	}
 }
