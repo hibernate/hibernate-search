@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.client.opensearch.rest;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 
@@ -14,6 +15,7 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 /**
  * The context passed to {@link ElasticsearchHttpClientConfigurer}.
  */
+@Incubating
 public interface ElasticsearchHttpClientConfigurationContext {
 
 	/**

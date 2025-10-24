@@ -5,10 +5,12 @@
 package org.hibernate.search.backend.elasticsearch.client.opensearch.rest.cfg.spi;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
  */
+@Incubating
 public final class ClientOpenSearchElasticsearchBackendClientSpiSettings {
 
 	/**

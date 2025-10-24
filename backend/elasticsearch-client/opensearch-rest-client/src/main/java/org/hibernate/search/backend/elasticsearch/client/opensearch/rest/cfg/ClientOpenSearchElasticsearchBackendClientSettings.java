@@ -6,6 +6,7 @@ package org.hibernate.search.backend.elasticsearch.client.opensearch.rest.cfg;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Specific configuration properties for the Elasticsearch backend's rest client based on the Elasticsearch's low-level rest client.
@@ -15,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.Elastic
  *
  * @author Gunnar Morling
  */
+@Incubating
 public final class ClientOpenSearchElasticsearchBackendClientSettings {
 
 	private ClientOpenSearchElasticsearchBackendClientSettings() {
