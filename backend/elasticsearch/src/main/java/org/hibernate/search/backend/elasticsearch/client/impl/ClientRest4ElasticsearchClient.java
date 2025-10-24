@@ -44,7 +44,7 @@ import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
 
-public class ClientRestElasticsearchClient implements ElasticsearchClientImplementor {
+public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplementor {
 
 	private final BeanHolder<? extends RestClient> restClientHolder;
 
@@ -58,7 +58,7 @@ public class ClientRestElasticsearchClient implements ElasticsearchClientImpleme
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	ClientRestElasticsearchClient(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
+	ClientRest4ElasticsearchClient(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
 			SimpleScheduledExecutor timeoutExecutorService,
 			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {

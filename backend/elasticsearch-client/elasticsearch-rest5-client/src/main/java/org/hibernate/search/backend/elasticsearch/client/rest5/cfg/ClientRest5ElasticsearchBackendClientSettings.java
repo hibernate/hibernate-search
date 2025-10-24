@@ -2,9 +2,11 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.rest4.cfg;
+package org.hibernate.search.backend.elasticsearch.client.rest5.cfg;
 
-import org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Specific configuration properties for the Elasticsearch backend's rest client based on the Elasticsearch's low-level rest client.
@@ -14,9 +16,10 @@ import org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttp
  *
  * @author Gunnar Morling
  */
-public final class ClientRestElasticsearchBackendClientSettings {
+@Incubating
+public final class ClientRest5ElasticsearchBackendClientSettings {
 
-	private ClientRestElasticsearchBackendClientSettings() {
+	private ClientRest5ElasticsearchBackendClientSettings() {
 	}
 
 	/**
@@ -111,7 +114,7 @@ public final class ClientRestElasticsearchBackendClientSettings {
 	* A {@link ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
 	* <p>
 	* It can be used for example to tune the SSL context to accept self-signed certificates.
-	* It allows overriding other HTTP client settings, such as {@code USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
+	* It allows overriding other HTTP client settings, such as {@link ElasticsearchBackendSettings#USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
 	* <p>
 	* Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
 	* <p>

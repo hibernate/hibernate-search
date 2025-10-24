@@ -283,9 +283,9 @@
                         WHEN 'hibernate-search-mapper-orm-outbox-polling' THEN 'OutboxPolling'
                         WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
                         WHEN 'hibernate-search-processor' THEN 'Processor'
-                        WHEN 'hibernate-search-backend-elasticsearch-client-rest4' THEN 'ClientRest'
-                        WHEN 'hibernate-search-backend-elasticsearch-client-rest5' THEN 'ClientJava'
-                        WHEN 'hibernate-search-backend-elasticsearch-client-opensearch' THEN 'ClientOpenSearch'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-rest4' THEN 'ClientRest4'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-rest5' THEN 'ClientRest5'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-opensearch-rest' THEN 'ClientOpenSearch'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END
             RETURN

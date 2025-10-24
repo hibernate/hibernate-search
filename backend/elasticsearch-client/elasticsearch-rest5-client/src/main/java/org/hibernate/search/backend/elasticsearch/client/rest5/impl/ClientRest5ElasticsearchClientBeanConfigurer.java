@@ -9,12 +9,12 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
-public class ClientJavaElasticsearchClientBeanConfigurer implements BeanConfigurer {
+public class ClientRest5ElasticsearchClientBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				ElasticsearchClientFactory.class, "elasticsearch-java",
-				beanResolver -> BeanHolder.of( new ClientJavaElasticsearchClientFactory() )
+				ElasticsearchClientFactory.class, "elasticsearch-rest5",
+				beanResolver -> BeanHolder.of( new ClientRest5ElasticsearchClientFactory() )
 		);
 	}
 }

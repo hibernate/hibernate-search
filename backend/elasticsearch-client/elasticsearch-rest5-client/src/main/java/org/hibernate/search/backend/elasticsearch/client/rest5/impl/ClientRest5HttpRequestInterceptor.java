@@ -26,19 +26,19 @@ import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.net.URIBuilder;
 
-record ClientJavaHttpRequestInterceptor(ElasticsearchRequestInterceptor elasticsearchRequestInterceptor)
+record ClientRest5HttpRequestInterceptor(ElasticsearchRequestInterceptor elasticsearchRequestInterceptor)
 		implements HttpRequestInterceptor {
 
 	@Override
 	public void process(HttpRequest request, EntityDetails entity, HttpContext context) throws IOException {
 		elasticsearchRequestInterceptor.intercept(
-				new ClientJavaRequestContext( request, entity, context )
+				new ClientRest5RequestContext( request, entity, context )
 		);
 	}
 
-	private record ClientJavaRequestContext(HttpRequest request, EntityDetails entity, HttpClientContext clientContext)
+	private record ClientRest5RequestContext(HttpRequest request, EntityDetails entity, HttpClientContext clientContext)
 			implements ElasticsearchRequestInterceptorContext {
-		private ClientJavaRequestContext(HttpRequest request, EntityDetails entity, HttpContext context) {
+		private ClientRest5RequestContext(HttpRequest request, EntityDetails entity, HttpContext context) {
 			this( request, entity, HttpClientContext.cast( context ) );
 		}
 

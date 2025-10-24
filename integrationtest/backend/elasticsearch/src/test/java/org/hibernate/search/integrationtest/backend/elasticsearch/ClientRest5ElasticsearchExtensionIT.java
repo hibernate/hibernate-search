@@ -21,12 +21,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import co.elastic.clients.transport.rest5_client.low_level.Request;
+import co.elastic.clients.transport.rest5_client.low_level.Response;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
-import org.opensearch.client.Request;
-import org.opensearch.client.Response;
-import org.opensearch.client.RestClient;
 
-class ElasticsearchExtensionOpenSearchLowLevelIT {
+class ClientRest5ElasticsearchExtensionIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -45,11 +45,11 @@ class ElasticsearchExtensionOpenSearchLowLevelIT {
 	void backend_getClient() throws Exception {
 		Backend backend = integration.backend();
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
-		RestClient restClient = elasticsearchBackend.client( RestClient.class );
+		Rest5Client restClient = elasticsearchBackend.client( Rest5Client.class );
 
 		// Test that the client actually works
 		Response response = restClient.performRequest( new Request( "GET", "/" ) );
-		assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
+		assertThat( response.getStatusCode() ).isEqualTo( 200 );
 	}
 
 	@Test
@@ -63,7 +63,7 @@ class ElasticsearchExtensionOpenSearchLowLevelIT {
 						"Invalid requested type for client",
 						HttpAsyncClient.class.getName(),
 						"The Elasticsearch low-level client can only be unwrapped to",
-						RestClient.class.getName()
+						Rest5Client.class.getName()
 				);
 	}
 
