@@ -95,7 +95,7 @@ public class ClientOpenSearchElasticsearchClient implements ElasticsearchClientI
 
 		HttpEntity entity;
 		try {
-			entity = GsonHttpEntity.toEntity( gson, elasticsearchRequest );
+			entity = ClientOpenSearchGsonHttpEntity.toEntity( gson, elasticsearchRequest );
 		}
 		catch (IOException | RuntimeException e) {
 			completableFuture.completeExceptionally( e );

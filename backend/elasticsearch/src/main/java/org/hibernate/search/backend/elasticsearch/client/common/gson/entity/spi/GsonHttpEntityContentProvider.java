@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.rest5.impl;
+package org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,20 +12,12 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
-import org.apache.hc.core5.function.Supplier;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.nio.AsyncEntityProducer;
-import org.apache.hc.core5.http.nio.DataStreamChannel;
 
 /**
  * Optimised adapter to encode GSON objects into HttpEntity instances.
@@ -55,11 +47,10 @@ import org.apache.hc.core5.http.nio.DataStreamChannel;
  *
  * @author Sanne Grinovero (C) 2017 Red Hat Inc.
  */
-final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
+@Incubating
+public class GsonHttpEntityContentProvider implements ContentProducer {
 
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
-
-	private static final String CONTENT_TYPE = ContentType.APPLICATION_JSON.toString();
 
 	/**
 	 * The size of byte buffer pages in {@link ProgressiveCharBufferWriter}
@@ -77,14 +68,6 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 	 * conversion ratio of almost 1.0, this should be close enough.
 	 */
 	private static final int CHAR_BUFFER_SIZE = BYTE_BUFFER_PAGE_SIZE;
-
-	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) throws IOException {
-		final List<JsonObject> bodyParts = request.bodyParts();
-		if ( bodyParts.isEmpty() ) {
-			return null;
-		}
-		return new GsonHttpEntity( gson, bodyParts );
-	}
 
 	private final Gson gson;
 	private final List<JsonObject> bodyParts;
@@ -127,7 +110,7 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 	private ProgressiveCharBufferWriter writer =
 			new ProgressiveCharBufferWriter( CHARSET, CHAR_BUFFER_SIZE, BYTE_BUFFER_PAGE_SIZE );
 
-	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) throws IOException {
+	public GsonHttpEntityContentProvider(Gson gson, List<JsonObject> bodyParts) throws IOException {
 		Contracts.assertNotNull( gson, "gson" );
 		Contracts.assertNotNull( bodyParts, "bodyParts" );
 		this.gson = gson;
@@ -136,49 +119,15 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 		attemptOnePassEncoding();
 	}
 
-	@Override
-	public boolean isRepeatable() {
-		return true;
-	}
-
-	@Override
-	public void failed(Exception cause) {
-
-	}
-
-	@Override
-	public boolean isChunked() {
-		return false;
-	}
-
-	@Override
-	public Set<String> getTrailerNames() {
-		return Set.of();
-	}
-
-	@Override
 	public long getContentLength() {
 		this.contentLengthWasProvided = true;
 		return this.contentLength;
 	}
 
-	@Override
-	public String getContentType() {
-		return CONTENT_TYPE;
-	}
-
-	@Override
-	public String getContentEncoding() {
-		//Apparently this is the correct value:
-		return null;
-	}
-
-	@Override
 	public InputStream getContent() {
-		return new HttpAsyncEntityProducerInputStream( this, BYTE_BUFFER_PAGE_SIZE );
+		return new HttpAsyncContentProducerInputStream( this, BYTE_BUFFER_PAGE_SIZE );
 	}
 
-	@Override
 	public void writeTo(OutputStream out) throws IOException {
 		/*
 		 * For this method we use no pagination, so ignore the mutable fields.
@@ -195,16 +144,6 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 		outWriter.flush();
 		//Now we finally know the content size in bytes:
 		hintContentLength( countingStream.getBytesWritten() );
-	}
-
-	@Override
-	public boolean isStreaming() {
-		return false;
-	}
-
-	@Override
-	public Supplier<List<? extends Header>> getTrailers() {
-		return null;
 	}
 
 	@Override
@@ -261,19 +200,14 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 	}
 
 	@Override
-	public int available() {
-		return 0;
-	}
-
-	@Override
-	public void produce(DataStreamChannel channel) throws IOException {
-		Contracts.assertNotNull( channel, "channel" );
+	public final void produceContent(ContentEncoder encoder) throws IOException {
+		Contracts.assertNotNull( encoder, "encoder" );
 		// Warning: this method is possibly invoked multiple times, depending on the output buffers
 		// to have available space !
 		// Production of data is expected to complete only after we invoke ContentEncoder#complete.
 
 		//Re-set the encoder as it might be a different one than a previously used instance:
-		writer.setOutput( channel );
+		writer.setOutput( encoder );
 
 		//First write unfinished business from previous attempts
 		writer.resumePendingWrites();
@@ -304,18 +238,12 @@ final class GsonHttpEntity implements HttpEntity, AsyncEntityProducer {
 		// because the HTTP Client itself will request the size before it starts writing content.
 		hintContentLength( writer.contentLength() );
 
-		channel.endStream();
-		this.releaseResources();
+		encoder.complete();
 	}
 
 	private void hintContentLength(long contentLength) {
 		if ( !contentLengthWasProvided ) {
 			this.contentLength = contentLength;
 		}
-	}
-
-	@Override
-	public void releaseResources() {
-		close();
 	}
 }

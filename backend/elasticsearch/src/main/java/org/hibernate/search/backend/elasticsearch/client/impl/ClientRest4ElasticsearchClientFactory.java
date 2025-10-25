@@ -285,7 +285,7 @@ public class ClientRest4ElasticsearchClientFactory implements ElasticsearchClien
 			Optional<ElasticsearchRequestInterceptor> requestInterceptor =
 					interceptorProvider.provide( clientConfigurationContext );
 			if ( requestInterceptor.isPresent() ) {
-				builder.addInterceptorLast( new ClientRestHttpRequestInterceptor( requestInterceptor.get() ) );
+				builder.addInterceptorLast( new ClientRest4HttpRequestInterceptor( requestInterceptor.get() ) );
 			}
 		}
 		if ( customConfig.isPresent() ) {

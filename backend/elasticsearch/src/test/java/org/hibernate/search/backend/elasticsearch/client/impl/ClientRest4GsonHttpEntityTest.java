@@ -38,7 +38,7 @@ import com.google.gson.JsonParser;
 import org.apache.http.Header;
 import org.apache.http.nio.ContentEncoder;
 
-class GsonHttpEntityTest {
+class ClientRest4GsonHttpEntityTest {
 
 	public static List<? extends Arguments> params() {
 		List<Arguments> params = new ArrayList<>();
@@ -142,13 +142,13 @@ class GsonHttpEntityTest {
 		return params;
 	}
 
-	private GsonHttpEntity gsonEntity;
+	private ClientRest4GsonHttpEntity gsonEntity;
 	private String expectedPayloadString;
 	private int expectedContentLength;
 
 	public void init(List<JsonObject> payload) throws IOException {
 		Gson gson = GsonProvider.create( GsonBuilder::new, true ).getGson();
-		this.gsonEntity = new GsonHttpEntity( gson, payload );
+		this.gsonEntity = new ClientRest4GsonHttpEntity( gson, payload );
 		StringBuilder builder = new StringBuilder();
 		for ( JsonObject object : payload ) {
 			gson.toJson( object, builder );
@@ -255,7 +255,7 @@ class GsonHttpEntityTest {
 		}
 	}
 
-	private String doProduceContent(GsonHttpEntity entity, int pushBackPeriod) throws IOException {
+	private String doProduceContent(ClientRest4GsonHttpEntity entity, int pushBackPeriod) throws IOException {
 		try ( ByteArrayOutputStream outputStream = new ByteArrayOutputStream() ) {
 			ContentEncoder contentEncoder = new OutputStreamContentEncoder( outputStream, pushBackPeriod );
 			while ( !contentEncoder.isCompleted() ) {
@@ -268,14 +268,14 @@ class GsonHttpEntityTest {
 		}
 	}
 
-	private String doWriteTo(GsonHttpEntity entity) throws IOException {
+	private String doWriteTo(ClientRest4GsonHttpEntity entity) throws IOException {
 		try ( ByteArrayOutputStream outputStream = new ByteArrayOutputStream() ) {
 			entity.writeTo( outputStream );
 			return outputStream.toString( StandardCharsets.UTF_8.name() );
 		}
 	}
 
-	private String doGetContent(GsonHttpEntity entity) throws IOException {
+	private String doGetContent(ClientRest4GsonHttpEntity entity) throws IOException {
 		try ( InputStream inputStream = entity.getContent();
 				Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 );
 				BufferedReader bufferedReader = new BufferedReader( reader ) ) {

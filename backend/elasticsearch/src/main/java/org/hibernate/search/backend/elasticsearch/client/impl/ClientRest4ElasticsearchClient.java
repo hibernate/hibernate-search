@@ -96,7 +96,7 @@ public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplem
 
 		HttpEntity entity;
 		try {
-			entity = GsonHttpEntity.toEntity( gson, elasticsearchRequest );
+			entity = ClientRest4GsonHttpEntity.toEntity( gson, elasticsearchRequest );
 		}
 		catch (IOException | RuntimeException e) {
 			completableFuture.completeExceptionally( e );

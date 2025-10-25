@@ -2,25 +2,25 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.opensearch.rest.impl;
+package org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.hibernate.search.util.common.annotation.Incubating;
 
-
-final class HttpAsyncEntityProducerInputStream extends InputStream {
-	private final AsyncEntityProducer entityProducer;
+@Incubating
+public final class HttpAsyncContentProducerInputStream extends InputStream {
+	private final ContentProducer contentProducer;
 	private final ByteBuffer buffer;
-	private final ByteBufferDataStreamChannel contentEncoder;
+	private final ContentEncoder contentEncoder;
 
-	public HttpAsyncEntityProducerInputStream(AsyncEntityProducer entityProducer, int bufferSize) {
-		this.entityProducer = entityProducer;
+	public HttpAsyncContentProducerInputStream(ContentProducer contentProducer, int bufferSize) {
+		this.contentProducer = contentProducer;
 		this.buffer = ByteBuffer.allocate( bufferSize );
 		this.buffer.limit( 0 );
-		this.contentEncoder = new ByteBufferDataStreamChannel( buffer );
+		this.contentEncoder = new ByteBufferContentEncoder( buffer );
 	}
 
 	@Override
@@ -53,13 +53,13 @@ final class HttpAsyncEntityProducerInputStream extends InputStream {
 	}
 
 	@Override
-	public void close() {
-		entityProducer.releaseResources();
+	public void close() throws IOException {
+		contentProducer.close();
 	}
 
 	private void writeToBuffer() throws IOException {
 		buffer.clear();
-		entityProducer.produce( contentEncoder );
+		contentProducer.produceContent( contentEncoder );
 		buffer.flip();
 	}
 

@@ -2,31 +2,22 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.rest5.impl;
+package org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
 
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.nio.ContentEncoder;
-import org.apache.hc.core5.http.nio.DataStreamChannel;
+import org.hibernate.search.util.common.annotation.Incubating;
 
-
-final class ByteBufferDataStreamChannel implements ContentEncoder, DataStreamChannel {
+@Incubating
+final class ByteBufferContentEncoder implements ContentEncoder {
 	private final ByteBuffer buffer;
 	private boolean complete = false;
 
-	ByteBufferDataStreamChannel(ByteBuffer buffer) {
+	ByteBufferContentEncoder(ByteBuffer buffer) {
 		this.buffer = buffer;
 		if ( !buffer.hasArray() ) {
 			throw new IllegalArgumentException( getClass().getName() + " requires a ByteBuffer backed by an array." );
 		}
-	}
-
-	@Override
-	public void requestOutput() {
-
 	}
 
 	@Override
@@ -38,17 +29,7 @@ final class ByteBufferDataStreamChannel implements ContentEncoder, DataStreamCha
 	}
 
 	@Override
-	public void endStream() throws IOException {
-		complete = true;
-	}
-
-	@Override
-	public void endStream(List<? extends Header> trailers) throws IOException {
-		complete = true;
-	}
-
-	@Override
-	public void complete(List<? extends Header> trailers) throws IOException {
+	public void complete() {
 		complete = true;
 	}
 

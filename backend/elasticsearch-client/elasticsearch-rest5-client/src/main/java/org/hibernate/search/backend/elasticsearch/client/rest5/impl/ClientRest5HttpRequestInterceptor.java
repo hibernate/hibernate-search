@@ -7,22 +7,28 @@ package org.hibernate.search.backend.elasticsearch.client.rest5.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi.ContentEncoder;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi.ContentProducer;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi.HttpAsyncContentProducerInputStream;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorContext;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.EntityDetails;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpEntityContainer;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpRequestInterceptor;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.DataStreamChannel;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.net.URIBuilder;
 
@@ -68,7 +74,7 @@ record ClientRest5HttpRequestInterceptor(ElasticsearchRequestInterceptor elastic
 				if ( !producer.isRepeatable() ) {
 					throw new AssertionFailure( "Cannot sign AWS requests with non-repeatable entities" );
 				}
-				return new HttpAsyncEntityProducerInputStream( producer, 1024 );
+				return new HttpAsyncContentProducerInputStream( new ClientRest5GsonContentProducer( producer ), 1024 );
 			}
 			return null;
 		}
@@ -138,6 +144,52 @@ record ClientRest5HttpRequestInterceptor(ElasticsearchRequestInterceptor elastic
 		@Override
 		public String toString() {
 			return request.toString();
+		}
+	}
+
+	private static class GsonEncoderDataStreamChannel implements DataStreamChannel {
+		private final ContentEncoder encoder;
+
+		public GsonEncoderDataStreamChannel(ContentEncoder encoder) {
+			this.encoder = encoder;
+		}
+
+		@Override
+		public void requestOutput() {
+
+		}
+
+		@Override
+		public int write(ByteBuffer src) throws IOException {
+			return encoder.write( src );
+		}
+
+		@Override
+		public void endStream(List<? extends Header> trailers) throws IOException {
+			encoder.complete();
+		}
+
+		@Override
+		public void endStream() throws IOException {
+			encoder.complete();
+		}
+	}
+
+	private static class ClientRest5GsonContentProducer implements ContentProducer {
+		private final AsyncEntityProducer producer;
+
+		public ClientRest5GsonContentProducer(AsyncEntityProducer producer) {
+			this.producer = producer;
+		}
+
+		@Override
+		public void produceContent(ContentEncoder encoder) throws IOException {
+			producer.produce( new GsonEncoderDataStreamChannel( encoder ) );
+		}
+
+		@Override
+		public void close() throws IOException {
+			producer.releaseResources();
 		}
 	}
 }

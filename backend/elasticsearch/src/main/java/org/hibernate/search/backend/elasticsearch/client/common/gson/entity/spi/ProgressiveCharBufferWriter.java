@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.impl;
+package org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -14,8 +14,6 @@ import java.nio.charset.CoderResult;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
-
-import org.apache.http.nio.ContentEncoder;
 
 /**
  * A writer to a ContentEncoder, using an automatically growing, paged buffer
@@ -165,7 +163,7 @@ class ProgressiveCharBufferWriter extends Writer {
 	 * Flow control may push back, in which case this method or {@link #flushToOutput()}
 	 * should be called again later.
 	 *
-	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
+	 * @throws IOException when {@link org.apache.http.nio.ContentEncoder#write(ByteBuffer)} fails.
 	 */
 	public void resumePendingWrites() throws IOException {
 		flush();
@@ -187,7 +185,7 @@ class ProgressiveCharBufferWriter extends Writer {
 	 * <p>
 	 * Flow control may push back, in which case this method should be called again later.
 	 *
-	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
+	 * @throws IOException when {@link org.apache.http.nio.ContentEncoder#write(ByteBuffer)} fails.
 	 */
 	public void flushToOutput() throws IOException {
 		flush();
