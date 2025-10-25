@@ -24,7 +24,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 
-record ClientRestHttpRequestInterceptor(ElasticsearchRequestInterceptor elasticsearchRequestInterceptor)
+record ClientRest4HttpRequestInterceptor(ElasticsearchRequestInterceptor elasticsearchRequestInterceptor)
 		implements HttpRequestInterceptor {
 
 	@Override
