@@ -23,6 +23,9 @@
         <failsafe.multiplebackends.summaryFile>${failsafe.multiplebackends.reportsDirectory}/failsafe-summary.xml</failsafe.multiplebackends.summaryFile>
         <failsafe.jvm.args.jacoco.lucene></failsafe.jvm.args.jacoco.lucene>
         <failsafe.jvm.args.jacoco.multiplebackends></failsafe.jvm.args.jacoco.multiplebackends>
+        <surefire.jvm.args.module>
+            ${test.mockito.agent.jvm.args}
+        </surefire.jvm.args.module>
     </properties>
 
     <dependencies>
