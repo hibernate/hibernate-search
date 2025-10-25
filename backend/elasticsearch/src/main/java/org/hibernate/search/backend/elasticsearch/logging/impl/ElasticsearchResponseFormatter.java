@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
@@ -39,7 +39,7 @@ public final class ElasticsearchResponseFormatter {
 				.append( " '" )
 				.append( response.statusMessage() )
 				.append( "' from '" )
-				.append( response.host() )
+				.append( response.hostAndPort() )
 				.append( "' with body " )
 				.append( helper.toString( response.body() ) );
 

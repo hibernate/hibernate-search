@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 
 import org.apache.http.HttpHost;
 
@@ -26,9 +26,12 @@ final class ServerUris {
 	static ServerUris fromOptionalStrings(Optional<String> protocol, Optional<List<String>> hostAndPortStrings,
 			Optional<List<String>> uris) {
 		if ( !uris.isPresent() ) {
-			String protocolValue = ( protocol.isPresent() ) ? protocol.get() : ElasticsearchBackendSettings.Defaults.PROTOCOL;
+			String protocolValue =
+					( protocol.isPresent() ) ? protocol.get() : ElasticsearchBackendSettings.Defaults.PROTOCOL;
 			List<String> hostAndPortValues =
-					( hostAndPortStrings.isPresent() ) ? hostAndPortStrings.get() : ElasticsearchBackendSettings.Defaults.HOSTS;
+					( hostAndPortStrings.isPresent() )
+							? hostAndPortStrings.get()
+							: ElasticsearchBackendSettings.Defaults.HOSTS;
 			return fromStrings( protocolValue, hostAndPortValues );
 		}
 

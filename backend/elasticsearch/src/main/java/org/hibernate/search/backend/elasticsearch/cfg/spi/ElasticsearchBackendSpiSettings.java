@@ -9,6 +9,7 @@ import static org.hibernate.search.backend.elasticsearch.resources.impl.DefaultE
 import org.hibernate.search.backend.elasticsearch.work.spi.ElasticsearchWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
@@ -28,24 +29,8 @@ public final class ElasticsearchBackendSpiSettings {
 	 */
 	public static final String BACKEND_WORK_EXECUTOR_PROVIDER = PREFIX + Radicals.BACKEND_WORK_EXECUTOR_PROVIDER;
 
-	/**
-	 * An external Elasticsearch client instance that Hibernate Search should use for all requests to Elasticsearch.
-	 * <p>
-	 * If this is set, Hibernate Search will not attempt to create its own Elasticsearch,
-	 * and all other client-related configuration properties
-	 * (hosts/uris, authentication, discovery, timeouts, max connections, configurer, ...)
-	 * will be ignored.
-	 * <p>
-	 * Expects a reference to a bean of type {@link org.elasticsearch.client.RestClient}.
-	 * <p>
-	 * Defaults to nothing: if no client instance is provided, Hibernate Search will create its own.
-	 * <p>
-	 * <strong>WARNING - Incubating API:</strong> the underlying client class may change without prior notice.
-	 *
-	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
-	 * which includes a description of the "bean reference" properties and accepted values.
-	 */
-	public static final String CLIENT_INSTANCE = "client.instance";
+	@Incubating
+	public static final String CLIENT_FACTORY = PREFIX + Radicals.CLIENT_FACTORY;
 
 	private ElasticsearchBackendSpiSettings() {
 	}
@@ -59,6 +44,7 @@ public final class ElasticsearchBackendSpiSettings {
 		}
 
 		public static final String BACKEND_WORK_EXECUTOR_PROVIDER = "backend_work_executor_provider";
+		public static final String CLIENT_FACTORY = "client_factory";
 	}
 
 	public static final class Defaults {

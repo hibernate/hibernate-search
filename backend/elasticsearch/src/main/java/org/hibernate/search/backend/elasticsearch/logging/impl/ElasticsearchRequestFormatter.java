@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}

@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.util.common.impl.Contracts;
 
 import com.google.gson.Gson;
@@ -78,6 +79,14 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	 * conversion ratio of almost 1.0, this should be close enough.
 	 */
 	private static final int CHAR_BUFFER_SIZE = BYTE_BUFFER_PAGE_SIZE;
+
+	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) throws IOException {
+		final List<JsonObject> bodyParts = request.bodyParts();
+		if ( bodyParts.isEmpty() ) {
+			return null;
+		}
+		return new GsonHttpEntity( gson, bodyParts );
+	}
 
 	private final Gson gson;
 	private final List<JsonObject> bodyParts;
