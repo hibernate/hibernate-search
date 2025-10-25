@@ -40,7 +40,7 @@ Map settings() {
 			]
 		case 'lucene-future':
 			return [
-					testCompilerTool: 'OpenJDK 24 Latest',
+					testCompilerTool: 'OpenJDK 25 Latest',
 					updateProperties: ['version.org.apache.lucene.next.updatable'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene-next'],
 					additionalMavenArgs: '-Dtest.elasticsearch.skip=true -pl :hibernate-search-backend-lucene-next,:hibernate-search-util-internal-integrationtest-backend-lucene-next'
