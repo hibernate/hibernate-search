@@ -48,7 +48,7 @@
             <id>springITs</id>
             <activation>
                 <!-- Hack to activate by default, except when explicitly disabled -->
-                <jdk>[17,)</jdk>
+                <jdk>[17,25)</jdk>
             </activation>
             <modules>
                 <module>mapper/orm-spring</module>
