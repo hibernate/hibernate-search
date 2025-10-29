@@ -523,13 +523,13 @@ stage('Non-default environments') {
 					// so we skip them.
 					String mavenBuildAdditionalArgs = ''' \
 							-pl !documentation \
-							-pl !integrationtest/mapper/orm-spring \
 							-pl !integrationtest/v5migrationhelper/orm \
 							-pl !integrationtest/java/modules/orm-lucene \
 							-pl !integrationtest/java/modules/orm-elasticsearch \
 							-pl !integrationtest/java/modules/orm-outbox-polling-elasticsearch \
 							-pl !lucene-next/documentation \
 							-pl !lucene-next/integrationtest/java/modules/orm-lucene \
+							-P !springITs \
 					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false
