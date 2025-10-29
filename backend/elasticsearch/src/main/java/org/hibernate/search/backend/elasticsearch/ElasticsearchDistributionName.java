@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.util.common.annotation.Incubating;
 

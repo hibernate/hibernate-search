@@ -9,6 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient.getDiscoveredClientFactory;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -21,17 +22,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
@@ -41,7 +40,6 @@ import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvide
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -217,11 +215,11 @@ class ElasticsearchContentLengthIT {
 		ConfigurationPropertySource clientPropertySource = AllAwareConfigurationPropertySource.fromMap( clientProperties );
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
-		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
-				threadPoolProvider.threadProvider(), "Client",
-				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
-				GsonProvider.create( GsonBuilder::new, true ),
-				Optional.of( ElasticsearchTestDialect.getActualVersion() ) );
+		return getDiscoveredClientFactory( beanResolver ).get()
+				.create( beanResolver, clientPropertySource,
+						threadPoolProvider.threadProvider(), "Client",
+						new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
+						GsonProvider.create( GsonBuilder::new, true ) );
 	}
 
 	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, Collection<JsonObject> bodyParts) {

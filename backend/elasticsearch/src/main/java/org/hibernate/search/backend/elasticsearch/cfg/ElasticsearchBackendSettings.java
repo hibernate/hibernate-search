@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRest4ElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
@@ -139,7 +139,11 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to no request timeout.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#REQUEST_TIMEOUT} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String REQUEST_TIMEOUT = "request_timeout";
 
 	/**
@@ -149,7 +153,11 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#READ_TIMEOUT}.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#READ_TIMEOUT} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String READ_TIMEOUT = "read_timeout";
 
 	/**
@@ -159,7 +167,11 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#CONNECTION_TIMEOUT} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String CONNECTION_TIMEOUT = "connection_timeout";
 
 	/**
@@ -170,7 +182,11 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#MAX_CONNECTIONS} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_CONNECTIONS = "max_connections";
 
 	/**
@@ -180,7 +196,11 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#MAX_CONNECTIONS_PER_ROUTE} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
 
 	/**
@@ -190,7 +210,11 @@ public final class ElasticsearchBackendSettings {
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#DISCOVERY_ENABLED} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
 
 	/**
@@ -200,19 +224,27 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#DISCOVERY_REFRESH_INTERVAL} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
 
 	/**
-	 * A {@link ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
+	 * A {@link org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
 	 * <p>
 	 * It can be used for example to tune the SSL context to accept self-signed certificates.
 	 * It allows overriding other HTTP client settings, such as {@link #USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
 	 * <p>
-	 * Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
+	 * Expects a reference to a bean of type {@link org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer}.
 	 * <p>
 	 * Defaults to no value.
+	 *
+	 * @deprecated Use client specific configurers instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String CLIENT_CONFIGURER = "client.configurer";
 
 	/**
@@ -298,7 +330,11 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * If this property is not set, only the {@code Keep-Alive} header is considered,
 	 * and if it's absent, idle connections will be kept forever.
+	 *
+	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#MAX_KEEP_ALIVE} instead.
+	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
 	 */
+	@Deprecated(since = "8.2", forRemoval = true)
 	public static final String MAX_KEEP_ALIVE = "max_keep_alive";
 
 	/**
@@ -329,11 +365,41 @@ public final class ElasticsearchBackendSettings {
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
 		public static final String PROTOCOL = "http";
 		public static final String PATH_PREFIX = "";
+		/**
+		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#READ_TIMEOUT} instead.
+		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int READ_TIMEOUT = 30000;
+		/**
+		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#CONNECTION_TIMEOUT} instead.
+		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int CONNECTION_TIMEOUT = 1000;
+		/**
+		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#MAX_CONNECTIONS} instead.
+		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int MAX_CONNECTIONS = 40;
+		/**
+		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#MAX_CONNECTIONS_PER_ROUTE} instead.
+		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int MAX_CONNECTIONS_PER_ROUTE = 20;
+		/**
+		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#DISCOVERY_ENABLED} instead.
+		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final boolean DISCOVERY_ENABLED = false;
+		/**
+		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#DISCOVERY_REFRESH_INTERVAL} instead.
+		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
+		 */
+		@Deprecated(since = "8.2", forRemoval = true)
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		/**

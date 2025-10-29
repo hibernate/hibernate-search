@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
 
 import com.google.gson.JsonObject;
 

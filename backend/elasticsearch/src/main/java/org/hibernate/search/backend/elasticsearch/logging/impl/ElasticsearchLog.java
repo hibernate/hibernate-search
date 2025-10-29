@@ -7,6 +7,9 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.jboss.logging.Logger.Level.TRACE;
 
+import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchRequestLog;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.annotations.LogMessage;
@@ -20,8 +23,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.BACKEND_ES_ID_RANGE_MIN, max = MessageConstants.BACKEND_ES_ID_RANGE_MAX),
 })
 public interface ElasticsearchLog
-		extends AnalysisLog, ConfigurationLog, DeprecationLog, ElasticsearchClientLog, ElasticsearchMiscLog,
-		ElasticsearchRequestLog, IndexingLog, MappingLog, QueryLog, VersionLog {
+		extends AnalysisLog, ConfigurationLog, DeprecationLog, ElasticsearchMiscLog,
+		ElasticsearchRequestLog, ElasticsearchClientLog, IndexingLog, MappingLog, QueryLog, VersionLog {
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (ES module)
@@ -40,6 +43,6 @@ public interface ElasticsearchLog
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 194, value = "")
+	@Message(id = ID_OFFSET + 197, value = "")
 	void nextLoggerIdForConvenience();
 }

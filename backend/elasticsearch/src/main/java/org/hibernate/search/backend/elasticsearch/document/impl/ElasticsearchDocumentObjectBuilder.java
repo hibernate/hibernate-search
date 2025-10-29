@@ -12,8 +12,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.IndexingLog;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
