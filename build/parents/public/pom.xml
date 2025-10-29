@@ -162,8 +162,16 @@
                                  See https://github.com/openjdk/jdk/blob/9862cd07c162fcc9cd5cbdd0aab564f446f9256c/src/jdk.javadoc/share/classes/jdk/javadoc/internal/doclint/Messages.java#L74-L78
                                   -->
                             <additionalOption>-Xdoclint:all,-missing</additionalOption>
+                            <additionalOption>--add-script resources/theme-switch.js</additionalOption>
                         </additionalOptions>
-                        <stylesheetfile>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk21/stylesheet.css</stylesheetfile>
+                        <docfilessubdirs>true</docfilessubdirs>
+                        <stylesheetfile>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk${jdk.min.version}/stylesheet.css</stylesheetfile>
+                        <javadocDirectory>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk${jdk.min.version}/</javadocDirectory>
+                        <header>
+                            <![CDATA[
+                                <div id="toggleContainer"></div>
+                            ]]>
+                        </header>
                     </configuration>
                 </plugin>
             </plugins>
