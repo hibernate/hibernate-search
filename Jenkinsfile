@@ -599,8 +599,9 @@ stage('Non-default environments') {
 								mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
 										-pl ${[
-											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
-											'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch'
+											// Add back after Spring Boot 4 update:
+											//, 'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
 											 ].join(',')} \
 										-Dtest.lucene.skip=true \
 										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
@@ -642,9 +643,11 @@ stage('Non-default environments') {
 								// Note that because we expect frequent failure and retries,
 								// we use --fail-fast here, to make sure we don't waste time.
 								retry(count: 3) {
+									// Add back after Spring Boot 4 update:
+									// ,org.hibernate.search:hibernate-search-integrationtest-showcase-library
 									mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
-										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
 										-Dtest.lucene.skip=true \
 										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 										-Dtest.elasticsearch.version=$buildEnv.version \
