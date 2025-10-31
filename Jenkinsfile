@@ -222,7 +222,7 @@ stage('Configure') {
 					// --------------------------------------------
 					// Elasticsearch distribution from Elastic
 					// Not testing 7.9- since those versions are EOL'ed.
-					new LocalElasticsearchBuildEnvironment(version: '7.10.1', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '7.10.2', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.11 to make the build quicker.
 					// The only difference with 7.12+ is that wildcard predicates on analyzed fields get their pattern normalized,
 					// and that was deemed a bug: https://github.com/elastic/elasticsearch/pull/53127
@@ -254,7 +254,7 @@ stage('Configure') {
 					new LocalElasticsearchBuildEnvironment(version: '8.16.1', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.17.6', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.18.7', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.19.4', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '8.19.6', condition: TestCondition.AFTER_MERGE),
 					new LocalElasticsearchBuildEnvironment(version: '9.0.7', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '9.1.5', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '9.2.0', condition: TestCondition.BEFORE_MERGE, isDefault: true),
@@ -290,7 +290,7 @@ stage('Configure') {
 					new LocalOpenSearchBuildEnvironment(version: '3.0.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.1.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.2.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '3.3.1', condition: TestCondition.BEFORE_MERGE),
+					new LocalOpenSearchBuildEnvironment(version: '3.3.2', condition: TestCondition.BEFORE_MERGE),
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
 					// IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions
 					//            See version.org.opensearch.compatible.expected.text
