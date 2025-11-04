@@ -300,7 +300,7 @@
         <version.surefire.plugin>3.5.4</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.9</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.14</version.jacoco.plugin>
-        <version.com.buschmais.jqassistant.plugin>2.7.1</version.com.buschmais.jqassistant.plugin>
+        <version.com.buschmais.jqassistant.plugin>2.8.0</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
         <version.sonar.plugin>5.2.0.4988</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
@@ -360,7 +360,7 @@
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.1.1.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.2.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>2.3.21</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.23</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!--
             Defines what to do with dependency management section of the flattened pom.
