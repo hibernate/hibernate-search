@@ -4,12 +4,15 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -18,6 +21,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Transient;
@@ -29,6 +33,7 @@ import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.associa
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.PropertyAccessor;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -36,6 +41,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Test automatic indexing caused by single-valued association updates
@@ -78,7 +85,44 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
 		setupContext.withProperty( AvailableSettings.MAX_FETCH_DEPTH, 1 );
 
+		setupContext.withAnnotatedTypes( CascadingParent.class, CascadableChildMapsId.class );
+		setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
+			session.getSessionFactory().getSchemaManager().truncateMappedObjects();
+		} ) );
+		backendMock.expectAnySchema( CascadableChildMapsId.INDEX );
+
 		return setupContext;
+	}
+
+	@Test
+	void deleteWithCascade() {
+		with( sessionFactory ).runInTransaction( session -> {
+			CascadingParent p = new CascadingParent( 1L, "Parent" );
+			CascadableChildMapsId entity = new CascadableChildMapsId( p, "Entity" );
+
+			session.persist( p );
+			session.persist( entity );
+
+			backendMock.expectWorks( CascadableChildMapsId.INDEX )
+					.add( "1", b -> b
+							.field( "name", "Entity" )
+							.objectField( "parent", b2 -> b2
+									.field( "parentName", "Parent" ) )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		with( sessionFactory ).runInTransaction( session -> {
+			CascadingParent parent = session.find( CascadingParent.class, 1L );
+
+			CascadableChildMapsId child = session.find( CascadableChildMapsId.class, 1L );
+			child.setName( "to-be-deleted" );
+			session.remove( parent );
+
+			backendMock.expectWorks( CascadableChildMapsId.INDEX )
+					.delete( "1" );
+		} );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Entity(name = "containing")
@@ -846,6 +890,103 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 						);
 					}
 				};
+	}
+
+	@Entity(name = "CascadingParent")
+	public static class CascadingParent {
+
+		@Id
+		private Long id;
+
+		@GenericField
+		private String parentName;
+
+		@OneToOne(mappedBy = "parent", cascade = CascadeType.ALL)
+		private CascadableChildMapsId cascadableChildMapsId;
+
+		public CascadingParent() {
+		}
+
+		public CascadingParent(Long id, String parentName) {
+			this.id = id;
+			this.parentName = parentName;
+		}
+
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
+		public String getParentName() {
+			return parentName;
+		}
+
+		public void setParentName(String parentName) {
+			this.parentName = parentName;
+		}
+
+		public CascadableChildMapsId getMapsIdJoinColumnChild() {
+			return cascadableChildMapsId;
+		}
+
+		public void setMapsIdJoinColumnChild(CascadableChildMapsId cascadableChildMapsId) {
+			this.cascadableChildMapsId = cascadableChildMapsId;
+		}
+
+	}
+
+	@Entity(name = "CascadableChildMapsId")
+	@Indexed(index = CascadableChildMapsId.INDEX)
+	public static class CascadableChildMapsId {
+		static final String INDEX = "CascadableChildMapsId";
+
+		@Id
+		@DocumentId
+		private Long id;
+
+		@MapsId
+		@JoinColumn(name = "PARENT_ID_CUSTOM_NAME")
+		@OneToOne
+		@IndexedEmbedded
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "cascadableChildMapsId")))
+		private CascadingParent parent;
+
+		@GenericField
+		@Column(name = "NAME")
+		private String name;
+
+		protected CascadableChildMapsId() {
+		}
+
+		public CascadableChildMapsId(Long id, String name) {
+			this.id = id;
+			this.name = name;
+		}
+
+		public CascadableChildMapsId(CascadingParent parent, String name) {
+			this.id = parent.getId();
+			this.parent = parent;
+			this.name = name;
+		}
+
+		public Long getId() {
+			return id;
+		}
+
+		public CascadingParent getParent() {
+			return parent;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
 	}
 
 }
