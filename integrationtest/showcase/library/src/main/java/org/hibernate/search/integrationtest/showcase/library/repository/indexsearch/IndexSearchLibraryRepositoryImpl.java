@@ -58,23 +58,12 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 
 	@Override
 	public List<LibrarySimpleProjection> searchAndProjectToMethodLocalClass(String terms, int offset, int limit) {
-		@ProjectionConstructor
-		class LocalClass {
-			public final String name;
-			public final List<LibraryServiceOption> services;
-
-			public LocalClass(String name, List<LibraryServiceOption> services) {
-				this.name = name;
-				this.services = services;
-			}
-		}
-
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}
 		return Search.session( entityManager )
 				.search( Library.class )
-				.select( LocalClass.class )
+				.select( SearchAndProjectToMethodLocalClass.class )
 				.where( f -> f.match().field( "name" ).matching( terms ) )
 				.sort( f -> f.field( "collectionSize" ).desc()
 						.then().field( "name_sort" ) )
@@ -82,6 +71,17 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 				.stream()
 				.map( local -> new LibrarySimpleProjection( local.name, local.services ) )
 				.collect( Collectors.toList() );
+	}
+
+	@ProjectionConstructor
+	static class SearchAndProjectToMethodLocalClass {
+		public final String name;
+		public final List<LibraryServiceOption> services;
+
+		public SearchAndProjectToMethodLocalClass(String name, List<LibraryServiceOption> services) {
+			this.name = name;
+			this.services = services;
+		}
 	}
 
 	@Override
