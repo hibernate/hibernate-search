@@ -524,13 +524,13 @@ stage('Non-default environments') {
 					// so we skip them.
 					String mavenBuildAdditionalArgs = ''' \
 							-pl !documentation \
+							-pl !integrationtest/mapper/orm-spring \
 							-pl !integrationtest/v5migrationhelper/orm \
 							-pl !integrationtest/java/modules/orm-lucene \
 							-pl !integrationtest/java/modules/orm-elasticsearch \
 							-pl !integrationtest/java/modules/orm-outbox-polling-elasticsearch \
 							-pl !lucene-next/documentation \
 							-pl !lucene-next/integrationtest/java/modules/orm-lucene \
-							-P !springITs \
 					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false
@@ -601,8 +601,7 @@ stage('Non-default environments') {
 										--fail-fast \
 										-pl ${[
 											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch'
-											// Add back after Spring Boot 4 update:
-											//, 'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+											, 'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
 											 ].join(',')} \
 										-Dtest.lucene.skip=true \
 										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
@@ -644,11 +643,9 @@ stage('Non-default environments') {
 								// Note that because we expect frequent failure and retries,
 								// we use --fail-fast here, to make sure we don't waste time.
 								retry(count: 3) {
-									// Add back after Spring Boot 4 update:
-									// ,org.hibernate.search:hibernate-search-integrationtest-showcase-library
 									mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
-										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
+										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										-Dtest.lucene.skip=true \
 										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 										-Dtest.elasticsearch.version=$buildEnv.version \
