@@ -251,6 +251,9 @@
                                 <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
                                 <argument>^org\.hibernate\.sql\.results\.graph\.Fetchable$</argument>
 
+                                <argument>^org\.hibernate\.engine\.extension\.spi\.[a-zA-Z]+$</argument>
+                                <argument>^org\.hibernate\.engine\.spi\.SharedSessionContractImplementor#getExtension.+$</argument>
+
                                 <!-- Types that are not used directly and are pulled by a "stable" interface -->
                                 <argument>^org\.hibernate\.mapping\.SoftDeletable$</argument>
                             </arguments>
