@@ -18,15 +18,15 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 class BeforeCommitIndexingPlanSynchronization implements Synchronization {
 
 	private final PojoIndexingPlan indexingPlan;
-	private final HibernateOrmSearchSessionHolder sessionHolder;
+	private final HibernateOrmSearchSessionExtension sessionExtension;
 	private final Transaction transactionIdentifier;
 	private final ConfiguredIndexingPlanSynchronizationStrategy synchronizationStrategy;
 
 	BeforeCommitIndexingPlanSynchronization(PojoIndexingPlan indexingPlan,
-			HibernateOrmSearchSessionHolder sessionHolder, Transaction transactionIdentifier,
+			HibernateOrmSearchSessionExtension sessionExtension, Transaction transactionIdentifier,
 			ConfiguredIndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;
-		this.sessionHolder = sessionHolder;
+		this.sessionExtension = sessionExtension;
 		this.transactionIdentifier = transactionIdentifier;
 		this.synchronizationStrategy = synchronizationStrategy;
 	}
@@ -47,7 +47,7 @@ class BeforeCommitIndexingPlanSynchronization implements Synchronization {
 		}
 		finally {
 			//clean the Synchronization per Transaction
-			sessionHolder.clear( transactionIdentifier );
+			sessionExtension.clear( transactionIdentifier );
 		}
 	}
 }
