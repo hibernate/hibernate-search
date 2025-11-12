@@ -487,7 +487,9 @@ stage('Non-default environments') {
 				withMavenWorkspace {
 					// Re-run integration tests against the JARs produced by the default build,
 					// but using a different JDK to build and run the tests.
-					mavenNonDefaultBuild buildEnv, "-f integrationtest"
+					// we pass -Dgib.buildAll=true so that we won't skip the test modules, otherwise it may lead to
+					// part of test sources compiled with a more recent JDK then the one we are about to test with:
+					mavenNonDefaultBuild buildEnv, "-f integrationtest -Dgib.buildAll=true"
 				}
 			}
 		})
