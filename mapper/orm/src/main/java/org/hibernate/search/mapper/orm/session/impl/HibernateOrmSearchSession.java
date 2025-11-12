@@ -76,13 +76,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
 			SessionImplementor sessionImplementor, boolean createIfDoesNotExist) {
-		HibernateOrmSearchSessionHolder holder =
-				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
-		if ( holder == null ) {
-			// Can only happen if createIfDoesNotExist is false
-			return null;
-		}
-		HibernateOrmSearchSession searchSession = holder.searchSession();
+		HibernateOrmSearchSessionExtension extension = HibernateOrmSearchSessionExtension.get( sessionImplementor );
+		HibernateOrmSearchSession searchSession = extension.searchSession();
 		if ( searchSession != null ) {
 			return searchSession;
 		}
@@ -92,7 +87,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 
 		searchSession = context.createSessionBuilder( sessionImplementor ).build();
-		holder.searchSession( searchSession );
+		extension.searchSession( searchSession );
 		return searchSession;
 	}
 
@@ -276,9 +271,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public PojoIndexingPlan currentIndexingPlan(boolean createIfDoesNotExist) {
-		HibernateOrmSearchSessionHolder holder =
-				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
-		if ( holder == null ) {
+		HibernateOrmSearchSessionExtension extension =
+				HibernateOrmSearchSessionExtension.get( sessionImplementor );
+		if ( extension.searchSession() == null ) {
 			// Can only happen if createIfDoesNotExist is false
 			return null;
 		}
@@ -291,7 +286,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			transactionIdentifier = null;
 		}
 
-		PojoIndexingPlan plan = holder.pojoIndexingPlan( transactionIdentifier );
+		PojoIndexingPlan plan = extension.pojoIndexingPlan( transactionIdentifier );
 		if ( plan != null ) {
 			return plan;
 		}
@@ -303,11 +298,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		ConfiguredIndexingPlanSynchronizationStrategy currentSynchronizationStrategy =
 				indexingPlanSynchronizationStrategy;
 		plan = automaticIndexingStrategy.createIndexingPlan( this, currentSynchronizationStrategy );
-		holder.pojoIndexingPlan( transactionIdentifier, plan );
+		extension.pojoIndexingPlan( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			Synchronization txSync = automaticIndexingStrategy.createTransactionWorkQueueSynchronization(
-					plan, holder, transactionIdentifier,
+					plan, extension, transactionIdentifier,
 					currentSynchronizationStrategy
 			);
 			registerSynchronization( sessionImplementor, txSync );
