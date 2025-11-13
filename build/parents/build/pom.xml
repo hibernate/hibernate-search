@@ -51,7 +51,7 @@
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
         <version.org.elasticsearch.client>9.2.1</version.org.elasticsearch.client>
         <version.org.elasticsearch.java.client>9.2.1</version.org.elasticsearch.java.client>
-        <version.org.opensearch.client>3.3.1</version.org.opensearch.client>
+        <version.org.opensearch.client>3.3.2</version.org.opensearch.client>
         <!-- Various HTTP client versions that our own Elasticsearch client implementations depend on -->
         <version.org.apache.httpcomponents.client5>5.5</version.org.apache.httpcomponents.client5>
         <version.org.apache.httpcomponents.core5>5.3.5</version.org.apache.httpcomponents.core5>

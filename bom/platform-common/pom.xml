@@ -21,7 +21,7 @@
         <version.bom.org.hibernate.orm>7.2.0.CR2</version.bom.org.hibernate.orm>
         <version.bom.org.elasticsearch.client>9.2.1</version.bom.org.elasticsearch.client>
         <version.bom.org.elasticsearch.java.client>9.2.1</version.bom.org.elasticsearch.java.client>
-        <version.bom.org.opensearch.client>3.3.1</version.bom.org.opensearch.client>
+        <version.bom.org.opensearch.client>3.3.2</version.bom.org.opensearch.client>
         <version.bom.software.amazon.awssdk>2.38.3</version.bom.software.amazon.awssdk>
         <version.bom.io.smallrye>3.3.1</version.bom.io.smallrye>
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
