@@ -85,8 +85,10 @@ pipeline {
 									dir('.release/scripts') {
 										sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git .'
 									}
+									def ghReleaseNote = sh(script: 'realpath -e github_release_notes.md 2>/dev/null', returnStdout: true).trim()
 									sh """
 										bash -xe .release/scripts/release.sh -j ${params.RELEASE_DRY_RUN ? '-d' : ''} \
+												${ghReleaseNote != '' ? '--notes=' + ghReleaseNote : ''} \
 												search ${releaseVersion.toString()} ${developmentVersion.toString()}
 									"""
 								}
