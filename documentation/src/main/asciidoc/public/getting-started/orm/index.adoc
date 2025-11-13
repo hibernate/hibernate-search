@@ -13,7 +13,7 @@
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 :html-meta-description: Hibernate Search, full text search for your entities - Getting started with Hibernate Search in Hibernate ORM
 :html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
-:html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/search/getting-started/orm/en-US/html_single/
+:html-meta-canonical-link: https://docs.hibernate.org/stable/search/getting-started/orm/en-US/html_single/
 :html-meta-version-family: {hibernateSearchVersionShort}
 
 :relfileprefix: ../../

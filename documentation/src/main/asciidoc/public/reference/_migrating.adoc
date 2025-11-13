@@ -22,6 +22,6 @@ Additionally, be aware that a lot of APIs have changed, some only because of a p
 others because of more fundamental changes
 (like moving away from using Lucene types in Hibernate Search APIs).
 For that reason, you are encouraged to migrate first to Hibernate Search 6.0
-using the https://docs.jboss.org/hibernate/search/6.0/migration/html_single/[6.0 migration guide],
+using the https://docs.hibernate.org/search/6.0/migration/html_single/[6.0 migration guide],
 and only then to later versions (which will be significantly easier).
 ====
