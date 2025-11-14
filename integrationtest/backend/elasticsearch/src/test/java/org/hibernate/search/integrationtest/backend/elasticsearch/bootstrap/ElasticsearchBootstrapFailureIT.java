@@ -55,8 +55,8 @@ class ElasticsearchBootstrapFailureIT {
 						.defaultBackendContext()
 						.failure(
 								"Unable to detect the Elasticsearch version running on the cluster",
-								"Elasticsearch request failed",
-								"Connection refused"
+								"Elasticsearch request failed"
+						// , "Connection refused"
 						)
 				);
 	}

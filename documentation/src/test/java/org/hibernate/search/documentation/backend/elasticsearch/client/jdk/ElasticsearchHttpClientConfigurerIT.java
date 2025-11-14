@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.documentation.backend.elasticsearch.client.rest;
+package org.hibernate.search.documentation.backend.elasticsearch.client.jdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ class ElasticsearchHttpClientConfigurerIT {
 		assertThat( staticCounters.get( HttpClientConfigurer.INSTANCES ) ).isZero();
 
 		setupHelper.start()
-				.withProperties( "/configuration/http-client-configurer.properties" )
+				.withProperties( "/configuration/http-client-configurer-jdk.properties" )
 				.setup( IndexedEntity.class );
 
 		assertThat( staticCounters.get( HttpClientConfigurer.INSTANCES ) ).isEqualTo( 1 );
