@@ -503,7 +503,7 @@ for example `class:org.hibernate.search.documentation.backend.elasticsearch.clie
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/rest/HttpClientConfigurer.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/rest4/HttpClientConfigurer.java[tags=include]
 ----
 <1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
 <2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.
@@ -546,7 +546,7 @@ for example `class:org.hibernate.search.documentation.backend.elasticsearch.clie
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/java/HttpClientConfigurer.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/rest5/HttpClientConfigurer.java[tags=include]
 ----
 <1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
 <2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.
@@ -558,7 +558,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/cl
 ====
 [source, xml, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/configuration/http-client-configurer-java.properties[tags=include]
+include::{resourcesdir}/configuration/http-client-configurer-rest5.properties[tags=include]
 ----
 <1> Specify the HTTP client configurer.
 ====
@@ -589,7 +589,7 @@ for example `class:org.hibernate.search.documentation.backend.elasticsearch.clie
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/java/HttpClientConfigurer.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/opensearch/HttpClientConfigurer.java[tags=include]
 ----
 <1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
 <2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.

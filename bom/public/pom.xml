@@ -54,6 +54,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-client-jdk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-elasticsearch-client-opensearch-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
