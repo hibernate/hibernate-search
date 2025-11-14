@@ -238,15 +238,15 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	}
 
 	public Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
-			HibernateOrmSearchSessionHolder sessionProperties,
+			HibernateOrmSearchSessionExtension sessionExtension,
 			Transaction transactionIdentifier,
 			ConfiguredIndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistsInTransaction ) {
-			return new BeforeCommitIndexingPlanSynchronization( indexingPlan, sessionProperties, transactionIdentifier,
+			return new BeforeCommitIndexingPlanSynchronization( indexingPlan, sessionExtension, transactionIdentifier,
 					synchronizationStrategy );
 		}
 		else {
-			return new AfterCommitIndexingPlanSynchronization( indexingPlan, sessionProperties, transactionIdentifier,
+			return new AfterCommitIndexingPlanSynchronization( indexingPlan, sessionExtension, transactionIdentifier,
 					synchronizationStrategy );
 		}
 	}
