@@ -120,10 +120,14 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					}
 				}
 				if ( clientFactoryHolder == null ) {
-					throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
-							clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) ).toList(),
-							eventContext
-					);
+					clientFactoryHolder =
+							beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class )
+									.get( "jdk-rest-client" ).resolve( beanResolver );
+
+					//					throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
+					//							clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) ).toList(),
+					//							eventContext
+					//					);
 				}
 			}
 			ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext );

@@ -286,6 +286,7 @@
                         WHEN 'hibernate-search-backend-elasticsearch-client-rest4' THEN 'ClientRest4'
                         WHEN 'hibernate-search-backend-elasticsearch-client-rest5' THEN 'ClientRest5'
                         WHEN 'hibernate-search-backend-elasticsearch-client-opensearch-rest' THEN 'ClientOpenSearch'
+                        WHEN 'hibernate-search-backend-elasticsearch-client-jdk' THEN 'ClientJdk'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END
             RETURN

@@ -17,7 +17,7 @@ you can set Hibernate Search properties:
 
 * In a `hibernate.properties` file at the root of your classpath.
 * In `persistence.xml`, if you bootstrap Hibernate ORM with the JPA APIs
-* In JVM system properties (`-DmyProperty=myValue` passed to the `java` command)
+* In JVM system properties (`-DmyProperty=myValue` passed to the `rest5` command)
 * In the configuration file of your framework,
 for example `application.yaml`/`application.properties`.
 

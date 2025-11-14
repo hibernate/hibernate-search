@@ -177,6 +177,7 @@
         <module>backend/elasticsearch-client/elasticsearch-rest4-client</module>
         <module>backend/elasticsearch-client/elasticsearch-rest5-client</module>
         <module>backend/elasticsearch-client/opensearch-rest-client</module>
+        <module>backend/elasticsearch-client/jdk-rest-client</module>
         <module>mapper/pojo-base</module>
         <module>mapper/pojo-standalone</module>
         <module>mapper/orm</module>

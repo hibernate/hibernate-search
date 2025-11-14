@@ -107,6 +107,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-jdk</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -275,6 +280,7 @@
                                 ${basedir}/../backend/elasticsearch-client/elasticsearch-rest4-client/src/main/java;
                                 ${basedir}/../backend/elasticsearch-client/elasticsearch-rest5-client/src/main/java;
                                 ${basedir}/../backend/elasticsearch-client/opensearch-rest-client/src/main/java;
+                                ${basedir}/../backend/elasticsearch-client/jdk-rest-client/src/main/java;
                                 ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
                                 ${basedir}/../mapper/orm-outbox-polling/src/main/java;
@@ -289,8 +295,9 @@
                                 ${basedir}/../backend/elasticsearch/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-client/common/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-client/elasticsearch-rest4-client/target/generated-sources/annotations;
-                                ${basedir}/../backend/elasticsearch-client/opensearch-rest-client/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-client/elasticsearch-rest5-client/target/generated-sources/annotations;
+                                ${basedir}/../backend/elasticsearch-client/opensearch-rest-client/target/generated-sources/annotations;
+                                ${basedir}/../backend/elasticsearch-client/jdk-rest-client/target/generated-sources/annotations;
                                 ${basedir}/../backend/elasticsearch-aws/target/generated-sources/annotations;
                                 ${basedir}/../backend/lucene/target/generated-sources/annotations;
                                 ${basedir}/../mapper/orm-outbox-polling/src/main/avro/generated;
