@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.documentation.backend.elasticsearch.client.java;
+package org.hibernate.search.documentation.backend.elasticsearch.client.rest5;
 
 import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.rest5.ElasticsearchHttpClientConfigurer;

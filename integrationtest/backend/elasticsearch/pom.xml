@@ -27,6 +27,10 @@
         <failsafe.client.elasticsearch.rest5.summaryFile>${failsafe.client.elasticsearch.rest5.reportsDirectory}/failsafe-summary.xml</failsafe.client.elasticsearch.rest5.summaryFile>
         <failsafe.jvm.args.jacoco.client.elasticsearch.rest5></failsafe.jvm.args.jacoco.client.elasticsearch.rest5>
 
+        <failsafe.client.jdk.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-jdk</failsafe.client.jdk.reportsDirectory>
+        <failsafe.client.jdk.summaryFile>${failsafe.client.jdk.reportsDirectory}/failsafe-summary.xml</failsafe.client.jdk.summaryFile>
+        <failsafe.jvm.args.jacoco.client.jdk></failsafe.jvm.args.jacoco.client.jdk>
+
         <surefire.jvm.args.module>
             ${test.mockito.agent.jvm.args}
         </surefire.jvm.args.module>
@@ -49,6 +53,10 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch-client-rest4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-client-jdk</artifactId>
         </dependency>
 
         <dependency>
@@ -86,79 +94,110 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
+<!--                    <execution>-->
+<!--                        <id>it</id>-->
+<!--                        <goals>-->
+<!--                            <goal>integration-test</goal>-->
+<!--                            <goal>verify</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <skip>${test.elasticsearch.skip}</skip>-->
+<!--                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-rest</reportNameSuffix>-->
+<!--                            <reportsDirectory>${failsafe.client.elasticsearch.reportsDirectory}</reportsDirectory>-->
+<!--                            <summaryFile>${failsafe.client.elasticsearch.summaryFile}</summaryFile>-->
+<!--                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.elasticsearch}</argLine>-->
+<!--                            &lt;!&ndash; WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module &ndash;&gt;-->
+<!--                            <dependenciesToScan>-->
+<!--                                <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>-->
+<!--                            </dependenciesToScan>-->
+<!--                            <classpathDependencyExcludes>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk</exclude>-->
+<!--                            </classpathDependencyExcludes>-->
+<!--                            <excludes>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientOpenSearchElasticsearchClientFactoryIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest5ElasticsearchExtensionIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientOpenSearchElasticsearchExtensionIT</exclude>-->
+<!--                            </excludes>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>it-opensearch-client</id>-->
+<!--                        <goals>-->
+<!--                            <goal>integration-test</goal>-->
+<!--                            <goal>verify</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <skip>${test.elasticsearch.skip}</skip>-->
+<!--                            <reportNameSuffix>${surefire.executionIdentifier}-opensearch-rest</reportNameSuffix>-->
+<!--                            <reportsDirectory>${failsafe.client.opensearch.reportsDirectory}</reportsDirectory>-->
+<!--                            <summaryFile>${failsafe.client.opensearch.summaryFile}</summaryFile>-->
+<!--                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.opensearch}</argLine>-->
+<!--                            <classpathDependencyExcludes>-->
+<!--                                &lt;!&ndash; Do not remove the "default" client so that we can test this scenario where a user drops a dependency to a nondefault one &ndash;&gt;-->
+<!--                                &lt;!&ndash; <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest<4/exclude> &ndash;&gt;-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk</exclude>-->
+<!--                            </classpathDependencyExcludes>-->
+<!--                            <excludes>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest4ElasticsearchClientFactoryIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest4ElasticsearchExtensionIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest5ElasticsearchExtensionIT</exclude>-->
+<!--                            </excludes>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>it-elasticsearch-rest5-client</id>-->
+<!--                        <goals>-->
+<!--                            <goal>integration-test</goal>-->
+<!--                            <goal>verify</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <skip>${test.elasticsearch.skip}</skip>-->
+<!--                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-rest5</reportNameSuffix>-->
+<!--                            <reportsDirectory>${failsafe.client.elasticsearch.rest5.reportsDirectory}</reportsDirectory>-->
+<!--                            <summaryFile>${failsafe.client.elasticsearch.rest5.summaryFile}</summaryFile>-->
+<!--                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.elasticsearch.rest5}</argLine>-->
+<!--                            <classpathDependencyExcludes>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</exclude>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>-->
+<!--                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk</exclude>-->
+<!--                            </classpathDependencyExcludes>-->
+<!--                            <excludes>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest4ElasticsearchClientFactoryIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientOpenSearchElasticsearchClientFactoryIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest4ElasticsearchExtensionIT</exclude>-->
+<!--                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientOpenSearchElasticsearchExtensionIT</exclude>-->
+<!--                            </excludes>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
                     <execution>
-                        <id>it</id>
+                        <id>it-jdk-client</id>
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <trimStackTrace>false</trimStackTrace>
                             <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-rest</reportNameSuffix>
-                            <reportsDirectory>${failsafe.client.elasticsearch.reportsDirectory}</reportsDirectory>
-                            <summaryFile>${failsafe.client.elasticsearch.summaryFile}</summaryFile>
-                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.elasticsearch}</argLine>
-                            <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module -->
-                            <dependenciesToScan>
-                                <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
-                            </dependenciesToScan>
-                            <classpathDependencyExcludes>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>
-                            </classpathDependencyExcludes>
-                            <excludes>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientOpenSearchElasticsearchClientFactoryIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest5ElasticsearchExtensionIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientOpenSearchElasticsearchExtensionIT</exclude>
-                            </excludes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>it-opensearch-client</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.executionIdentifier}-opensearch-rest</reportNameSuffix>
-                            <reportsDirectory>${failsafe.client.opensearch.reportsDirectory}</reportsDirectory>
-                            <summaryFile>${failsafe.client.opensearch.summaryFile}</summaryFile>
-                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.opensearch}</argLine>
-                            <classpathDependencyExcludes>
-                                <!-- Do not remove the "default" client so that we can test this scenario where a user drops a dependency to a nondefault one -->
-                                <!-- <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest<4/exclude> -->
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>
-                            </classpathDependencyExcludes>
-                            <excludes>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest4ElasticsearchClientFactoryIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest4ElasticsearchExtensionIT</exclude>
-                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest5ElasticsearchExtensionIT</exclude>
-                            </excludes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>it-elasticsearch-rest5-client</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${test.elasticsearch.skip}</skip>
-                            <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-rest5</reportNameSuffix>
-                            <reportsDirectory>${failsafe.client.elasticsearch.rest5.reportsDirectory}</reportsDirectory>
-                            <summaryFile>${failsafe.client.elasticsearch.rest5.summaryFile}</summaryFile>
-                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.elasticsearch.rest5}</argLine>
+                            <reportNameSuffix>${surefire.executionIdentifier}-jdk</reportNameSuffix>
+                            <reportsDirectory>${failsafe.client.jdk.reportsDirectory}</reportsDirectory>
+                            <summaryFile>${failsafe.client.jdk.summaryFile}</summaryFile>
+                            <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.jdk}</argLine>
                             <classpathDependencyExcludes>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</exclude>
+                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest4ElasticsearchClientFactoryIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientOpenSearchElasticsearchClientFactoryIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest4ElasticsearchExtensionIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientRest5ElasticsearchExtensionIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.ClientOpenSearchElasticsearchExtensionIT</exclude>
                             </excludes>
                         </configuration>
