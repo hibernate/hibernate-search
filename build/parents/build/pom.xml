@@ -44,7 +44,7 @@
         <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
 
         <version.com.carrotsearch.hppc>0.10.0</version.com.carrotsearch.hppc>
-        <version.org.apache.lucene.next>10.3.1</version.org.apache.lucene.next>
+        <version.org.apache.lucene.next>10.3.2</version.org.apache.lucene.next>
 
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
