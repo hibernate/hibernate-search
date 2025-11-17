@@ -10,12 +10,12 @@ import java.util.Map;
 
 import org.hibernate.Transaction;
 import org.hibernate.engine.extension.spi.Extension;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public class HibernateOrmSearchSessionExtension implements Serializable, Extension {
 
-	public static HibernateOrmSearchSessionExtension get(SessionImplementor session) {
+	public static HibernateOrmSearchSessionExtension get(SharedSessionContractImplementor session) {
 		return session.getExtension( HibernateOrmSearchSessionExtension.class );
 	}
 

@@ -17,6 +17,7 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -66,7 +67,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
-			SessionImplementor sessionImplementor) {
+			SharedSessionContractImplementor sessionImplementor) {
 		return get( context, sessionImplementor, true );
 	}
 
@@ -75,7 +76,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
-			SessionImplementor sessionImplementor, boolean createIfDoesNotExist) {
+			SharedSessionContractImplementor sessionImplementor, boolean createIfDoesNotExist) {
 		HibernateOrmSearchSessionExtension extension = HibernateOrmSearchSessionExtension.get( sessionImplementor );
 		HibernateOrmSearchSession searchSession = extension.searchSession();
 		if ( searchSession != null ) {
@@ -86,9 +87,16 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return null;
 		}
 
-		searchSession = context.createSessionBuilder( sessionImplementor ).build();
-		extension.searchSession( searchSession );
-		return searchSession;
+		if ( sessionImplementor instanceof SessionImplementor implementor ) {
+			searchSession = context.createSessionBuilder( implementor ).build();
+			extension.searchSession( searchSession );
+			return searchSession;
+		}
+		else {
+			// TODO: For a stateless session need a different impl of the search session
+			throw new UnsupportedOperationException(
+					"Cannot create Search Session using a non stateful ORM session: " + sessionImplementor.getClass() );
+		}
 	}
 
 	private final HibernateOrmSearchSessionMappingContext mappingContext;
@@ -198,6 +206,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return mappingContext.createScope( rootScope, classes );
 	}
 
+	// TODO: won't be able to use these (toEntityManager / toOrmSession / session) in a stateless session case...
+	//  options ?
+	//    = deprecate and introduce some shared session interface instead ?
+	//    = keep two search session interfaces one for stateless one for stateful ?
 	@Override
 	public EntityManager toEntityManager() {
 		return sessionImplementor;
@@ -205,6 +217,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public Session toOrmSession() {
+		return sessionImplementor;
+	}
+
+	@Override
+	public SessionImplementor session() {
 		return sessionImplementor;
 	}
 
@@ -247,11 +264,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter() {
 		return configuredIndexingPlanFilter;
-	}
-
-	@Override
-	public SessionImplementor session() {
-		return sessionImplementor;
 	}
 
 	@Override
@@ -342,6 +354,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		 * In a JTA env, the before transaction completion is called before the flush, so not all changes are yet
 		 * written. However, Synchronization-s do propagate exceptions, so they can be safely used.
 		 */
+
+		// TODO: There's no action queue with stateless session ...
+		//  Hence it would be great if we could just have an SPI in ORM to deal with this instead?
+		// TODO: Have a closer look at this part to figure the best way to deal with stateless sessions..
 		final ActionQueue actionQueue = sessionImplementor.getActionQueue();
 		SynchronizationAdapter adapter = new SynchronizationAdapter( synchronization );
 
@@ -367,7 +383,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 				.isJta();
 	}
 
-	private static void checkOpen(SessionImplementor session) {
+	private static void checkOpen(SharedSessionContractImplementor session) {
 		try {
 			session.checkOpen();
 		}

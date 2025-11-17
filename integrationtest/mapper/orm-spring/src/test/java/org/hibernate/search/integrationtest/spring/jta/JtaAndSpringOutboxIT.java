@@ -13,10 +13,8 @@ import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractMapperOrmSpringIT;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHolder;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -46,11 +44,6 @@ class JtaAndSpringOutboxIT extends AbstractMapperOrmSpringIT {
 		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
-	}
-
-	@AfterEach
-	void checkNoMemoryLeak() {
-		assertThat( HibernateOrmSearchSessionHolder.staticMapSize() ).isZero();
 	}
 
 	@Test
