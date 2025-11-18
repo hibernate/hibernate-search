@@ -71,6 +71,7 @@ updates:
           - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
           - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
           - "org.mockito:*"
+          - "org.wiremock:*"
           - "org.hamcrest:*"
           - "org.apache.logging.log4j:*"
           - "org.assertj:*"
