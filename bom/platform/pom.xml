@@ -19,7 +19,7 @@
         <deploy.skip>false</deploy.skip>
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
-        <version.bom.org.apache.lucene>9.12.3</version.bom.org.apache.lucene>
+        <version.bom.org.apache.lucene>10.3.2</version.bom.org.apache.lucene>
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
     </properties>
 
