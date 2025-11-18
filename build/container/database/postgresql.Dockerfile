@@ -1,3 +1,3 @@
 # PostgreSQL
 # See https://hub.docker.com/_/postgres
-FROM docker.io/postgres:18.0
+FROM docker.io/postgres:18.1
