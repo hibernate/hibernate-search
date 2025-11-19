@@ -64,7 +64,6 @@ public final class ClientJdkElasticsearchBackendClientSettings {
 		private Defaults() {
 		}
 
-		public static final int READ_TIMEOUT = 30000;
 		public static final int CONNECTION_TIMEOUT = 1000;
 	}
 }

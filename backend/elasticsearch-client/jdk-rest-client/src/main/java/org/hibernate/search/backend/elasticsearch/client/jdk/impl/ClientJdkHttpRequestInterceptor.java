@@ -11,7 +11,9 @@ import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorContext;
@@ -19,6 +21,11 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 
 record ClientJdkHttpRequestInterceptor(ElasticsearchRequestInterceptor elasticsearchRequestInterceptor)
 		implements HttpRequestInterceptor {
+
+	// https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/module-summary.html
+	//
+	// Host header is one of the restricted ^ so we skip it here:
+	private static final Set<String> HEADERS_TO_IGNORE = Set.of( "host" );
 
 	@Override
 	public void process(HttpRequest.Builder request, HttpRequest.BodyPublisher bodyPublisher,
@@ -103,6 +110,10 @@ record ClientJdkHttpRequestInterceptor(ElasticsearchRequestInterceptor elasticse
 		public void overrideHeaders(Map<String, List<String>> headers) {
 			for ( Map.Entry<String, List<String>> header : headers.entrySet() ) {
 				String name = header.getKey();
+				// To prevent java.lang.IllegalArgumentException: restricted header name: "Header-name"
+				if ( HEADERS_TO_IGNORE.contains( name.toLowerCase( Locale.ROOT ) ) ) {
+					continue;
+				}
 				boolean first = true;
 				for ( String value : header.getValue() ) {
 					if ( first ) {

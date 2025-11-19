@@ -170,6 +170,7 @@ which may change in future versions of Hibernate Search.
 You should explicitly define the REST client in the application dependencies,
 if it matters which one the Elasticsearch backend will pick.
 
+:jdk-client-warn:
 === Available clients
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-rest4]]
@@ -207,6 +208,23 @@ ArtifactID::: `hibernate-search-backend-elasticsearch-client-opensearch-rest`
 Underlying HTTP Client::: Apache HTTP Client 5
 
 This Elasticsearch backend REST client is based on the OpenSearch low level client (`org.opensearch.client:opensearch-rest-client`).
+
+[[backend-elasticsearch-configuration-client-elasticsearch-client-jdk]]
+==== Simple REST client based on the JDKs `HttpClient`
+
+include::../components/_incubating-warning.adoc[]
+
+Coordinates::
+GroupID::: `org.hibernate.search`
+ArtifactID::: `hibernate-search-backend-elasticsearch-client-jdk`
+Underlying HTTP Client::: JDKs Http Client (`java.net.http.HttpClient`)
+
+This Elasticsearch backend REST client is based on the Http client that is part of the JDKs `java.net` API.
+Mostly intended for very basic use cases, and may lack some features,
+e.g. automatic node discovery, compared to the other clients.
+
+NOTE: JDKs Http client allows configuration though the system properties.
+Consult the list of available properties for your JDK version, e.g. https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/module-summary.html[JDK 25]
 
 [[backend-elasticsearch-configuration-hosts]]
 === Target hosts
@@ -297,7 +315,7 @@ Expects a boolean value. The default for this property is `false`.
 * `discovery.refresh_interval` defines the interval between two executions of the automatic discovery.
 Expects a positive integer, in seconds. The default for this property is `10`.
 
-include::../components/elasticsearch-client-compatibility/_all.adoc[]
+include::../components/elasticsearch-client-compatibility/_apache_based.adoc[]
 
 [[backend-elasticsearch-authentication-http]]
 === HTTP authentication
@@ -395,6 +413,7 @@ include::../components/elasticsearch-client-compatibility/_all.adoc[]
 [[backend-elasticsearch-configuration-connection-tuning]]
 === [[_connection_tuning]] Connection tuning
 
+:jdk-client-warn: (Read timeout is not supported)
 Timeouts::
 +
 [source, properties]
@@ -418,6 +437,7 @@ These properties expect a positive <<configuration-property-types,Integer value>
 +
 include::../components/elasticsearch-client-compatibility/_all.adoc[]
 
+:jdk-client-warn: (Configurable through JDKs Http client system properties)
 Connection pool::
 +
 [source, properties]
@@ -453,8 +473,9 @@ To prevent that from happening consider having the maximum number of connections
 ====
 
 +
-include::../components/elasticsearch-client-compatibility/_all.adoc[]
+include::../components/elasticsearch-client-compatibility/_apache_based.adoc[]
 
+:jdk-client-warn: "(Configurable through JDKs Http client system properties)"
 Keep Alive::
 +
 [source, properties]
@@ -472,7 +493,7 @@ the duration from the `Keep-Alive` header or the value of this property (if set)
 If this property is not set, only the `Keep-Alive` header is considered,
 and if it's absent, idle connections will be kept forever.
 +
-include::../components/elasticsearch-client-compatibility/_all.adoc[]
+include::../components/elasticsearch-client-compatibility/_apache_based.adoc[]
 
 [[backend-elasticsearch-configuration-http-client]]
 === [[_custom_http_client_configurations]] Custom HTTP client configurations
@@ -485,7 +506,7 @@ See the following sections to learn how each of the clients can be configured.
 [[backend-elasticsearch-configuration-http-client-elasticsearch-rest]]
 === Elasticsearch low level client
 It is possible to directly configure the underlying Apache HTTP 4 client of the
-<<backend-elasticsearch-configuration-client-elasticsearch-client-rest,Elasticsearch low level client>>
+<<backend-elasticsearch-configuration-client-elasticsearch-client-rest4,Elasticsearch low level client>>
 using an instance of `org.apache.http.impl.nio.client.HttpAsyncClientBuilder`.
 
 With this API you can add interceptors, change the keep alive, the max connections,
@@ -602,6 +623,46 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/cl
 [source, xml, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/configuration/http-client-configurer-opensearch.properties[tags=include]
+----
+<1> Specify the HTTP client configurer.
+====
+
+[NOTE]
+====
+Any setting defined by a custom http client configurer will override any other setting defined by Hibernate Search.
+====
+
+[[backend-elasticsearch-configuration-http-client-elasticsearch-jdk]]
+=== JDK `HttpClient` based REST client
+It is possible to directly configure the underlying
+<<backend-elasticsearch-configuration-client-elasticsearch-client-jdk,`HttpClient`>>
+using an instance of `java.net.http.HttpClient.Builder`.
+
+Configuring the HTTP client directly requires two steps:
+
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.jdk.ElasticsearchHttpClientConfigurer` interface.
+. Configure Hibernate Search to use that implementation by setting the configuration property
+`hibernate.search.backend.client.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:org.hibernate.search.documentation.backend.elasticsearch.client.jdk.HttpClientConfigurer`.
+
+.Implementing and using a `ElasticsearchHttpClientConfigurer`
+====
+[source, java, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/jdk/HttpClientConfigurer.java[tags=include]
+----
+<1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
+<2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.
+<3> From the context it is possible to get the `HttpClient.Builder`.
+<4> Finally, you can use the builder to configure the client with your custom settings.
+====
+
+.Define a custom http client configurer in the properties
+====
+[source, xml, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/configuration/http-client-configurer-jdk.properties[tags=include]
 ----
 <1> Specify the HTTP client configurer.
 ====

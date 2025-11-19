@@ -144,22 +144,16 @@ public class NodeProvider {
 	}
 
 	public static final class ServerNode {
-		private static final long RETRY_DELAY_MILLISECONDS = 1_000L;
 		private final String protocol;
 		private final String host;
 		private final String basePath;
 		private final int port;
-		private volatile Status status;
-		private volatile long retryAfterMillis;
-		private ServerNode next;
 
 		public ServerNode(String protocol, String host, String basePath, int port) {
 			this.protocol = protocol;
 			this.host = host;
 			this.basePath = normalizeBasePath( basePath );
 			this.port = port;
-			this.status = Status.ACTIVE;
-			this.retryAfterMillis = -1;
 		}
 
 		private String normalizeBasePath(String basePath) {
@@ -210,15 +204,6 @@ public class NodeProvider {
 			catch (URISyntaxException e) {
 				throw new IllegalArgumentException( "Invalid URI: " + e.getMessage(), e );
 			}
-		}
-
-		public void failing() {
-			this.status = Status.FAILING;
-			this.retryAfterMillis = System.currentTimeMillis() + RETRY_DELAY_MILLISECONDS;
-		}
-
-		private void setNext(ServerNode next) {
-			this.next = next;
 		}
 
 		@Override

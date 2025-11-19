@@ -18,7 +18,7 @@ Configuration properties from this section are applicable to the following clien
 ^| ✔
 
 |<<backend-elasticsearch-configuration-client-elasticsearch-client-jdk,JDK HttpClient based REST client>>
-^| ✔ {jdk-client-warn}
+^| ❌ {jdk-client-warn}
 
 |===
 ====
