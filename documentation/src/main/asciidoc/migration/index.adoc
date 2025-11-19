@@ -61,6 +61,7 @@ Currently available options are:
 * `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` backed by `org.elasticsearch.client:elasticsearch-rest-client`
 * `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` backed by `co.elastic.clients:elasticsearch-rest5-client`
 * `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` backed by `org.opensearch.client:opensearch-rest-client`
+* `org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk` backed by `java.net.http.HttpClient`
 
 [[data-format]]
 == Data format and schema

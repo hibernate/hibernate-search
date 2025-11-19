@@ -7,7 +7,7 @@ package org.hibernate.search.backend.elasticsearch.client.jdk;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * An extension point allowing fine tuning of the Apache HTTP Client used by the Elasticsearch integration.
+ * An extension point allowing fine-tuning of the JDK HTTP Client used by the Elasticsearch integration.
  * <p>
  * This enables in particular connecting to cloud services that require a particular authentication method,
  * such as request signing on Amazon Web Services.
@@ -32,7 +32,7 @@ public interface ElasticsearchHttpClientConfigurer {
 	 * For example an authentication configurer could decide not to do anything if no username is provided,
 	 * or if the configuration property {@code my.configurer.enabled} is {@code false}.
 	 *
-	 * @param context A configuration context giving access to the Apache HTTP client builder
+	 * @param context A configuration context giving access to the JDK HTTP client builder
 	 * and configuration properties in particular.
 	 */
 	void configure(ElasticsearchHttpClientConfigurationContext context);
