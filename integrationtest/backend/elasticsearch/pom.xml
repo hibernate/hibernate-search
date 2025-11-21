@@ -54,10 +54,6 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch-client-rest4</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-client-jdk</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -113,7 +109,6 @@
                             <classpathDependencyExcludes>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>
@@ -139,7 +134,6 @@
                                 <!-- Do not remove the "default" client so that we can test this scenario where a user drops a dependency to a nondefault one -->
                                 <!-- <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest<4/exclude> -->
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest5ElasticsearchClientFactoryIT</exclude>
@@ -164,7 +158,6 @@
                             <classpathDependencyExcludes>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</exclude>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</exclude>
-                                <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-jdk</exclude>
                             </classpathDependencyExcludes>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.backend.elasticsearch.client.ClientRest4ElasticsearchClientFactoryIT</exclude>
@@ -187,6 +180,9 @@
                             <reportsDirectory>${failsafe.client.jdk.reportsDirectory}</reportsDirectory>
                             <summaryFile>${failsafe.client.jdk.summaryFile}</summaryFile>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.client.jdk}</argLine>
+                            <systemProperties>
+                                <org.hibernate.search.integrationtest.backend.elasticsearch.client.type>jdk-rest-client</org.hibernate.search.integrationtest.backend.elasticsearch.client.type>
+                            </systemProperties>
                             <classpathDependencyExcludes>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</exclude>
                                 <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</exclude>

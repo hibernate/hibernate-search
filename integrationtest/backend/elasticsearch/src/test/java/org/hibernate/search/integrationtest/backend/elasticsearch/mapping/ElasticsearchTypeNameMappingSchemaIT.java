@@ -75,7 +75,7 @@ class ElasticsearchTypeNameMappingSchemaIT {
 
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendSpiSettings.Radicals.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, it messes with our assertions

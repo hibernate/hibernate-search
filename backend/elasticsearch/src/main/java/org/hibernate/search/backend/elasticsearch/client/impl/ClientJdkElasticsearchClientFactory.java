@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.jdk.impl;
+package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
