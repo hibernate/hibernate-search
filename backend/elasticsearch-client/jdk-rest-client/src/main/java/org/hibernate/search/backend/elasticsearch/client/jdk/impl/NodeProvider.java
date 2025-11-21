@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.search.backend.elasticsearch.client.jdk.cfg.spi;
+package org.hibernate.search.backend.elasticsearch.client.jdk.impl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
