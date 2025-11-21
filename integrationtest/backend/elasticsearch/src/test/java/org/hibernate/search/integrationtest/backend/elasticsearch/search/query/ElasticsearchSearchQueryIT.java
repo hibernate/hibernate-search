@@ -58,7 +58,7 @@ class ElasticsearchSearchQueryIT {
 	public void init(Object layoutStrategy, URLEncodedString readName) {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendSpiSettings.Radicals.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy

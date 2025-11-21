@@ -15,12 +15,22 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 public abstract class BackendConfiguration {
 
 	private static final String BACKEND_TYPE_PROPERTY_KEY = "org.hibernate.search.integrationtest.backend.type";
+	private static final String ELASTICSEARCH_BACKEND_CLIENT_TYPE_PROPERTY_KEY =
+			"org.hibernate.search.integrationtest.backend.elasticsearch.client.type";
 
 	// Uncomment one of the following lines to set the backend type when running tests from the IDE
 	public static final String IDE_BACKEND_TYPE = "lucene";
 	//	public static final String IDE_BACKEND_TYPE = "elasticsearch";
 
+	// Uncomment one of the following lines to set the backend type when running tests from the IDE
+	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = null;
+	// public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "default";
+	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "jdk-rest-client";
+	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "opensearch-rest-client";
+	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "elasticsearch-rest5";
+
 	public static final String BACKEND_TYPE;
+	public static final String ELASTICSEARCH_BACKEND_CLIENT_TYPE;
 	public static final boolean IS_IDE;
 	static {
 		String property = System.getProperty( BACKEND_TYPE_PROPERTY_KEY );
@@ -37,6 +47,18 @@ public abstract class BackendConfiguration {
 		else {
 			BACKEND_TYPE = property;
 			IS_IDE = false;
+		}
+		if ( isElasticsearch() ) {
+			property = System.getProperty( ELASTICSEARCH_BACKEND_CLIENT_TYPE_PROPERTY_KEY );
+			if ( property == null ) {
+				ELASTICSEARCH_BACKEND_CLIENT_TYPE = IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE;
+			}
+			else {
+				ELASTICSEARCH_BACKEND_CLIENT_TYPE = property;
+			}
+		}
+		else {
+			ELASTICSEARCH_BACKEND_CLIENT_TYPE = null;
 		}
 	}
 
@@ -61,6 +83,9 @@ public abstract class BackendConfiguration {
 		if ( IS_IDE ) {
 			// More than one backend type in the classpath, we have to set it explicitly.
 			rawBackendProperties.put( BackendSettings.TYPE, BACKEND_TYPE );
+		}
+		if ( ELASTICSEARCH_BACKEND_CLIENT_TYPE != null ) {
+			rawBackendProperties.put( "client_factory", ELASTICSEARCH_BACKEND_CLIENT_TYPE );
 		}
 		return configurationProvider.interpolateProperties( rawBackendProperties );
 	}

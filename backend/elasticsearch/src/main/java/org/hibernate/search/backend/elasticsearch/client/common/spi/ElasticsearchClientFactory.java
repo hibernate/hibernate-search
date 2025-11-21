@@ -19,6 +19,9 @@ public interface ElasticsearchClientFactory {
 	@Incubating
 	String DEFAULT_BEAN_NAME = "default";
 
+	@Incubating
+	String SIMPLE_JDK_CLIENT_BEAN_NAME = "jdk-rest-client";
+
 	ElasticsearchClientImplementor create(BeanResolver beanResolver,
 			ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,

@@ -53,7 +53,7 @@ class ElasticsearchSearchQueryRequestTransformerIT {
 	void setup() {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendSpiSettings.Radicals.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withIndexes( mainIndex, otherIndex )
 				.setup();

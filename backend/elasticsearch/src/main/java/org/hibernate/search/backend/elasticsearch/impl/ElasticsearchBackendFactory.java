@@ -4,9 +4,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -58,7 +61,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
-			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_FACTORY )
+			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.Radicals.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
 					.build();
 
@@ -95,7 +98,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				clientFactoryHolder = customClientFactoryHolderOptional.get();
 			}
 			else {
-				// otherwise let's find all client factories and pick
+				// otherwise let's find all client factories and pick one of them:
 				List<BeanReference<ElasticsearchClientFactory>> clientFactoryReferences =
 						beanResolver.allConfiguredForRole( ElasticsearchClientFactory.class );
 				if ( clientFactoryReferences.isEmpty() ) {
@@ -105,18 +108,34 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				else if ( clientFactoryReferences.size() == 1 ) {
 					clientFactoryHolder = clientFactoryReferences.get( 0 ).resolve( beanResolver );
 				}
-				// if there are 2 of them, maybe one is the "default" one, if so -- use the other one
-				else if ( clientFactoryReferences.size() == 2 ) {
-					var defaultFactoryReference = beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class )
-							.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME );
-
-					var first = clientFactoryReferences.get( 0 );
-					var second = clientFactoryReferences.get( 1 );
-					if ( first == defaultFactoryReference ) {
-						clientFactoryHolder = second.resolve( beanResolver );
+				// if there are more of them, maybe one is the "default" and the other one is JDK based, if so -- use the 3rd one
+				else {
+					Map<String, BeanReference<ElasticsearchClientFactory>> namedFactoryReferences =
+							beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class );
+					if ( clientFactoryReferences.size() == 2
+							&& namedFactoryReferences.containsKey( ElasticsearchClientFactory.DEFAULT_BEAN_NAME )
+							&& namedFactoryReferences.containsKey( ElasticsearchClientFactory.SIMPLE_JDK_CLIENT_BEAN_NAME ) ) {
+						clientFactoryHolder = namedFactoryReferences.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME )
+								.resolve( beanResolver );
 					}
-					else if ( second == defaultFactoryReference ) {
-						clientFactoryHolder = first.resolve( beanResolver );
+					else {
+						Set<BeanReference<ElasticsearchClientFactory>> skippable = new HashSet<>( 2 );
+						skippable.add( namedFactoryReferences.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME ) );
+						skippable.add( namedFactoryReferences.get( ElasticsearchClientFactory.SIMPLE_JDK_CLIENT_BEAN_NAME ) );
+						for ( BeanReference<ElasticsearchClientFactory> factoryReference : clientFactoryReferences ) {
+							if ( skippable.contains( factoryReference ) ) {
+								continue;
+							}
+							if ( clientFactoryHolder == null ) {
+								clientFactoryHolder = factoryReference.resolve( beanResolver );
+							}
+							else {
+								throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
+										clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) ).toList(),
+										eventContext
+								);
+							}
+						}
 					}
 				}
 				if ( clientFactoryHolder == null ) {
