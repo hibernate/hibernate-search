@@ -19,14 +19,16 @@ public final class ClientJdkElasticsearchBackendClientSpiSettings {
 	public static final String PREFIX = EngineSettings.PREFIX + "backend.";
 
 	/**
-	 * An external Elasticsearch client instance that Hibernate Search should use for all requests to Elasticsearch.
+	 * An external HTTP client instance that Hibernate Search should use for all requests to Elasticsearch.
 	 * <p>
-	 * If this is set, Hibernate Search will not attempt to create its own Elasticsearch,
-	 * and all other client-related configuration properties
-	 * (hosts/uris, authentication, discovery, timeouts, max connections, configurer, ...)
+	 * If this is set, Hibernate Search will not attempt to create its own {@link java.net.http.HttpClient},
+	 * and all client-related configuration properties (authentication, timeouts, configurer, ...)
 	 * will be ignored.
 	 * <p>
-	 * Expects a reference to a bean of type {@link RestJdkClient}.
+	 * Hibernate Search will still apply some configuration properties (e.g. hosts/uris)
+	 * that are not handled by the {@link java.net.http.HttpClient} itself.
+	 * <p>
+	 * Expects a reference to a bean of type {@link java.net.http.HttpClient}.
 	 * <p>
 	 * Defaults to nothing: if no client instance is provided, Hibernate Search will create its own.
 	 * <p>

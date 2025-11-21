@@ -30,8 +30,6 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.jdk.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.jdk.cfg.ClientJdkElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.jdk.cfg.spi.ClientJdkElasticsearchBackendClientSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.jdk.cfg.spi.NodeProvider;
-import org.hibernate.search.backend.elasticsearch.client.jdk.cfg.spi.RestJdkClient;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -46,9 +44,9 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientFactory {
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends RestJdkClient>> CLIENT_INSTANCE =
+	private static final OptionalConfigurationProperty<BeanReference<? extends HttpClient>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ClientJdkElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
-					.asBeanReference( RestJdkClient.class )
+					.asBeanReference( HttpClient.class )
 					.build();
 
 	private static final OptionalConfigurationProperty<List<String>> HOSTS =
@@ -106,18 +104,10 @@ public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientF
 			GsonProvider gsonProvider) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
-		Optional<BeanHolder<? extends RestJdkClient>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
-				propertySource, beanResolver::resolve );
-
-		BeanHolder<? extends RestJdkClient> restClientHolder;
-		if ( providedRestClientHolder.isPresent() ) {
-			restClientHolder = providedRestClientHolder.get();
-		}
-		else {
-			NodeProvider nodeProvider = NodeProvider.fromOptionalStrings( PROTOCOL.get( propertySource ),
-					HOSTS.get( propertySource ), URIS.get( propertySource ), PATH_PREFIX.get( propertySource ) );
-			restClientHolder = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, nodeProvider );
-		}
+		NodeProvider nodeProvider = NodeProvider.fromOptionalStrings( PROTOCOL.get( propertySource ),
+				HOSTS.get( propertySource ), URIS.get( propertySource ), PATH_PREFIX.get( propertySource ) );
+		BeanHolder<? extends RestJdkClient> restClientHolder =
+				createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, nodeProvider );
 
 		return new ClientJdkElasticsearchClient(
 				restClientHolder, timeoutExecutorService, requestTimeoutMs,
@@ -149,6 +139,12 @@ public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientF
 	private BeanHolder<? extends RestJdkClient> createClient(BeanResolver beanResolver,
 			ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix, NodeProvider nodeProvider) {
+		Optional<BeanHolder<? extends HttpClient>> providedHttpClientHolder = CLIENT_INSTANCE.getAndMap(
+				propertySource, beanResolver::resolve );
+		if ( providedHttpClientHolder.isPresent() ) {
+			return BeanHolder.ofCloseable( new RestJdkClient( nodeProvider, providedHttpClientHolder.get().get() ) );
+		}
+
 		HttpClient.Builder builder = HttpClient.newBuilder()
 				// NOTE: ES does not work ok with HTTP 2 if we don't send the content length and that can happen so let's stick to 1.1 for now ?
 				//   (we end up with Caused by: java.io.IOException: Received RST_STREAM: Stream cancelled)

@@ -30,7 +30,6 @@ import org.hibernate.search.backend.elasticsearch.client.common.spi.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.ElasticsearchClientUtils;
-import org.hibernate.search.backend.elasticsearch.client.jdk.cfg.spi.RestJdkClient;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchRequestLog;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
