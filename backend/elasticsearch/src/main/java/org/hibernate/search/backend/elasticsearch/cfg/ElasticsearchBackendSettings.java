@@ -361,7 +361,7 @@ public final class ElasticsearchBackendSettings {
 	/// One of the following values can be provided:
 	/// * `default`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
 	/// * `jdk-rest-client`, no additional requirements.
-	/// * `elasticsearch-rest5`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
+	/// * `elasticsearch-rest5-client`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
 	/// * `opensearch-rest-client`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the classpath.
 	///
 	/// Not specified by default. Hibernate Search will pick the default client on its own.
