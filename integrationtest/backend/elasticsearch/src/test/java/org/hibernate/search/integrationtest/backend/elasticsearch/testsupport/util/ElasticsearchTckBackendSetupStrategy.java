@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.DefaultITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
@@ -39,7 +39,7 @@ class ElasticsearchTckBackendSetupStrategy extends TckBackendSetupStrategy<Elast
 		super( new ElasticsearchBackendConfiguration() );
 		setProperty( "analysis.configurer", BeanReference.ofInstance( new DefaultITAnalysisConfigurer() ) );
 		if ( ELASTICSEARCH_BACKEND_CLIENT_TYPE != null ) {
-			setProperty( ElasticsearchBackendSpiSettings.Radicals.CLIENT_FACTORY, ELASTICSEARCH_BACKEND_CLIENT_TYPE );
+			setProperty( ElasticsearchBackendSettings.CLIENT_FACTORY, ELASTICSEARCH_BACKEND_CLIENT_TYPE );
 		}
 	}
 

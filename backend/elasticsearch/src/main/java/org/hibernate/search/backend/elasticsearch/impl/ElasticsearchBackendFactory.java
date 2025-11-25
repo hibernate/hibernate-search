@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
@@ -61,7 +60,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
-			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.Radicals.CLIENT_FACTORY )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
 					.build();
 
