@@ -187,7 +187,7 @@
         <!-- >>> Common -->
         <version.org.jboss.logging.jboss-logging>3.4.3.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.2.1.Final</version.org.jboss.logging.jboss-logging-tools>
-        <javadoc.org.hibernate.search.url>https://docs.jboss.org/hibernate/search/${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}/api/</javadoc.org.hibernate.search.url>
+        <javadoc.org.hibernate.search.url>https://docs.hibernate.org/search/${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}/api/</javadoc.org.hibernate.search.url>
 
         <!-- >>> Engine -->
         <!-- Nothing beyond common dependencies -->
@@ -249,8 +249,8 @@
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.6.15.Final</version.org.hibernate>
-        <javadoc.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
-        <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
+        <javadoc.org.hibernate.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
+        <documentation.org.hibernate.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM.
              DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
              Thanks to not using dependency management for these dependencies, we get a build failure
@@ -278,8 +278,8 @@
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
         <version.org.hibernate.orm>6.2.46.Final</version.org.hibernate.orm>
-        <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
-        <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
+        <javadoc.org.hibernate.orm.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
+        <documentation.org.hibernate.orm.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
              DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
              Thanks to not using dependency management for these dependencies, we get a build failure

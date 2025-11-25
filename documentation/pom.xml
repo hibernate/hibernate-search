@@ -277,8 +277,8 @@
                         <hibernateSearchVersionShort>${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}</hibernateSearchVersionShort>
                         <hibernateSearchPreviousStableVersionShort>${parsed-version.org.hibernate.search.previous-stable.majorVersion}.${parsed-version.org.hibernate.search.previous-stable.minorVersion}</hibernateSearchPreviousStableVersionShort>
                         <hibernateSearchJavadocUrl>${javadoc.org.hibernate.search.url}</hibernateSearchJavadocUrl>
-                        <hibernateSearchDocUrl>https://docs.jboss.org/hibernate/search/${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}/reference/en-US/html_single/</hibernateSearchDocUrl>
-                        <hibernateSearchPreviousStableDocUrl>https://docs.jboss.org/hibernate/search/${parsed-version.org.hibernate.search.previous-stable.majorVersion}.${parsed-version.org.hibernate.search.previous-stable.minorVersion}/reference/en-US/html_single/</hibernateSearchPreviousStableDocUrl>
+                        <hibernateSearchDocUrl>https://docs.hibernate.org/search/${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}/reference/en-US/html_single/</hibernateSearchDocUrl>
+                        <hibernateSearchPreviousStableDocUrl>https://docs.hibernate.org/search/${parsed-version.org.hibernate.search.previous-stable.majorVersion}.${parsed-version.org.hibernate.search.previous-stable.minorVersion}/reference/en-US/html_single/</hibernateSearchPreviousStableDocUrl>
                         <hibernateSearchJiraUrl>https://hibernate.atlassian.net/browse</hibernateSearchJiraUrl>
                         <hibernateSearchMigrationGuidesIndexUrl>https://hibernate.org/search/documentation/migrate/</hibernateSearchMigrationGuidesIndexUrl>
                         <hibernateCommunityUrl>https://hibernate.org/community</hibernateCommunityUrl>
