@@ -15,27 +15,27 @@ or remote [Elasticsearch](https://www.elastic.co/products/elasticsearch)/[OpenSe
 
 It features:
 
-* [**Declarative mapping**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapper-orm-mapping)
+* [**Declarative mapping**](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#mapper-orm-mapping)
 of entity properties to index fields,
 either through annotations or a programmatic API.
-* [**On-demand mass indexing**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapper-orm-indexing-massindexer)
+* [**On-demand mass indexing**](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#mapper-orm-indexing-massindexer)
 of all entities in the database,
 to initialize the indexes with pre-existing data.
-* [**On-the-fly listener-triggered indexing**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#listener-triggered-indexing)
+* [**On-the-fly listener-triggered indexing**](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#listener-triggered-indexing)
 of entities modified through a Hibernate ORM session,
 to always keep the indexes up-to-date.
-* [**A Search DSL**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#search-dsl)
+* [**A Search DSL**](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#search-dsl)
 to easily build full-text search queries
 and retrieve the hits as Hibernate ORM entities.
-* And more: [configuration of analyzers](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#concepts-analysis),
-many different [predicates](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#search-dsl-predicate)
-and [sorts](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#search-dsl-sort)
+* And more: [configuration of analyzers](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#concepts-analysis),
+many different [predicates](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#search-dsl-predicate)
+and [sorts](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#search-dsl-sort)
 in the Search DSL,
-[spatial support](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapper-orm-geopoint).
-search queries returning [projections](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#search-dsl-projection)
+[spatial support](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#mapper-orm-geopoint).
+search queries returning [projections](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#search-dsl-projection)
 instead of entities,
-[aggregations](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#search-dsl-aggregation),
-advanced customization of the mapping using [bridges](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapper-orm-bridge),
+[aggregations](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#search-dsl-aggregation),
+advanced customization of the mapping using [bridges](https://docs.hibernate.org/stable/search/reference/en-US/html_single/#mapper-orm-bridge),
 ...
 
 For example, map your entities like this:
