@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexL
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Configuration properties for Elasticsearch backends.
@@ -353,6 +354,23 @@ public final class ElasticsearchBackendSettings {
 	 * Defaults to {@link Defaults#QUERY_SHARD_FAILURE_IGNORE}.
 	 */
 	public static final String QUERY_SHARD_FAILURE_IGNORE = "query.shard_failure.ignore";
+
+	/// Specifies which client factory to use when creating a REST client for the backend
+	/// to communicate with the Elasticsearch cluster.
+	///
+	/// One of the following values can be provided:
+	/// * `default`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
+	/// * `jdk-rest-client`, no additional requirements.
+	/// * `elasticsearch-rest5`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
+	/// * `opensearch-rest-client`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the classpath.
+	///
+	/// Not specified by default. Hibernate Search will pick the default client on its own.
+	/// If there is just one non-default client factory available it will be selected.
+	/// If there is more than one non-default client factory available -- Hibernate Search will fail to start
+	/// and a client factory has to be specified explicitly through this property, or alternatively,
+	/// unnecessary client factories have to be removed.
+	@Incubating
+	public static final String CLIENT_FACTORY = "client_factory";
 
 	/**
 	 * Default values for the different settings if no values are given.
