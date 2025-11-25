@@ -18,12 +18,10 @@ import com.google.gson.JsonObject;
 
 public class ClientJdkGsonHttpEntity extends GsonHttpEntityContentProvider implements HttpRequest.BodyPublisher {
 
-	private static final HttpRequest.BodyPublisher NO_BODY_PUBLISHER = HttpRequest.BodyPublishers.noBody();
-
 	public static HttpRequest.BodyPublisher toEntity(Gson gson, ElasticsearchRequest request) throws IOException {
 		final List<JsonObject> bodyParts = request.bodyParts();
 		if ( bodyParts.isEmpty() ) {
-			return NO_BODY_PUBLISHER;
+			return HttpRequest.BodyPublishers.noBody();
 		}
 		return new ClientJdkGsonHttpEntity( gson, bodyParts );
 	}
@@ -46,6 +44,6 @@ public class ClientJdkGsonHttpEntity extends GsonHttpEntityContentProvider imple
 	}
 
 	static boolean isNoBodyPublisher(HttpRequest.BodyPublisher bodyPublisher) {
-		return bodyPublisher == NO_BODY_PUBLISHER || bodyPublisher.contentLength() == 0;
+		return bodyPublisher.contentLength() == 0;
 	}
 }
