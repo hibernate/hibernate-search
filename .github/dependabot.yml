@@ -137,6 +137,8 @@ updates:
       # We depend on the JUnit version in ORM, hence we cannot just bump to a next major/minor
       - dependency-name: "org.junit:*"
         update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+      - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
+        versions: [ "13.3.0.jre11-preview" ]
 
   - package-ecosystem: "docker"
     registries:
