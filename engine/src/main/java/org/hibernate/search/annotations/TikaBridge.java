@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  *
  * @author Hardy Ferentschik
  * @deprecated Support for Tika bridges will be removed in Hibernate Search 6.
- * See <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#tikabridge">this section of the migrationg guide</a>.
+ * See <a href="https://docs.hibernate.org/search/6.0/migration/html_single/#tikabridge">this section of the migrationg guide</a>.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })

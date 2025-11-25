@@ -1534,15 +1534,15 @@
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
-                            <link>http://download.oracle.com/javase/8/docs/api/</link>
-                            <link>http://docs.jboss.org/hibernate/orm/5.3/javadocs/</link>
-                            <link>http://lucene.apache.org/core/5_5_4/core/</link>
-                            <link>http://lucene.apache.org/core/5_5_4/analyzers-common/</link>
-                            <link>http://lucene.apache.org/core/5_5_4/queryparser/</link>
-                            <link>http://jgroups.org/javadoc/</link>
+                            <link>https://download.oracle.com/javase/8/docs/api/</link>
+                            <link>https://docs.hibernate.org/orm/5.3/javadocs/</link>
+                            <link>https://lucene.apache.org/core/5_5_4/core/</link>
+                            <link>https://lucene.apache.org/core/5_5_4/analyzers-common/</link>
+                            <link>https://lucene.apache.org/core/5_5_4/queryparser/</link>
+                            <link>https://jgroups.org/javadoc/</link>
                             <!-- for javax.batch in the JSR 352 modules -->
                             <link>https://docs.oracle.com/javaee/7/api/</link>
-                            <link>http://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
+                            <link>https://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
                         </links>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>

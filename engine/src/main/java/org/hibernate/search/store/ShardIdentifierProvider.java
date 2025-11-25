@@ -78,7 +78,7 @@ public interface ShardIdentifierProvider {
 	 * @return the set of shard identifiers this query should target
 	 *
 	 * @deprecated Support for
-	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * <a href="https://docs.hibernate.org/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
 	 * Future-proof implementations must not override this method.
 	 */
 	@Deprecated
@@ -95,7 +95,7 @@ public interface ShardIdentifierProvider {
 	 * @return the target IndexManager for the deletion operation
 	 *
 	 * @deprecated Support for
-	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * <a href="https://docs.hibernate.org/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
 	 * Future-proof implementations must not override this method.
 	 */
 	@Deprecated

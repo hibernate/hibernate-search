@@ -38,7 +38,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	/**
 	 * @param shardName The name of a shard to add.
 	 * @deprecated Support for
-	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * <a href="https://docs.hibernate.org/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
 	 * Future-proof implementations must not call this method and
 	 * must make sure the list of shards is fully defined on startup
 	 * ({@link #loadInitialShardNames(Properties, BuildContext)}).
@@ -66,7 +66,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	 * selection based on the active FullTextFilters.
 	 *
 	 * @deprecated Support for
-	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * <a href="https://docs.hibernate.org/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
 	 * Future-proof implementations must not override this method.
 	 */
 	@Override
@@ -80,7 +80,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	 * The default implementation will perform delete and purge operations on all known indexes.
 	 *
 	 * @deprecated Support for
-	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * <a href="https://docs.hibernate.org/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
 	 * Future-proof implementations must not override this method.
 	 */
 	@Override
