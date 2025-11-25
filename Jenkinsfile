@@ -117,7 +117,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *       credentials: ...
  */
 
-@Field final String MAVEN_TOOL = 'Apache Maven 3.5'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
