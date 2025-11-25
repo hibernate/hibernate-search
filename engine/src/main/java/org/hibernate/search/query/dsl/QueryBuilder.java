@@ -85,7 +85,7 @@ public interface QueryBuilder {
 	 * @return the entry point for building a more like this query
 	 *
 	 * @deprecated Support for more-like-this queries will be removed in Hibernate Search 6.
-	 * See <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#more-like-this">this section of the migration guide</a>.
+	 * See <a href="https://docs.hibernate.org/search/6.0/migration/html_single/#more-like-this">this section of the migration guide</a>.
 	 */
 	@Deprecated
 	MoreLikeThisContext moreLikeThis();

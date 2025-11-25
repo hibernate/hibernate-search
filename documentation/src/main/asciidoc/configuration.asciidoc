@@ -566,7 +566,7 @@ properties for the initial context lookup.
 |hibernate.jndi.url|Name of the JNDI InitialContext connection url
 |===============
 
-See also the link:http://docs.jboss.org/hibernate/orm/{hibernateShortVersion}/userguide/html_single/Hibernate_User_Guide.html#jndi/[JNDI configuration in Hibernate ORM].
+See also the link:http://docs.hibernate.org/orm/{hibernateShortVersion}/userguide/html_single/Hibernate_User_Guide.html#jndi/[JNDI configuration in Hibernate ORM].
 
 [WARNING]
 ====

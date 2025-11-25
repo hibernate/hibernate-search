@@ -2114,7 +2114,7 @@ add a filter clause (`filteredBy`)
 to constraint values of the facet field with either a <<_keyword_queries,keyword query>>
 or a <<_range_queries,range query>>.
 
-See also https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#searching-facets-selectfacets[this section of the migration guide].
+See also https://docs.hibernate.org/search/6.0/migration/html_single/#searching-facets-selectfacets[this section of the migration guide].
 ====
 
 A common use case for faceting is a "drill-down" functionality which allows you to narrow your

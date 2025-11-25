@@ -24,7 +24,7 @@ import org.apache.lucene.search.Query;
  * add a {@link org.hibernate.search.query.dsl.BooleanJunction#filteredBy(Query) filter clause}
  * to constraint values of the facet field with either a {@link QueryBuilder#keyword() keyword query}
  * or a {@link QueryBuilder#range() range query}.
- * See also <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#searching-facets-selectfacets">this section of the migration guide</a>.
+ * See also <a href="https://docs.hibernate.org/search/6.0/migration/html_single/#searching-facets-selectfacets">this section of the migration guide</a>.
  */
 @Deprecated
 public interface FacetSelection {
