@@ -12,7 +12,7 @@
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 :html-meta-description: Hibernate Search, full text search for your entities - Migration Guide
 :html-meta-keywords: hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch
-:html-meta-canonical-link: https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/migration/html_single/
+:html-meta-canonical-link: https://docs.hibernate.org/search/{hibernateSearchVersionShort}/migration/html_single/
 
 [[introduction]]
 == [[_introduction]] Introduction
@@ -36,7 +36,7 @@ others because of more fundamental changes
 (like moving away from using Lucene types in Hibernate Search APIs).
 
 When migrating from Hibernate Search 5, you are encouraged to migrate first to Hibernate Search 6.0
-using the https://docs.jboss.org/hibernate/search/6.0/migration/html_single/[6.0 migration guide],
+using the https://docs.hibernate.org/search/6.0/migration/html_single/[6.0 migration guide],
 and only then to later versions (which will be significantly easier).
 ====
 
@@ -80,7 +80,7 @@ older indexes can be read from and written to without reindexing.
 === Outbox polling database tables
 
 The event and agent database tables used for
-link:https://docs.jboss.org/hibernate/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#coordination-database-polling[outbox-polling]
+link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#coordination-database-polling[outbox-polling]
 in Hibernate Search {hibernateSearchVersion}
 are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}:
 no database schema update is necessary for these tables.
