@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
@@ -37,6 +38,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequ
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -48,6 +50,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -60,6 +63,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class TestElasticsearchClient implements BeforeEachCallback, AfterEachCallback, Closeable {
+
+	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_FACTORY )
+					.asBeanReference( ElasticsearchClientFactory.class )
+					.withDefault( BeanReference.of( ElasticsearchClientFactory.class,
+							ElasticsearchBackendSettings.Defaults.CLIENT_FACTORY ) )
+					.build();
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -620,14 +630,11 @@ public class TestElasticsearchClient implements BeforeEachCallback, AfterEachCal
 		return JsonParser.parseString( jsonAsString );
 	}
 
-	public static BeanHolder<ElasticsearchClientFactory> getDiscoveredClientFactory(BeanResolver beanResolver) {
-		BeanReference<ElasticsearchClientFactory> reference = null;
-		for ( var entry : beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class ).entrySet() ) {
-			reference = entry.getValue();
-			if ( !ElasticsearchClientFactory.DEFAULT_BEAN_NAME.equals( entry.getKey() ) ) {
-				break;
-			}
-		}
-		return beanResolver.resolve( reference );
+	public static BeanHolder<? extends ElasticsearchClientFactory> getDiscoveredClientFactory(BeanResolver beanResolver) {
+		return beanResolver.resolve(
+				BeanReference.of( ElasticsearchClientFactory.class,
+						BackendConfiguration.ELASTICSEARCH_BACKEND_CLIENT_TYPE != null
+								? BackendConfiguration.ELASTICSEARCH_BACKEND_CLIENT_TYPE
+								: BackendConfiguration.IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE ) );
 	}
 }

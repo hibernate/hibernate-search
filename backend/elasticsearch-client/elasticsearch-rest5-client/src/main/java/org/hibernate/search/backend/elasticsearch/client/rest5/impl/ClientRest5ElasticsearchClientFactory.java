@@ -55,6 +55,8 @@ import org.apache.hc.core5.util.Timeout;
  */
 public class ClientRest5ElasticsearchClientFactory implements ElasticsearchClientFactory {
 
+	public static final String NAME = "elasticsearch-rest5";
+
 	private static final OptionalConfigurationProperty<BeanReference<? extends Rest5Client>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ClientRest5ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( Rest5Client.class )

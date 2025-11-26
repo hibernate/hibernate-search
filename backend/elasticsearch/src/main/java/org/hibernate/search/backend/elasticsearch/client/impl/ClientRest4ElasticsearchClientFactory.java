@@ -45,6 +45,8 @@ import org.elasticsearch.client.sniff.SnifferBuilder;
  */
 public class ClientRest4ElasticsearchClientFactory implements ElasticsearchClientFactory {
 
+	public static final String NAME = "elasticsearch-rest4";
+
 	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ClientRest4ElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( RestClient.class )

@@ -13,7 +13,7 @@ public class ClientOpenSearchElasticsearchClientBeanConfigurer implements BeanCo
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				ElasticsearchClientFactory.class, "opensearch-rest-client",
+				ElasticsearchClientFactory.class, ClientOpenSearchElasticsearchClientFactory.NAME,
 				beanResolver -> BeanHolder.of( new ClientOpenSearchElasticsearchClientFactory() )
 		);
 	}

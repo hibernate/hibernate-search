@@ -44,6 +44,8 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientFactory {
 
+	public static final String NAME = "jdk-rest";
+
 	private static final OptionalConfigurationProperty<BeanReference<? extends HttpClient>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ClientJdkElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( HttpClient.class )

@@ -227,6 +227,8 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
+                                <!-- Using the "default": -->
+                                <!-- <org.hibernate.search.integrationtest.backend.elasticsearch.client.type>elasticsearch-rest4</org.hibernate.search.integrationtest.backend.elasticsearch.client.type>-->
                             </systemPropertyVariables>
                             <excludes>
                                 <exclude>**/Lucene*IT</exclude>
@@ -254,6 +256,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
+                                <org.hibernate.search.integrationtest.backend.elasticsearch.client.type>elasticsearch-rest5</org.hibernate.search.integrationtest.backend.elasticsearch.client.type>
                             </systemPropertyVariables>
                             <includes>
                                 <include>**/client/rest5/*IT</include>
@@ -278,6 +281,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
+                                <org.hibernate.search.integrationtest.backend.elasticsearch.client.type>opensearch-rest</org.hibernate.search.integrationtest.backend.elasticsearch.client.type>
                             </systemPropertyVariables>
                             <includes>
                                 <include>**/client/opensearch/*IT</include>
@@ -303,7 +307,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
-                                <org.hibernate.search.integrationtest.backend.elasticsearch.client.type>jdk-rest-client</org.hibernate.search.integrationtest.backend.elasticsearch.client.type>
+                                <org.hibernate.search.integrationtest.backend.elasticsearch.client.type>jdk-rest</org.hibernate.search.integrationtest.backend.elasticsearch.client.type>
                             </systemPropertyVariables>
                             <includes>
                                 <include>**/client/jdk/*IT</include>
