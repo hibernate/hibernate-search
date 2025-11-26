@@ -4,12 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -59,9 +55,13 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
+	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
+					// Creating a reference here so that we don't "expose" the fact
+					//  that it's a bean reference to an SPI type to the users in the API interfaces:
+					.withDefault( BeanReference.of( ElasticsearchClientFactory.class,
+							ElasticsearchBackendSettings.Defaults.CLIENT_FACTORY ) )
 					.build();
 
 	private static final ConfigurationProperty<TypeNameMappingStrategyName> MAPPING_TYPE_STRATEGY =
@@ -91,59 +91,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			threads = new BackendThreads( eventContext.render() );
 
 			// First, let's see if the factory was configured explicitly:
-			Optional<BeanHolder<? extends ElasticsearchClientFactory>> customClientFactoryHolderOptional =
-					CLIENT_FACTORY.getAndMap( propertySource, beanResolver::resolve );
-			if ( customClientFactoryHolderOptional.isPresent() ) {
-				clientFactoryHolder = customClientFactoryHolderOptional.get();
-			}
-			else {
-				// otherwise let's find all client factories and pick one of them:
-				List<BeanReference<ElasticsearchClientFactory>> clientFactoryReferences =
-						beanResolver.allConfiguredForRole( ElasticsearchClientFactory.class );
-				if ( clientFactoryReferences.isEmpty() ) {
-					throw ConfigurationLog.INSTANCE.backendClientFactoryNotConfigured( eventContext );
-				}
-				// if there's just one -- use it:
-				else if ( clientFactoryReferences.size() == 1 ) {
-					clientFactoryHolder = clientFactoryReferences.get( 0 ).resolve( beanResolver );
-				}
-				// if there are more of them, maybe one is the "default" and the other one is JDK based, if so -- use the 3rd one
-				else {
-					Map<String, BeanReference<ElasticsearchClientFactory>> namedFactoryReferences =
-							beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class );
-					if ( clientFactoryReferences.size() == 2
-							&& namedFactoryReferences.containsKey( ElasticsearchClientFactory.DEFAULT_BEAN_NAME )
-							&& namedFactoryReferences.containsKey( ElasticsearchClientFactory.SIMPLE_JDK_CLIENT_BEAN_NAME ) ) {
-						clientFactoryHolder = namedFactoryReferences.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME )
-								.resolve( beanResolver );
-					}
-					else {
-						Set<BeanReference<ElasticsearchClientFactory>> skippable = new HashSet<>( 2 );
-						skippable.add( namedFactoryReferences.get( ElasticsearchClientFactory.DEFAULT_BEAN_NAME ) );
-						skippable.add( namedFactoryReferences.get( ElasticsearchClientFactory.SIMPLE_JDK_CLIENT_BEAN_NAME ) );
-						for ( BeanReference<ElasticsearchClientFactory> factoryReference : clientFactoryReferences ) {
-							if ( skippable.contains( factoryReference ) ) {
-								continue;
-							}
-							if ( clientFactoryHolder == null ) {
-								clientFactoryHolder = factoryReference.resolve( beanResolver );
-							}
-							else {
-								throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
-										clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) ).toList(),
-										eventContext
-								);
-							}
-						}
-					}
-				}
-				if ( clientFactoryHolder == null ) {
-					throw ConfigurationLog.INSTANCE.backendClientFactoryMultipleConfigured(
-							clientFactoryReferences.stream().map( ref -> ref.resolve( beanResolver ) ).toList(),
-							eventContext
-					);
-				}
-			}
+			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
 			ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();

@@ -13,11 +13,11 @@ public class ElasticsearchClientBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				ElasticsearchClientFactory.class, ElasticsearchClientFactory.DEFAULT_BEAN_NAME,
+				ElasticsearchClientFactory.class, ClientRest4ElasticsearchClientFactory.NAME,
 				beanResolver -> BeanHolder.of( new ClientRest4ElasticsearchClientFactory() )
 		);
 		context.define(
-				ElasticsearchClientFactory.class, ElasticsearchClientFactory.SIMPLE_JDK_CLIENT_BEAN_NAME,
+				ElasticsearchClientFactory.class, ClientJdkElasticsearchClientFactory.NAME,
 				beanResolver -> BeanHolder.of( new ClientJdkElasticsearchClientFactory() )
 		);
 	}

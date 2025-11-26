@@ -359,16 +359,12 @@ public final class ElasticsearchBackendSettings {
 	/// to communicate with the Elasticsearch cluster.
 	///
 	/// One of the following values can be provided:
-	/// * `default`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
-	/// * `jdk-rest-client`, no additional requirements.
-	/// * `elasticsearch-rest5-client`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
-	/// * `opensearch-rest-client`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the classpath.
+	/// * `jdk-rest`, no additional requirements.
+	/// * `elasticsearch-rest`, current default, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
+	/// * `elasticsearch-rest5`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
+	/// * `opensearch-rest`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the classpath.
 	///
-	/// Not specified by default. Hibernate Search will pick the default client on its own.
-	/// If there is just one non-default client factory available it will be selected.
-	/// If there is more than one non-default client factory available -- Hibernate Search will fail to start
-	/// and a client factory has to be specified explicitly through this property, or alternatively,
-	/// unnecessary client factories have to be removed.
+	/// Defaults to [Defaults#CLIENT_FACTORY].
 	@Incubating
 	public static final String CLIENT_FACTORY = "client_factory";
 
@@ -441,5 +437,6 @@ public final class ElasticsearchBackendSettings {
 				BeanReference.of( IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME );
 		public static final int SCROLL_TIMEOUT = 60;
 		public static final boolean QUERY_SHARD_FAILURE_IGNORE = false;
+		public static final String CLIENT_FACTORY = "elasticsearch-rest4";
 	}
 }

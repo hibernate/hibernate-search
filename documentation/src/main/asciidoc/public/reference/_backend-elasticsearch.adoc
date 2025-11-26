@@ -166,9 +166,12 @@ An Elasticsearch backend communicates with an Elasticsearch cluster through a RE
 Hibernate Search comes with a range of pluggable Elasticsearch REST clients that you can pick from.
 
 Currently, the default one is the <<backend-elasticsearch-configuration-client-elasticsearch-client-rest4,`hibernate-search-backend-elasticsearch-client-rest4`>>,
-which may change in future versions of Hibernate Search.
+which may change in a future version of Hibernate Search.
 You should explicitly define the REST client in the application dependencies,
 if it matters which one the Elasticsearch backend will pick.
+
+To change the REST client you need to add the dependency that contains the client
+and specify the <<configuration-properties-aggregated-hibernate-search-backend-elasticsearchhibernate.search.backend.client_factory,client factory configuration property>>.
 
 :jdk-client-warn:
 === Available clients

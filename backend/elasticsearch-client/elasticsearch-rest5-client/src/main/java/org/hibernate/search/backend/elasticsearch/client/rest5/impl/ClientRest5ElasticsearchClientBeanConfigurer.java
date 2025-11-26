@@ -13,7 +13,7 @@ public class ClientRest5ElasticsearchClientBeanConfigurer implements BeanConfigu
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				ElasticsearchClientFactory.class, "elasticsearch-rest5-client",
+				ElasticsearchClientFactory.class, ClientRest5ElasticsearchClientFactory.NAME,
 				beanResolver -> BeanHolder.of( new ClientRest5ElasticsearchClientFactory() )
 		);
 	}

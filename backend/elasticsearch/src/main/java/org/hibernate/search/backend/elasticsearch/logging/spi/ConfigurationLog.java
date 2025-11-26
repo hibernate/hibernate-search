@@ -12,7 +12,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
@@ -130,16 +129,7 @@ public interface ConfigurationLog {
 			value = "Elasticsearch backend will use client factory '%s'.")
 	void backendClientFactory(BeanHolder<?> clientFactoryHolder, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 194,
-			value = "Elasticsearch backend have found no client factories. Please make one of the client factory implementations available.")
-	SearchException backendClientFactoryNotConfigured(@Param EventContext context);
-
-	@Message(id = ID_OFFSET + 195,
-			value = "Elasticsearch backend have found multiple client factories: %s. Please make just one of the client factory implementations available.")
-	SearchException backendClientFactoryMultipleConfigured(List<BeanHolder<ElasticsearchClientFactory>> factories,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET + 196, value = "Invalid uri: '%1$s'. Reason: %2$s")
+	@Message(id = ID_OFFSET + 194, value = "Invalid uri: '%1$s'. Reason: %2$s")
 	SearchException invalidUri(String uri, String reason, @Cause Exception e);
 
 }

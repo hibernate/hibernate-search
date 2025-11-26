@@ -55,6 +55,8 @@ import org.opensearch.client.sniff.SnifferBuilder;
  */
 public class ClientOpenSearchElasticsearchClientFactory implements ElasticsearchClientFactory {
 
+	public static final String NAME = "opensearch-rest";
+
 	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>> CLIENT_INSTANCE =
 			ConfigurationProperty.forKey( ClientOpenSearchElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( RestClient.class )

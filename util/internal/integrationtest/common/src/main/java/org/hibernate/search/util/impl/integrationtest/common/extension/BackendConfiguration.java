@@ -23,10 +23,9 @@ public abstract class BackendConfiguration {
 	//	public static final String IDE_BACKEND_TYPE = "elasticsearch";
 
 	// Uncomment one of the following lines to set the backend type when running tests from the IDE
-	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = null;
-	// public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "default";
-	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "jdk-rest-client";
-	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "opensearch-rest-client";
+	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "elasticsearch-rest4";
+	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "jdk-rest";
+	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "opensearch-rest";
 	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "elasticsearch-rest5";
 
 	public static final String BACKEND_TYPE;
@@ -48,8 +47,10 @@ public abstract class BackendConfiguration {
 			BACKEND_TYPE = property;
 			IS_IDE = false;
 		}
-		if ( isElasticsearch() ) {
-			property = System.getProperty( ELASTICSEARCH_BACKEND_CLIENT_TYPE_PROPERTY_KEY );
+		// it may be, e.g. in Backend ITs, that we do not explicitly set the backend property,
+		//  but we still would set the client:
+		property = System.getProperty( ELASTICSEARCH_BACKEND_CLIENT_TYPE_PROPERTY_KEY );
+		if ( property != null || isElasticsearch() ) {
 			if ( property == null ) {
 				ELASTICSEARCH_BACKEND_CLIENT_TYPE = IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE;
 			}
