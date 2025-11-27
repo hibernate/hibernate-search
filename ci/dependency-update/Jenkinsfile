@@ -31,10 +31,6 @@ def withMavenWorkspace(Closure body) {
 
 pipeline {
 	agent none
-	triggers {
-		// Run at least once per week, in case of snapshot updates.
-		cron '@weekly'
-	}
 	options {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
 		disableConcurrentBuilds(abortPrevious: true)

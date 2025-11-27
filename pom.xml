@@ -831,6 +831,11 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-directory-provider</artifactId>
+                <version>${version.org.infinispan}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -1622,7 +1627,7 @@
                             <configuration>
                                 <outputDirectory>${project.build.directory}/</outputDirectory>
                                 <includeGroupIds>${project.groupId}</includeGroupIds>
-                                <includeArtifacIds>hibernate-search-sharedtestresources</includeArtifacIds>
+                                <includeArtifactIds>hibernate-search-sharedtestresources</includeArtifactIds>
                                 <includeTypes>zip</includeTypes>
                                 <excludeTransitive>true</excludeTransitive>
                             </configuration>
