@@ -219,14 +219,16 @@ include::../components/_incubating-warning.adoc[]
 
 Coordinates::
 GroupID::: `org.hibernate.search`
-ArtifactID::: `hibernate-search-backend-elasticsearch-client-jdk`
+ArtifactID::: `hibernate-search-backend-elasticsearch`
 Underlying HTTP Client::: JDKs Http Client (`java.net.http.HttpClient`)
 
-This Elasticsearch backend REST client is based on the Http client that is part of the JDKs `java.net` API.
+This Elasticsearch backend REST client is based on the HTTP client that is part of the JDKs `java.net` API.
 Mostly intended for very basic use cases, and may lack some features,
 e.g. automatic node discovery, compared to the other clients.
+As this client implementation relies only on the JDK, it is shipped as part of the Elasticsearch backend
+and does not require any extra dependencies.
 
-NOTE: JDKs Http client allows configuration though the system properties.
+NOTE: JDKs HTTP client allows configuration though the system properties.
 Consult the list of available properties for your JDK version, e.g. https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/module-summary.html[JDK 25]
 
 [[backend-elasticsearch-configuration-hosts]]
