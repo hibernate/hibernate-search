@@ -340,7 +340,9 @@ stage('Configure') {
 			pipelineTriggers(
 					// HSEARCH-3417: do not add snapshotDependencies() here, this was known to cause problems.
 					[
-							issueCommentTrigger('.*test this please.*')
+							issueCommentTrigger('.*test this please.*'),
+							// Run every week Sunday @ 2 AM
+							cron('0 2 * * 0')
 					]
 							+ helper.generateUpstreamTriggers()
 			),
