@@ -24,7 +24,7 @@ Hibernate ORM::
 Hibernate Search targets the Hibernate ORM 7.2 series.
 [[lucene-version]]
 Lucene::
-The Lucene backend now uses Lucene 9.12.2, while the `lucene-next` backend relies on Lucene 10.2.2
+The Lucene backend now uses Lucene 9.12.3, while the `lucene-next` backend relies on Lucene 10.3.2
 [[elasticsearch-version]]
 Elasticsearch::
 The Elasticsearch backend works with Elasticsearch 9.2, as well as other already compatible versions.
@@ -37,10 +37,10 @@ The Elasticsearch backend works with OpenSearch 3.2 and 3.3, as well as other al
 
 This version of Hibernate Search introduces pluggable REST clients for the Elasticsearch backend.
 Historically, the Elasticsearch backend relied on the Elasticsearch low-level REST client,
-which is based on Apache HTTP Client 4. With the new pluggable client architecture,
+which is based on the Apache HTTP Client 4. With the new pluggable client architecture,
 it is possible to switch to a different REST client as needed.
 This may be useful when you are running Hibernate Search in an environment relying on a different HTTP client type (e.g. Vert.x).
-or when you need to use some distribution specific client features and need to switch to the OpenSearch REST client.
+or when you need to use some distribution specific client features and for example need to switch to the OpenSearch REST client.
 
 Hibernate Search provides the following REST client options out of the box:
 
@@ -79,3 +79,20 @@ This Elasticsearch backend REST client is based on the OpenSearch low level clie
 NOTE: It is recommended to explicitly add a client that you prefer as a dependency, since in the future version
 of Hibernate Search we will remove the implicit dependency on `hibernate-search-backend-elasticsearch-client-rest4`
 from the Elasticsearch backend.
+
+[[backend-elasticsearch-configuration-client-elasticsearch-client-jdk]]
+==== Simple REST client based on the JDKs `HttpClient`
+
+Coordinates::
+GroupID::: `org.hibernate.search`
+ArtifactID::: `hibernate-search-backend-elasticsearch`
+Underlying HTTP Client::: JDKs Http Client (`java.net.http.HttpClient`)
+
+This Elasticsearch backend REST client is based on the HTTP client that is part of the JDKs `java.net` API.
+Mostly intended for very basic use cases, and may lack some features,
+e.g. automatic node discovery, compared to the other clients.
+As this client implementation relies only on the JDK, it is shipped as part of the Elasticsearch backend
+and does not require any extra dependencies.
+
+NOTE: JDKs HTTP client allows configuration though the system properties.
+Consult the list of available properties for your JDK version, e.g. https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/module-summary.html[JDK 25]
