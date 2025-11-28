@@ -189,13 +189,13 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '24', testCompilerTool: 'OpenJDK 24 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '25', testCompilerTool: 'OpenJDK 25 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '26', testCompilerTool: 'OpenJDK 26 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.ON_DEMAND)
 					// IMPORTANT: Make sure to update the documentation for any newly supported Java versions
 					//            See java-version.main.compatible.expected.text in POMs.
 			],
@@ -340,7 +340,9 @@ stage('Configure') {
 			pipelineTriggers(
 					// HSEARCH-3417: do not add snapshotDependencies() here, this was known to cause problems.
 					[
-							issueCommentTrigger('.*test this please.*')
+							issueCommentTrigger('.*test this please.*'),
+							// Run every week Sunday @ 2 AM
+							cron('0 2 * * 0')
 					]
 							+ helper.generateUpstreamTriggers()
 			),

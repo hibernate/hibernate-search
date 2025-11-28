@@ -97,10 +97,6 @@ String qualify(String radical) {
 
 pipeline {
 	agent none
-	triggers {
-		// Run at least once per week, in case of snapshot updates.
-		cron '@weekly'
-	}
 	parameters {
 		// choice parameter doesn't have a default, but the first value should be treated as a default, if it wasn't specified manually.
 		// Make sure tp update axis and settings() when adding new choice parameter.
