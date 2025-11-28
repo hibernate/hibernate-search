@@ -281,6 +281,7 @@
                         WHEN 'hibernate-search-mapper-pojo-standalone' THEN 'StandalonePojo'
                         WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
                         WHEN 'hibernate-search-mapper-orm-outbox-polling' THEN 'OutboxPolling'
+                        WHEN 'hibernate-search-mapper-orm-jakarta-batch-core' THEN 'BatchCore'
                         WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
                         WHEN 'hibernate-search-processor' THEN 'Processor'
                         WHEN 'hibernate-search-backend-elasticsearch-client-rest4' THEN 'ClientRest4'
