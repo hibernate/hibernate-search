@@ -157,13 +157,13 @@ stage('Configure') {
 					// and it's useful to test that.
 					new JdkBuildEnvironment(version: '20', testCompilerTool: 'OpenJDK 20 Latest',
 							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
 							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '22', testCompilerTool: 'OpenJDK 22 Latest',
 							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.ON_DEMAND)
 					// IMPORTANT: Make sure to update the documentation for any newly supported Java versions
 					//            See java-version.main.compatible.expected.text in POMs.
 			],
