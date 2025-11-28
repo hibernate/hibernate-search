@@ -183,7 +183,7 @@ stage('Configure') {
 					// and it's useful to test that.
 					new JdkBuildEnvironment(version: '22', testCompilerTool: 'OpenJDK 22 Latest',
 							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					// The following JDKs aren't supported by Hibernate ORM out-of-the box yet:
 					// they require the use of -Dnet.bytebuddy.experimental=true.
 					// Make sure to remove that argument as soon as possible
@@ -193,7 +193,7 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '24', testCompilerTool: 'OpenJDK 24 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '25', testCompilerTool: 'OpenJDK 25 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
 							condition: TestCondition.AFTER_MERGE)
