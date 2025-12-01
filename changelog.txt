@@ -1,6 +1,80 @@
 Hibernate Search Changelog
 ==========================
 
+8.2.0.CR1 (2025-12-01)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/33307
+
+
+** Bug
+    * HSEARCH-5471 NPE for aggregations that are expected to return null when no field values available
+    * HSEARCH-5456 Metric aggregation (e.g. min/max) may fail for a Lucene backend when there are `null` values
+
+** Improvement
+    * HSEARCH-5533 Update documentation theme to the current latest 6.1.2.Final
+    * HSEARCH-5532 Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+    * HSEARCH-5531 Update to AWS SDK 2.39.3
+    * HSEARCH-5530 Update to Hibernate ORM 7.2.0.CR3
+    * HSEARCH-5528 Update Apache HTTP Client components to 5.5.1
+    * HSEARCH-5527 Update Apache HTTP Core client components to 5.3.6
+    * HSEARCH-5526 Upgrade to commons-codec 1.20.0
+    * HSEARCH-5525 Update to Lucene 10.3.2
+    * HSEARCH-5524 Update Elasticsearch rest client (opensearch-rest-client) to 3.3.2
+    * HSEARCH-5523 Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.1
+    * HSEARCH-5522 Update Elasticsearch client (elasticsearch-rest-client) to 9.2.1
+    * HSEARCH-5519 Update to AWS SDK 2.38.3
+    * HSEARCH-5516 Upgrade Jackson to 2.20.1
+    * HSEARCH-5515 Update to AWS SDK 2.37.3
+    * HSEARCH-5513 Add a "What's New" document for series
+    * HSEARCH-5510 Apply the new JDK 25 Javadoc theme
+    * HSEARCH-5509 Update Elasticsearch client to 9.2.0
+    * HSEARCH-5508 Add compatibility with Elasticsearch 9.2
+    * HSEARCH-5506 Update to Avro 1.12.1
+    * HSEARCH-5505 Update AWS SDK to 2.35.7
+    * HSEARCH-5504 Add compatibility with OpenSearch 3.3
+    * HSEARCH-5502 Update to JUnit 6.0.0
+    * HSEARCH-5501 Update to Hibernate ORM 7.2.0.CR2
+    * HSEARCH-5500 Upgrade to AWS SDK 2.35.1
+    * HSEARCH-5499 Test against the latest Elasticsearch 9.1.5
+    * HSEARCH-5498 Upgrade Elasticsearch client to 9.1.5
+    * HSEARCH-5497 Update to Lucene 10.3.1
+    * HSEARCH-5493 Require JDK 25 for the build
+    * HSEARCH-5492 Apply the unified Hibernat Documentation theme
+    * HSEARCH-5491 Update to Hibernate ORM 7.1.2.Final
+    * HSEARCH-5488 Update to Lucene 9.12.3
+    * HSEARCH-5485 Use annotationProcessorPathsUseDepMgmt where applicable
+    * HSEARCH-5484 Upgrade to AWS SDK 2.34.1
+    * HSEARCH-5480 Upgrade Elasticsearch client to 9.1.4
+    * HSEARCH-5478 Update to Lucene 10.3
+    * HSEARCH-5476 Update to Hibernate ORM 7.1.1.Final
+    * HSEARCH-5474 Upgrade to GSON 2.13.2
+    * HSEARCH-5473 Include license file in the META-INF of published artifacts
+    * HSEARCH-5472 Upgrade Jackson to 2.20.0
+    * HSEARCH-5470 Upgrade to AWS SDK 2.33.0
+    * HSEARCH-5465 Upgrade Elasticsearch client to 9.1.3
+    * HSEARCH-5464 Groundwork for pluggable rest clients in the Elasticsearch backend
+    * HSEARCH-5459 Add compatibility with OpenSearch 3.2.0
+    * HSEARCH-5457 Enable count-values aggregation for string/boolean fields
+    * HSEARCH-5453 Upgrade Elasticsearch client to 9.1.2
+
+** New Feature
+    * HSEARCH-5482 Simple Elasticsearch client based on java.net.http.HttpClient
+
+** Task
+    * HSEARCH-5520 Test against the latest Elasticsearch 9.2.1
+    * HSEARCH-5512 Test against the latest Elasticsearch 7.10/8.19
+    * HSEARCH-5511 Test against the latest OpenSearch 3.3.2
+    * HSEARCH-5507 Test against the latest OpenSearch 3.3.1
+    * HSEARCH-5486 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+    * HSEARCH-5481 Try alternatives to https://search.maven.org/solrsearch in DependencyManagementIncludesAllGroupIdArtifactsRule
+    * HSEARCH-5479 Test against the latest Elasticsearch 9.1.4
+    * HSEARCH-5466 Test against the latest Elasticsearch 9.1.3
+    * HSEARCH-5455 Test against the latest Elasticsearch 8.19.2
+    * HSEARCH-5454 Test against the latest Elasticsearch 9.1.2
+    * HSEARCH-5441 Explicitly add mockito agent to the surefire args
+    * HSEARCH-5355 Move the description of features and enhancements to a file published as part of documentation
+
 8.1.0.Final (2025-08-08)
 -------------------------
 
