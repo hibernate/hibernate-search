@@ -30,7 +30,7 @@
 		</file>
 		<file>
 			<source>${asciidoctor.base-output-dir}/pdf/public/whats-new/index.pdf</source>
-			<outputDirectory>reference/en-US/pdf/</outputDirectory>
+			<outputDirectory>whats-new/en-US/pdf/</outputDirectory>
 			<destName>hibernate_search_whats_new.pdf</destName>
 		</file>
 		<file>
