@@ -140,7 +140,7 @@
         <version.junit-jupiter>6.0.1</version.junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>2.0.1</version.testcontainers>
+        <version.testcontainers>2.0.2</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.20.0</version.org.mockito>
@@ -187,6 +187,7 @@
         <version.org.springframework.boot>3.5.0</version.org.springframework.boot>
         <!-- Spring Boot 3 JTA starter and related libs version: -->
         <version.dev.snowdrop>3.5.0</version.dev.snowdrop>
+        <version.io.agroal>2.8</version.io.agroal>
 
         <version.jsoup>1.21.2</version.jsoup>
         <version.snakeyaml>2.5</version.snakeyaml>
