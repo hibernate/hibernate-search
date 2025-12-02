@@ -1352,18 +1352,6 @@
         </profile>
 
         <profile>
-            <id>testWithJdk25</id>
-            <activation>
-                <!-- Hack to activate by default, except when explicitly disabled -->
-                <jdk>[25,)</jdk>
-            </activation>
-            <properties>
-                <!-- Spring Boot 3 isn't ready for JDK25 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>testWithJdk26</id>
             <activation>
                 <property>
