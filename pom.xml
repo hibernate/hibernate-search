@@ -290,7 +290,7 @@
         <version.exec.plugin>3.6.2</version.exec.plugin>
         <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
-        <version.jandex.plugin>3.5.2</version.jandex.plugin>
+        <version.jandex.plugin>3.5.3</version.jandex.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
         <version.jar.plugin>3.5.0</version.jar.plugin>
         <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
@@ -305,13 +305,13 @@
         <version.jacoco.plugin>0.8.14</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.8.0</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
-        <version.sonar.plugin>5.4.0.6343</version.sonar.plugin>
+        <version.sonar.plugin>5.5.0.6356</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <!--
             We want to keep patch updates for groovy enabled as those may contain compatibility with a more recent JDK versions.
             e.g. 4.0.13 won't work with JDK 23, while 4.0.26 is working just fine.
          -->
-        <version.org.apache.groovy.groovy-jsr223>5.0.2</version.org.apache.groovy.groovy-jsr223>
+        <version.org.apache.groovy.groovy-jsr223>5.0.3</version.org.apache.groovy.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>12.2.0</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.20.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
