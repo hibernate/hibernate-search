@@ -4,10 +4,7 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -303,17 +300,38 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 		return QueryParameterBindings.empty();
 	}
 
-	@Override
+	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter, P value) {
+		throw parametersNoSupported();
+	}
+
+	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter, Collection<? extends P> values) {
+		throw parametersNoSupported();
+	}
+
+	protected <P> QueryParameterBinding<P> locateBinding(String name, Class<P> javaType, P value) {
+		throw parametersNoSupported();
+	}
+
+	protected <P> QueryParameterBinding<P> locateBinding(int position, Class<P> javaType, P value) {
+		throw parametersNoSupported();
+	}
+
+	protected <P> QueryParameterBinding<P> locateBinding(String name, Class<P> javaType, Collection<? extends P> values) {
+		throw parametersNoSupported();
+	}
+
+	protected <P> QueryParameterBinding<P> locateBinding(int position, Class<P> javaType, Collection<? extends P> values) {
+		throw parametersNoSupported();
+	}
+
 	protected <P> QueryParameterBinding<P> locateBinding(String name) {
 		throw parametersNoSupported();
 	}
 
-	@Override
 	protected <P> QueryParameterBinding<P> locateBinding(int position) {
 		throw parametersNoSupported();
 	}
 
-	@Override
 	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
 		throw parametersNoSupported();
 	}
