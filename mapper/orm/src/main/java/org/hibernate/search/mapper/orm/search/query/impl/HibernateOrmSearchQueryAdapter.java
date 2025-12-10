@@ -10,13 +10,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.Parameter;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
@@ -244,21 +242,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	}
 
 	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(String name) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(int position) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
-		throw parametersNoSupported();
-	}
-
-	@Override
 	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
 		throw parametersNoSupported();
 	}
@@ -294,7 +277,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	@Deprecated(since = "8.0")
 	@Override
 	@SuppressWarnings("removal")
-	public LockOptions getLockOptions() {
+	public org.hibernate.LockOptions getLockOptions() {
 		/*
 		 * Ideally we'd throw an UnsupportedOperationException,
 		 * but we can't because getLockOptions is called
