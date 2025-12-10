@@ -14,13 +14,11 @@ import java.util.function.Function;
 
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.Parameter;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -304,21 +302,6 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(String name) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(int position) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
-		throw parametersNoSupported();
-	}
-
-	@Override
 	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
 		throw parametersNoSupported();
 	}
@@ -337,8 +320,10 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 		return (FullTextQueryImpl) super.setFetchSize( fetchSize );
 	}
 
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.2", forRemoval = true)
 	@Override
-	public QueryImplementor setLockOptions(LockOptions lockOptions) {
+	public QueryImplementor setLockOptions(org.hibernate.LockOptions lockOptions) {
 		throw lockOptionsNotSupported();
 	}
 
@@ -390,8 +375,10 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 		throw lockOptionsNotSupported();
 	}
 
+	@SuppressWarnings("removal")
+	@Deprecated(since = "8.2", forRemoval = true)
 	@Override
-	public LockOptions getLockOptions() {
+	public org.hibernate.LockOptions getLockOptions() {
 		throw lockOptionsNotSupported();
 	}
 
