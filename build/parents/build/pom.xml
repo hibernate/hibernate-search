@@ -90,7 +90,7 @@
         <documentation.org.opensearch.url>https://opensearch.org/docs/${parsed-version.org.opensearch.compatible.main.majorVersion}.${parsed-version.org.opensearch.compatible.main.minorVersion}</documentation.org.opensearch.url>
 
         <version.com.google.code.gson>2.13.2</version.com.google.code.gson>
-        <version.software.amazon.awssdk>2.39.3</version.software.amazon.awssdk>
+        <version.software.amazon.awssdk>2.40.4</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
         <version.com.fasterxml.jackson>2.20.1</version.com.fasterxml.jackson>
         <version.com.fasterxml.jackson.annotations>2.20</version.com.fasterxml.jackson.annotations>
