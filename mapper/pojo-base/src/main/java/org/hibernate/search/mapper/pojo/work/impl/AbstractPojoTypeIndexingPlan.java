@@ -120,7 +120,12 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		BitSet dirtyPaths =
 				typeContext().reindexingResolver().dirtySelfOrContainingFilter().filter( dirtyAssociationPathOrdinal );
 		if ( dirtyPaths != null ) {
-			getState( identifier ).addOrUpdate( entitySupplier, dirtyPaths, false, false );
+			S state = getState( identifier );
+			// If the current entity state is "removed" and we are trying to add/update something because of
+			// the association, then we should ignore that action, since the actual value is ... removed?!
+			if ( !EntityStatus.ABSENT.equals( state.currentStatus ) ) {
+				state.addOrUpdate( entitySupplier, dirtyPaths, false, false );
+			}
 		}
 	}
 
