@@ -42,7 +42,11 @@ it is possible to switch to a different REST client as needed.
 This may be useful when you are running Hibernate Search in an environment relying on a different HTTP client type (e.g. Vert.x).
 or when you need to use some distribution specific client features and for example need to switch to the OpenSearch REST client.
 
-Hibernate Search provides the following REST client options out of the box:
+Hibernate Search provides the following REST client options out of the box.
+
+NOTE: It is recommended to explicitly add a client that you prefer as a dependency, since in the future version
+of Hibernate Search we will remove the implicit dependency on `hibernate-search-backend-elasticsearch-client-rest4`
+from the Elasticsearch backend.
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-rest4]]
 === Elasticsearch low level REST client (Apache HTTP Client 4)
@@ -53,7 +57,7 @@ ArtifactID::: `hibernate-search-backend-elasticsearch-client-rest4`
 Underlying HTTP Client::: Apache HTTP Client 4
 
 This Elasticsearch backend REST client is based on the Elasticsearch low level client (`org.elasticsearch.client:elasticsearch-rest-client`).
-Currently, the default REST client used by the Elasticsearch backend.
+Currently, this is the default REST client used by the Elasticsearch backend.
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-rest5]]
 ==== Elasticsearch low level REST client (Apache HTTP Client 5)
@@ -75,10 +79,6 @@ ArtifactID::: `hibernate-search-backend-elasticsearch-client-opensearch-rest`
 Underlying HTTP Client::: Apache HTTP Client 5
 
 This Elasticsearch backend REST client is based on the OpenSearch low level client (`org.opensearch.client:opensearch-rest-client`).
-
-NOTE: It is recommended to explicitly add a client that you prefer as a dependency, since in the future version
-of Hibernate Search we will remove the implicit dependency on `hibernate-search-backend-elasticsearch-client-rest4`
-from the Elasticsearch backend.
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-jdk]]
 === Simple REST client based on the JDKs `HttpClient`
