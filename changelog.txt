@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+8.2.0.Final (2025-12-15)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/36773
+
+
+** Improvement
+    * HSEARCH-5541 Update to Hibernate ORM 7.2.0.Final
+    * HSEARCH-5540 Update to AWS SDK 2.40.4
+    * HSEARCH-5539 Update to Hibernate ORM 7.2.0.CR4
+    * HSEARCH-5538 Update Elasticsearch client (elasticsearch-rest-client) to 9.2.2
+    * HSEARCH-5537 Test against latest Elasticsearch 9.2.2
+    * HSEARCH-5536 Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.2
+
+** Task
+    * HSEARCH-5542 Update what's new document
+
 8.2.0.CR1 (2025-12-01)
 -------------------------
 
