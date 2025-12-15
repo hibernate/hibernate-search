@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-relocation</artifactId>
-        <version>8.2.0.Final</version>
+        <version>8.2.1-SNAPSHOT</version>
         <relativePath>../../../build/parents/relocation</relativePath>
     </parent>
     <packaging>pom</packaging>
