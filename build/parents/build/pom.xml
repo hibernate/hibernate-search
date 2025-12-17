@@ -50,7 +50,7 @@
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
         <version.org.elasticsearch.client>9.2.2</version.org.elasticsearch.client>
-        <version.org.elasticsearch.java.client>9.2.2</version.org.elasticsearch.java.client>
+        <version.org.elasticsearch.java.client>9.2.3</version.org.elasticsearch.java.client>
         <version.org.opensearch.client>3.3.2</version.org.opensearch.client>
         <!-- Various HTTP client versions that our own Elasticsearch client implementations depend on -->
         <version.org.apache.httpcomponents.client5>5.5.1</version.org.apache.httpcomponents.client5>
