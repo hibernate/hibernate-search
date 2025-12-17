@@ -382,6 +382,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 				propertyValue, firstIndexedFieldValues, otherIndexedFieldValues );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@SafeVarargs
 	final <E, P, F> void doTest(Supplier<StandalonePojoMappingSetupHelper.SetupContext> startSetup,
 			TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
@@ -425,6 +426,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	final <E, P, F> void doTestExpectMissing(TestModel<E, P> testModel,
 			Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue) {

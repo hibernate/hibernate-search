@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 class ElasticsearchTestDialectVersionTest {
 
 	@Test

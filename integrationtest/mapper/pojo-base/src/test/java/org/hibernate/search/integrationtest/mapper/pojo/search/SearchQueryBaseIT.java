@@ -62,6 +62,7 @@ class SearchQueryBaseIT {
 				.setup();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void target_byClass_singleType() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
@@ -89,6 +90,7 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void target_byClass_multipleTypes() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
@@ -146,6 +148,7 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void target_byName_singleType() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
@@ -173,6 +176,7 @@ class SearchQueryBaseIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void target_byName_multipleTypes() {
 		try ( SearchSession searchSession = mapping.createSession() ) {

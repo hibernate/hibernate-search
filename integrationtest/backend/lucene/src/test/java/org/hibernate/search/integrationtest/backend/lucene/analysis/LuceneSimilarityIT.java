@@ -32,6 +32,7 @@ class LuceneSimilarityIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3777")
 	void defaults() {
@@ -56,6 +57,7 @@ class LuceneSimilarityIT {
 				.hasTotalHitCount( 1L );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3777")
 	@PortedFromSearch5(original = "org.hibernate.search.test.similarity.SimilarityTest")

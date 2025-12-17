@@ -213,6 +213,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 		setupAndUpdateIndex( null );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndUpdateIndex(Object layoutStrategy) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

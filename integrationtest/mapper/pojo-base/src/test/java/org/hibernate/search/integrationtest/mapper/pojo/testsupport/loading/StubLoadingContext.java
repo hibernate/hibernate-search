@@ -15,7 +15,7 @@ public class StubLoadingContext {
 
 	private final List<LoaderCall> loaderCalls = new ArrayList<>();
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	public <I, E> Map<I, E> persistenceMap(PersistenceTypeKey<E, I> key) {
 		return (Map<I, E>) persistenceMaps.computeIfAbsent( key, ignored -> new ConcurrentHashMap<>() );
 	}

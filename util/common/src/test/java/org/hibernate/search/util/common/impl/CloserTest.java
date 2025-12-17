@@ -4,9 +4,7 @@
  */
 package org.hibernate.search.util.common.impl;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -16,6 +14,7 @@ import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 class CloserTest {
 
 	@Test

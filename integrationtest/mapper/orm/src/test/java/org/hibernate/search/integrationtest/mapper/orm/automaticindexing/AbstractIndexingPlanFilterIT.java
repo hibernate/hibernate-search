@@ -118,6 +118,7 @@ public abstract class AbstractIndexingPlanFilterIT {
 		return setupContext.setup();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void clearFilter() throws Exception {
 		sessionFactory = setup();

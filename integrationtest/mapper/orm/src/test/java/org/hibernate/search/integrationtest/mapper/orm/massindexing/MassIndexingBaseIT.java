@@ -82,6 +82,7 @@ class MassIndexingBaseIT {
 	@Parameter(0)
 	public static TenancyMode tenancyMode;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeParameterizedClassInvocation
 	static void setup() {
 		backendMock.resetExpectations();

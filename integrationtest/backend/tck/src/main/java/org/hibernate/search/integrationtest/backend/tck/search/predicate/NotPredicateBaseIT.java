@@ -92,6 +92,7 @@ class NotPredicateBaseIT {
 				super( "singleRoutingKey" );
 			}
 
+			@SuppressWarnings("unused") // For EJC and lambda arg
 			public void contribute(BulkIndexer scoreIndexer) {
 				for ( Integer ordinal : ordinals ) {
 					scoreIndexer.add( docId( ordinal ), routingKey, document -> {} );

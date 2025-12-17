@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -796,6 +797,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			this.name = expectations.aggregationName() + "_" + expectations.fieldType().getUniqueName();
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		private void init() {
 			FieldTypeDescriptor<F, ?> fieldType = expectations.fieldType();
 
@@ -841,15 +843,19 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		final ObjectBinding nestedObject;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"", c -> c.aggregable( Aggregable.YES ) );
-			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
-			fieldWithAggregableDefaultModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithAggregableDefaultModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"aggregableDefault_", c -> c.aggregable( Aggregable.NO ) );
-			fieldWithAggregableNoModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithAggregableNoModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"aggreableNo_", c -> c.aggregable( Aggregable.NO ) );
 
 			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectStructure.FLATTENED );
@@ -873,12 +879,14 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		final SimpleFieldModelsByType fieldWithConverterModels;
 
 		CompatibleIndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"", (fieldType, c) -> {
 						c.aggregable( Aggregable.YES );
 						addIrrelevantOptions( fieldType, c );
 					} );
-			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"converted_", (fieldType, c) -> {
 						c.aggregable( Aggregable.YES )
 								.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
@@ -905,7 +913,8 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			 * Add a field with the same name as the fieldWithConverterModel from IndexBinding,
 			 * but with an incompatible projection converter.
 			 */
-			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, new IncompatibleDslConverter<>() )
 							.projectionConverter( ValueWrapper.class, new IncompatibleProjectionConverter() ) );

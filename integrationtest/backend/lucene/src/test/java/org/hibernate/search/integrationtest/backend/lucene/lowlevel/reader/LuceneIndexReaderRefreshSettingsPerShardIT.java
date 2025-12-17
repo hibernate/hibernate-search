@@ -41,6 +41,7 @@ class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettingsPerShar
 		super( strategy, setupStrategyFunction, shardIds );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void test() {
 		setupHelper.start( setupStrategyFunction ).withIndex( index )

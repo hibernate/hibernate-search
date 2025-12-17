@@ -94,6 +94,7 @@ class AndPredicateBaseIT {
 				super( "singleRoutingKey" );
 			}
 
+			@SuppressWarnings("unused") // For EJC and lambda arg
 			public void contribute(BulkIndexer scoreIndexer) {
 				scoreIndexer.add( docId( 0 ), routingKey, document -> {} );
 				scoreIndexer.add( docId( 1 ), routingKey, document -> {} );
@@ -154,6 +155,7 @@ class AndPredicateBaseIT {
 				super( "singleRoutingKey" );
 			}
 
+			@SuppressWarnings("unused") // For EJC and lambda arg
 			public void contribute(BulkIndexer scoreIndexer) {
 				scoreIndexer.add( docId( 0 ), routingKey, document -> {} );
 				scoreIndexer.add( docId( 1 ), routingKey, document -> {} );

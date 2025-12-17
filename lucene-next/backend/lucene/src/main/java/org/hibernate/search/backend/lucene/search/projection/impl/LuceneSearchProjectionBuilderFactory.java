@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchIndexScopeImpl;
 import org.hibernate.search.backend.lucene.search.projection.dsl.DocumentTree;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -46,11 +47,13 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		return new LuceneEntityReferenceProjection<>( scope );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <I> SearchProjection<I> id(Class<I> requestedIdentifierType) {
 		SearchIndexIdentifierContext identifier = scope.identifier();
 		return new LuceneIdProjection<>( scope,
-				identifier.mappingProjectionConverter().withConvertedType( requestedIdentifierType, identifier ) );
+				(ProjectionConverter<String, I>) identifier.mappingProjectionConverter()
+						.withConvertedType( requestedIdentifierType, identifier ) );
 	}
 
 	@Override

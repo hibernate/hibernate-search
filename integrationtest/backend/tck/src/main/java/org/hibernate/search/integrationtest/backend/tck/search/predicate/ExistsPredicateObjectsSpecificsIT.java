@@ -270,6 +270,7 @@ class ExistsPredicateObjectsSpecificsIT {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		mainIndex.bulkIndexer()
 				.add( DOCUMENT_0, document -> {} )

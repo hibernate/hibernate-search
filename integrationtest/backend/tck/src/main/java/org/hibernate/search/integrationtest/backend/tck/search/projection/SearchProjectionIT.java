@@ -720,6 +720,7 @@ class SearchProjectionIT {
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> {
@@ -771,6 +772,7 @@ class SearchProjectionIT {
 				.join();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static <T, R> Function<T, R> shouldNotBeCalled() {
 		return ignored -> {
 			throw new IllegalStateException( "This should not be called" );

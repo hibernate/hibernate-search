@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link OutboxPollingEventProcessorClusterLink#leaveCluster(AgentClusterLinkContextProvider)}.
  */
+@SuppressWarnings("unused") // For EJC and lambda arg
 class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProcessorClusterLinkTest {
 	final OutboxPollingEventProcessorClusterLink setupLink() {
 		return new OutboxPollingEventProcessorClusterLink(

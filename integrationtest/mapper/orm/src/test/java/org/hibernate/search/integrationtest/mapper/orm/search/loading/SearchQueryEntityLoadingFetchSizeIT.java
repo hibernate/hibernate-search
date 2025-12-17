@@ -182,6 +182,7 @@ class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLo
 				null );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void testLoadingFetchSize(
 			Integer searchLoadingFetchSize,
 			Integer overriddenFetchSize,

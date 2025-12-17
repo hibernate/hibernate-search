@@ -61,6 +61,7 @@ class MassIndexingEnvironmentIT {
 		initData();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void success() throws InterruptedException {
 		try ( SearchSession searchSession = mapping.createSession() ) {

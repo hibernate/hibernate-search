@@ -217,6 +217,7 @@ class ToHibernateOrmScrollableResultsIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void fetchSize() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -1196,6 +1197,7 @@ class ToHibernateOrmScrollableResultsIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void expectScrollCreate() {
 		backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
 				DEFAULT_FETCH_SIZE, b -> {} );

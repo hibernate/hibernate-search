@@ -98,6 +98,7 @@ class LuceneQueryCacheConfigurerIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setup(String queryCacheConfigurer) {
 		setup( queryCacheConfigurer, c -> {} );
 	}

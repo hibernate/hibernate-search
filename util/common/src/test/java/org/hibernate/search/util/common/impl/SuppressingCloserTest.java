@@ -56,6 +56,7 @@ class SuppressingCloserTest {
 				.hasNoSuppressedExceptions();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void javaIOCloseable() {
 		Throwable mainException = new Exception();
@@ -75,6 +76,7 @@ class SuppressingCloserTest {
 				.hasSuppressedException( exception2 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void extract_javaIOCloseable() {
 		Throwable mainException = new Exception();
@@ -96,6 +98,7 @@ class SuppressingCloserTest {
 				.hasSuppressedException( exception2 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void autoCloseable() {
 		Throwable mainException = new Exception();
@@ -115,6 +118,7 @@ class SuppressingCloserTest {
 				.hasSuppressedException( exception2 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void extract_autoCloseable() {
 		Throwable mainException = new Exception();
@@ -137,6 +141,7 @@ class SuppressingCloserTest {
 				.hasSuppressedException( exception2 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void runtimeException() {
 		Throwable mainException = new Exception();
@@ -157,6 +162,7 @@ class SuppressingCloserTest {
 				.hasSuppressedException( exception3 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void extract_runtimeException() {
 		Throwable mainException = new Exception();
@@ -166,7 +172,7 @@ class SuppressingCloserTest {
 
 		Supplier<Object> supplier1 = () -> { throw exception1; };
 		Supplier<Object> supplier2 = () -> { throw exception2; };
-		Supplier<Object> supplier3 = () -> new Object();
+		Supplier<Object> supplier3 = Object::new;
 
 		new SuppressingCloser( mainException )
 				.push( ignored -> fail( "Should not be called" ), supplier1, Supplier::get )
@@ -181,6 +187,7 @@ class SuppressingCloserTest {
 				.hasSuppressedException( exception3 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void someNonFailingCloseables() {
 		Throwable mainException = new Exception();
@@ -217,6 +224,7 @@ class SuppressingCloserTest {
 				.hasNoSuppressedExceptions();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void customCloseable() {
 		Throwable mainException = new Exception();

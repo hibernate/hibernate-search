@@ -22,6 +22,7 @@ public class TestAppender extends AbstractAppender {
 		super( name, null, null, true, Property.EMPTY_ARRAY );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Override
 	public void append(LogEvent event) {
 		synchronized (this) {

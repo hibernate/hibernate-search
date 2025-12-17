@@ -142,6 +142,7 @@ class ToJpaQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void getResultList() {
 		with( sessionFactory ).runNoTransaction( entityManager -> {
@@ -167,6 +168,7 @@ class ToJpaQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void getSingleResult() {
 		with( sessionFactory ).runNoTransaction( entityManager -> {
@@ -365,6 +367,7 @@ class ToJpaQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	void graph_jpaHint_load() {

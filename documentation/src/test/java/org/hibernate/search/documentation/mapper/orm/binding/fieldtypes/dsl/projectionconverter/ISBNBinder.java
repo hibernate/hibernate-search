@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 public class ISBNBinder implements PropertyBinder {
 
 	@Override

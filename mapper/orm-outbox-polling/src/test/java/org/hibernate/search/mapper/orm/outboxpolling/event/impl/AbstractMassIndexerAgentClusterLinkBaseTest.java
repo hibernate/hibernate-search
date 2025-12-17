@@ -118,6 +118,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 
 	protected abstract MassIndexerAgentClusterLinkPulseExpectations onClusterWith3NodesAll3NodesSuspended();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void initPulseMocks() {
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );

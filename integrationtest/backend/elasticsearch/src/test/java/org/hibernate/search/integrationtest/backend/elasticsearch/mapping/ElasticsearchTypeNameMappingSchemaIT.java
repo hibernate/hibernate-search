@@ -52,6 +52,7 @@ class ElasticsearchTypeNameMappingSchemaIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void schema(String strategyName, JsonObject expectedMappingContent) {

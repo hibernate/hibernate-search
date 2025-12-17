@@ -9,6 +9,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -601,6 +602,7 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
 				// Important: do not index the documents in the expected order after sorts (1, 2, 3)
@@ -630,11 +632,11 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 		AbstractObjectMapping(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
 			fieldModels = SimpleFieldModelsByType.mapAll(
-					supportedFieldTypes,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes,
 					root, "", c -> c.sortable( Sortable.YES ), additionalConfiguration
 			);
 			fieldWithDslConverterModels = SimpleFieldModelsByType.mapAll(
-					supportedFieldTypes, root, "converted_",
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root, "converted_",
 					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen(
 							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
@@ -646,6 +648,7 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 	private static class IndexBinding extends AbstractObjectMapping {
 		final FirstLevelObjectMapping nested;
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		IndexBinding(IndexSchemaElement root) {
 			this( root, ignored -> {} );
 		}
@@ -683,14 +686,15 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 
 		CompatibleIndexBinding(IndexSchemaElement root) {
 			fieldModels = SimpleFieldModelsByType.mapAll(
-					supportedFieldTypes,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes,
 					root, "", (fieldType, c) -> {
 						c.sortable( Sortable.YES );
 						addIrrelevantOptions( fieldType, c );
 					}
 			);
 			fieldWithDslConverterModels = SimpleFieldModelsByType.mapAll(
-					supportedFieldTypes, root, "converted_", (fieldType, c) -> {
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root, "converted_",
+					(fieldType, c) -> {
 						c.sortable( Sortable.YES );
 						c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() );
 						addIrrelevantOptions( fieldType, c );

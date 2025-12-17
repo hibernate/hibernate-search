@@ -146,6 +146,7 @@ class AnnotationMappingSmokeIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void index() {
 		try ( SearchSession session = mapping.createSession() ) {

@@ -32,6 +32,7 @@ class MatchIdPredicateConverterIT {
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
 			.idDslConverter( Integer.class, (value, context) -> "document" + value ) );
 
@@ -83,6 +84,7 @@ class MatchIdPredicateConverterIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> {} )

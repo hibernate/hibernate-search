@@ -343,6 +343,7 @@ class SearchSortIT {
 				.hasMessageContainingAll( messageParts.toArray( String[]::new ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void extension() {
 		SearchQuery<DocumentReference> query;
@@ -490,6 +491,7 @@ class SearchSortIT {
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		mainIndex.bulkIndexer()
 				// Important: do not index the documents in the expected order after sorts

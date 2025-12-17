@@ -112,6 +112,7 @@ class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndCreateIndexIfMissingOnly(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withIndex( index )

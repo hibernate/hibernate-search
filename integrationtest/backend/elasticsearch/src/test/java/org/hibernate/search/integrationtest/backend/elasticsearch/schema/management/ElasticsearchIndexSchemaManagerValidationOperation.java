@@ -36,6 +36,7 @@ enum ElasticsearchIndexSchemaManagerValidationOperation {
 		}
 	};
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public final CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
 		RootFailureCollector failureCollector = new RootFailureCollector( "validation" );
 		ContextualFailureCollector validationFailureCollector =

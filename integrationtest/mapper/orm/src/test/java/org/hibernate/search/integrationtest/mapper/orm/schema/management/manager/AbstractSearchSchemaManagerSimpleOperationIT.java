@@ -147,6 +147,7 @@ abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	protected abstract void execute(SearchSchemaManager manager);
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected final void expectWork(String indexName, CompletableFuture<?> future) {
 		expectWork( indexName, ignored -> future );
 	}

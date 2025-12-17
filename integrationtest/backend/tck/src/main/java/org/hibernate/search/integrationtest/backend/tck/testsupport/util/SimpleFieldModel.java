@@ -14,6 +14,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 
 public class SimpleFieldModel<F> {
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public static <
 			F,
 			S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>> SimpleFieldMapper<F, S, SimpleFieldModel<F>> mapper(

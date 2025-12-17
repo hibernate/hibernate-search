@@ -199,6 +199,7 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")

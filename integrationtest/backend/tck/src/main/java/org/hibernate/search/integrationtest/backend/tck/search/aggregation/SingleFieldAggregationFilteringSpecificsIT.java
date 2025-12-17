@@ -7,6 +7,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -140,7 +141,8 @@ class SingleFieldAggregationFilteringSpecificsIT<F> {
 		final SimpleFieldModelsByType fieldModels;
 
 		AbstractObjectBinding(IndexSchemaElement self) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, self,
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, self,
 					"", c -> c.aggregable( Aggregable.YES ) );
 		}
 	}

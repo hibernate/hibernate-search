@@ -58,6 +58,7 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 					.withBackendMock( backendMock );
 	private SessionFactory sessionFactory;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeAll
 	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
@@ -91,7 +92,7 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class
 				)
-				.dataClearing( dc -> dc.preClear( session -> eventFilter.hideAllEvents() ) )
+				.dataClearing( dc -> dc.preClear( ignored -> eventFilter.hideAllEvents() ) )
 				.setup();
 	}
 

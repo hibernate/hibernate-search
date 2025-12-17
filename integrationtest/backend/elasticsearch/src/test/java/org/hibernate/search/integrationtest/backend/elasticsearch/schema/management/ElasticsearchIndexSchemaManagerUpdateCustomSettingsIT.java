@@ -228,6 +228,7 @@ class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 		setupAndUpdateIndex( "valid.json" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndUpdateIndex(String customSettingsFile) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

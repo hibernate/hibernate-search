@@ -653,6 +653,7 @@ class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndUpdate(StubMappedIndex index) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

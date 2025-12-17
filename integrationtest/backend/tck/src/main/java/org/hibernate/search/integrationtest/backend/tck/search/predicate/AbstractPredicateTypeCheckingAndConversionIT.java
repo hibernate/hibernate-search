@@ -961,6 +961,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 			super( values );
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
 				SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex, BulkIndexer compatibleIndexer,
 				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,

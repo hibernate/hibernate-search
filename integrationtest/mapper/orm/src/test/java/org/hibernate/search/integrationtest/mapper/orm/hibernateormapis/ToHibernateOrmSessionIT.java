@@ -93,6 +93,7 @@ class ToHibernateOrmSessionIT {
 				.hasMessageContainingAll( "Unable to access Hibernate ORM session", "is closed" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1857")
 	void reuseSearchQueryAfterOrmSessionIsClosed() {

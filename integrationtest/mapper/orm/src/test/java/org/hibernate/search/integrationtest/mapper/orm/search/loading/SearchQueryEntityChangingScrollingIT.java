@@ -54,6 +54,7 @@ class SearchQueryEntityChangingScrollingIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void test() {
 		backendMock.inLenientMode( () -> with( sessionFactory ).runInTransaction( session -> {

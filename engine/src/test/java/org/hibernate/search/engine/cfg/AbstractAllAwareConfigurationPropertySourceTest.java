@@ -16,7 +16,7 @@ import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractAllAwareConfigurationPropertySourceTest {
 
 	@Test

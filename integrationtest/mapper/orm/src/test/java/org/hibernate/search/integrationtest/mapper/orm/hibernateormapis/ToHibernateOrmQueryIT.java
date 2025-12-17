@@ -139,6 +139,7 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void list() {
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -164,6 +165,7 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void uniqueResult() {
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -436,6 +438,7 @@ class ToHibernateOrmQueryIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	void graph_jpaHint_load() {

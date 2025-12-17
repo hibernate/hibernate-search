@@ -346,6 +346,7 @@ class CleanupIT {
 				.hasMessageContaining( SimulatedFailure.MESSAGE );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void startup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
 		this.mapping = setupHelper.start()
 				.withConfiguration(

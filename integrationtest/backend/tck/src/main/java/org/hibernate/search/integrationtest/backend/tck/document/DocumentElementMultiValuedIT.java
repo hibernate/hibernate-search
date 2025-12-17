@@ -6,6 +6,7 @@ package org.hibernate.search.integrationtest.backend.tck.document;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -355,9 +356,11 @@ class DocumentElementMultiValuedIT<F> {
 		final SimpleFieldModelsByType multiValuedFieldModels;
 
 		AbstractObjectBinding(IndexSchemaElement schemaElement) {
-			this.singleValuedFieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(),
+			this.singleValuedFieldModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedTypeDescriptors(),
 					schemaElement, "single_" );
-			this.multiValuedFieldModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(),
+			this.multiValuedFieldModels = SimpleFieldModelsByType.mapAllMultiValued(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedTypeDescriptors(),
 					schemaElement, "multi_" );
 		}
 	}

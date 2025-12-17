@@ -38,6 +38,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 	private TermsAggregationDescriptor() {
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Override
 	public <F> ExpectationsAlternative<
 			SupportedSingleFieldAggregationExpectations<F>,

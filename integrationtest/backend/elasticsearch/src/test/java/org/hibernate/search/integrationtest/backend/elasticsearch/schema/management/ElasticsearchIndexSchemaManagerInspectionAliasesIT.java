@@ -116,6 +116,7 @@ class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 						"These names must resolve to a single index" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndInspectIndex(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

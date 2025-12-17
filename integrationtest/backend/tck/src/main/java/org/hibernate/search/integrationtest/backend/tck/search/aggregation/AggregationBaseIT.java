@@ -111,6 +111,7 @@ class AggregationBaseIT {
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> {

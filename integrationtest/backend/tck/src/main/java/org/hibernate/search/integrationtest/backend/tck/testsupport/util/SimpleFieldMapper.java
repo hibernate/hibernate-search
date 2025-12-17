@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOp
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.SearchableProjectableIndexFieldTypeOptionsStep;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 public final class SimpleFieldMapper<F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>, M> {
 
 	public static <F, S extends SearchableProjectableIndexFieldTypeOptionsStep<?, F>, M> SimpleFieldMapper<F, S, M> of(

@@ -52,6 +52,7 @@ class IdClassIT {
 	}
 
 	// This used to fail with an NPE at bootstrap
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3874")
 	void idClass_nonIndexed() {
@@ -73,6 +74,7 @@ class IdClassIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4025")
 	void idClass_indexed_WithDocumentId() {

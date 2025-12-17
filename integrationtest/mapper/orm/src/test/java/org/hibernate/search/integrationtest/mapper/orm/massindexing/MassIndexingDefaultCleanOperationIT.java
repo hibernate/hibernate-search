@@ -69,6 +69,7 @@ class MassIndexingDefaultCleanOperationIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest
 	@MethodSource("params")
 	void test(MassIndexingDefaultCleanOperation operation, TenancyMode tenancyMode) {

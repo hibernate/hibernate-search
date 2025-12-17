@@ -74,7 +74,7 @@ class FieldTemplateIT {
 
 	private SimpleMappedIndex<IndexBinding> index;
 
-
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3273")
@@ -116,6 +116,7 @@ class FieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3273")
@@ -171,6 +172,7 @@ class FieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3273")

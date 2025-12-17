@@ -161,6 +161,7 @@ class MetricTemporalFieldsAggregationsIT {
 				.toQuery();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		LocalDate baseDate = LocalDate.of( 2016, Month.DECEMBER, 6 );
 		int[] integers = new int[] { 9, 18, 3, 18, 7, -10, 3, 0, 7, 0 };

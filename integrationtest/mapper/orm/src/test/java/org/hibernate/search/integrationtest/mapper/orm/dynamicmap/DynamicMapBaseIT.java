@@ -64,6 +64,7 @@ class DynamicMapBaseIT {
 	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest
 	@ValueSource(booleans = { true, false })
 	void simple(boolean jpaCompliance) {
@@ -158,6 +159,7 @@ class DynamicMapBaseIT {
 						"e.g. 'MyEntity.myEmbedded' or 'MyEntity.myEmbedded.myNestedEmbedded'." );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@TestForIssue(jiraKey = "HSEARCH-3848")
 	@ParameterizedTest
 	@ValueSource(booleans = { true, false })
@@ -281,6 +283,7 @@ class DynamicMapBaseIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void nonEntityIdDocumentId() {
 		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
@@ -341,6 +344,7 @@ class DynamicMapBaseIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void inheritance() {
 		String hbmPath = "/DynamicMapBaseIT/inheritance.hbm.xml";

@@ -415,6 +415,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 * even though a single loader is created for the abstract supertype,
 	 * which has no cache.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	void secondLevelCacheLookup() {
@@ -494,6 +495,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 * Same as {@link #typeChanged()},
 	 * but with the entity that changed its type retrieved from the second level cache instead of from a query.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	void typeChanged_secondLevelCacheLookup() {
@@ -522,6 +524,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected <T> void testLoading(List<? extends Class<? extends T>> targetClasses,
 			List<String> targetIndexes,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
@@ -537,6 +540,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected <T> void testLoading(List<? extends Class<? extends T>> targetClasses,
 			List<String> targetIndexes,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,

@@ -1099,6 +1099,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 						.failure( "Invalid value. Expected 'another-normalizer', actual is 'custom-normalizer'" ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndValidate(StubMappedIndex index, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

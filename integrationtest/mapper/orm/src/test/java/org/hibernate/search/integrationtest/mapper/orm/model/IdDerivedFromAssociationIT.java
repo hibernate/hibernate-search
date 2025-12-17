@@ -57,6 +57,7 @@ class IdDerivedFromAssociationIT {
 
 	// This used to fail with an exception at bootstrap,
 	// even though the class with a derived ID was not indexed.
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4352")
 	void nonIndexed() {
@@ -79,6 +80,7 @@ class IdDerivedFromAssociationIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4352")
 	void indexed_withDocumentId() {

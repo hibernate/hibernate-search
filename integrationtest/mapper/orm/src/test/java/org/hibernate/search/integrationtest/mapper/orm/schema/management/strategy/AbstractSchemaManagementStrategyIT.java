@@ -97,6 +97,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 
 	protected abstract SchemaManagementStrategyName getStrategyName();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected final void expectWork(String indexName, CompletableFuture<?> future) {
 		expectWork( indexName, ignored -> future );
 	}

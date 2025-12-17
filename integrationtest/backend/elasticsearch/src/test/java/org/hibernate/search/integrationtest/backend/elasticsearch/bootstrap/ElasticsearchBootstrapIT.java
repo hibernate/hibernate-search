@@ -385,6 +385,7 @@ class ElasticsearchBootstrapIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void checkBackendWorks() {
 		index.schemaManager().createIfMissing( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasNoHits();

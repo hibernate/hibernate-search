@@ -231,6 +231,7 @@ class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 		setupAndValidate( "valid.json", operation );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndValidate(String customSettingsFile, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

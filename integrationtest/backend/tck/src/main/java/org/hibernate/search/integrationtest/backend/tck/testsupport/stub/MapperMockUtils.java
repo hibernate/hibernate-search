@@ -89,6 +89,7 @@ public final class MapperMockUtils {
 		private final List<DocumentReference> referencesToLoad = new ArrayList<>();
 		private final List<E> loadedObjects = new ArrayList<>();
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public HitMappingDefinitionContext<E> entityReference(DocumentReference documentReference,
 				EntityReference transformedReference) {
 			referenceMap.computeIfAbsent( documentReference, ignored -> new LinkedHashSet<>() )

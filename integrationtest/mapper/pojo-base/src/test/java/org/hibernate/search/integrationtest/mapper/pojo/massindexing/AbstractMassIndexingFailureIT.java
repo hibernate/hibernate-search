@@ -129,6 +129,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		entityLoading( Optional.of( FAILURE_FLOODING_THRESHOLD ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public void entityLoading(Optional<Integer> failureFloodingThreshold) {
 		String exceptionMessage = "Entity loading error";
 

@@ -192,6 +192,7 @@ class MatchIdPredicateSpecificsIT {
 				.hasDocRefHitsAnyOrder( parseIndex.typeName(), ( ParseIdConverter.id( DOCUMENT_1 ) ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> {} )

@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +60,9 @@ class MetricFieldAggregationsIT<F> {
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.aggregable( Aggregable.YES ) );
+			root -> SingleFieldIndexBinding.create( root,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes,
+					c -> c.aggregable( Aggregable.YES ) );
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of( bindingFactory ).name( "main" );
 

@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -1092,6 +1093,7 @@ class RangeAggregationSpecificsIT<F> {
 			this.documentFieldValues = ascendingValues.subList( 0, 7 );
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		private void init() {
 			BulkIndexer indexer = index.bulkIndexer();
 			for ( int i = 0; i < documentFieldValues.size(); i++ ) {
@@ -1122,16 +1124,19 @@ class RangeAggregationSpecificsIT<F> {
 		final SimpleFieldModel<Integer> bucketMultiValue;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"", c -> c.aggregable( Aggregable.YES )
 							.searchable( Searchable.NO ) // Range aggregations should not need this
 			);
-			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() )
 			);
-			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"nonAggregable_", c -> c.aggregable( Aggregable.NO )
 			);
 			bucketValue = SimpleFieldModel.mapper( IntegerFieldTypeDescriptor.INSTANCE, c -> c.aggregable( Aggregable.YES ) )

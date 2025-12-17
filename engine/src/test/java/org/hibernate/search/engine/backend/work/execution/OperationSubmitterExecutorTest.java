@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 class OperationSubmitterExecutorTest {
 
 	private SimpleScheduledExecutor executor;

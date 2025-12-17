@@ -1061,6 +1061,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 			return docIdConstant + "_" + routingKey;
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
 				SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index, BulkIndexer missingLevel1Indexer,
 				SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,

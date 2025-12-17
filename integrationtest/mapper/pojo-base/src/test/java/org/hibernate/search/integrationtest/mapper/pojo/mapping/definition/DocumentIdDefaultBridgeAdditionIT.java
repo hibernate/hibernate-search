@@ -100,6 +100,7 @@ class DocumentIdDefaultBridgeAdditionIT {
 				IndexedEntityWithCustomClassSubclass1Id::new );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private <T> void doTestSuccess(Consumer<BridgesConfigurationContext> bridgesConfigurer,
 			Class<T> indexedType, Function<String, T> constructor) {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );

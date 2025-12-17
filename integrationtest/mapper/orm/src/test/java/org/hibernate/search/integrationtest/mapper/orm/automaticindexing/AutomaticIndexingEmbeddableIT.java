@@ -47,6 +47,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Test automatic indexing based on Hibernate ORM entity events when embeddable objects are involved.
  */
+@SuppressWarnings("unused") // For EJC and lambda arg
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AutomaticIndexingEmbeddableIT {
 

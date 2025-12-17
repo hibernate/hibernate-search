@@ -31,6 +31,7 @@ class LuceneIndexSchemaManagerDropAndCreateIT {
 					.toReference()
 	);
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
 	void test() throws IOException {

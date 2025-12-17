@@ -53,6 +53,7 @@ class AutomaticIndexingIdentiferRollbackIT {
 				.setup();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void jpaIdAsDocumentId() {
 		AtomicReference<Integer> entity1Id = new AtomicReference<>();
@@ -86,6 +87,7 @@ class AutomaticIndexingIdentiferRollbackIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void nonJpaIdAsDocumentId() {
 		AtomicReference<Integer> entity1Id = new AtomicReference<>();

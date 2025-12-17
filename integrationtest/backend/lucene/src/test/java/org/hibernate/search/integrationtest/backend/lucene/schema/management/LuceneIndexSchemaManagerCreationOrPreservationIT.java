@@ -50,6 +50,7 @@ class LuceneIndexSchemaManagerCreationOrPreservationIT {
 		assertThat( indexExists() ).isTrue();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3759")

@@ -91,6 +91,7 @@ class AutomaticIndexingPolymorphicAssociationIT {
 
 	// Failing case: the level3 refers to a level2 of a non-contained type (Level2, the base type).
 	// This should not affect the index, but indexing used to fail with an exception before HSEARCH-3156 was solved.
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void testPolymorphicAssociationNonContainedType() {
 		with( sessionFactory ).runInTransaction( session -> {

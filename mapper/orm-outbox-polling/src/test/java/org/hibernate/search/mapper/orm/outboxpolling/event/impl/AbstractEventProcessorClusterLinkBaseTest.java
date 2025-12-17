@@ -167,6 +167,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 
 	protected abstract EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void initPulseMocks() {
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );

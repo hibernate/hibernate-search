@@ -255,6 +255,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
 				// Important: do not index the documents in the expected order after sorts (1, 2, 3)
@@ -297,6 +298,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 	private static class IndexBinding extends AbstractObjectMapping {
 		private final FirstLevelObjectMapping nested;
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		IndexBinding(IndexSchemaElement root) {
 			this( root, ignored -> {} );
 		}
@@ -332,6 +334,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 		final SimpleFieldModel<GeoPoint> fieldModel;
 		final SimpleFieldModel<GeoPoint> fieldWithDslConverterModel;
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		CompatibleIndexBinding(IndexSchemaElement root) {
 			this( root, ignored -> {} );
 		}

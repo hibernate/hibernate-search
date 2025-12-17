@@ -46,6 +46,7 @@ class SearchQueryTimeoutIT {
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeAll
 	static void setup() {
 		setupHelper.start().withIndex( index ).setup();

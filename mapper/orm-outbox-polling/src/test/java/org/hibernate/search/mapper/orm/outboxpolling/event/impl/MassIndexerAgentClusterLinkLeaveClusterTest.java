@@ -28,6 +28,7 @@ class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassIndexerAge
 		link.leaveCluster( contextMock );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void joined_found() {
 		OutboxPollingMassIndexerAgentClusterLink link = setupLink();
@@ -42,6 +43,7 @@ class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassIndexerAge
 		verify( repositoryMock ).delete( Collections.singletonList( repositoryMockHelper.self() ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void joined_notFound() {
 		OutboxPollingMassIndexerAgentClusterLink link = setupLink();

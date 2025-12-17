@@ -79,6 +79,7 @@ class ElasticsearchImplicitFieldsIT {
 				.hasDocRefHitsAnyOrder( "mainType", "1", "2", "3", "4", "5", "empty" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		mainIndex.bulkIndexer()
 				.add( SECOND_ID, document -> {

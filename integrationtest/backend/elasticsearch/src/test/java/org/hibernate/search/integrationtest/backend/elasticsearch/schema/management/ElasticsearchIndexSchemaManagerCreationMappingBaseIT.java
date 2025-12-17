@@ -163,6 +163,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndCreateIndex(StubMappedIndex index, ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withIndex( index )

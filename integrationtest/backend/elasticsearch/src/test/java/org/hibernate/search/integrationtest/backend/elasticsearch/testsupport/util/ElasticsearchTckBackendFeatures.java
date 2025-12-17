@@ -58,6 +58,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	private Gson gson = new GsonBuilder().setPrettyPrinting().create();

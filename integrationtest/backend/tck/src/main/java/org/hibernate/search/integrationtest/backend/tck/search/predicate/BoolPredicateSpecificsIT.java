@@ -748,6 +748,7 @@ class BoolPredicateSpecificsIT {
 				.hasNoHits();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void minimumShouldMatch_default_withinFilter_filterSibling() {
 		// We're following here the Lucene's conventions.

@@ -42,6 +42,7 @@ class AnnotationMappingDiscoveryIT {
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void discoveryEnabled() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b

@@ -341,6 +341,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		setupAndCreateIndex( index, operation, Optional.empty() );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndCreateIndex(StubMappedIndex index, ElasticsearchIndexSchemaManagerOperation operation,
 			Optional<String> mappingFile) {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start()

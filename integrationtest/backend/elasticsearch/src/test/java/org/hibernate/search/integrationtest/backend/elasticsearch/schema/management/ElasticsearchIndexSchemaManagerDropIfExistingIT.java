@@ -71,6 +71,7 @@ class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 		assertThat( elasticSearchClient.index( index.name() ).exists() ).isFalse();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndDropIndexIfExisting() {
 		setupHelper.start()
 				.withIndex( index )

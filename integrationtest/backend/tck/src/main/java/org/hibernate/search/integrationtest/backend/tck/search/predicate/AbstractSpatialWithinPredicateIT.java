@@ -50,6 +50,7 @@ public abstract class AbstractSpatialWithinPredicateIT {
 		initData();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected void initData() {
 		mainIndex.bulkIndexer()
 				.add( OURSON_QUI_BOIT_ID, document -> {

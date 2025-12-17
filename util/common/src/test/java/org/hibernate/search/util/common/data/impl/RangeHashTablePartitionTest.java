@@ -31,6 +31,7 @@ class RangeHashTablePartitionTest {
 				.collect( Collectors.toList() );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	// The hash function is not used in this test
 	RangeCompatibleHashFunction irrelevantFunction = key -> {
 		throw new IllegalStateException( "This method should not be called in this test" );

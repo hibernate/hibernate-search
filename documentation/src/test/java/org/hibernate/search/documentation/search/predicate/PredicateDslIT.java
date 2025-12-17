@@ -57,6 +57,7 @@ class PredicateDslIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static boolean isVectorSearchSupported() {
 		return BackendConfiguration.isLucene()
 				|| ElasticsearchTestDialect.isActualVersion(
@@ -1315,6 +1316,7 @@ class PredicateDslIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void knn() {
 		assumeTrue(

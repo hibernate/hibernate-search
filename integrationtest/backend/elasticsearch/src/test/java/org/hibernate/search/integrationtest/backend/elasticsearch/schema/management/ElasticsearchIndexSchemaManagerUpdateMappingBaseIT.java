@@ -381,6 +381,7 @@ class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.hasMessageContainingAll( messageContent );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndUpdateIndex(StubMappedIndex index) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

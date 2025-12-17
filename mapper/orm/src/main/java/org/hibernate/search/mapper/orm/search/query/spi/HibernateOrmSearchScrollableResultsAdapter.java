@@ -172,6 +172,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 		return currentIndexInScroll;
 	}
 
+	@SuppressWarnings({ "removal", "deprecation" }) // For EJC
 	@Override
 	public boolean position(int position) {
 		return setRowNumber( position - 1 );

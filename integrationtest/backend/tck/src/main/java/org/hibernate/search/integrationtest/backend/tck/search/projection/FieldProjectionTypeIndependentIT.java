@@ -55,10 +55,10 @@ class FieldProjectionTypeIndependentIT {
 	private static class IndexBinding {
 		final SimpleFieldModel<String> string1Field;
 
-
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		IndexBinding(IndexSchemaElement root) {
-			string1Field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE, c -> {} )
-					.map( root, "string1" );
+			string1Field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
+					c -> {} ).map( root, "string1" );
 		}
 	}
 

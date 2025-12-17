@@ -61,6 +61,7 @@ class ElasticsearchSchemaManagerExporterIT {
 				.setup( Book.class, Article.class );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void elasticsearch() throws IOException {
 		assumeFalse(

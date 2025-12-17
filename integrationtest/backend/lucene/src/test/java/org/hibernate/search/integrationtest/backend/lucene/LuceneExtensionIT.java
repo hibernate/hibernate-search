@@ -163,6 +163,7 @@ class LuceneExtensionIT {
 						.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void query() {
 		StubMappingScope scope = mainIndex.createScope();
