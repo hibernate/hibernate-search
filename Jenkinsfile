@@ -290,7 +290,8 @@ stage('Configure') {
 					new LocalOpenSearchBuildEnvironment(version: '3.0.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.1.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.2.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '3.3.2', condition: TestCondition.BEFORE_MERGE),
+                    new LocalOpenSearchBuildEnvironment(version: '3.3.2', condition: TestCondition.ON_DEMAND),
+                    new LocalOpenSearchBuildEnvironment(version: '3.4.0', condition: TestCondition.BEFORE_MERGE),
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
 					// IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions
 					//            See version.org.opensearch.compatible.expected.text
