@@ -189,6 +189,7 @@ class ObjectStructureIT {
 				.hasMessageContainingAll( "Unknown field", "'doesNotExist'" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		index.bulkIndexer()
 				.add( EXPECTED_NESTED_MATCH_ID, document -> {

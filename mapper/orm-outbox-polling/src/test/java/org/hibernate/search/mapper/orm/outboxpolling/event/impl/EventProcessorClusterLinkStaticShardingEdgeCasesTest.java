@@ -40,6 +40,7 @@ class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void initPulseMocks() {
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );

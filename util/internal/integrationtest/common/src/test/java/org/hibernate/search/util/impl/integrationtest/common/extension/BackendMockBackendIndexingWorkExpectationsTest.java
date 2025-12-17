@@ -29,6 +29,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")
 	void syncDefaultAddWorkType() {
@@ -55,6 +56,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 		backendMock.resetExpectations();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")
 	void asyncDefaultAddWorkType() {
@@ -81,6 +83,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 		backendMock.resetExpectations();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")
 	void asyncCustomAddWorkType() {
@@ -116,6 +119,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 		backendMock.resetExpectations();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4133")
 	void workSubmittedFromExpectedThread() {
@@ -132,6 +136,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 				.doesNotThrowAnyException();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4133")
 	void workSubmittedFromUnexpectedThread() {
@@ -155,6 +160,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 		backendMock.resetExpectations();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4308")
 	void syncDuplicateIndexingWork() {
@@ -180,6 +186,7 @@ class BackendMockBackendIndexingWorkExpectationsTest {
 		backendMock.resetExpectations();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4308")
 	void asyncDuplicateIndexingWork() {

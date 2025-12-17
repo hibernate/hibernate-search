@@ -115,7 +115,7 @@ class ElasticsearchIndexSchemaManagerStatusCheckIT {
 				.hasMessageContainingAll( "HSEARCH400024", "100ms" );
 	}
 
-
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndInspectIndex(String settingsPath, ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withBackendProperty(

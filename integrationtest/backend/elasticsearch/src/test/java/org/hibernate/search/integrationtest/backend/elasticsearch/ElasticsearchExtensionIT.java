@@ -142,6 +142,7 @@ class ElasticsearchExtensionIT {
 						.where( f -> f.fromJson( "{'match_all': {}}" ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void query() {
 		StubMappingScope scope = mainIndex.createScope();
@@ -1121,6 +1122,7 @@ class ElasticsearchExtensionIT {
 				);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		mainIndex.bulkIndexer()
 				.add( SECOND_ID, document -> {

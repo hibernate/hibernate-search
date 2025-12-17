@@ -14,6 +14,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.StubNextS
 
 class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadingBaseIT {
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Override
 	protected <T2> List<T2> getHits(List<String> targetIndexes, SearchQuery<T2> query,
 			List<DocumentReference> hitDocumentReferences) {

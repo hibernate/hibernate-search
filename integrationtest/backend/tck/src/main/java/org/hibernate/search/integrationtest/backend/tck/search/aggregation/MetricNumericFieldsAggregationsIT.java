@@ -340,6 +340,7 @@ class MetricNumericFieldsAggregationsIT {
 				.toQuery();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		Integer[] integers = new Integer[] { 9, 18, 3, 18, 7, -10, 3, 0, 7, 0, null };
 		String[] styles = new String[] { "bla", "aaa" };

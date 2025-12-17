@@ -61,6 +61,7 @@ class MassIndexingInheritanceIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeAll
 	void setup() {
 		sysOut = System.out;

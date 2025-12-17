@@ -160,6 +160,7 @@ class ExistsPredicateObjectsBaseIT {
 				this.structure = structure;
 			}
 
+			@SuppressWarnings("unused") // For EJC and lambda arg
 			public void contribute(BulkIndexer mainIndexer, BulkIndexer missingFieldIndexer) {
 				mainIndexer.add( docId( 0 ), routingKey, document -> mainIndex.binding()
 						.initDocument( document, innerFieldType, "irrelevant" ) );

@@ -47,6 +47,7 @@ class AgentRepositoryMockingHelper {
 		this.repositoryMock = repositoryMock;
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	void defineSelfCreatedByPulse(UUID selfId) {
 		ArgumentCaptor<Agent> selfCaptor = ArgumentCaptor.forClass( Agent.class );
 		selfSupplier = selfCaptor::getValue;

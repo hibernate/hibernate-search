@@ -42,6 +42,7 @@ class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 			SHARD_ID_1, SHARD_ID_2, SHARD_ID_3
 	);
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public ShardingExplicitIT() {
 		super( ignored -> explicitShardingBackendSetupStrategy( SHARD_IDS ), SHARD_IDS );
 	}

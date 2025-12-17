@@ -26,6 +26,7 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	public static final String DISCRIMINATOR_VALUE_INCLUDED = "included";
 	public static final String DISCRIMINATOR_VALUE_EXCLUDED = "excluded";
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public static final Consumer<SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> NO_ADDITIONAL_CONFIGURATION = c -> {};
 
 	public static <S extends SearchableProjectableIndexFieldTypeOptionsStep<?, ?>> SingleFieldIndexBinding create(

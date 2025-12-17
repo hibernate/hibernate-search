@@ -527,6 +527,7 @@ class FieldProjectionTypeCheckingAndConversionIT<F> {
 		documentElement.addValue( fieldModel.reference, getFieldValue( fieldModel.typeDescriptor, documentNumber ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> initDocument( mainIndex.binding(), document, 1 ) )

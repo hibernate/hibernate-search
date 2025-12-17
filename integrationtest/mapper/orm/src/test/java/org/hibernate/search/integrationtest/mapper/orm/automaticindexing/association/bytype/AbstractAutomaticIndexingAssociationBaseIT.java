@@ -152,6 +152,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  *     </li>
  * </ul>
  */
+@SuppressWarnings("unused") // For EJC and lambda arg
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		TIndexed extends TContaining,

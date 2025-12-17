@@ -28,12 +28,13 @@ public class TestFailureHandler implements FailureHandler {
 		delegate.handle( context );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
 		for ( EntityReference entityReference : context.failingEntityReferences() ) {
 			Integer id = (Integer) entityReference.id();
 
-			entityFailures.computeIfAbsent( id, key -> Collections.synchronizedList( new ArrayList<>() ) );
+			entityFailures.computeIfAbsent( id, ignored -> Collections.synchronizedList( new ArrayList<>() ) );
 			entityFailures.get( id ).add( context );
 		}
 		// For easier debugging

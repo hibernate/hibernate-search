@@ -7,6 +7,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -379,7 +380,7 @@ class MatchPredicateSpecificsIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			unsupportedTypeFields = SimpleFieldModelsByType.mapAll(
-					unsupportedFieldTypes,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) unsupportedFieldTypes,
 					root, "unsupported_"
 			);
 			analyzedStringField = SimpleFieldModel.mapperWithOverride(

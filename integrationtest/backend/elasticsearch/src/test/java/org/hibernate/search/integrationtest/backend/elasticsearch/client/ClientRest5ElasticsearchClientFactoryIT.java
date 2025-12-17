@@ -1179,6 +1179,7 @@ class ClientRest5ElasticsearchClientFactoryIT {
 		};
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private ElasticsearchClientImplementor createClient() {
 		return createClient( ignored -> {} );
 	}

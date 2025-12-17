@@ -50,6 +50,7 @@ class ProvidedIdIT {
 
 	private StubIndexModel indexModel;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void converters() {
 		final String entityAndIndexName = "indexed";
@@ -89,6 +90,7 @@ class ProvidedIdIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void indexAndSearch() {
 		final String entityAndIndexName = "indexed";

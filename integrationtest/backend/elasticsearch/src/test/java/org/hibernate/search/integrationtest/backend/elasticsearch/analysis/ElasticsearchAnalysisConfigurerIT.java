@@ -298,6 +298,7 @@ class ElasticsearchAnalysisConfigurerIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private StubMappedIndex setup(String analysisConfigurer) {
 		return setup( analysisConfigurer, c -> {} );
 	}

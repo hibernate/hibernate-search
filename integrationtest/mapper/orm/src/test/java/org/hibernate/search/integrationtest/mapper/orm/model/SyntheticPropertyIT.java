@@ -44,6 +44,7 @@ class SyntheticPropertyIT {
 	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void test() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b

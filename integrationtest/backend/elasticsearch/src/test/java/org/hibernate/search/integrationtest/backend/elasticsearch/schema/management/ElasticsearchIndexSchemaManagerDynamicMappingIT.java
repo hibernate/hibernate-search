@@ -110,6 +110,7 @@ class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 				.hasMessageContaining( "Valid values are: [true, false, strict]" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndInspectIndex(String dynamicMapping, ElasticsearchIndexSchemaManagerOperation operation) {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withBackendProperty(

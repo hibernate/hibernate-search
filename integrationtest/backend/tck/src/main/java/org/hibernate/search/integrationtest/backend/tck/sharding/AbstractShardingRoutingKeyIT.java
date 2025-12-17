@@ -56,6 +56,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		totalDocumentCount = routingKeys.size() * documentCountPerRoutingKey;
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start( setupStrategyFunction );

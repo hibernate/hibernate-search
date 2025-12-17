@@ -203,6 +203,7 @@ class IndexValueFieldTypeDescriptorBaseIT {
 		return TermsAggregationDescriptor.INSTANCE.getSingleFieldAggregationExpectations( fieldType ).isSupported();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private class IndexBinding {
 		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<?, ?> fieldType) {
 			mapper( fieldType, ignored -> {} ).map( root, "default" );

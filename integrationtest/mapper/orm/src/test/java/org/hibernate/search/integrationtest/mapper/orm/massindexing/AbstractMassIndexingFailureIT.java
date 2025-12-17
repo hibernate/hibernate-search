@@ -777,6 +777,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		};
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private SessionFactory setup() {
 		return setup( ignored -> {} );
 	}

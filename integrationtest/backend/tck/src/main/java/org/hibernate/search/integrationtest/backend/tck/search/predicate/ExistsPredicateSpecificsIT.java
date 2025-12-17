@@ -318,6 +318,7 @@ class ExistsPredicateSpecificsIT<F> {
 			this.fieldType = fieldType;
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public void contribute(BulkIndexer mainIndexer, BulkIndexer differentFieldTypeIndexer) {
 			List<F> values = fieldType.getIndexableValues().getSingle();
 			F value1 = values.get( 0 );

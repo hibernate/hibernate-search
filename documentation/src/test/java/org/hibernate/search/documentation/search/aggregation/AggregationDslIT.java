@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 class AggregationDslIT {
 
 	private static final int BOOK1_ID = 1;
@@ -810,7 +811,7 @@ class AggregationDslIT {
 		} );
 	}
 
-	@SuppressWarnings("raw")
+	@SuppressWarnings({ "raw", "unchecked", "rawtypes" })
 	@Test
 	void composite() {
 		withinSearchSession( searchSession -> {

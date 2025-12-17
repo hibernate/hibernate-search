@@ -495,6 +495,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected 'keyword', actual is 'integer'" ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndValidate(StubMappedIndex index, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

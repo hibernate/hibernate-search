@@ -57,6 +57,7 @@ class MassIndexingGenericMappedSuperclassIT {
 	@RegisterExtension
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void setup() {
 		backendMock.resetExpectations();

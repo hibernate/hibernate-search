@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
  * or by updates of associated (contained) entities,
  * with a multi-valued association.
  */
+@SuppressWarnings("unused") // For EJC and lambda arg
 public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		TIndexed extends TContaining,
 		TContaining,

@@ -51,6 +51,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 				null, null );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected final void testLoadingThatManyEntities(
 			Consumer<Session> sessionSetup,
 			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,

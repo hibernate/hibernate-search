@@ -43,6 +43,7 @@ class ElasticsearchSchemaManagerExporterIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void elasticsearch() throws IOException {
 		assumeFalse(

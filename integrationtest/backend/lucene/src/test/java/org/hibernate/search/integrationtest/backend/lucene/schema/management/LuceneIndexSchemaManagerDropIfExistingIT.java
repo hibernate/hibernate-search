@@ -57,6 +57,7 @@ class LuceneIndexSchemaManagerDropIfExistingIT {
 		assertThat( indexExists() ).isFalse();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
 	void alreadyExists() throws IOException {

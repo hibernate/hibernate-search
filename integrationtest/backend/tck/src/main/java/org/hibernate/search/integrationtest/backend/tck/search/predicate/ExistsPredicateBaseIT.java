@@ -231,6 +231,7 @@ class ExistsPredicateBaseIT {
 				super( testValues( fieldType ) );
 			}
 
+			@SuppressWarnings("unused") // For EJC and lambda arg
 			public void contribute(BulkIndexer scoreIndexer) {
 				IndexBinding binding = index.binding();
 				scoreIndexer.add( docId( 0 ), routingKey, document -> {

@@ -91,6 +91,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	@Mock
 	private SelectionEntityLoader<ContainedEntity> containedEntityLoaderMock;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public void setup(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
 			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
 		this.commitStrategy = commitStrategy;
@@ -194,6 +195,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		when( containedEntityLoaderMock.load( ids, null ) ).thenReturn( entities );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected final void expectOperation(CompletableFuture<?> futureFromBackend, int id, String providedRoutingKey,
 			String value) {
 		expectOperation( futureFromBackend, ignored -> {}, id, providedRoutingKey, value );
@@ -237,6 +239,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 				tenantId, String.valueOf( id ), expectedRoutingKey, value, null );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected final void expectUpdateCausedByContained(CompletableFuture<?> futureFromBackend, int id,
 			String value, String containedValue) {
 		expectUpdateCausedByContained( futureFromBackend, ignored -> {}, id, value, containedValue );

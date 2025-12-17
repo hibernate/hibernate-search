@@ -34,6 +34,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 	protected abstract SessionFactory sessionFactory();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected final <T> void testLoading(
 			Consumer<Session> sessionSetup,
 			List<? extends Class<? extends T>> targetClasses,

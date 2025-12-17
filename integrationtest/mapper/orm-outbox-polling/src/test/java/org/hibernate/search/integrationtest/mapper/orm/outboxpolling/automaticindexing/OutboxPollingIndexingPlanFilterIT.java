@@ -51,6 +51,7 @@ class OutboxPollingIndexingPlanFilterIT {
 		).setup();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void clearFilter() throws Exception {
 		Search.mapping( sessionFactory ).indexingPlanFilter(

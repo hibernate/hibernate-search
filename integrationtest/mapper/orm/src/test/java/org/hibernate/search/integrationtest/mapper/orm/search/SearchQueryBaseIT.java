@@ -92,6 +92,7 @@ class SearchQueryBaseIT {
 		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( Book.class, Author.class, NotIndexed.class ).setup();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void initData() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -153,6 +154,7 @@ class SearchQueryBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void target_byClass_singleType() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -181,6 +183,7 @@ class SearchQueryBaseIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3896")
 	void target_byClass_singleType_reuseQueryInstance() {
@@ -213,6 +216,7 @@ class SearchQueryBaseIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void target_byClass_multipleTypes() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -373,6 +377,7 @@ class SearchQueryBaseIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void selectEntity() {
 		with( sessionFactory ).runInTransaction( session -> {

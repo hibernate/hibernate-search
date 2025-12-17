@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @MethodSource("params")
 public abstract class AbstractSettingsPerShardIT {
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public static List<? extends Arguments> params() {
 		Set<String> hashShardIds = CollectionHelper.asImmutableSet( "0", "1", "2", "3" );
 		Set<String> explicitShardIds = CollectionHelper.asImmutableSet( "first", "second", "other", "yetanother" );

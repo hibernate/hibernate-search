@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -797,6 +798,7 @@ class TermsAggregationSpecificsIT<F> {
 			}
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		private void init() {
 			BulkIndexer indexer = index.bulkIndexer();
 			for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
@@ -820,16 +822,19 @@ class TermsAggregationSpecificsIT<F> {
 		final SimpleFieldModelsByType fieldWithAggregationDisabledModels;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"", c -> c.aggregable( Aggregable.YES )
 							.searchable( Searchable.NO ) // Terms aggregations should not need this
 			);
-			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() )
 			);
-			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"nonAggregable_", c -> c.aggregable( Aggregable.NO )
 			);
 		}

@@ -200,6 +200,7 @@ class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void lockedEventRowRetries() {
 		assumeTrue(

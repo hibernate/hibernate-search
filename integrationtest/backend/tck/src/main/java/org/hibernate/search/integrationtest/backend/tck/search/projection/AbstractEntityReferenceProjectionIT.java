@@ -100,6 +100,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	public static void initData(BulkIndexer indexer) {
 		indexer
 				.add( DOCUMENT_1_ID, document -> {} )

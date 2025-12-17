@@ -132,6 +132,7 @@ class PhrasePredicateSpecificsIT {
 			super( null );
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public void contribute(BulkIndexer indexer) {
 			indexer.add( DOCUMENT_1, document -> {
 				document.addValue( index.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );

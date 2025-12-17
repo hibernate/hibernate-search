@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -90,7 +91,9 @@ class SingleFieldAggregationBaseIT<F> {
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.aggregable( Aggregable.YES ) );
+			root -> SingleFieldIndexBinding.create( root,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes,
+					c -> c.aggregable( Aggregable.YES ) );
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of( bindingFactory ).name( "Main" );
@@ -342,6 +345,7 @@ class SingleFieldAggregationBaseIT<F> {
 			this.fieldStructure = fieldStructure;
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		private void contribute(BulkIndexer mainIndexer, BulkIndexer nullOnlyIndexer) {
 			if ( fieldStructure.isSingleValued() ) {
 				List<F> values = expectations.getMainIndexDocumentFieldValues();

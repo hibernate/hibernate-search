@@ -222,6 +222,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 				.hasMessageContaining( "'semantic' must not be null" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void testLoadingWithEntityGraph(String graphName, GraphSemantic graphSemantic,
 			boolean expectEagerAssociationLoaded, boolean expectLazyAssociationLoaded) {
 		testLoading(

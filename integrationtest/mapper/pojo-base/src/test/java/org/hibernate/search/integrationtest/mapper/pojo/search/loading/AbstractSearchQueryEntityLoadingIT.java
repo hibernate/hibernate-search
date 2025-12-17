@@ -83,6 +83,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query,
 			List<DocumentReference> hitDocumentReferences) {
 		backendMock.expectSearchObjects(

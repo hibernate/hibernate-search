@@ -7,6 +7,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -370,9 +371,11 @@ class RangePredicateSpecificsIT<F> {
 		final SimpleFieldModelsByType customDslConverterField;
 
 		IndexBinding(IndexSchemaElement root) {
-			defaultDslConverterField = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			defaultDslConverterField = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"defaultDslConverterField_" );
-			customDslConverterField = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+			customDslConverterField = SimpleFieldModelsByType.mapAll(
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes, root,
 					"customDslConverterField_",
 					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 		}

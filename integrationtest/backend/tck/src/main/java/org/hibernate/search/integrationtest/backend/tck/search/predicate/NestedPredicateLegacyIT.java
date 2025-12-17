@@ -288,6 +288,7 @@ class NestedPredicateLegacyIT {
 				.hasTotalHitCount( 2 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static void initData() {
 		BulkIndexer mainIndexIndexer = mainIndex.bulkIndexer();
 		mainIndexIndexer

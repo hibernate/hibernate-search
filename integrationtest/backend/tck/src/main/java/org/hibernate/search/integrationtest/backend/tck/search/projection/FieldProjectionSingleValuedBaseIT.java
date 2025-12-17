@@ -70,6 +70,7 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
 					root,

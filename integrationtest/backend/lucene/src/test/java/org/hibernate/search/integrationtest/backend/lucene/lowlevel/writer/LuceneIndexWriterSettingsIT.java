@@ -41,6 +41,7 @@ class LuceneIndexWriterSettingsIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
 	void defaults() {
@@ -94,6 +95,7 @@ class LuceneIndexWriterSettingsIT {
 				.hasTotalHitCount( 1L );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
 	@PortedFromSearch5(

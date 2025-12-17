@@ -43,6 +43,7 @@ class MarkerBindingBaseIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(), backendMock );
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
@@ -52,6 +53,7 @@ class MarkerBindingBaseIT {
 		verifyExtractedModelType();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
@@ -101,6 +103,7 @@ class MarkerBindingBaseIT {
 
 	public static class ExtractTypeModelBinder implements TypeBinder {
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		@Override
 		public void bind(TypeBindingContext context) {
 			context.dependencies().useRootOnly();

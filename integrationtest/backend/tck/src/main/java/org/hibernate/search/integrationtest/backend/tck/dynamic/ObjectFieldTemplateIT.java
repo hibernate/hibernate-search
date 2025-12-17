@@ -52,6 +52,7 @@ class ObjectFieldTemplateIT {
 
 	private SimpleMappedIndex<IndexBinding> index;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
 	void simple() {
@@ -100,6 +101,7 @@ class ObjectFieldTemplateIT {
 	/**
 	 * Templates defined on a given object should also be taken into account in their children.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
 	void inherited() {
@@ -149,6 +151,7 @@ class ObjectFieldTemplateIT {
 		checkNested( "staticObject.foo" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
 	void matchingPathGlob() {
@@ -214,6 +217,7 @@ class ObjectFieldTemplateIT {
 		checkFlattened( "bar_flattened" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-4048" })
 	void matchingPathGlob_precedence_firstDeclared() {
@@ -283,6 +287,7 @@ class ObjectFieldTemplateIT {
 		checkFlattened( "flattened_object" );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
 	void matchingPathGlob_precedence_deepestDeclared() {
@@ -358,6 +363,7 @@ class ObjectFieldTemplateIT {
 	/**
 	 * The {@code exists} predicate should detect static object fields even if all their sub-fields are dynamic.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
 	void exists_staticObjectField() {
@@ -421,6 +427,7 @@ class ObjectFieldTemplateIT {
 	/**
 	 * The {@code exists} predicate should detect dynamic object fields even if all their sub-fields are dynamic.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
 	void exists_dynamicObjectField() {
@@ -497,6 +504,7 @@ class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void checkFlattened(String objectFieldPath) {
 		assertThatThrownBy( () -> query(
 				f -> f.nested( objectFieldPath )
@@ -518,6 +526,7 @@ class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED, DOCUMENT_MATCHING_FOR_ALL );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> rootTemplatesBinder) {
 		return setup( schemaManagementStrategy, rootTemplatesBinder, ignored -> {} );

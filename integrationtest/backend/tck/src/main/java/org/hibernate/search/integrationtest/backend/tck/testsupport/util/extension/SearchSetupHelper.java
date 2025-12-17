@@ -264,7 +264,7 @@ public class SearchSetupHelper extends AbstractScopeTrackingExtension implements
 			return setupFirstPhaseOnly( Optional.empty() );
 		}
 
-		@SuppressWarnings("resource") // For the eclipse-compiler: complains on StubMappingImpl not bing closed
+		@SuppressWarnings({ "resource", "unused" }) // For the eclipse-compiler: complains on StubMappingImpl not bing closed
 		public PartialSetup setupFirstPhaseOnly(Optional<StubMapping> previousMapping) {
 			Context context = currentContext();
 			SearchIntegrationEnvironment environment =

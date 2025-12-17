@@ -33,6 +33,7 @@ class LuceneGetIndexSizeIT {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void computeIndexSize() {
 		//tag::computeIndexSize[]

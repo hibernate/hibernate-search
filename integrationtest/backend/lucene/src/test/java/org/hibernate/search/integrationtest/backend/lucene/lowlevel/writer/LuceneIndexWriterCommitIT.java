@@ -58,6 +58,7 @@ class LuceneIndexWriterCommitIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
 	@MethodSource("params")
 	void commitStrategyNone(String ioStrategyName, Integer commitInterval) throws IOException {
@@ -86,6 +87,7 @@ class LuceneIndexWriterCommitIT {
 		} );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
 	@MethodSource("params")
 	void commitStrategyForce(String ioStrategyName, Integer commitInterval) throws IOException {
@@ -109,6 +111,7 @@ class LuceneIndexWriterCommitIT {
 	/**
 	 * Test that changes are actually committed when closing the integration.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
 	@MethodSource("params")
 	void integrationClose(String ioStrategyName, Integer commitInterval) throws IOException {

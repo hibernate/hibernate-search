@@ -142,6 +142,7 @@ public class PerSessionFactoryIndexingCountHelper {
 
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static class StaticCountersKeys {
 		private final Map<String, StaticCounters.Key> keys = new ConcurrentHashMap<>();
 

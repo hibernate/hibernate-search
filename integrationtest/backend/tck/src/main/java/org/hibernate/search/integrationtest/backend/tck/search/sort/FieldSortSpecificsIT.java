@@ -16,6 +16,7 @@ import java.time.MonthDay;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -104,7 +105,9 @@ class FieldSortSpecificsIT<F> {
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.sortable( Sortable.YES ) );
+			root -> SingleFieldIndexBinding.create( root,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes,
+					c -> c.sortable( Sortable.YES ) );
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
 

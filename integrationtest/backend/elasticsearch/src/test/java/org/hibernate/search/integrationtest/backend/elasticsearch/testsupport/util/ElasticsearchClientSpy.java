@@ -121,6 +121,7 @@ public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCall
 			delegate.close();
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		@Override
 		public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
 			requestCount.incrementAndGet();

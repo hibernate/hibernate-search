@@ -187,6 +187,7 @@ class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		setupAndValidate( null, operation );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndValidate(Object layoutStrategy, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

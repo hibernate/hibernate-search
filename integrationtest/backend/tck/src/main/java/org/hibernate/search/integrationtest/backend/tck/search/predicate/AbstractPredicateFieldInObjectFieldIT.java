@@ -103,6 +103,7 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 			super( values );
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
 				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, BulkIndexer missingFieldIndexer) {
 			F fieldValue = values.fieldValue( 0 );

@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -72,10 +73,11 @@ class FieldProjectionMultiValuedBaseIT<F> {
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.create(
 					root,
-					supportedFieldTypes,
+					(Collection<? extends StandardFieldTypeDescriptor<?>>) supportedFieldTypes,
 					TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
 							? c -> {}
 							: c -> c.projectable( Projectable.YES )

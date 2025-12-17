@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.common.EntityReference;
@@ -23,6 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
@@ -103,7 +105,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoEntityReferenceFactory createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate) {
+	public EntityReferenceFactory createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate) {
 		return new PojoEntityReferenceFactory( delegate, typeManagers );
 	}
 
@@ -119,7 +121,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 				mappingContext,
 				rootScope,
 				typeManagers,
-				typeManagers.indexedForSuperTypeClasses( classes ),
+				(Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>) typeManagers.indexedForSuperTypeClasses( classes ),
 				indexedTypeExtendedContextProvider
 		);
 	}
@@ -163,7 +165,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 				mappingContext,
 				rootScope,
 				typeManagers,
-				typeManagers.indexedForSuperTypes( targetedTypes ),
+				(Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>) typeManagers.indexedForSuperTypes( targetedTypes ),
 				indexedTypeExtendedContextProvider
 		);
 	}

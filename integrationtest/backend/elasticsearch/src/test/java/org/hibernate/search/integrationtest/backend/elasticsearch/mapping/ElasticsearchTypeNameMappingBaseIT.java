@@ -231,6 +231,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 		initData();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void initData() {
 		BulkIndexer indexer1 = index1.bulkIndexer()
 				.add( ID_1, document -> {} )

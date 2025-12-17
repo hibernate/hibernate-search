@@ -101,6 +101,7 @@ class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndDropAndCreateIndex() {
 		setupHelper.start()
 				.withIndex( index )

@@ -66,6 +66,7 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 	private StubIndexModel index2Model;
 
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	void setup(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
@@ -90,6 +91,7 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void indexing(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
@@ -145,6 +147,7 @@ class DocumentIdDefaultBridgeBaseIT<I> {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void projection_id(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {

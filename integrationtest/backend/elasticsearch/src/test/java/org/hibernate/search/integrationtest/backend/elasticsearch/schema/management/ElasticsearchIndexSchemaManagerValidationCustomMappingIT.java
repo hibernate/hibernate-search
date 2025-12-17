@@ -219,6 +219,7 @@ class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						.failure( "Missing property mapping" ) );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private void setupAndValidate(String customMappingFile, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

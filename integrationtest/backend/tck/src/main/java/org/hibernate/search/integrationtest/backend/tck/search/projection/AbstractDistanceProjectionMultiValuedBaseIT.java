@@ -87,6 +87,7 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 	@RegisterExtension
 	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of(
 					root -> SingleFieldIndexBinding.create(
@@ -98,6 +99,8 @@ abstract class AbstractDistanceProjectionMultiValuedBaseIT {
 					)
 			)
 					.name( "main" );
+
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> sortableIndex =
 			SimpleMappedIndex.of(
 					root -> SingleFieldIndexBinding.create(

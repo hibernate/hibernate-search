@@ -80,6 +80,7 @@ class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void test() {
 		// Init

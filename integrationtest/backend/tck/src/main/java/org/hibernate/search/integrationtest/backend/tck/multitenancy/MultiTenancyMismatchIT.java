@@ -87,6 +87,7 @@ class MultiTenancyMismatchIT {
 				);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void using_multi_tenancy_for_add_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
@@ -105,6 +106,7 @@ class MultiTenancyMismatchIT {
 				);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void using_multi_tenancy_for_update_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();

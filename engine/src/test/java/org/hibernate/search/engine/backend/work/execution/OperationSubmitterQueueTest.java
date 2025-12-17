@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("unused") // For EJC and lambda arg
 class OperationSubmitterQueueTest {
 
 	private BlockingQueue<Integer> queue;

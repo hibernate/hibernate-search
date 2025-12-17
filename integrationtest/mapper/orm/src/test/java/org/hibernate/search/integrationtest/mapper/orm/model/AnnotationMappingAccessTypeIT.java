@@ -52,6 +52,7 @@ class AnnotationMappingAccessTypeIT {
 
 	private SessionFactory sessionFactory;
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b

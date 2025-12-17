@@ -246,6 +246,7 @@ class NamedPredicateBaseIT {
 			super( null );
 		}
 
+		@SuppressWarnings("unused") // For EJC and lambda arg
 		public void contribute(BulkIndexer indexer) {
 			indexer
 					.add( DOCUMENT_1, document -> index.binding().initDocument( document, WORD_1, WORD_2, WORD_3, WORD_4 ) )

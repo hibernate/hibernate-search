@@ -55,6 +55,7 @@ class EntityLoadingBinderInheritanceIT {
 		entityMap.put( derived1.id, derived1 );
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void binder_inheritance() throws InterruptedException {
 		String rootEntityName = RootEntity.class.getSimpleName();
@@ -116,6 +117,7 @@ class EntityLoadingBinderInheritanceIT {
 	}
 
 	// Same as the test above, but with explicit names
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void inheritance_explicitName() throws InterruptedException {
 		String rootEntityName = "customRootName";

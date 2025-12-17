@@ -136,7 +136,8 @@ class FieldSortFilteringSpecificsIT<F> {
 		final SimpleFieldModelsByType fieldModels;
 
 		AbstractObjectMapping(IndexSchemaElement self) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(), self,
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					(Stream<? extends StandardFieldTypeDescriptor<?>>) supportedTypeDescriptors(), self,
 					"", c -> c.sortable( Sortable.YES ) );
 		}
 	}

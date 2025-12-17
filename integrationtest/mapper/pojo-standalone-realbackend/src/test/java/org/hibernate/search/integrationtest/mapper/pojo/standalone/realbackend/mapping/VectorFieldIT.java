@@ -273,6 +273,7 @@ class VectorFieldIT {
 		}
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static boolean isVectorSearchSupported() {
 		return BackendConfiguration.isLucene()
 				|| ElasticsearchTestDialect.isActualVersion(

@@ -158,6 +158,7 @@ class AutomaticIndexingElementCollectionIT {
 	 * Test that updating a non-indexed element collection
 	 * does not trigger reindexing of the indexed entity owning the collection.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	void directValueUpdate_nonIndexedElementCollectionField() {
@@ -199,6 +200,7 @@ class AutomaticIndexingElementCollectionIT {
 	 * We need dedicated tests for this because Hibernate ORM does not handle
 	 * replaced collections the same way as it does updated collections.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	void directValueReplace_nonIndexedElementCollectionField() {

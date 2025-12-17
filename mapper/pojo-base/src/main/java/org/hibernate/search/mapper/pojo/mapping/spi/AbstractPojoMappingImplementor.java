@@ -47,6 +47,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
+	@SuppressWarnings("deprecation") // For EJC
 	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate) {
 		this( delegate, PojoEntityReference::new );
 	}

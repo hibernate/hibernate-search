@@ -89,6 +89,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	/**
 	 * Test loading without any specific configuration.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void simple() {
 		final int entityCount = 3;
@@ -104,6 +105,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void simple_withVeryLargeTimeout() {
 		final int entityCount = 3;
@@ -120,6 +122,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		);
 	}
 
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void simple_entityLoadingTimeout() {
 		final int entityCount = 3;
@@ -144,6 +147,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 * In that case, we expect the loader to return null,
 	 * and the backend to skip the corresponding hits.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	void notFound() {
@@ -167,6 +171,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	/**
 	 * Test that returned results are initialized even if a proxy was present in the persistence context.
 	 */
+	@SuppressWarnings("unused") // For EJC and lambda arg
 	@Test
 	void initializeProxyFromPersistenceContext() {
 		final int entityCount = 10;
