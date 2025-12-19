@@ -4,10 +4,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
-import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
@@ -26,7 +26,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
 public class ElasticsearchAwsSigningInterceptorProvider implements ElasticsearchRequestInterceptorProvider {
-	private static final Pattern DISTRIBUTION_NAME_PATTERN = Pattern.compile( "([^\\d]+)?(?:(?<=^)|(?=$)|(?<=.):(?=.))(.+)?" );
+
 	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
 					.asBoolean()
@@ -55,9 +55,9 @@ public class ElasticsearchAwsSigningInterceptorProvider implements Elasticsearch
 					.asString()
 					.build();
 
-	static final OptionalConfigurationProperty<String> DISTRIBUTION_NAME =
+	static final OptionalConfigurationProperty<ElasticsearchVersion> VERSION =
 			ConfigurationProperty.forKey( "version" )
-					.asString()
+					.as( ElasticsearchVersion.class, ElasticsearchVersion::of )
 					.build();
 
 	@Override
@@ -72,15 +72,10 @@ public class ElasticsearchAwsSigningInterceptorProvider implements Elasticsearch
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, AwsLog.INSTANCE::missingPropertyForSigning );
 		String service;
 
-		String distributionName = DISTRIBUTION_NAME.getAndTransform( propertySource,
-				v -> v.map( ver -> ver.toLowerCase( Locale.ROOT ) )
-						.map( DISTRIBUTION_NAME_PATTERN::matcher )
-						.map( matcher -> {
-							if ( matcher.matches() ) {
-								return matcher.group( 1 );
-							}
-							return null;
-						} ).orElse( "opensearch" ) );
+		String distributionName = VERSION.get( propertySource )
+				.map( ElasticsearchVersion::distribution )
+				.map( ElasticsearchDistributionName::externalRepresentation )
+				.orElse( "opensearch" );
 
 		if ( "amazon-opensearch-serverless".equals( distributionName ) ) {
 			service = "aoss";
