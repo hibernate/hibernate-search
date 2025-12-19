@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-integrationtest-performance</artifactId>
-        <version>8.2.1-SNAPSHOT</version>
+        <version>8.2.1.Final</version>
         <relativePath>../..</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest-performance-backend-base</artifactId>
