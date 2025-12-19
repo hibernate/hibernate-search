@@ -30,7 +30,7 @@ Elasticsearch::
 The Elasticsearch backend works with Elasticsearch 9.2, as well as other already compatible versions.
 [[opensearch-version]]
 OpenSearch::
-The Elasticsearch backend works with OpenSearch 3.2 and 3.3, as well as other already compatible versions.
+The Elasticsearch backend works with OpenSearch 3.2, 3.3 and 3.4, as well as other already compatible versions.
 
 [[pluggable-clients]]
 == Pluggable Elasticsearch backend REST clients
