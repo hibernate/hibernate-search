@@ -4,6 +4,6 @@
   <ignoreVersions>
     <!-- Restrict allowed versions to a particular major/range-of-minors, because forbidding major/minor upgrades
          in the version-maven-plugin configuration doesn't always work for some reason. -->
-    <ignoreVersion type="regex">(?!10\.\d+\.).*</ignoreVersion>
+    <ignoreVersion type="regex">(?!10\.3\.).*</ignoreVersion>
   </ignoreVersions>
 </ruleset>
