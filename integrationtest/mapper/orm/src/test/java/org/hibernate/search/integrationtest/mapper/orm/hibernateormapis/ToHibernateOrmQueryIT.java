@@ -211,8 +211,10 @@ class ToHibernateOrmQueryIT {
 					Arrays.asList( IndexedEntity.NAME ),
 					b -> {},
 					StubSearchWorkBehavior.of(
-							2L,
-							reference( IndexedEntity.NAME, "1" ),
+							// https://github.com/hibernate/hibernate-orm/commit/2597db20341ea5d9313e4a0d42d2f2ab5c4eab98
+							// multiple same references won't work here anymore ^
+							1L,
+							//reference( IndexedEntity.NAME, "1" ),
 							reference( IndexedEntity.NAME, "1" )
 					)
 			);

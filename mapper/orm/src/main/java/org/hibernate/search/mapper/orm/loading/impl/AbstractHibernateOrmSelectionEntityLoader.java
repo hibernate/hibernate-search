@@ -6,6 +6,8 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.List;
 
+import jakarta.persistence.PersistenceException;
+
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -46,6 +48,21 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 				throw e;
 			}
 			throw deadline.forceTimeoutAndCreateException( e );
+		}
+		// We might get a jakarta.persistence.PersistenceException instead
+		//  of a more specific jakarta.persistence.QueryTimeoutException
+		//  if tx was marked for rollback, so we need to handle that differently here
+		//
+		//  See also: https://github.com/hibernate/hibernate-orm/commit/01b3ee1f9f2949390e0cb2d9065915f379da5a1f
+		catch (PersistenceException pe) {
+			if ( pe.getCause() instanceof QueryTimeoutException ) {
+				if ( deadline == null ) {
+					// ORM-initiated timeout: just propagate the exception.
+					throw pe;
+				}
+				throw deadline.forceTimeoutAndCreateException( pe );
+			}
+			throw pe;
 		}
 	}
 
