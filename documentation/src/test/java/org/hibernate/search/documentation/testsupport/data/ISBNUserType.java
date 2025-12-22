@@ -9,14 +9,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import org.hibernate.HibernateException;
 import org.hibernate.type.descriptor.WrapperOptions;
-import org.hibernate.usertype.UserType;
+import org.hibernate.usertype.EnhancedUserType;
 
 /**
  * In some cases, e.g. with {@link jakarta.persistence.Id}, an {@link jakarta.persistence.AttributeConverter attribute converter}
  * cannot be used, then we'll rely on a user type instead.
  */
-public class ISBNUserType implements UserType<ISBN> {
+public class ISBNUserType implements EnhancedUserType<ISBN> {
 
 	@Override
 	public int getSqlType() {
@@ -52,5 +53,20 @@ public class ISBNUserType implements UserType<ISBN> {
 		else {
 			st.setString( position, value.getStringValue() );
 		}
+	}
+
+	@Override
+	public String toSqlLiteral(ISBN value) {
+		return value == null ? null : value.getStringValue();
+	}
+
+	@Override
+	public String toString(ISBN value) throws HibernateException {
+		return toSqlLiteral( value );
+	}
+
+	@Override
+	public ISBN fromStringValue(CharSequence sequence) throws HibernateException {
+		return sequence == null ? null : ISBN.parse( sequence.toString() );
 	}
 }

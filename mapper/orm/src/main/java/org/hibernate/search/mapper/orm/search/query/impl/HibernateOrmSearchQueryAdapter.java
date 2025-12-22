@@ -29,9 +29,7 @@ import org.hibernate.query.spi.AbstractQuery;
 import org.hibernate.query.spi.MutableQueryOptions;
 import org.hibernate.query.spi.ParameterMetadataImplementor;
 import org.hibernate.query.spi.QueryImplementor;
-import org.hibernate.query.spi.QueryParameterBinding;
 import org.hibernate.query.spi.QueryParameterBindings;
-import org.hibernate.query.spi.QueryParameterImplementor;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
@@ -239,11 +237,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	public QueryParameterBindings getQueryParameterBindings() {
 		// parameters not supported in Hibernate Search queries
 		return QueryParameterBindings.empty();
-	}
-
-	@Override
-	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
-		throw parametersNoSupported();
 	}
 
 	private UnsupportedOperationException parametersNoSupported() {
