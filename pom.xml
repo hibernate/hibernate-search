@@ -488,7 +488,7 @@
         <!-- See https://hub.docker.com/_/postgres -->
         <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
         <test.database.run.postgres.image.name>docker.io/postgres</test.database.run.postgres.image.name>
-        <test.database.run.postgres.image.tag>15.1</test.database.run.postgres.image.tag>
+        <test.database.run.postgres.image.tag>9.1.24</test.database.run.postgres.image.tag>
         <!-- MariaDB -->
         <!-- See https://hub.docker.com/_/mariadb -->
         <test.database.run.mariadb.skip>true</test.database.run.mariadb.skip>
@@ -498,7 +498,7 @@
         <!-- See https://hub.docker.com/_/mysql -->
         <test.database.run.mysql.skip>true</test.database.run.mysql.skip>
         <test.database.run.mysql.image.name>docker.io/mysql</test.database.run.mysql.image.name>
-        <test.database.run.mysql.image.tag>8.0.31</test.database.run.mysql.image.tag>
+        <test.database.run.mysql.image.tag>5.5.62</test.database.run.mysql.image.tag>
     </properties>
 
     <dependencyManagement>
@@ -2959,7 +2959,7 @@
             ###################################################################
         -->
 
-        <!-- The MySQL 5.1 test environment -->
+        <!-- The MySQL 5.5 test environment -->
         <profile>
             <id>mysql51</id>
             <properties>
@@ -2987,7 +2987,7 @@
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
                 <jdbc.driver.version>42.1.1</jdbc.driver.version>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://localhost:5432:hibernate_orm_test</jdbc.url>
+                <jdbc.url>jdbc:postgresql://localhost:5432/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
                 <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
