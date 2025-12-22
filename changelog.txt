@@ -1,6 +1,32 @@
 Hibernate Search Changelog
 ==========================
 
+7.2.5.Final (2025-12-22)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/33736
+
+
+** Improvement
+    * HSEARCH-5552 Update to Hibernate ORM 6.6.40.Final
+    * HSEARCH-5534 Update to Hibernate ORM 6.6.38.Final
+    * HSEARCH-5494 Update to Hibernate ORM 6.6.31.Final
+    * HSEARCH-5490 Update to Hibernate ORM 6.6.30.Final
+    * HSEARCH-5475 Update to Hibernate ORM 6.6.29.Final
+    * HSEARCH-5473 Include license file in the META-INF of published artifacts
+    * HSEARCH-5469 Update to Hibernate ORM 6.6.28.Final
+    * HSEARCH-5462 Update to Hibernate ORM 6.6.27.Final
+    * HSEARCH-5458 Update to Hibernate ORM 6.6.26.Final
+    * HSEARCH-5450 Update to Hibernate ORM 6.6.25.Final
+    * HSEARCH-5445 Update to Hibernate ORM 6.6.24.Final
+    * HSEARCH-5434 Update to Hibernate ORM 6.6.23.Final
+    * HSEARCH-5424 Upgrade to Hibernate ORM 6.6.22.Final
+    * HSEARCH-5419 Upgrade to Hibernate ORM 6.6.21.Final
+    * HSEARCH-5414 Upgrade to Hibernate ORM 6.6.20.Final
+
+** Task
+    * HSEARCH-5486 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+
 7.2.4.Final (2025-05-30)
 -------------------------
 
