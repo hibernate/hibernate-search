@@ -18,7 +18,7 @@
         <deploy.skip>true</deploy.skip>
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
-        <version.bom.org.hibernate.orm>7.2.0.Final</version.bom.org.hibernate.orm>
+        <version.bom.org.hibernate.orm>7.3.0.CR2</version.bom.org.hibernate.orm>
         <version.bom.org.elasticsearch.client>9.2.4</version.bom.org.elasticsearch.client>
         <version.bom.org.elasticsearch.java.client>9.2.4</version.bom.org.elasticsearch.java.client>
         <version.bom.org.opensearch.client>3.4.0</version.bom.org.opensearch.client>
@@ -242,6 +242,11 @@
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-community-dialects</artifactId>
+                <version>${version.bom.org.hibernate.orm}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-assistant</artifactId>
                 <version>${version.bom.org.hibernate.orm}</version>
             </dependency>
 
