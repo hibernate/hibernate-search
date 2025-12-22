@@ -478,6 +478,27 @@
         <!-- Eclipse plugin options -->
 
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+
+        <!-- Docker container properties and versions -->
+        <version.docker.maven.plugin>0.48.0</version.docker.maven.plugin>
+        <test.containers.run.skip>true</test.containers.run.skip>
+        <!-- Run containers for additional ORM databases -->
+        <test.database.run.skip>true</test.database.run.skip>
+        <!-- PostgreSQL -->
+        <!-- See https://hub.docker.com/_/postgres -->
+        <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
+        <test.database.run.postgres.image.name>docker.io/postgres</test.database.run.postgres.image.name>
+        <test.database.run.postgres.image.tag>15.1</test.database.run.postgres.image.tag>
+        <!-- MariaDB -->
+        <!-- See https://hub.docker.com/_/mariadb -->
+        <test.database.run.mariadb.skip>true</test.database.run.mariadb.skip>
+        <test.database.run.mariadb.image.name>docker.io/mariadb</test.database.run.mariadb.image.name>
+        <test.database.run.mariadb.image.tag>10.10.2</test.database.run.mariadb.image.tag>
+        <!-- MySQL -->
+        <!-- See https://hub.docker.com/_/mysql -->
+        <test.database.run.mysql.skip>true</test.database.run.mysql.skip>
+        <test.database.run.mysql.image.name>docker.io/mysql</test.database.run.mysql.image.name>
+        <test.database.run.mysql.image.tag>8.0.31</test.database.run.mysql.image.tag>
     </properties>
 
     <dependencyManagement>
@@ -1889,6 +1910,125 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${version.docker.maven.plugin}</version>
+                    <configuration>
+                        <skip>${test.containers.run.skip}</skip>
+                        <startParallel>true</startParallel>
+                        <images>
+                            <image>
+                                <name>${test.database.run.postgres.image.name}:${test.database.run.postgres.image.tag}</name>
+                                <alias>postgres</alias>
+                                <run>
+                                    <skip>${test.database.run.postgres.skip}</skip>
+                                    <env>
+                                        <POSTGRES_USER>hibernate_orm_test</POSTGRES_USER>
+                                        <POSTGRES_PASSWORD>hibernate_orm_test</POSTGRES_PASSWORD>
+                                        <POSTGRES_DB>hibernate_orm_test</POSTGRES_DB>
+                                    </env>
+                                    <ports>
+                                        <port>5432:5432</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>PostgreSQL: </prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <wait>
+                                        <time>20000</time>
+                                        <!-- For some reason, Postgres will tell us it's ready *twice*,
+                                             and that's the truth the second time only.
+                                             See https://github.com/fabric8io/docker-maven-plugin/issues/628 -->
+                                        <log>(?s)ready to accept connections.*ready to accept connections</log>
+                                    </wait>
+                                </run>
+                            </image>
+                            <image>
+                                <name>${test.database.run.mariadb.image.name}:${test.database.run.mariadb.image.tag}</name>
+                                <alias>mariadb</alias>
+                                <run>
+                                    <skip>${test.database.run.mariadb.skip}</skip>
+                                    <cmd>--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci</cmd>
+                                    <env>
+                                        <MYSQL_USER>hibernate_orm_test</MYSQL_USER>
+                                        <MYSQL_PASSWORD>hibernate_orm_test</MYSQL_PASSWORD>
+                                        <MYSQL_DATABASE>hibernate_orm_test</MYSQL_DATABASE>
+                                        <MYSQL_RANDOM_ROOT_PASSWORD>true</MYSQL_RANDOM_ROOT_PASSWORD>
+                                    </env>
+                                    <ports>
+                                        <port>3306:3306</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>MariaDB: </prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <!-- Speed things up a bit by not actually flushing writes to disk -->
+                                    <tmpfs>/var/lib/mysql</tmpfs>
+                                    <wait>
+                                        <time>20000</time>
+                                        <exec>
+                                            <postStart>mysqladmin ping -h localhost -u hibernate_orm_test -phibernate_orm_test</postStart>
+                                        </exec>
+                                    </wait>
+                                </run>
+                            </image>
+                            <image>
+                                <name>${test.database.run.mysql.image.name}:${test.database.run.mysql.image.tag}</name>
+                                <alias>mysql</alias>
+                                <run>
+                                    <skip>${test.database.run.mysql.skip}</skip>
+                                    <env>
+                                        <MYSQL_USER>hibernate_orm_test</MYSQL_USER>
+                                        <MYSQL_PASSWORD>hibernate_orm_test</MYSQL_PASSWORD>
+                                        <MYSQL_DATABASE>hibernate_orm_test</MYSQL_DATABASE>
+                                        <MYSQL_RANDOM_ROOT_PASSWORD>true</MYSQL_RANDOM_ROOT_PASSWORD>
+                                    </env>
+                                    <ports>
+                                        <port>3306:3306</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>MySQL:</prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <!-- Speed things up a bit by not actually flushing writes to disk -->
+                                    <tmpfs>/var/lib/mysql</tmpfs>
+                                    <wait>
+                                        <time>20000</time>
+                                        <exec>
+                                            <postStart>mysqladmin ping -h localhost -u hibernate_orm_test -phibernate_orm_test</postStart>
+                                        </exec>
+                                    </wait>
+                                </run>
+                            </image>
+                        </images>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>docker-start</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <!-- Stops all images currently running before starting them again.
+                                     Useful to stop processes still running from a previously failed integration test run.
+                                     Because this is invoked before the start goal,
+                                     this will stop all images defined in the configuration, not just those we will start.
+                                     -->
+                                <goal>stop</goal>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>docker-stop</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -2824,15 +2964,17 @@
             <id>mysql51</id>
             <properties>
                 <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
-                <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
+                <jdbc.driver.groupId>com.mysql</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mysql-connector-j</jdbc.driver.artifactId>
                 <!-- Version 6.0.5 fails with a ArrayIndexOutOfBoundsException during connection, so we'll stick to 5.x for now -->
-                <jdbc.driver.version>5.1.13</jdbc.driver.version>
+                <jdbc.driver.version>9.5.0</jdbc.driver.version>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.url>jdbc:mysql://localhost:3306/hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
+                <test.database.run.mysql.skip>false</test.database.run.mysql.skip>
+                <test.containers.run.skip>false</test.containers.run.skip>
             </properties>
         </profile>
 
@@ -2845,10 +2987,12 @@
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
                 <jdbc.driver.version>42.1.1</jdbc.driver.version>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.url>jdbc:postgresql://localhost:5432:hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
+                <test.database.run.postgres.skip>false</test.database.run.postgres.skip>
+                <test.containers.run.skip>false</test.containers.run.skip>
             </properties>
         </profile>
 
@@ -2861,10 +3005,12 @@
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
                 <jdbc.driver.version>42.1.1</jdbc.driver.version>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://localhost:5432/testingdb</jdbc.url>
-                <jdbc.user>hibernate_user</jdbc.user>
-                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.url>jdbc:postgresql://localhost:5432/hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
+                <test.database.run.postgres.skip>false</test.database.run.postgres.skip>
+                <test.containers.run.skip>false</test.containers.run.skip>
             </properties>
         </profile>
 
@@ -2875,12 +3021,14 @@
                 <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
-                <jdbc.driver.version>2.2.4</jdbc.driver.version>
+                <jdbc.driver.version>3.5.7</jdbc.driver.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mariadb://localhost/testingdb</jdbc.url>
-                <jdbc.user>hibernate_user</jdbc.user>
-                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.url>jdbc:mariadb://localhost:3306/hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
+                <test.database.run.mariadb.skip>false</test.database.run.mariadb.skip>
+                <test.containers.run.skip>false</test.containers.run.skip>
             </properties>
         </profile>
 

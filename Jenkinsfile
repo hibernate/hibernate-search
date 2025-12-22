@@ -341,7 +341,7 @@ stage('Non-default environments') {
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
-			runBuildOnNode('FedoraLegacyDBInstall') {
+			runBuildOnNode {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-orm -P$buildEnv.mavenProfile \
