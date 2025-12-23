@@ -276,7 +276,7 @@
         <version.install.plugin>3.1.4</version.install.plugin>
         <version.enforcer.plugin>3.6.2</version.enforcer.plugin>
         <version.project-info.plugin>3.9.0</version.project-info.plugin>
-        <version.japicmp.plugin>0.25.0</version.japicmp.plugin>
+        <version.japicmp.plugin>0.25.1</version.japicmp.plugin>
         <version.deploy.plugin>3.1.4</version.deploy.plugin>
         <version.flatten-maven-plugin>1.7.3</version.flatten-maven-plugin>
         <version.assembly.plugin>3.8.0</version.assembly.plugin>
@@ -287,7 +287,7 @@
         <version.dependency.plugin>3.9.0</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>12.1.9</version.dependency-check.plugin>
-        <version.exec.plugin>3.6.2</version.exec.plugin>
+        <version.exec.plugin>3.6.3</version.exec.plugin>
         <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
         <!-- Make sure that upgraded Jandex plugin aligns with the Jandex version imported from the ORM platform pom -->
         <version.jandex.plugin>3.5.3</version.jandex.plugin>
