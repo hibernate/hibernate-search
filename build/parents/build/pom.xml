@@ -53,7 +53,7 @@
         <version.org.elasticsearch.java.client>9.3.0</version.org.elasticsearch.java.client>
         <version.org.opensearch.client>3.4.0</version.org.opensearch.client>
         <!-- Various HTTP client versions that our own Elasticsearch client implementations depend on -->
-        <version.org.apache.httpcomponents.client5>5.5.1</version.org.apache.httpcomponents.client5>
+        <version.org.apache.httpcomponents.client5>5.6</version.org.apache.httpcomponents.client5>
         <version.org.apache.httpcomponents.core5>5.4</version.org.apache.httpcomponents.core5>
         <version.org.apache.httpcomponents.httpclient>4.5.14</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.4.16</version.org.apache.httpcomponents.httpcore>
