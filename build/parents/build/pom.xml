@@ -189,7 +189,7 @@
         <version.dev.snowdrop>3.5.0</version.dev.snowdrop>
         <version.io.agroal>2.8</version.io.agroal>
 
-        <version.jsoup>1.21.2</version.jsoup>
+        <version.jsoup>1.22.1</version.jsoup>
         <version.snakeyaml>2.5</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
