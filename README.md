@@ -47,12 +47,6 @@ Include the following to your dependency list:
        <version>5.10.13.Final</version>
     </dependency>
 
-### Sourceforge Bundle
-
-Download the distribution bundle from
-[SourceForge](http://sourceforge.net/projects/hibernate/files/hibernate-search) and unzip to
-installation directory. Then read the documentation available in *docs/reference*.
-
 ### Building from source
 
     > git clone git@github.com:hibernate/hibernate-search.git
