@@ -380,7 +380,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			SharedSessionContractImplementor sessionImplementor,
 			PojoRawTypeIdentifier<?> typeIdentifier) {
 		try {
-			SessionImplementor session = sessionImplementor.unwrap( SessionImplementor.class );
+			SessionImplementor session = (SessionImplementor) sessionImplementor;
 			HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
 			if ( searchSession != null ) {
 				// If the session exist, rely on the session-level filter
