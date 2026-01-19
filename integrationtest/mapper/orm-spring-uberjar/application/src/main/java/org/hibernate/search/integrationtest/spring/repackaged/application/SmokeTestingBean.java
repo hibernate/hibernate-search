@@ -26,6 +26,7 @@ public class SmokeTestingBean {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	@SuppressWarnings("unused")
 	public void smokeTest() {
 		TransactionTemplate transactionTemplate = new TransactionTemplate( transactionManager );
 

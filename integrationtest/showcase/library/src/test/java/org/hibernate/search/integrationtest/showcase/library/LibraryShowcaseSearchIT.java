@@ -462,6 +462,7 @@ class LibraryShowcaseSearchIT extends AbstractLibraryShowcaseSearchIT {
 				libraryService.getById( SUBURBAN_2_ID, Library::getServices ) );
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	void searchFaceted() {
 		assumeTrue(

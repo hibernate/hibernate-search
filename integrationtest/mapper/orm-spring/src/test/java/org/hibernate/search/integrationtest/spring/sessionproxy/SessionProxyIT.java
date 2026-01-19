@@ -70,6 +70,7 @@ class SessionProxyIT extends AbstractMapperOrmSpringIT {
 		needsInit = true;
 	}
 
+	@SuppressWarnings("unused")
 	@BeforeEach
 	void before() {
 		if ( needsInit ) {
@@ -82,6 +83,7 @@ class SessionProxyIT extends AbstractMapperOrmSpringIT {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	void useSingleSearchSessionFromMultipleThreads() {
 		TransactionTemplate template = new TransactionTemplate( transactionManager );

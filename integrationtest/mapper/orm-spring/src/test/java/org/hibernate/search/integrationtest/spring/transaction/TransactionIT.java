@@ -47,6 +47,7 @@ class TransactionIT extends AbstractMapperOrmSpringIT {
 	@Autowired
 	private HelperService helperService;
 
+	@SuppressWarnings("unused")
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1270")
 	void innerTransactionRollback() {
@@ -66,6 +67,7 @@ class TransactionIT extends AbstractMapperOrmSpringIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1270")
 	void innerTransactionRollback_flushBeforeInner() {

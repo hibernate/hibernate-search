@@ -51,6 +51,7 @@ class TransactionOutboxIT extends AbstractMapperOrmSpringIT {
 	@Autowired
 	private HelperService helperService;
 
+	@SuppressWarnings("unused")
 	@Test
 	void persist() {
 		Integer id = 1;
