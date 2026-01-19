@@ -135,9 +135,6 @@ Fore more information, refer to the Hibernate Search website:
 * [Available versions and compatibility matrix](http://hibernate.org/search/releases/)
 * [Reference documentation for all versions (current and past)](http://hibernate.org/search/documentation/)
 
-For offline use, distribution bundles downloaded from [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-search/)
-also include the reference documentation for the downloaded version in PDF and HTML format. 
-
 ## Contact
 
 ### Latest Documentation
