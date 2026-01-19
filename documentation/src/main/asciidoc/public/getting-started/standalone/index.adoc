@@ -53,10 +53,6 @@ For more advanced setups, you are encouraged to have a look at the xref:{referen
 
 The Hibernate Search artifacts can be found in Maven's http://central.sonatype.org/[Central Repository].
 
-If you do not want to, or cannot, fetch the JARs from a Maven repository,
-you can get them from the
-link:http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/[distribution bundle hosted at Sourceforge].
-
 In order to use Hibernate Search, you will need at least two direct dependencies:
 
 * a dependency to the xref:{reference-documentation-location}#architecture-hsearch-components-mapper["mapper"],
