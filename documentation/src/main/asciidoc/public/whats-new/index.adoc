@@ -17,82 +17,13 @@
 :version-selector-enabled: true
 :stem: latexmath
 
+This release is here to provide the Hibernate ORM 7.3 compatibility.
+
 == Dependency upgrades
 
 [[orm-version]]
 Hibernate ORM::
-Hibernate Search targets the Hibernate ORM 7.2 series.
-[[lucene-version]]
-Lucene::
-The Lucene backend now uses Lucene 9.12.3, while the `lucene-next` backend relies on Lucene 10.3.2
-[[elasticsearch-version]]
-Elasticsearch::
-The Elasticsearch backend works with Elasticsearch 9.2, as well as other already compatible versions.
+Hibernate Search targets the Hibernate ORM 7.3 series.
 [[opensearch-version]]
 OpenSearch::
-The Elasticsearch backend works with OpenSearch 3.2 and 3.3, as well as other already compatible versions.
-
-[[pluggable-clients]]
-== Pluggable Elasticsearch backend REST clients
-
-This version of Hibernate Search introduces pluggable REST clients for the Elasticsearch backend.
-Historically, the Elasticsearch backend relied on the Elasticsearch low-level REST client,
-which is based on the Apache HTTP Client 4. With the new pluggable client architecture,
-it is possible to switch to a different REST client as needed.
-This may be useful when you are running Hibernate Search in an environment relying on a different HTTP client type (e.g. Vert.x).
-or when you need to use some distribution specific client features and for example need to switch to the OpenSearch REST client.
-
-Hibernate Search provides the following REST client options out of the box.
-
-NOTE: It is recommended to explicitly add a client that you prefer as a dependency, since in the future version
-of Hibernate Search we will remove the implicit dependency on `hibernate-search-backend-elasticsearch-client-rest4`
-from the Elasticsearch backend.
-
-[[backend-elasticsearch-configuration-client-elasticsearch-client-rest4]]
-=== Elasticsearch low level REST client (Apache HTTP Client 4)
-
-Coordinates::
-GroupID::: `org.hibernate.search`
-ArtifactID::: `hibernate-search-backend-elasticsearch-client-rest4`
-Underlying HTTP Client::: Apache HTTP Client 4
-
-This Elasticsearch backend REST client is based on the Elasticsearch low level client (`org.elasticsearch.client:elasticsearch-rest-client`).
-Currently, this is the default REST client used by the Elasticsearch backend.
-
-[[backend-elasticsearch-configuration-client-elasticsearch-client-rest5]]
-==== Elasticsearch low level REST client (Apache HTTP Client 5)
-
-Coordinates::
-GroupID::: `org.hibernate.search`
-ArtifactID::: `hibernate-search-backend-elasticsearch-client-rest5`
-Underlying HTTP Client::: Apache HTTP Client 5
-
-This Elasticsearch backend REST client is based on the newer Elasticsearch low level client (`co.elastic.clients:elasticsearch-rest5-client`),
-which is also used in the `co.elastic.clients:elasticsearch-java`.
-
-[[backend-elasticsearch-configuration-client-elasticsearch-client-opensearch]]
-=== OpenSearch low level REST client (Apache HTTP Client 5)
-
-Coordinates::
-GroupID::: `org.hibernate.search`
-ArtifactID::: `hibernate-search-backend-elasticsearch-client-opensearch-rest`
-Underlying HTTP Client::: Apache HTTP Client 5
-
-This Elasticsearch backend REST client is based on the OpenSearch low level client (`org.opensearch.client:opensearch-rest-client`).
-
-[[backend-elasticsearch-configuration-client-elasticsearch-client-jdk]]
-=== Simple REST client based on the JDKs `HttpClient`
-
-Coordinates::
-GroupID::: `org.hibernate.search`
-ArtifactID::: `hibernate-search-backend-elasticsearch`
-Underlying HTTP Client::: JDKs Http Client (`java.net.http.HttpClient`)
-
-This Elasticsearch backend REST client is based on the HTTP client that is part of the JDKs `java.net` API.
-Mostly intended for very basic use cases, and may lack some features,
-e.g. automatic node discovery, compared to the other clients.
-As this client implementation relies only on the JDK, it is shipped as part of the Elasticsearch backend
-and does not require any extra dependencies.
-
-NOTE: JDKs HTTP client allows configuration though the system properties.
-Consult the list of available properties for your JDK version, e.g. https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/module-summary.html[JDK 25]
+The Elasticsearch backend works with OpenSearch 3.4, as well as other already compatible versions.
