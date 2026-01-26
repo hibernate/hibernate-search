@@ -144,7 +144,7 @@
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.21.0</version.org.mockito>
-        <version.org.assertj.assertj-core>3.27.6</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
         <version.org.awaitily>4.3.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
