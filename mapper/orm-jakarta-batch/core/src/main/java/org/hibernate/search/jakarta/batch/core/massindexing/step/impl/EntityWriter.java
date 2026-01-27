@@ -14,12 +14,9 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.batch.runtime.context.StepContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.LockModeType;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -27,16 +24,20 @@ import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperati
 import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
-import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.BatchCoreEntityTypeDescriptor;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchEntityLoader;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchEntitySink;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -79,7 +80,7 @@ public class EntityWriter extends AbstractItemWriter {
 
 	private EntityManagerFactory emf;
 	private BatchMappingContext mappingContext;
-	private EntityTypeDescriptor<?, ?> type;
+	private BatchCoreEntityTypeDescriptor<?, ?> type;
 	private PojoScopeWorkspace workspace;
 
 	private WriteMode writeMode;
@@ -128,9 +129,28 @@ public class EntityWriter extends AbstractItemWriter {
 	@Override
 	public void writeItems(List<Object> entityIds) {
 		try ( Session session = PersistenceUtil.openSession( emf, tenancyConfiguration.convert( tenantId ) ) ) {
-			SessionImplementor sessionImplementor = session.unwrap( SessionImplementor.class );
+			HibernateOrmBatchEntityLoader entityLoader = entityLoader( type,
+					new HibernateOrmBatchEntityLoadingOptions() {
+						@Override
+						public int batchSize() {
+							return entityFetchSize;
+						}
 
-			PojoIndexer indexer = mappingContext.sessionContext( session ).createIndexer();
+						@Override
+						public CacheMode cacheMode() {
+							return cacheMode;
+						}
+
+						@SuppressWarnings("unchecked")
+						@Override
+						public <T> T context(Class<T> contextType) {
+							if ( Session.class.isAssignableFrom( contextType ) ) {
+								return (T) session;
+							}
+							throw new AssertionFailure( "Unexpected context " + contextType + " requested." );
+						}
+					}, session
+			);
 
 			int i = 0;
 			while ( i < entityIds.size() ) {
@@ -138,9 +158,7 @@ public class EntityWriter extends AbstractItemWriter {
 				i += entityFetchSize;
 				int toIndex = Math.min( i, entityIds.size() );
 
-				List<?> entities = loadEntities( sessionImplementor, entityIds.subList( fromIndex, toIndex ) );
-
-				indexAndWaitForCompletion( entities, indexer );
+				entityLoader.load( entityIds.subList( fromIndex, toIndex ) );
 			}
 		}
 
@@ -169,18 +187,6 @@ public class EntityWriter extends AbstractItemWriter {
 	@Override
 	public void close() throws Exception {
 		JakartaBatchLog.INSTANCE.closingEntityWriter( partitionIdStr, entityName );
-	}
-
-	private List<?> loadEntities(SessionImplementor session, List<Object> entityIds) {
-		return type.createLoadingQuery( session, ID_PARAMETER_NAME )
-				.setParameter( ID_PARAMETER_NAME, entityIds )
-				.setReadOnly( true )
-				.setCacheable( false )
-				.setLockMode( LockModeType.NONE )
-				.setCacheMode( cacheMode )
-				.setQueryFlushMode( QueryFlushMode.NO_FLUSH ) // FlushMode.MANUAL
-				.setFetchSize( entityFetchSize )
-				.list();
 	}
 
 	private void indexAndWaitForCompletion(List<?> entities, PojoIndexer indexer) {
@@ -217,6 +223,21 @@ public class EntityWriter extends AbstractItemWriter {
 				// Commit and refresh are handled globally after all documents are indexed.
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 		);
+	}
+
+	<E> HibernateOrmBatchEntityLoader entityLoader(BatchCoreEntityTypeDescriptor<E, ?> type,
+			HibernateOrmBatchEntityLoadingOptions options,
+			Session session) {
+		return type.batchLoadingStrategy().createEntityLoader(
+				type,
+				createSink( session ),
+				options
+		);
+	}
+
+	<E> HibernateOrmBatchEntitySink<E> createSink(Session session) {
+		PojoIndexer indexer = mappingContext.sessionContext( session ).createIndexer();
+		return entities -> indexAndWaitForCompletion( entities, indexer );
 	}
 
 	private enum WriteMode {
