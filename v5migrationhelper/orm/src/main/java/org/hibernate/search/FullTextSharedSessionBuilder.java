@@ -56,6 +56,11 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSession openSession();
 
+	@Override
+	default FullTextSession open() {
+		return openSession();
+	}
+
 	@Deprecated(forRemoval = true)
 	@Override
 	FullTextSharedSessionBuilder tenantIdentifier(String tenantIdentifier);
