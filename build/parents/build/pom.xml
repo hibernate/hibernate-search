@@ -144,7 +144,7 @@
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.21.0</version.org.mockito>
-        <version.org.assertj.assertj-core>3.27.6</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
         <version.org.awaitily>4.3.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
@@ -178,7 +178,7 @@
         <version.com.ibm.jbatch>2.1.1</version.com.ibm.jbatch>
 
         <!-- >>> Jakarta Batch: JBeret SE dependencies -->
-        <version.org.jboss.marshalling>2.2.3.Final</version.org.jboss.marshalling>
+        <version.org.jboss.marshalling>2.3.0</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
 
         <!-- >>> Spring integration tests -->
