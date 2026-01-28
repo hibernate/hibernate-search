@@ -5,6 +5,7 @@
 package org.hibernate.search.util.common.logging.impl;
 
 import java.lang.invoke.MethodHandles.Lookup;
+import java.util.Locale;
 
 import org.jboss.logging.Logger;
 
@@ -16,11 +17,11 @@ public final class LoggerFactory {
 
 	public static <T> T make(Class<T> logClass, Lookup creationContext) {
 		final String className = creationContext.lookupClass().getName();
-		return Logger.getMessageLogger( creationContext, logClass, className );
+		return Logger.getMessageLogger( creationContext, logClass, className, Locale.ROOT );
 	}
 
 	public static <T> T make(Class<T> logClass, String category, Lookup creationContext) {
-		return Logger.getMessageLogger( creationContext, logClass, category );
+		return Logger.getMessageLogger( creationContext, logClass, category, Locale.ROOT );
 	}
 
 }
