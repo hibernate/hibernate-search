@@ -15,8 +15,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
-import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.TransactionCompletionCallbacks;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -347,22 +347,22 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		 * In a JTA env, the before transaction completion is called before the flush, so not all changes are yet
 		 * written. However, Synchronization-s do propagate exceptions, so they can be safely used.
 		 */
-		final ActionQueue actionQueue = sessionImplementor.getActionQueue();
+		final TransactionCompletionCallbacks completionCallbacks = sessionImplementor.getTransactionCompletionCallbacks();
 		SynchronizationAdapter adapter = new SynchronizationAdapter( synchronization );
 
 		boolean isLocal = isLocalTransaction( sessionImplementor );
 		if ( isLocal ) {
 			//if local tx never use Synchronization
-			actionQueue.registerCallback( (BeforeTransactionCompletionProcess) adapter );
+			completionCallbacks.registerCallback( (BeforeTransactionCompletionProcess) adapter );
 		}
 		else {
 			//TODO could we remove the action queue registration in this case?
-			actionQueue.registerCallback( (BeforeTransactionCompletionProcess) adapter );
+			completionCallbacks.registerCallback( (BeforeTransactionCompletionProcess) adapter );
 			sessionImplementor.accessTransaction().registerSynchronization( adapter );
 		}
 
 		//executed in all environments
-		actionQueue.registerCallback( (AfterTransactionCompletionProcess) adapter );
+		completionCallbacks.registerCallback( (AfterTransactionCompletionProcess) adapter );
 	}
 
 	private boolean isLocalTransaction(SessionImplementor sessionImplementor) {
