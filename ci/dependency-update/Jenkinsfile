@@ -308,13 +308,34 @@ pipeline {
 									withMavenWorkspace {
 										pullContainerImages()
 										sh """ \
-									mvn clean install -U -Pdependency-update -Pdist -Pci-build -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)} \
-									--fail-at-end -Dno-build-cache \
-									${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
-								"""
+                                            mvn clean install -U -Pdependency-update -Pdist -Pci-build -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)} \
+                                            --fail-at-end -Dno-build-cache \
+                                            ${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
+                                        """
 									}
 								}
 							}
+                            stage('Test with Postgresql') {
+                                post {
+                                    cleanup {
+                                        sh 'ci/docker-cleanup.sh'
+                                    }
+                                }
+                                options {
+                                    timeout(time: 1, unit: 'HOURS')
+                                }
+                                steps {
+                                    withMavenWorkspace {
+                                        pullContainerImages()
+                                        sh """ \
+                                            mvn clean install -U -Pdependency-update -Pdist -Pci-build -Pci-postgresql \
+                                            -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)}-postgresql \
+                                            --fail-at-end -Dno-build-cache \
+                                            ${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
+                                        """
+                                    }
+                                }
+                            }
 						}
 					}
 				}
