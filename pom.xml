@@ -283,7 +283,7 @@
         <version.buildhelper.plugin>3.6.1</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
         <version.bundle.plugin>6.0.0</version.bundle.plugin>
-        <version.compiler.plugin>3.14.1</version.compiler.plugin>
+        <version.compiler.plugin>3.15.0</version.compiler.plugin>
         <version.dependency.plugin>3.9.0</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>12.2.0</version.dependency-check.plugin>
