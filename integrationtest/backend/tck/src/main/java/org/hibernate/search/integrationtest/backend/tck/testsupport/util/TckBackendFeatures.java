@@ -230,4 +230,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public <T> T aggregatedSumNullValue(Class<T> clazz) {
 		return null;
 	}
+
+	public boolean canHandleDeepNestedPredicate(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
+		return true;
+	}
 }

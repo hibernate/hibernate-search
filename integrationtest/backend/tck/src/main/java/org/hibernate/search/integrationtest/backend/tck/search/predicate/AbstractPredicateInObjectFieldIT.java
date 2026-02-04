@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Collection;
 
@@ -82,6 +83,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void nestedX2_explicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( mainIndex.binding().nested.absolutePath )
 						.add( f.nested( mainIndex.binding().nested.nested.absolutePath )
@@ -95,6 +97,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void nestedX2_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		assertThatQuery( mainIndex.query()
 				.where( f -> predicate( f, mainIndex.binding().nested.nested, 0, dataSet ) )
 				.routing( dataSet.routingKey ) )
@@ -106,6 +109,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void nestedX2_explicit_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( mainIndex.binding().nested.absolutePath )
 						.add( predicate( f, mainIndex.binding().nested.nested, 0, dataSet ) ) )
@@ -118,6 +122,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void nestedX3_explicitX2_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( mainIndex.binding().nested.absolutePath )
 						.add( f.nested( mainIndex.binding().nested.nested.absolutePath )
@@ -131,6 +136,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void nestedX3_explicit_implicitX2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( mainIndex.binding().nested.absolutePath )
 						.add( predicate( f, mainIndex.binding().nested.nested.nested, 0, dataSet ) ) )
@@ -143,6 +149,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void nestedFlattenedNested_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		assertThatQuery( mainIndex.query()
 				.where( f -> predicate( f, mainIndex.binding().nested.flattened.nested, 0, dataSet ) )
 				.routing( dataSet.routingKey ) )
@@ -159,6 +166,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	void multiIndex_missingNestedField_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
+		assumeTrue( canHandleDeepNestedPredicate( dataSet ) );
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		// The "nested" predicate should not match anything in missingFieldIndex
@@ -182,6 +190,10 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal, AbstractPredicateDataSet dataSet);
+
+	protected boolean canHandleDeepNestedPredicate(AbstractPredicateDataSet dataSet) {
+		return true;
+	}
 
 	abstract static class AbstractObjectBinding {
 		final String absolutePath;

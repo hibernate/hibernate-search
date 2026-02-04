@@ -568,4 +568,16 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		}
 		return super.aggregatedSumNullValue( clazz );
 	}
+
+	@Override
+	public boolean canHandleDeepNestedPredicate(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
+		if ( ByteVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
+			return isActualVersion(
+					es -> !es.isMatching( "9.3.0" ),
+					os -> true,
+					aoss -> true
+			);
+		}
+		return super.canHandleDeepNestedPredicate( fieldTypeDescriptor );
+	}
 }
