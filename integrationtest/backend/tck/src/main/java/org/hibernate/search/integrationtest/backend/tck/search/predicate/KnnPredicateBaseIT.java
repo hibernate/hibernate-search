@@ -168,6 +168,12 @@ class KnnPredicateBaseIT {
 			return knnPredicateOptionsStep( f, fieldPath, matchingDocOrdinal,
 					dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected boolean canHandleDeepNestedPredicate(AbstractPredicateDataSet dataSet) {
+			return TckConfiguration.get().getBackendFeatures()
+					.canHandleDeepNestedPredicate( ( (DataSet<?, ?>) dataSet ).fieldType );
+		}
 	}
 
 	@Nested
