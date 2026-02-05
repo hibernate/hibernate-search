@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-integrationtest</artifactId>
-        <version>8.3.0.CR1</version>
+        <version>8.3.0-SNAPSHOT</version>
         <relativePath>../integrationtest</relativePath>
     </parent>
     <artifactId>hibernate-search-parent-springtest</artifactId>
