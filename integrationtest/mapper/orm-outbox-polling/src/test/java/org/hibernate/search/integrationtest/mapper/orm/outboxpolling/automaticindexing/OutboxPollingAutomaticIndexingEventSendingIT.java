@@ -36,15 +36,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import org.awaitility.Awaitility;
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	private static final OutboxEventFilter eventFilter = new OutboxEventFilter();
@@ -59,7 +54,7 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 	private SessionFactory sessionFactory;
 
 	@SuppressWarnings("unused") // For EJC and lambda arg
-	@BeforeAll
+	@BeforeEach
 	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
@@ -92,16 +87,8 @@ class OutboxPollingAutomaticIndexingEventSendingIT {
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class
 				)
-				.dataClearing( dc -> dc.preClear( ignored -> eventFilter.hideAllEvents() ) )
+				.dataClearing( dc -> dc.clearDatabaseData( false ) )
 				.setup();
-	}
-
-	@BeforeEach
-	void resetFilter() {
-		eventFilter.reset();
-		Awaitility.await().untilAsserted( () -> with( sessionFactory ).runInTransaction( session -> {
-			assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isZero();
-		} ) );
 	}
 
 	@Test
