@@ -1,6 +1,39 @@
 Hibernate Search Changelog
 ==========================
 
+8.3.0.CR1 (2026-02-05)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/36608
+
+
+** Bug
+    * HSEARCH-5517 Document is updated instead of deleted on cascading delete in OneToOne relations
+
+** Improvement
+    * HSEARCH-5566 Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.0
+    * HSEARCH-5565 Update Elasticsearch client (elasticsearch-rest-client) to 9.3.0
+    * HSEARCH-5564 Add compatibility with Elasticsearch 9.3
+    * HSEARCH-5563 Upgrade to JBoss logging 3.6.2.Final
+    * HSEARCH-5562 Pass a ROOT locale to loggers to avoid unnecessary class lookups
+    * HSEARCH-5561 Update to Hibernate ORM 7.3.0.CR2
+    * HSEARCH-5560 Update Jackson to 2.21.0
+    * HSEARCH-5557 Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.4
+    * HSEARCH-5556 Update Elasticsearch client (elasticsearch-rest-client) to 9.2.4
+    * HSEARCH-5555 Update to AWS SDK 2.41.2
+    * HSEARCH-5550 Update Elasticsearch client (elasticsearch-rest-client) to 9.2.3
+    * HSEARCH-5549 Make ElasticsearchAwsSigningInterceptorProvider capable to handle "preparsed" Elasticsearch versions
+    * HSEARCH-5546 Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.3
+    * HSEARCH-5545 Update Elasticsearch rest client (opensearch-rest-client) to 3.4.0
+    * HSEARCH-5544 Update Apache HTTP Core client components to 5.4
+    * HSEARCH-5543 Add compatibility with OpenSearch 3.4.0
+
+** Task
+    * HSEARCH-5558 Test against latest Elasticsearch 9.2.4
+    * HSEARCH-5548 Test against latest Elasticsearch 9.2.3
+    * HSEARCH-5547 Use Maven 3.9.12 as a required minimum version for the build
+    * HSEARCH-5518 Use Spring Boot 4 and corresponding Narayana starter in ITs
+
 8.2.0.Final (2025-12-15)
 -------------------------
 
