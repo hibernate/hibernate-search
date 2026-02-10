@@ -168,7 +168,7 @@
         <version.org.mariadb.jdbc>3.5.7</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.6.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.3.0</version.com.ibm.db2.jcc>
-        <version.com.oracle.database.jdbc>23.26.0.0.0</version.com.oracle.database.jdbc>
+        <version.com.oracle.database.jdbc>23.26.1.0.0</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>13.2.1.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
