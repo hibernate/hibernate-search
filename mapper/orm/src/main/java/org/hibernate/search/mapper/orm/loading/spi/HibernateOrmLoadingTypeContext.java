@@ -5,6 +5,7 @@
 package org.hibernate.search.mapper.orm.loading.spi;
 
 import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchLoadingStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
@@ -24,6 +25,8 @@ public interface HibernateOrmLoadingTypeContext<E> {
 	 */
 	EntityMappingType entityMappingType();
 
-	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
+	HibernateOrmBatchLoadingStrategy<E, ?> batchLoadingStrategy();
+
+	String uniquePropertyName();
 
 }
