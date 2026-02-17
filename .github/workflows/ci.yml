@@ -82,6 +82,11 @@ jobs:
             }
           }
     steps:
+      - name: Verify Docker Status
+        if: "startsWith(matrix.os.runs-on, 'ubuntu')"
+        run: |
+          docker info
+          docker version
       - name: Support longpaths on Windows
         if: "startsWith(matrix.os.runs-on, 'windows')"
         run: git config --global core.longpaths true
