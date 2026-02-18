@@ -1,6 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+8.1.3.Final (2026-02-18)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/35254
+
+
+** Improvement
+    * HSEARCH-5573 Update to Hibernate ORM 7.1.16.Final
+    * HSEARCH-5554 Update to Hibernate ORM 7.1.14.Final
+    * HSEARCH-5551 Update to Hibernate ORM 7.1.13.Final
+    * HSEARCH-5535 Update to Hibernate ORM 7.1.11.Final
+    * HSEARCH-5529 Update to Hibernate ORM 7.1.9.Final
+    * HSEARCH-5514 Update to Hibernate ORM 7.1.6.Final
+    * HSEARCH-5506 Update to Avro 1.12.1
+    * HSEARCH-5499 Test against the latest Elasticsearch 9.1.5
+    * HSEARCH-5498 Upgrade Elasticsearch client to 9.1.5
+    * HSEARCH-5491 Update to Hibernate ORM 7.1.2.Final
+    * HSEARCH-5488 Update to Lucene 9.12.3
+    * HSEARCH-5480 Upgrade Elasticsearch client to 9.1.4
+    * HSEARCH-5476 Update to Hibernate ORM 7.1.1.Final
+    * HSEARCH-5474 Upgrade to GSON 2.13.2
+    * HSEARCH-5473 Include license file in the META-INF of published artifacts
+
+** Task
+    * HSEARCH-5486 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+    * HSEARCH-5481 Try alternatives to https://search.maven.org/solrsearch in DependencyManagementIncludesAllGroupIdArtifactsRule
+    * HSEARCH-5479 Test against the latest Elasticsearch 9.1.4
+
 8.1.2.Final (2025-09-09)
 -------------------------
 
