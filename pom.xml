@@ -12,7 +12,7 @@
 
     <groupId>org.hibernate.search</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>7.2.6.Final</version>
+    <version>7.2.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search</name>
@@ -444,7 +444,7 @@
         <goal.formatter-maven-plugin>format</goal.formatter-maven-plugin>
 
         <!-- For Reproducible Builds -->
-        <project.build.outputTimestamp>2026-02-18T15:36:31Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-02-18T15:49:10Z</project.build.outputTimestamp>
 
         <!-- Sonar options -->
         <!--

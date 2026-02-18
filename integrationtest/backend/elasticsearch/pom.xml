@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-integrationtest</artifactId>
-        <version>7.2.6.Final</version>
+        <version>7.2.7-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
