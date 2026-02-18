@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-integrationtest-lucene-next</artifactId>
-        <version>8.1.3.Final</version>
+        <version>8.1.4-SNAPSHOT</version>
         <relativePath>../../..</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene-next</artifactId>
