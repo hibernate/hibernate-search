@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-public</artifactId>
-        <version>8.1.3-SNAPSHOT</version>
+        <version>8.1.3.Final</version>
         <relativePath>../../build/parents/public</relativePath>
     </parent>
     <artifactId>hibernate-search-backend-lucene</artifactId>
