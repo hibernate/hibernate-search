@@ -1,6 +1,41 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.5.Final (2026-02-18)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/32288
+
+
+** Bug
+    * HSEARCH-5334 Conditional search failure when sorting by nullable fields
+
+** Improvement
+    * HSEARCH-5571 Upgrade to Avro 1.11.5
+    * HSEARCH-5496 Update to Hibernate ORM 6.2.49.Final
+    * HSEARCH-5489 Update to Hibernate ORM 6.2.46.Final
+    * HSEARCH-5477 Update to Hibernate ORM 6.2.45.Final
+    * HSEARCH-5468 Upgrade -orm6 artifacts to Hibernate ORM 6.2.44.Final
+    * HSEARCH-5463 Upgrade -orm6 artifacts to Hibernate ORM 6.2.43.Final
+    * HSEARCH-5451 Upgrade -orm6 artifacts to Hibernate ORM 6.2.42.Final
+    * HSEARCH-5425 Upgrade to Hibernate ORM 6.2.41.Final
+    * HSEARCH-5387 Upgrade -orm6 artifacts to Hibernate ORM 6.2.38.Final
+    * HSEARCH-5381 Upgrade -orm6 artifacts to Hibernate ORM 6.2.37.Final
+    * HSEARCH-5341 Upgrade -orm6 artifacts to Hibernate ORM 6.2.36.Final
+    * HSEARCH-5337 Upgrade -orm6 artifacts to Hibernate ORM 6.2.35.Final
+    * HSEARCH-5324 Upgrade -orm6 artifacts to Hibernate ORM 6.2.34.Final
+    * HSEARCH-5254 Upgrade to Avro 1.11.4
+    * HSEARCH-5253 Upgrade -orm6 artifacts to Hibernate ORM 6.2.32.Final
+    * HSEARCH-5227 Upgrade -orm6 artifacts to Hibernate ORM 6.2.31.Final
+    * HSEARCH-5215 Upgrade -orm6 artifacts to Hibernate ORM 6.2.30.Final
+    * HSEARCH-5191 Upgrade -orm6 artifacts to Hibernate ORM 6.2.27.Final
+    * HSEARCH-5168 Upgrade -orm6 artifacts to Hibernate ORM 6.2.26.Final
+    * HSEARCH-5137 Upgrade -orm6 artifacts to Hibernate ORM 6.2.25.Final
+
+** Task
+    * HSEARCH-5486 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+    * HSEARCH-5123 Promote the latest version of getting started guides
+
 6.2.4.Final (2024-04-10)
 -------------------------
 
