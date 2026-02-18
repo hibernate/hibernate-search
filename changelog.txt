@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+8.2.2.Final (2026-02-18)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/37173
+
+
+** Bug
+    * HSEARCH-5517 Document is updated instead of deleted on cascading delete in OneToOne relations
+
+** Improvement
+    * HSEARCH-5572 Update to Hibernate ORM 7.2.4.Final
+    * HSEARCH-5562 Pass a ROOT locale to loggers to avoid unnecessary class lookups
+    * HSEARCH-5559 Update to Hibernate ORM 6.6.41.Final
+
 8.2.1.Final (2025-12-19)
 -------------------------
 
