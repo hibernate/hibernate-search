@@ -22,6 +22,16 @@
     <properties>
         <java.module.name>org.hibernate.search.batch.jsr352.jberet</java.module.name>
         <documentation.config.properties.skip>true</documentation.config.properties.skip>
+        <!--
+           We want to skip the javadoc warnings for this module, since Jakarta Batch API is using proper modules,
+           resulting in a warning like:
+               [WARNING] Javadoc Warnings
+               [WARNING] warning: The code being documented uses packages in the unnamed module, but the packages defined in https://jakarta.ee/specifications/batch/2.1/apidocs/ are in named modules.
+               [WARNING] 1 warning
+           when trying to build this module. Since it cannot be suppressed, but the generated docs are actually OK
+           and links point to correct addresses, we just ignore all warnings for this module.
+       -->
+        <failOnJavadocWarning>false</failOnJavadocWarning>
     </properties>
 
     <dependencies>
