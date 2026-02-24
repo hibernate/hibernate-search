@@ -300,10 +300,10 @@
         <version.shade.plugin>3.6.1</version.shade.plugin>
         <version.source.plugin>3.4.0</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
-        <version.surefire.plugin>3.5.4</version.surefire.plugin>
+        <version.surefire.plugin>3.5.5</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.9.1</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.14</version.jacoco.plugin>
-        <version.com.buschmais.jqassistant.plugin>2.9.0</version.com.buschmais.jqassistant.plugin>
+        <version.com.buschmais.jqassistant.plugin>2.9.1</version.com.buschmais.jqassistant.plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
         <version.sonar.plugin>5.5.0.6356</version.sonar.plugin>
         <version.scripting.plugin>3.1.0</version.scripting.plugin>
