@@ -7,6 +7,6 @@
     <ignoreVersion type="regex">.*\.(Alpha|Beta|CR).*</ignoreVersion>
     <!-- Restrict allowed versions to a particular major/minor, because forbidding major/minor upgrades
          in the version-maven-plugin configuration doesn't always work for some reason. -->
-    <ignoreVersion type="regex">^([0-6]\.\d+|7\.[0-1])\..*</ignoreVersion>
+    <ignoreVersion type="regex">(?!7\.3\.).*</ignoreVersion>
   </ignoreVersions>
 </ruleset>
