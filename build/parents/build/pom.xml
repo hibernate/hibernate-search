@@ -92,8 +92,7 @@
         <version.com.google.code.gson>2.13.2</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.41.2</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
-        <version.com.fasterxml.jackson>2.21.0</version.com.fasterxml.jackson>
-        <version.com.fasterxml.jackson.annotations>2.21</version.com.fasterxml.jackson.annotations>
+        <version.com.fasterxml.jackson>2.21.1</version.com.fasterxml.jackson>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
@@ -591,18 +590,10 @@
 
             <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${version.com.fasterxml.jackson}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${version.com.fasterxml.jackson.annotations}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <type>pom</type>
+                <scope>import</scope>
                 <version>${version.com.fasterxml.jackson}</version>
             </dependency>
 
