@@ -37,7 +37,7 @@
         <version.bom.jakarta.transaction>2.0.1</version.bom.jakarta.transaction>
         <version.bom.jakarta.xml.bind>4.0.4</version.bom.jakarta.xml.bind>
         <version.bom.org.jberet>3.1.0.Final</version.bom.org.jberet>
-        <version.bom.com.fasterxml.jackson>2.21.0</version.bom.com.fasterxml.jackson>
+        <version.bom.com.fasterxml.jackson>2.21.1</version.bom.com.fasterxml.jackson>
         <version.bom.org.apache.httpcomponents.client5>5.6</version.bom.org.apache.httpcomponents.client5>
         <version.bom.org.apache.httpcomponents.core5>5.4.1</version.bom.org.apache.httpcomponents.core5>
         <version.bom.org.apache.httpcomponents.httpclient>4.5.14</version.bom.org.apache.httpcomponents.httpclient>
