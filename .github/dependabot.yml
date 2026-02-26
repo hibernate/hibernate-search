@@ -25,6 +25,205 @@ updates:
       - dependency-name: "redhat-actions/*"
   - package-ecosystem: "maven"
     directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    assignees: [ "marko-bekhta" ]
+    # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
+    # so we can safely use a high limit here.
+    open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven extensions:
+          - "*-maven-extension"
+          - "org.hibernate.infra.develocity:*"
+          # Maven plugins:
+          - "*maven*plugin*"
+          - "org.apache.maven*:*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "*owasp*"
+          - "io.github.gitflow-incremental-builder:*"
+          - "com.puppycrawl.tools:*"
+          # DB drivers:
+          - "com.h2database:h2"
+          - "org.postgresql:postgresql"
+          - "org.mariadb.jdbc:mariadb-java-client"
+          - "com.mysql:mysql-connector-j"
+          - "com.ibm.db2:jcc"
+          - "com.oracle.database.jdbc:ojdbc*"
+          - "com.microsoft.sqlserver:mssql-jdbc"
+          # Other test dependencies
+          - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
+          - "org.apache.commons:commons-math3" # used in hibernate-search-util-common tests
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
+          - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
+          - "org.springframework.boot:*" # Spring is only for ITs
+          - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "org.mockito:*"
+          - "org.wiremock:*"
+          - "org.hamcrest:*"
+          - "org.apache.logging.log4j:*"
+          - "org.assertj:*"
+          - "org.awaitility:*"
+          - "org.skyscreamer:*"
+          - "com.github.tomakehurst:*"
+          - "org.jsoup:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "org.testcontainers:testcontainers-bom"
+          - "org.junit:*"
+          - "org.jboss.weld.se:*"
+          # Eclipse compiler
+          - "org.codehaus.plexus:*"
+          - "org.eclipse.jdt:*"
+          # We only use the version of WildFly for a link in the documentation
+          - "org.wildfly:wildfly-dist"
+          # Used to generate reports during build time:
+          - "org.yaml:snakeyaml"
+    ignore:
+      # These dependencies are updated manually
+      - dependency-name: "org.hibernate:*"
+      - dependency-name: "org.hibernate.*:*"
+      # AWS SDK releases way too often (every week?); ignore all patch updates
+      - dependency-name: "software.amazon.awssdk:*"
+        update-types: [ "version-update:semver-patch" ]
+      # We don't care that much about being on the very latest version of some integration test dependencies
+      - dependency-name: "org.springframework.boot:*"
+        update-types: [ "version-update:semver-patch" ]
+      # We strictly align these dependencies on the version used in Hibernate ORM.
+      - dependency-name: "io.smallrye:jandex"
+      - dependency-name: "jakarta.persistence:jakarta.persistence-api"
+      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
+      - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
+      - dependency-name: "net.bytebuddy:*"
+      # Because we stay on a particular version of CDI that matches the one in ORM
+      # we don't want always want to get the latest Weld version:
+      - dependency-name: "org.jboss.weld.se:*"
+        update-types: [ "version-update:semver-major" ]
+      # Sticking to SLF4J 1.x for now since later versions require to upgrade providers
+      # (Log4j, ... see https://www.slf4j.org/faq.html#changesInVersion200),
+      # and also because we only need this dependency for AWS SDK,
+      # which is currently still on SLF4J 1.x
+      # (see https://search.maven.org/artifact/software.amazon.awssdk/aws-sdk-java-pom/2.17.257/pom)
+      - dependency-name: "org.slf4j:*"
+        update-types: [ "version-update:semver-major" ]
+      # We only define a maven's minimum version, so we don't need it to be updated to the latest:
+      - dependency-name: "org.apache.maven:maven-core"
+      # We require JDK 11, so we don't need "-jdk8"
+      - dependency-name: "org.bsc.maven:maven-processor-plugin"
+        # Apparently patterns using wildcards are not supported here. Hopefully this will last until they drop these silly -jdk8 packages.
+        versions: [ "5.0-jdk8", "5.1-jdk8", "5.2-jdk8", "5.3-jdk8", "5.4-jdk8", "5.5-jdk8", "5.6-jdk8", "5.7-jdk8", "5.8-jdk8", "5.9-jdk8" ]
+      # We only use the major version of WildFly, and only for a link in the documentation
+      - dependency-name: "org.wildfly:wildfly-dist"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
+      # We ignore any plexus-compiler updates that are > 2.14.2 since that's the last version
+      #  with which jboss-logging annotation processor can still work.
+      #  To be removed once we update the AP to the one with a fix.
+      - dependency-name: "org.codehaus.plexus:*"
+      # Enable updates after JDK 21 upgrade (as of jsonassert 1.5.2 it requires JDK 21)
+      - dependency-name: "org.skyscreamer:jsonassert"
+      - dependency-name: "org.eclipse.jdt:ecj"
+        versions: [ "3.42.0", "3.43.0" ]
+      # We depend on the JUnit version in ORM, hence we cannot just bump to a next major/minor
+      - dependency-name: "org.junit:*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+      - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
+        versions: [ "13.3.0.jre11-preview" ]
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "8.2"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    assignees: [ "marko-bekhta" ]
+    # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
+    # so we can safely use a high limit here.
+    open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven extensions:
+          - "*-maven-extension"
+          - "org.hibernate.infra.develocity:*"
+          # Maven plugins:
+          - "*maven*plugin*"
+          - "org.apache.maven*:*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "*owasp*"
+          - "io.github.gitflow-incremental-builder:*"
+          - "com.puppycrawl.tools:*"
+          # DB drivers:
+          - "com.h2database:h2"
+          - "org.postgresql:postgresql"
+          - "org.mariadb.jdbc:mariadb-java-client"
+          - "com.mysql:mysql-connector-j"
+          - "com.ibm.db2:jcc"
+          - "com.oracle.database.jdbc:ojdbc*"
+          - "com.microsoft.sqlserver:mssql-jdbc"
+          # Other test dependencies
+          - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
+          - "org.apache.commons:commons-math3" # used in hibernate-search-util-common tests
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
+          - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
+          - "org.springframework.boot:*" # Spring is only for ITs
+          - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "org.mockito:*"
+          - "org.wiremock:*"
+          - "org.hamcrest:*"
+          - "org.apache.logging.log4j:*"
+          - "org.assertj:*"
+          - "org.awaitility:*"
+          - "org.skyscreamer:*"
+          - "com.github.tomakehurst:*"
+          - "org.jsoup:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "org.testcontainers:testcontainers-bom"
+          - "org.junit:*"
+          - "org.jboss.weld.se:*"
+          # Eclipse compiler
+          - "org.codehaus.plexus:*"
+          - "org.eclipse.jdt:*"
+          # We only use the version of WildFly for a link in the documentation
+          - "org.wildfly:wildfly-dist"
+          # Used to generate reports during build time:
+          - "org.yaml:snakeyaml"
+    ignore:
+      # These dependencies are updated manually
+      - dependency-name: "org.hibernate:*"
+      - dependency-name: "org.hibernate.*:*"
+      # We strictly align these dependencies on the version used in Hibernate ORM.
+      - dependency-name: "io.smallrye:jandex"
+      - dependency-name: "jakarta.persistence:jakarta.persistence-api"
+      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
+      - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
+      - dependency-name: "net.bytebuddy:*"
+      - dependency-name: "org.codehaus.plexus:*"
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "8.1"
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -94,51 +293,258 @@ updates:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
       - dependency-name: "org.hibernate.*:*"
-      # AWS SDK releases way too often (every week?); ignore all patch updates
-      - dependency-name: "software.amazon.awssdk:*"
-        update-types: ["version-update:semver-patch"]
-      # We don't care that much about being on the very latest version of some integration test dependencies
-      - dependency-name: "org.springframework.boot:*"
-        update-types: [ "version-update:semver-patch" ]
       # We strictly align these dependencies on the version used in Hibernate ORM.
       - dependency-name: "io.smallrye:jandex"
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
       - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
       - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
       - dependency-name: "net.bytebuddy:*"
-      # Because we stay on a particular version of CDI that matches the one in ORM
-      # we don't want always want to get the latest Weld version:
-      - dependency-name: "org.jboss.weld.se:*"
-        update-types: ["version-update:semver-major"]
-      # Sticking to SLF4J 1.x for now since later versions require to upgrade providers
-      # (Log4j, ... see https://www.slf4j.org/faq.html#changesInVersion200),
-      # and also because we only need this dependency for AWS SDK,
-      # which is currently still on SLF4J 1.x
-      # (see https://search.maven.org/artifact/software.amazon.awssdk/aws-sdk-java-pom/2.17.257/pom)
-      - dependency-name: "org.slf4j:*"
-        update-types: ["version-update:semver-major"]
-      # We only define a maven's minimum version, so we don't need it to be updated to the latest:
-      - dependency-name: "org.apache.maven:maven-core"
-      # We require JDK 11, so we don't need "-jdk8"
-      - dependency-name: "org.bsc.maven:maven-processor-plugin"
-        # Apparently patterns using wildcards are not supported here. Hopefully this will last until they drop these silly -jdk8 packages.
-        versions: ["5.0-jdk8", "5.1-jdk8", "5.2-jdk8", "5.3-jdk8", "5.4-jdk8", "5.5-jdk8", "5.6-jdk8", "5.7-jdk8", "5.8-jdk8", "5.9-jdk8"]
-      # We only use the major version of WildFly, and only for a link in the documentation
-      - dependency-name: "org.wildfly:wildfly-dist"
-        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
-      # We ignore any plexus-compiler updates that are > 2.14.2 since that's the last version
-      #  with which jboss-logging annotation processor can still work.
-      #  To be removed once we update the AP to the one with a fix.
       - dependency-name: "org.codehaus.plexus:*"
-      # Enable updates after JDK 21 upgrade (as of jsonassert 1.5.2 it requires JDK 21)
-      - dependency-name: "org.skyscreamer:jsonassert"
-      - dependency-name: "org.eclipse.jdt:ecj"
-        versions: [ "3.42.0", "3.43.0" ]
-      # We depend on the JUnit version in ORM, hence we cannot just bump to a next major/minor
-      - dependency-name: "org.junit:*"
+      - dependency-name: "*"
         update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
-      - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
-        versions: [ "13.3.0.jre11-preview" ]
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "7.2"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    assignees: ["marko-bekhta"]
+    # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
+    # so we can safely use a high limit here.
+    open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven extensions:
+          - "*-maven-extension"
+          - "org.hibernate.infra.develocity:*"
+          # Maven plugins:
+          - "*maven*plugin*"
+          - "org.apache.maven*:*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "*owasp*"
+          - "io.github.gitflow-incremental-builder:*"
+          - "com.puppycrawl.tools:*"
+          # DB drivers:
+          - "com.h2database:h2"
+          - "org.postgresql:postgresql"
+          - "org.mariadb.jdbc:mariadb-java-client"
+          - "com.mysql:mysql-connector-j"
+          - "com.ibm.db2:jcc"
+          - "com.oracle.database.jdbc:ojdbc*"
+          - "com.microsoft.sqlserver:mssql-jdbc"
+          # Other test dependencies
+          - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
+          - "org.apache.commons:commons-math3" # used in hibernate-search-util-common tests
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
+          - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
+          - "org.springframework.boot:*" # Spring is only for ITs
+          - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "org.mockito:*"
+          - "org.wiremock:*"
+          - "org.hamcrest:*"
+          - "org.apache.logging.log4j:*"
+          - "org.assertj:*"
+          - "org.awaitility:*"
+          - "org.skyscreamer:*"
+          - "com.github.tomakehurst:*"
+          - "org.jsoup:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "org.testcontainers:testcontainers-bom"
+          - "org.junit:*"
+          - "org.jboss.weld.se:*"
+          # Eclipse compiler
+          - "org.codehaus.plexus:*"
+          - "org.eclipse.jdt:*"
+          # We only use the version of WildFly for a link in the documentation
+          - "org.wildfly:wildfly-dist"
+          # Used to generate reports during build time:
+          - "org.yaml:snakeyaml"
+    ignore:
+      # These dependencies are updated manually
+      - dependency-name: "org.hibernate:*"
+      - dependency-name: "org.hibernate.*:*"
+      # We strictly align these dependencies on the version used in Hibernate ORM.
+      - dependency-name: "io.smallrye:jandex"
+      - dependency-name: "jakarta.persistence:jakarta.persistence-api"
+      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
+      - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
+      - dependency-name: "net.bytebuddy:*"
+      - dependency-name: "org.codehaus.plexus:*"
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "6.2"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    assignees: ["marko-bekhta"]
+    # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
+    # so we can safely use a high limit here.
+    open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven extensions:
+          - "*-maven-extension"
+          - "org.hibernate.infra.develocity:*"
+          # Maven plugins:
+          - "*maven*plugin*"
+          - "org.apache.maven*:*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "*owasp*"
+          - "io.github.gitflow-incremental-builder:*"
+          - "com.puppycrawl.tools:*"
+          # DB drivers:
+          - "com.h2database:h2"
+          - "org.postgresql:postgresql"
+          - "org.mariadb.jdbc:mariadb-java-client"
+          - "com.mysql:mysql-connector-j"
+          - "com.ibm.db2:jcc"
+          - "com.oracle.database.jdbc:ojdbc*"
+          - "com.microsoft.sqlserver:mssql-jdbc"
+          # Other test dependencies
+          - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
+          - "org.apache.commons:commons-math3" # used in hibernate-search-util-common tests
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
+          - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
+          - "org.springframework.boot:*" # Spring is only for ITs
+          - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "org.mockito:*"
+          - "org.wiremock:*"
+          - "org.hamcrest:*"
+          - "org.apache.logging.log4j:*"
+          - "org.assertj:*"
+          - "org.awaitility:*"
+          - "org.skyscreamer:*"
+          - "com.github.tomakehurst:*"
+          - "org.jsoup:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "org.testcontainers:testcontainers-bom"
+          - "org.junit:*"
+          - "org.jboss.weld.se:*"
+          # Eclipse compiler
+          - "org.codehaus.plexus:*"
+          - "org.eclipse.jdt:*"
+          # We only use the version of WildFly for a link in the documentation
+          - "org.wildfly:wildfly-dist"
+          # Used to generate reports during build time:
+          - "org.yaml:snakeyaml"
+    ignore:
+      # These dependencies are updated manually
+      - dependency-name: "org.hibernate:*"
+      - dependency-name: "org.hibernate.*:*"
+      # We strictly align these dependencies on the version used in Hibernate ORM.
+      - dependency-name: "io.smallrye:jandex"
+      - dependency-name: "jakarta.persistence:jakarta.persistence-api"
+      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
+      - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
+      - dependency-name: "net.bytebuddy:*"
+      - dependency-name: "org.codehaus.plexus:*"
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "5.10"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    assignees: ["marko-bekhta"]
+    # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
+    # so we can safely use a high limit here.
+    open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven extensions:
+          - "*-maven-extension"
+          - "org.hibernate.infra.develocity:*"
+          # Maven plugins:
+          - "*maven*plugin*"
+          - "org.apache.maven*:*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "*owasp*"
+          - "io.github.gitflow-incremental-builder:*"
+          - "com.puppycrawl.tools:*"
+          # DB drivers:
+          - "com.h2database:h2"
+          - "org.postgresql:postgresql"
+          - "org.mariadb.jdbc:mariadb-java-client"
+          - "com.mysql:mysql-connector-j"
+          - "com.ibm.db2:jcc"
+          - "com.oracle.database.jdbc:ojdbc*"
+          - "com.microsoft.sqlserver:mssql-jdbc"
+          # Other test dependencies
+          - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
+          - "org.apache.commons:commons-math3" # used in hibernate-search-util-common tests
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
+          - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
+          - "org.springframework.boot:*" # Spring is only for ITs
+          - "io.agroal:agroal-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "dev.snowdrop:narayana-spring-boot-starter" # part of Spring dependencies, is only for ITs
+          - "org.mockito:*"
+          - "org.wiremock:*"
+          - "org.hamcrest:*"
+          - "org.apache.logging.log4j:*"
+          - "org.assertj:*"
+          - "org.awaitility:*"
+          - "org.skyscreamer:*"
+          - "com.github.tomakehurst:*"
+          - "org.jsoup:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "org.testcontainers:testcontainers-bom"
+          - "org.junit:*"
+          - "org.jboss.weld.se:*"
+          # Eclipse compiler
+          - "org.codehaus.plexus:*"
+          - "org.eclipse.jdt:*"
+          # We only use the version of WildFly for a link in the documentation
+          - "org.wildfly:wildfly-dist"
+          # Used to generate reports during build time:
+          - "org.yaml:snakeyaml"
+    ignore:
+      # These dependencies are updated manually
+      - dependency-name: "org.hibernate:*"
+      - dependency-name: "org.hibernate.*:*"
+      # We strictly align these dependencies on the version used in Hibernate ORM.
+      - dependency-name: "io.smallrye:jandex"
+      - dependency-name: "jakarta.persistence:jakarta.persistence-api"
+      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
+      - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
+      - dependency-name: "net.bytebuddy:*"
+      - dependency-name: "org.codehaus.plexus:*"
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
 
   - package-ecosystem: "docker"
     registries:
