@@ -287,7 +287,7 @@ stage('Configure') {
 					new LocalOpenSearchBuildEnvironment(version: '2.16.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.17.1', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.18.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.19.3', condition: TestCondition.AFTER_MERGE),
+					new LocalOpenSearchBuildEnvironment(version: '2.19.4', condition: TestCondition.AFTER_MERGE),
 					new LocalOpenSearchBuildEnvironment(version: '3.0.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.1.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.2.0', condition: TestCondition.ON_DEMAND),
