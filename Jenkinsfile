@@ -254,10 +254,10 @@ stage('Configure') {
 					new LocalElasticsearchBuildEnvironment(version: '8.16.1', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.17.6', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.18.7', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.19.6', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '8.19.12', condition: TestCondition.AFTER_MERGE),
 					new LocalElasticsearchBuildEnvironment(version: '9.0.7', condition: TestCondition.ON_DEMAND),
                     new LocalElasticsearchBuildEnvironment(version: '9.1.5', condition: TestCondition.ON_DEMAND),
-                    new LocalElasticsearchBuildEnvironment(version: '9.2.4', condition: TestCondition.ON_DEMAND),
+                    new LocalElasticsearchBuildEnvironment(version: '9.2.6', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '9.3.1', condition: TestCondition.BEFORE_MERGE, isDefault: true),
 					// IMPORTANT: Make sure to update the documentation for any newly supported Elasticsearch versions
 					//            See version.org.elasticsearch.compatible.expected.text
