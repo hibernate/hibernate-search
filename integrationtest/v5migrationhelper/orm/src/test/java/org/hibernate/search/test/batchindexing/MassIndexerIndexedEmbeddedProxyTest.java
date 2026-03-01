@@ -17,11 +17,11 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -74,7 +74,7 @@ class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 	private void verifyIndexIsEmpty() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
-			Query q = new MatchAllDocsQuery();
+			Query q = MatchAllDocsQueryUtils.matchAllDocsQuery();
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
 			int resultSize = fullTextQuery.getResultSize();
 			List list = fullTextQuery.list();

@@ -26,13 +26,12 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.Tags;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 @TestForIssue(jiraKey = "HSEARCH-2535")
 @Tag(Tags.PORTED_TO_SEARCH_6)
@@ -53,7 +52,7 @@ public class MultiValuedFacetingTest {
 		entity = new StringArrayFacetEntity( 2L, "foo", "bar" );
 		helper.add( entity );
 
-		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), StringArrayFacetEntity.class );
+		HSQuery hsQuery = helper.hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), StringArrayFacetEntity.class );
 
 		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( StringArrayFacetEntity.class ).get();
 		FacetingRequest facetReq = builder.facet()
@@ -80,7 +79,7 @@ public class MultiValuedFacetingTest {
 		entity = new StringCollectionFacetEntity( 2L, "foo", "bar" );
 		helper.add( entity );
 
-		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), StringCollectionFacetEntity.class );
+		HSQuery hsQuery = helper.hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), StringCollectionFacetEntity.class );
 
 		QueryBuilder builder =
 				sfHolder.getSearchFactory().buildQueryBuilder().forEntity( StringCollectionFacetEntity.class ).get();
@@ -108,7 +107,7 @@ public class MultiValuedFacetingTest {
 		entity = new StringMapFacetEntity( 2L, "foo", "bar" );
 		helper.add( entity );
 
-		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), StringMapFacetEntity.class );
+		HSQuery hsQuery = helper.hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), StringMapFacetEntity.class );
 
 		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( StringMapFacetEntity.class ).get();
 		FacetingRequest facetReq = builder.facet()
@@ -136,7 +135,7 @@ public class MultiValuedFacetingTest {
 		entity = new NumberArrayFacetEntity( 2L, 43, 442 );
 		helper.add( entity );
 
-		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), NumberArrayFacetEntity.class );
+		HSQuery hsQuery = helper.hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), NumberArrayFacetEntity.class );
 
 		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NumberArrayFacetEntity.class ).get();
 		FacetingRequest facetReq = builder.facet()
@@ -166,7 +165,7 @@ public class MultiValuedFacetingTest {
 		entity = new NumberCollectionFacetEntity( 2L, 42.3f, 442.2f );
 		helper.add( entity );
 
-		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), NumberCollectionFacetEntity.class );
+		HSQuery hsQuery = helper.hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), NumberCollectionFacetEntity.class );
 
 		QueryBuilder builder =
 				sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NumberCollectionFacetEntity.class ).get();
@@ -197,7 +196,7 @@ public class MultiValuedFacetingTest {
 		entity = new NumberMapFacetEntity( 2L, 42.3f, 442.2f );
 		helper.add( entity );
 
-		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), NumberMapFacetEntity.class );
+		HSQuery hsQuery = helper.hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), NumberMapFacetEntity.class );
 
 		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NumberMapFacetEntity.class ).get();
 		FacetingRequest facetReq = builder.facet()

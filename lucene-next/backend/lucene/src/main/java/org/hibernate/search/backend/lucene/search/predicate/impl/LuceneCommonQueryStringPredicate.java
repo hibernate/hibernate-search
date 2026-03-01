@@ -169,7 +169,7 @@ abstract class LuceneCommonQueryStringPredicate extends AbstractLuceneNestablePr
 					for ( BooleanClause clause : booleanQuery.clauses() ) {
 						builder.add( clause );
 					}
-					builder.add( new BooleanClause( new MatchAllDocsQuery(), BooleanClause.Occur.MUST ) );
+					builder.add( new BooleanClause( MatchAllDocsQuery.INSTANCE, BooleanClause.Occur.MUST ) );
 					query = builder.build();
 				}
 			}

@@ -23,12 +23,12 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -110,7 +110,7 @@ class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
-		Query luceneQuery = new MatchAllDocsQuery();
+		Query luceneQuery = MatchAllDocsQueryUtils.matchAllDocsQuery();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, A.class );
 		List<?> result = fullTextQuery.list();
