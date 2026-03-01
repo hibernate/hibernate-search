@@ -24,7 +24,7 @@ class LuceneMatchAllPredicate extends AbstractLuceneSearchPredicate {
 
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
-		return new MatchAllDocsQuery();
+		return MatchAllDocsQuery.INSTANCE;
 	}
 
 	static class Builder extends AbstractBuilder implements MatchAllPredicateBuilder {

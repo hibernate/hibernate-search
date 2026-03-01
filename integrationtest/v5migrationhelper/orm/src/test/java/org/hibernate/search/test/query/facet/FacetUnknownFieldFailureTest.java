@@ -13,11 +13,11 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.junit.Tags;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 @Tag(Tags.PORTED_TO_SEARCH_6)
@@ -44,7 +44,8 @@ class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 				.createFacetingRequest();
 
 		assertThatThrownBy( () -> {
-			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Fruit.class );
+			FullTextQuery query =
+					fullTextSession.createFullTextQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), Fruit.class );
 			query.getFacetManager().enableFaceting( request );
 			assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 1 );
 

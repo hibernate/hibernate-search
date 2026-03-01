@@ -62,6 +62,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
@@ -84,7 +85,6 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
@@ -135,7 +135,7 @@ class LuceneExtensionIT {
 		);
 		// Note we can use Lucene-specific predicates immediately
 		LuceneSearchQueryOptionsStep<Object, DocumentReference, StubLoadingOptionsStep> context3 =
-				context2.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
+				context2.where( f -> f.fromLuceneQuery( MatchAllDocsQueryUtils.matchAllDocsQuery() ) );
 		// Note we can use Lucene-specific sorts immediately
 		LuceneSearchQueryOptionsStep<Object, DocumentReference, StubLoadingOptionsStep> context4 =
 				context3.sort( f -> f.fromLuceneSortField( new SortedSetSortField( "sort1", false ) ) );
@@ -160,7 +160,7 @@ class LuceneExtensionIT {
 				scope.query().extension( LuceneExtension.get() ).select( projection, projection );
 		LuceneSearchQueryOptionsStep<Object, DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( LuceneExtension.get() )
-						.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
+						.where( f -> f.fromLuceneQuery( MatchAllDocsQueryUtils.matchAllDocsQuery() ) );
 	}
 
 	@SuppressWarnings("unused") // For EJC and lambda arg
@@ -871,7 +871,7 @@ class LuceneExtensionIT {
 
 		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
-			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 1000 );
+			TopDocs topDocs = searcher.search( MatchAllDocsQueryUtils.matchAllDocsQuery(), 1000 );
 			assertThat( topDocs.scoreDocs ).hasSize( 15 );
 		}
 
@@ -879,7 +879,7 @@ class LuceneExtensionIT {
 
 		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
-			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 1000 );
+			TopDocs topDocs = searcher.search( MatchAllDocsQueryUtils.matchAllDocsQuery(), 1000 );
 			assertThat( topDocs.scoreDocs ).hasSize( 30 );
 		}
 	}

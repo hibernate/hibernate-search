@@ -15,13 +15,13 @@ import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.Luce
 import org.hibernate.search.integrationtest.backend.tck.sharding.AbstractShardingRoutingKeyIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TopDocs;
 
 /**
@@ -53,7 +53,7 @@ class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 
 		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
-			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 1000 );
+			TopDocs topDocs = searcher.search( MatchAllDocsQueryUtils.matchAllDocsQuery(), 1000 );
 			assertThat( topDocs.scoreDocs ).hasSize( 300 );
 		}
 
@@ -61,7 +61,7 @@ class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 				Collections.singleton( SHARD_ID_1 )
 		) ) {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
-			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 1000 );
+			TopDocs topDocs = searcher.search( MatchAllDocsQueryUtils.matchAllDocsQuery(), 1000 );
 			assertThat( topDocs.scoreDocs ).hasSize( 100 );
 		}
 	}

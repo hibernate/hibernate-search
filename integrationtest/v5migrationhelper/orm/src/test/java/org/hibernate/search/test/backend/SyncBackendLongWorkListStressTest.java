@@ -18,10 +18,9 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Test;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
@@ -54,7 +53,7 @@ class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
-		int fullTextCount = s.createFullTextQuery( new MatchAllDocsQuery(), Clock.class ).getResultSize();
+		int fullTextCount = s.createFullTextQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), Clock.class ).getResultSize();
 		assertThat( fullTextCount ).isEqualTo( NUM_SAVED_ENTITIES );
 		s.purgeAll( Clock.class );
 		tx.commit();

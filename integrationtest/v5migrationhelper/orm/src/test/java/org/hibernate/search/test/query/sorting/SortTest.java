@@ -32,6 +32,7 @@ import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.Tags;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,6 @@ import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Pruning;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SimpleFieldComparator;
@@ -210,7 +210,7 @@ class SortTest extends SearchTestBase {
 	void testCustomFieldComparatorAscendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
-		Query query = new MatchAllDocsQuery();
+		Query query = MatchAllDocsQueryUtils.matchAllDocsQuery();
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, NumberHolder.class );
 		Sort sort = new Sort( new SortField( "sum", new SumFieldComparatorSource() ) );
 		hibQuery.setSort( sort );
@@ -233,7 +233,7 @@ class SortTest extends SearchTestBase {
 	void testCustomFieldComparatorDescendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
-		Query query = new MatchAllDocsQuery();
+		Query query = MatchAllDocsQueryUtils.matchAllDocsQuery();
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, NumberHolder.class );
 		Sort sort = new Sort( new SortField( "sum", new SumFieldComparatorSource(), true ) );
 		hibQuery.setSort( sort );

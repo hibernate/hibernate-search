@@ -30,9 +30,9 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.testsupport.migration.V5MigrationStandalonePojoSearchSessionAdapter;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
@@ -115,7 +115,7 @@ public class SearchITHelper {
 	}
 
 	public HSQuery hsQuery(Class<?>... classes) {
-		return hsQuery( new MatchAllDocsQuery(), classes );
+		return hsQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), classes );
 	}
 
 	public HSQuery hsQuery(Query query, Class<?>... classes) {
@@ -127,7 +127,7 @@ public class SearchITHelper {
 	}
 
 	public AssertBuildingHSQueryContext assertThatQuery() {
-		return assertThatQuery( new MatchAllDocsQuery() );
+		return assertThatQuery( MatchAllDocsQueryUtils.matchAllDocsQuery() );
 	}
 
 	public AssertBuildingHSQueryContext assertThatQuery(Query luceneQuery) {

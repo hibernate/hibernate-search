@@ -15,11 +15,10 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.junit.Tags;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 @Tag(Tags.PORTED_TO_SEARCH_6)
 class ManyToOneFacetingTest extends AbstractFacetTest {
@@ -49,7 +48,7 @@ class ManyToOneFacetingTest extends AbstractFacetTest {
 	}
 
 	private FullTextQuery queryCompanyWithFacet(FacetingRequest request) {
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+		FullTextQuery query = fullTextSession.createFullTextQuery( MatchAllDocsQueryUtils.matchAllDocsQuery() );
 		query.getFacetManager().enableFaceting( request );
 		assertThat( query.getResultSize() ).as( "Wrong number of query matches" ).isEqualTo( 1 );
 		return query;
