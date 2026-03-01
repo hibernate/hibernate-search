@@ -20,14 +20,13 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.testsupport.StaticIndexingSwitch;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 import org.hibernate.stat.Statistics;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * Test second level cache and persistence context lookup methods
@@ -57,7 +56,7 @@ class StrictSecondLCAndPCLookupTest extends SearchTestBase {
 		indexingSwitch.enable( true );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		FullTextQuery allKernelsQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() )
+		FullTextQuery allKernelsQuery = fullTextSession.createFullTextQuery( MatchAllDocsQueryUtils.matchAllDocsQuery() )
 				.initializeObjectsWith( ObjectLookupMethod.SECOND_LEVEL_CACHE, DatabaseRetrievalMethod.QUERY );
 
 		//Identify the mismatch between index/database:

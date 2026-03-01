@@ -82,7 +82,7 @@ public final class LuceneWorkFactory {
 			filters.add( Queries.anyTerm( MetadataFields.routingKeyFieldName(), routingKeys ) );
 		}
 
-		return new DeleteEntriesByQueryWork( Queries.boolFilter( new MatchAllDocsQuery(), filters ) );
+		return new DeleteEntriesByQueryWork( Queries.boolFilter( MatchAllDocsQuery.INSTANCE, filters ) );
 	}
 
 	public <R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit, int totalHitCountThreshold) {

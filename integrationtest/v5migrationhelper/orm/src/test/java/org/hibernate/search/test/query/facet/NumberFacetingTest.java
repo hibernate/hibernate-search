@@ -14,11 +14,11 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.junit.Tags;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 /**
@@ -52,7 +52,7 @@ class NumberFacetingTest extends AbstractFacetTest {
 	}
 
 	private FullTextQuery matchAll(FacetingRequest request) {
-		Query luceneQuery = new MatchAllDocsQuery();
+		Query luceneQuery = MatchAllDocsQueryUtils.matchAllDocsQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.getFacetManager().enableFaceting( request );
 		assertThat( query.getResultSize() ).as( "Wrong number of indexed cars" ).isEqualTo( 50 );

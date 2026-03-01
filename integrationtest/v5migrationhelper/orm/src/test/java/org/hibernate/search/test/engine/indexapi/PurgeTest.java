@@ -15,11 +15,10 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * Test {@link FullTextSession#purge(Class, java.io.Serializable)} and  {@link FullTextSession#purgeAll(Class)}.
@@ -163,7 +162,8 @@ class PurgeTest extends SearchTestBase {
 		try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
 			Transaction tx = fullTextSession.beginTransaction();
 
-			org.hibernate.query.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
+			org.hibernate.query.Query query =
+					fullTextSession.createFullTextQuery( MatchAllDocsQueryUtils.matchAllDocsQuery(), types );
 			@SuppressWarnings("unchecked")
 			List<Object> results = (List<Object>) query.list();
 			assertThat( results ).as( "Incorrect document count for type: " + Arrays.toString( types ) )

@@ -17,11 +17,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Yoann Rodiere
@@ -37,7 +36,7 @@ class BuildQueryBuilderTest {
 	@Test
 	void forEntity_configured_indexed() {
 		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( ConfiguredIndexed.class ).get();
-		assertThat( new MatchAllDocsQuery() ).isEqualTo( builder.all().createQuery() );
+		assertThat( MatchAllDocsQueryUtils.matchAllDocsQuery() ).isEqualTo( builder.all().createQuery() );
 	}
 
 	@Test

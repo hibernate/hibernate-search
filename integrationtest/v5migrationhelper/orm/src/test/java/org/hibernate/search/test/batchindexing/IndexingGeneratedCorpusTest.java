@@ -22,6 +22,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.MigrationHelperLog;
 
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 /**
@@ -184,7 +184,7 @@ class IndexingGeneratedCorpusTest {
 	}
 
 	private int countByFT(Class<? extends TitleAble>... types) {
-		Query findAll = new MatchAllDocsQuery();
+		Query findAll = MatchAllDocsQueryUtils.matchAllDocsQuery();
 		int bySize = 0;
 		int byResultSize = 0;
 		FullTextSession fullTextSession = builder.openFullTextSession();

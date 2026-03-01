@@ -13,11 +13,10 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 class AvoidDuplicatesTest extends SearchTestBase {
 
@@ -64,7 +63,7 @@ class AvoidDuplicatesTest extends SearchTestBase {
 		Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		fullTextSession.beginTransaction();
-		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( MatchAllDocsQueryUtils.matchAllDocsQuery() );
 		int size = fullTextQuery.list().size();
 		fullTextSession.getTransaction().commit();
 		fullTextSession.close();

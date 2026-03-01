@@ -12,10 +12,9 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.MatchAllDocsQueryUtils;
 
 import org.junit.jupiter.api.Test;
-
-import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * Verify index changes queued during a transaction are canceled
@@ -63,7 +62,7 @@ class RollbackTransactionTest extends SearchTestBase {
 	public int countBusLinesByFullText() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		org.apache.lucene.search.Query ftQuery = new MatchAllDocsQuery();
+		org.apache.lucene.search.Query ftQuery = MatchAllDocsQueryUtils.matchAllDocsQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( ftQuery, BusLine.class );
 		int count = query.list().size();
 		tx.commit();
