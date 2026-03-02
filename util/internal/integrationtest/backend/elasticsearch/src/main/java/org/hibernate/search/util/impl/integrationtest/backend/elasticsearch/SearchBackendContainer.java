@@ -32,7 +32,7 @@ public final class SearchBackendContainer {
 		Path containers = Path.of( System.getProperty( "org.hibernate.search.integrationtest.container.directory", "" ) );
 
 		try {
-			DockerImageName dockerImageName = parseDockerImageName( containers.resolve( "search-backend" )
+			DockerImageNameAndVersion dockerImageName = parseDockerImageName( containers.resolve( "search-backend" )
 					.resolve( distributionName.externalRepresentation() + ".Dockerfile" ), tag );
 			switch ( distributionName ) {
 				case ELASTIC:
@@ -83,8 +83,8 @@ public final class SearchBackendContainer {
 		}
 	}
 
-	private static GenericContainer<?> elasticsearch(DockerImageName dockerImageName) {
-		GenericContainer<?> container = common( dockerImageName )
+	private static GenericContainer<?> elasticsearch(DockerImageNameAndVersion dockerImageName) {
+		GenericContainer<?> container = common( dockerImageName.dockerImageName() )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Older images require HTTP authentication for all requests;
@@ -105,7 +105,7 @@ public final class SearchBackendContainer {
 				.withEnv( "cluster.routing.allocation.disk.threshold_enabled", "false" );
 
 		ElasticsearchVersion version =
-				ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, dockerImageName.getVersionPart() );
+				ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, dockerImageName.version() );
 
 		// Disable a few features that we don't use and that just slow up container startup.
 		if ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 7 ) {
@@ -138,8 +138,8 @@ public final class SearchBackendContainer {
 				.withEnv( "xpack.watcher.enabled", "false" );
 	}
 
-	private static GenericContainer<?> opensearch(DockerImageName dockerImageName) {
-		GenericContainer<?> container = common( dockerImageName )
+	private static GenericContainer<?> opensearch(DockerImageNameAndVersion dockerImageName) {
+		GenericContainer<?> container = common( dockerImageName.dockerImageName() )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Prevent swapping
@@ -160,7 +160,7 @@ public final class SearchBackendContainer {
 				.withEnv( "cluster.routing.allocation.disk.threshold_enabled", "false" );
 
 		ElasticsearchVersion version =
-				ElasticsearchVersion.of( ElasticsearchDistributionName.OPENSEARCH, dockerImageName.getVersionPart() );
+				ElasticsearchVersion.of( ElasticsearchDistributionName.OPENSEARCH, dockerImageName.version() );
 
 		if ( ( version.majorOptional().orElse( Integer.MIN_VALUE ) == 2
 				&& version.minor().orElse( Integer.MAX_VALUE ) > 11 )
@@ -186,14 +186,13 @@ public final class SearchBackendContainer {
 	}
 
 
-	private static DockerImageName parseDockerImageName(Path dockerfile, String tag) throws IOException {
-		Pattern DOCKERFILE_FROM_LINE_PATTERN = Pattern.compile( "FROM (.+)" );
+	private static DockerImageNameAndVersion parseDockerImageName(Path dockerfile, String tag) throws IOException {
+		Pattern DOCKERFILE_FROM_LINE_PATTERN = Pattern.compile( "FROM ([^@:\\s]+)(?::([^@\\s]+))?(@.+)?" );
 
-		DockerImageName dockerImageName = Files.lines( dockerfile )
+		DockerImageNameAndVersion dockerImageName = Files.lines( dockerfile )
 				.map( DOCKERFILE_FROM_LINE_PATTERN::matcher )
 				.filter( Matcher::matches )
-				.map( m -> m.group( 1 ) )
-				.map( DockerImageName::parse )
+				.map( DockerImageNameAndVersion::of )
 				.findAny().orElseThrow( () -> new IllegalStateException(
 						"Dockerfile " + dockerfile + " has unexpected structure. It *must* contain a single FROM line." ) );
 
@@ -202,5 +201,27 @@ public final class SearchBackendContainer {
 		}
 
 		return dockerImageName;
+	}
+
+	private record DockerImageNameAndVersion(DockerImageName dockerImageName, String version) {
+		static DockerImageNameAndVersion of(Matcher matcher) {
+			String name = matcher.group( 1 );
+			String maybeTag = matcher.group( 2 );
+			String maybeHash = matcher.group( 3 );
+
+			if ( maybeHash == null ) {
+				return new DockerImageNameAndVersion( DockerImageName.parse( name ).withTag( maybeTag ), maybeTag );
+			}
+			else if ( maybeTag == null ) {
+				return new DockerImageNameAndVersion( DockerImageName.parse( name + maybeHash ), null );
+			}
+			else {
+				return new DockerImageNameAndVersion( DockerImageName.parse( name + maybeHash ), maybeTag );
+			}
+		}
+
+		public DockerImageNameAndVersion withTag(String tag) {
+			return new DockerImageNameAndVersion( dockerImageName.withTag( tag ), tag );
+		}
 	}
 }

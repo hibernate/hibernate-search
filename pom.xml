@@ -986,7 +986,20 @@
                                         def fromFile = parseImage( './build/container/search-backend/${test.elasticsearch.distribution}.Dockerfile')
                                         def suppliedVersion = '${test.elasticsearch.version}'
                                         if (isNotBlankString(suppliedVersion)) {
-                                            images += fromFile.substring(0, fromFile.lastIndexOf(':')+1) + suppliedVersion
+                                            def matcher = fromFile =~ /FROM ([^@:\s]+)(?::([^@\s]+))?(@.+)?/
+                                            if (matcher.find()) {
+                                                def name = matcher.group(1)
+                                                def maybeTag = matcher.group(2)
+                                                def maybeHash = matcher.group(3)
+
+                                                if (suppliedVersion == maybeTag) {
+                                                    images += fromFile
+                                                } else {
+                                                    images += name + ":" + suppliedVersion
+                                                }
+                                            } else {
+                                                images += fromFile
+                                            }
                                         } else {
                                             images += fromFile
                                         }

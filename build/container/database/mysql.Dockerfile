@@ -1,3 +1,3 @@
 # MySQL
 # See https://hub.docker.com/_/mysql/tags
-FROM docker.io/mysql:9.6.0
+FROM docker.io/mysql:9.6.0@sha256:e5dc14f6e01c3e577e669337d2855c6d1561b30d8ef2c592e63e4e8a9a52650a
