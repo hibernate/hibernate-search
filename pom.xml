@@ -296,8 +296,8 @@
         <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.processor.plugin>5.1</version.processor.plugin>
-        <version.resources.plugin>3.4.0</version.resources.plugin>
-        <version.shade.plugin>3.6.1</version.shade.plugin>
+        <version.resources.plugin>3.5.0</version.resources.plugin>
+        <version.shade.plugin>3.6.2</version.shade.plugin>
         <version.source.plugin>3.4.0</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.5.5</version.surefire.plugin>
@@ -355,7 +355,7 @@
                 is outdated and leads to compilation errors.
          -->
         <version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>2.14.2</version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.44.0</version.org.eclipse.jdt.ecj>
+        <version.org.eclipse.jdt.ecj>3.45.0</version.org.eclipse.jdt.ecj>
 
         <!-- Asciidoctor -->
 
