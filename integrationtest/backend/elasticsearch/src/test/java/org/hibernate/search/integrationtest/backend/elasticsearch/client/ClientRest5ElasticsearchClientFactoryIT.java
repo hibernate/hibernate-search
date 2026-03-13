@@ -16,6 +16,7 @@ import static org.assertj.core.api.Fail.fail;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -64,6 +65,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendHelper;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -735,6 +737,8 @@ class ClientRest5ElasticsearchClientFactoryIT {
 	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2449")
 	void discovery_http() {
+		assumeTrue( ElasticsearchTckBackendFeatures.supportsVersionCheck(),
+				"Elasticsearch REST Client based on Apache HTTP client 5 requires version when sniffer is parsing responses." );
 		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.getPort(), wireMockRule2.getPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
@@ -789,6 +793,8 @@ class ClientRest5ElasticsearchClientFactoryIT {
 	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2736")
 	void discovery_https() {
+		assumeTrue( ElasticsearchTckBackendFeatures.supportsVersionCheck(),
+				"Elasticsearch REST Client based on Apache HTTP client 5 requires version when sniffer is parsing responses." );
 		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.getHttpsPort(), wireMockRule2.getHttpsPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
