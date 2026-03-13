@@ -142,7 +142,7 @@
         <version.testcontainers>2.0.3</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
-        <version.org.mockito>5.22.0</version.org.mockito>
+        <version.org.mockito>5.23.0</version.org.mockito>
         <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
         <version.org.awaitily>4.3.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
@@ -168,7 +168,7 @@
         <version.mysql.mysql-connector-j>9.6.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.4.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.26.1.0.0</version.com.oracle.database.jdbc>
-        <version.com.microsoft.sqlserver.mssql-jdbc>13.2.1.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
+        <version.com.microsoft.sqlserver.mssql-jdbc>13.4.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
