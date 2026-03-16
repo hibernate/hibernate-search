@@ -24,6 +24,12 @@ This release is here to provide the Hibernate ORM 7.3 compatibility.
 [[orm-version]]
 Hibernate ORM::
 Hibernate Search targets the Hibernate ORM 7.3 series.
+[[elasticsearch-version]]
+Elasticsearch::
+The Elasticsearch backend works with Elasticsearch 9.3, as well as other already compatible versions.
 [[opensearch-version]]
 OpenSearch::
-The Elasticsearch backend works with OpenSearch 3.4, as well as other already compatible versions.
+The Elasticsearch backend works with OpenSearch 3.4 and 3.5, as well as other already compatible versions.
+[[lucene-version]]
+Lucene::
+The Lucene-next backend is now based on Lucene 10.4.0.
