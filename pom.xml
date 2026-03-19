@@ -511,14 +511,6 @@
                 <!-- The default resource dir: -->
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
-            <resource>
-                <!-- Extra dir to include the license file: -->
-                <directory>${rootProject.directory}</directory>
-                <includes>
-                    <include>LICENSE.txt</include>
-                </includes>
-                <targetPath>META-INF</targetPath>
-            </resource>
         </resources>
         <pluginManagement>
             <plugins>
@@ -1154,6 +1146,37 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!--
+                            Copy LICENSE.txt to META-INF in the build output directory.
+                            Previously done via a project-level <resource> pointing at ${rootProject.directory},
+                            but that caused the entire workspace root to be fingerprinted as a build cache input
+                            for all goals consuming project resources (e.g. checkstyle:check), breaking
+                            build cache relocatability.
+                        -->
+                        <id>copy-license</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${rootProject.directory}</directory>
+                                    <includes>
+                                        <include>LICENSE.txt</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
