@@ -629,7 +629,7 @@
                              Necessary to avoid rebuilding JARs when executing Maven twice,
                              which has dramatic cascading effects as it leads to recompiling
                              sources for all depending projects. -->
-                        <overwrite>false</overwrite>
+                        <changeDetection>content</changeDetection>
                     </configuration>
                 </plugin>
                 <plugin>
