@@ -1,6 +1,36 @@
 Hibernate Search Changelog
 ==========================
 
+8.3.0.Final (2026-03-20)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/37774
+
+
+** Improvement
+    * HSEARCH-5594 Update to AWS SDK 2.42.14
+    * HSEARCH-5592 Update to JBoss logging 3.6.3.Final
+    * HSEARCH-5591 Update to Hibernate ORM 7.3.0.Final
+    * HSEARCH-5589 Update to AWS SDK 2.41.9
+    * HSEARCH-5587 Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.2
+    * HSEARCH-5586 Update to Apache Lucene 10.4.0
+    * HSEARCH-5582 Test against newer version of OpenSearch 2.19.4
+    * HSEARCH-5581 Test against newer versions of Elasticsearch 9.2.6 / 8.19.12
+    * HSEARCH-5580 Update Elasticsearch client (elasticsearch-rest-client) to 9.3.1
+    * HSEARCH-5579 Test against latest Elasticsearch 9.3.1
+    * HSEARCH-5576 Update Apache HTTP Core client components to 5.4.1
+    * HSEARCH-5575 Upgrade to commons-codec 1.21.0
+    * HSEARCH-5571 Upgrade to Avro 1.11.5
+    * HSEARCH-5570 Update Elasticsearch rest client (opensearch-rest-client) to 3.5.0
+    * HSEARCH-5568 Add compatibility with OpenSearch 3.5
+    * HSEARCH-5553 Update Apache HTTP Client components to 5.6
+
+** Task
+    * HSEARCH-5593 Use Maven 3.9.14 as a required minimum version for the build
+    * HSEARCH-5588 Use Maven 3.9.13 as a required minimum version for the build
+    * HSEARCH-5569 Test against the latest OpenSearch 3.5.0
+    * HSEARCH-5567 Look into failing OutboxPollingAutomaticIndexingEventSendingIT on Oracle 
+
 8.3.0.CR1 (2026-02-05)
 -------------------------
 
