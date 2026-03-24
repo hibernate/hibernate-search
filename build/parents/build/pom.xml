@@ -139,7 +139,7 @@
         <version.junit-jupiter>6.0.3</version.junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>2.0.3</version.testcontainers>
+        <version.testcontainers>2.0.4</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.23.0</version.org.mockito>
