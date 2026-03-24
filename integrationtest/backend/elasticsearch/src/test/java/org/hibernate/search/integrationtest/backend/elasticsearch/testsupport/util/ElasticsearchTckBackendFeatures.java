@@ -574,7 +574,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		if ( ByteVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
 			// https://github.com/elastic/elasticsearch/issues/141830
 			return isActualVersion(
-					es -> !es.isBetween( "9.3.0", "9.3.1" ),
+					es -> !es.isBetween( "9.3.0", "9.3.2" ),
 					os -> true,
 					aoss -> true
 			);
