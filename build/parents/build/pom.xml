@@ -102,7 +102,7 @@
             NOTE: when Hibernate ORM updates Byte Buddy, make sure to check Jenkinsfile to see if
             `net.bytebuddy.experimental` property can be removed.
          -->
-        <version.org.hibernate.orm>7.3.0.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>7.4.0-SNAPSHOT</version.org.hibernate.orm>
 
         <javadoc.org.hibernate.orm.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
@@ -141,6 +141,7 @@
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
         <version.testcontainers>2.0.4</version.testcontainers>
 
+        <version.org.checkerframework>3.54.0</version.org.checkerframework>
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.23.0</version.org.mockito>
         <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
@@ -427,6 +428,13 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>${version.org.jboss.logging.jboss-logging}</version>
+            </dependency>
+
+            <!-- Checker framework is leaking into APIs from ORM so we need it if we compile some classes that override things annotated with checker. -->
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual-android</artifactId>
+                <version>${version.org.checkerframework}</version>
             </dependency>
 
             <!-- Other public dependencies -->
