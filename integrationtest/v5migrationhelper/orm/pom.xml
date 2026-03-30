@@ -23,7 +23,6 @@
         <!-- This is based on legacy code and there are plenty of problems that we don't care to fix -->
         <jqassistant.skip>true</jqassistant.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
-        <sonar.skip>true</sonar.skip>
 
         <test.database.run.skip>false</test.database.run.skip>
     </properties>
