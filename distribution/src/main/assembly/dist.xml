@@ -233,6 +233,7 @@
 				<exclude>**/*.iml</exclude>
 				<exclude>atlassian-ide-plugin.xml</exclude>
 				<exclude>.sonar-ide.properties</exclude>
+				<exclude>sonar-project.properties</exclude>
 				<exclude>Jenkinsfile</exclude>
 				<exclude>jenkins/**</exclude>
 				<exclude>.empty/**</exclude>
