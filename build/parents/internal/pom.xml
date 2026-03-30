@@ -37,13 +37,6 @@
              Wiremock depends on multiple versions of the servlet API, ... -->
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
 
-        <!--
-            In all internal modules, especially but not only test modules,
-            consider all sources as tests during Sonar analysis.
-            This is important because some analysis rules do not apply to test code.
-         -->
-        <sonar.sources>${rootProject.empty.directory}</sonar.sources>
-        <sonar.tests>${project.basedir}/src</sonar.tests>
     </properties>
 
     <build>
