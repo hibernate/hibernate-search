@@ -403,32 +403,53 @@ stage('Default build') {
 			if (enableDefaultBuildIT) {
 				if (helper.configuration.file?.sonar?.credentials) {
 					def sonarCredentialsId = helper.configuration.file.sonar.credentials
-					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+                    def sonarCliVersion = helper.configuration.file?.sonar?.cli?.version
+                    def sonarCliInstallerHash = helper.configuration.file?.sonar?.cli?.hash
+                    // WARNING: Make sure credentials are evaluated by sh, not Groovy.
 					// To that end, escape the '$' when referencing the variables.
 					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
-					withCredentials([usernamePassword(
-									credentialsId: sonarCredentialsId,
-									usernameVariable: 'SONARCLOUD_ORGANIZATION',
-									passwordVariable: 'SONARCLOUD_TOKEN'
-					)]) {
-						sh """ \
-								mvn sonar:sonar \
-								-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
-								-Dsonar.host.url=https://sonarcloud.io \
-								-Dsonar.login=\${SONARCLOUD_TOKEN} \
-								${helper.scmSource.pullRequest ? """ \
-										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
-										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
-										-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
-										${helper.scmSource.gitHubRepoId ? """ \
-												-Dsonar.pullrequest.provider=GitHub \
-												-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
-										""" : ''} \
-								""" : """ \
-										-Dsonar.branch.name=${helper.scmSource.branch.name} \
-								"""} \
-						"""
-					}
+
+                    dir('.sonar') {
+                        sh "curl --create-dirs -sSLo \"\$(pwd)\"/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${sonarCliVersion}.zip"
+                        def downloadedHash = sh(script: 'sha256sum $(pwd)/sonar-scanner.zip | awk \'{print $1}\'', returnStdout: true).trim()
+                        if (downloadedHash != sonarCliInstallerHash) {
+                            echo "Downloaded CLI sha256: $downloadedHash"
+                            echo "Expected CLI sha256: $sonarCliInstallerHash"
+                            throw new Exception("Downloaded CLI has an unexpected checksum. Stopping the build!")
+                        }
+                        sh "unzip -o \$(pwd)/sonar-scanner.zip -d \$(pwd)"
+                        sh "mv \"\$(pwd)/sonar-scanner-$sonarCliVersion\"/* \"\$(pwd)\""
+
+                    }
+
+                    // WARNING: Make sure credentials are evaluated by sh, not Groovy.
+                    // To that end, escape the '$' when referencing the variables.
+                    // See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
+                    withCredentials([usernamePassword(
+                            credentialsId: sonarCredentialsId,
+                            usernameVariable: 'SONARCLOUD_ORGANIZATION',
+                            // https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
+                            passwordVariable: 'SONAR_TOKEN'
+                    )]) {
+                        def sonarCliArgs = ''
+
+                        if (helper.scmSource.pullRequest) {
+                            sonarCliArgs += " -Dsonar.pullrequest.branch=${helper.scmSource.branch.name}"
+                            sonarCliArgs += " -Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id}"
+                            sonarCliArgs += " -Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name}"
+                            if (helper.scmSource.gitHubRepoId) {
+                                sonarCliArgs += " -Dsonar.pullrequest.provider=GitHub"
+                                sonarCliArgs += " -Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId}"
+                            }
+                        } else {
+                            sonarCliArgs += " -Dsonar.branch.name=${helper.scmSource.branch.name}"
+                        }
+
+                        sh """.sonar/bin/sonar-scanner $sonarCliArgs \\
+                            -Dsonar.java.libraries="\$(pwd)/build/reports/target/sonar-dependencies/*.jar" \\
+                            -Dsonar.coverage.jacoco.xmlReportPaths="\$(pwd)/build/reports/target/site/jacoco-aggregate/jacoco.xml"
+                        """
+                    }
 				}
 				else {
 					echo "No Sonar organization configured - skipping Sonar report."
