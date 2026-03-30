@@ -54,3 +54,6 @@ nbactions.xml
 # Gradle Enterprise/Develocity
 /.mvn/.gradle-enterprise
 /.mvn/.develocity
+
+# Sonar:
+.scannerwork
