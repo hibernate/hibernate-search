@@ -135,7 +135,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.25.3</version.log4j>
+        <version.log4j>2.25.4</version.log4j>
         <version.junit-jupiter>6.0.3</version.junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
@@ -186,7 +186,7 @@
         <version.org.springframework.boot>4.0.1</version.org.springframework.boot>
         <!-- Spring Boot 3 JTA starter and related libs version: -->
         <version.dev.snowdrop>4.0.0</version.dev.snowdrop>
-        <version.io.agroal>3.0</version.io.agroal>
+        <version.io.agroal>3.0.1</version.io.agroal>
 
         <version.jsoup>1.22.1</version.jsoup>
         <version.snakeyaml>2.6</version.snakeyaml>
