@@ -1288,6 +1288,7 @@
                         <excludes>
                             **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
                             **/*_$logger.java,**/*_$bundle.java,
+                            **/*__.java,
                             **/module-info.java,
                             **/avro/generated/**/*.java
                         </excludes>
