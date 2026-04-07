@@ -164,7 +164,7 @@
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.4.240</version.com.h2database>
         <version.org.postgresql>42.7.10</version.org.postgresql>
-        <version.org.mariadb.jdbc>3.5.7</version.org.mariadb.jdbc>
+        <version.org.mariadb.jdbc>3.5.8</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.6.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.4.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.26.1.0.0</version.com.oracle.database.jdbc>
