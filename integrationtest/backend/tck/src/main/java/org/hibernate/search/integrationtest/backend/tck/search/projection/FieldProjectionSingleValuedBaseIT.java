@@ -97,6 +97,9 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@MethodSource("params")
 	void simple(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( TckConfiguration.get().getBackendFeatures()
+				.canRetrieveVectorFieldFromNestedCamelCaseObject( dataSet.fieldType ) );
+
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -118,6 +121,9 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@MethodSource("params")
 	void optional(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( TckConfiguration.get().getBackendFeatures()
+				.canRetrieveVectorFieldFromNestedCamelCaseObject( dataSet.fieldType ) );
+
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -141,6 +147,9 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@MethodSource("params")
 	void noClass(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( TckConfiguration.get().getBackendFeatures()
+				.canRetrieveVectorFieldFromNestedCamelCaseObject( dataSet.fieldType ) );
+
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -166,6 +175,9 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-3391")
 	void multi(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( TckConfiguration.get().getBackendFeatures()
+				.canRetrieveVectorFieldFromNestedCamelCaseObject( dataSet.fieldType ) );
+
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -196,6 +208,9 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@MethodSource("params")
 	void duplicated(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( TckConfiguration.get().getBackendFeatures()
+				.canRetrieveVectorFieldFromNestedCamelCaseObject( dataSet.fieldType ) );
+
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -225,6 +240,9 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-4162")
 	void factoryWithRoot(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F, ?> fieldType, DataSet<F> dataSet) {
+		assumeTrue( TckConfiguration.get().getBackendFeatures()
+				.canRetrieveVectorFieldFromNestedCamelCaseObject( dataSet.fieldType ) );
+
 		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
 
 		assumeTrue(

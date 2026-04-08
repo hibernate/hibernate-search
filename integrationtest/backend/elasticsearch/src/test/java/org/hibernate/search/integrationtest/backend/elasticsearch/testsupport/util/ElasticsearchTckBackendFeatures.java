@@ -581,4 +581,20 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		}
 		return super.canHandleDeepNestedPredicate( fieldTypeDescriptor );
 	}
+
+	@Override
+	public boolean canRetrieveVectorFieldFromNestedCamelCaseObject(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
+		if ( ByteVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor )
+				|| FloatVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
+			// https://github.com/opensearch-project/OpenSearch/issues/21184
+			// https://github.com/opensearch-project/k-NN/issues/3268
+			return isActualVersion(
+					es -> true,
+					os -> !os.isMatching( "3.6.0" ),
+					// TODO: CHANGE aoss as ^ are fixed
+					aoss -> false
+			);
+		}
+		return super.canRetrieveVectorFieldFromNestedCamelCaseObject( fieldTypeDescriptor );
+	}
 }

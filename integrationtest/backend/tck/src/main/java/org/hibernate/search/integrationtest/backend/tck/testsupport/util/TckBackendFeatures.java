@@ -234,4 +234,8 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 	public boolean canHandleDeepNestedPredicate(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
 		return true;
 	}
+
+	public boolean canRetrieveVectorFieldFromNestedCamelCaseObject(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
+		return true;
+	}
 }

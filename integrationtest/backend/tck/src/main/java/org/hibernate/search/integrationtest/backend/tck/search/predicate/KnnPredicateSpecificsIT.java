@@ -39,6 +39,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.ByteVectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.VectorFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -765,6 +766,9 @@ class KnnPredicateSpecificsIT {
 		@Test
 		@SuppressWarnings("unchecked")
 		void nestedVector() {
+			assumeTrue( TckConfiguration.get().getBackendFeatures()
+					.canRetrieveVectorFieldFromNestedCamelCaseObject( ByteVectorFieldTypeDescriptor.INSTANCE ) );
+
 			assertThat(
 					indexNested.createScope().query()
 							.select( f -> f.composite()
