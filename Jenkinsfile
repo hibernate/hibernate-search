@@ -718,7 +718,7 @@ stage('Sonar analysis') {
 
 				// we don't clean to keep the unstashed jacoco reports:
 				sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestEnvironmentArgs(environments.content.jdk.default)}"
-
+                def currentJavaVersion = sh(script: 'mvn help:evaluate -Dexpression=java-version.main.release -q -DforceStdout', returnStdout: true).trim()
 
 				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
 				// To that end, escape the '$' when referencing the variables.
@@ -729,7 +729,7 @@ stage('Sonar analysis') {
 						// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
 						passwordVariable: 'SONAR_TOKEN'
 				)]) {
-                    def sonarCliArgs = ''
+                    def sonarCliArgs = "-Dsonar.java.source=${currentJavaVersion}"
 
                     if (helper.scmSource.pullRequest) {
                         sonarCliArgs+=" -Dsonar.pullrequest.branch=${helper.scmSource.branch.name}"
