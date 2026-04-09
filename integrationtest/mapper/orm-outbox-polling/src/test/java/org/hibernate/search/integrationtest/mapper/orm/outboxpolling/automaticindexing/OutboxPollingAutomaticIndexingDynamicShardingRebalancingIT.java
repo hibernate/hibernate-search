@@ -35,17 +35,11 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test of automatic rebalancing for dynamic sharding with the outbox-polling coordination strategy.
  */
-// This test is pretty much failing most of the time on Windows.
-//  We have a JIRA HSEARCH-5280 to look into it.
-//  For now, we'll just skip it on Windows envs:
-@DisabledOnOs(OS.WINDOWS)
 @TestForIssue(jiraKey = "HSEARCH-4140")
 class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 
@@ -122,9 +116,13 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	}
 
 	private void createEntitiesToIndex(SessionFactory sessionFactory, int entityCount) {
+		createEntitiesToIndex( sessionFactory, entityCount, 0 );
+	}
+
+	private void createEntitiesToIndex(SessionFactory sessionFactory, int entityCount, int idOffset) {
 		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
-				IndexedEntity entity = new IndexedEntity( i, "initial" );
+				IndexedEntity entity = new IndexedEntity( idOffset + i, "initial" );
 				session.persist( entity );
 			}
 		} );
@@ -132,7 +130,7 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// expectations can be added outside the session/transaction
 		for ( int i = 0; i < entityCount; i++ ) {
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
+					.add( String.valueOf( idOffset + i ), b -> b.field( "text", "initial" ) );
 		}
 
 		// The filter is there to make sure we don't consume all events while we're creating them,
@@ -227,14 +225,17 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		createEntitiesToIndex( sessionFactory, entityCount );
+		int firstBatch = entityCount / 2;
+		createEntitiesToIndex( sessionFactory, firstBatch );
 
 		// Start a new factory as soon as all others have processed at least one entity
 		await()
 				.pollInterval( 1, TimeUnit.MILLISECONDS )
 				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForEachSessionFactory()
 						.allSatisfy( c -> assertThat( c ).isNotZero() ) );
+		eventFilter.hideAllEvents();
 		setup( "none" );
+		createEntitiesToIndex( sessionFactory, entityCount - firstBatch, firstBatch );
 
 		waitForIndexing( sessionFactory );
 		backendMock.verifyExpectationsMet();
