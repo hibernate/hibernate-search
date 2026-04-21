@@ -276,7 +276,7 @@
         <version.install.plugin>3.1.4</version.install.plugin>
         <version.enforcer.plugin>3.6.2</version.enforcer.plugin>
         <version.project-info.plugin>3.9.0</version.project-info.plugin>
-        <version.japicmp.plugin>0.25.5</version.japicmp.plugin>
+        <version.japicmp.plugin>0.25.6</version.japicmp.plugin>
         <version.deploy.plugin>3.1.4</version.deploy.plugin>
         <version.flatten-maven-plugin>1.7.3</version.flatten-maven-plugin>
         <version.assembly.plugin>3.8.0</version.assembly.plugin>
