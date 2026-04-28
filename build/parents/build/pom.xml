@@ -139,7 +139,7 @@
         <version.junit-jupiter>6.0.3</version.junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
-        <version.testcontainers>2.0.4</version.testcontainers>
+        <version.testcontainers>2.0.5</version.testcontainers>
 
         <version.org.hamcrest>3.0</version.org.hamcrest>
         <version.org.mockito>5.23.0</version.org.mockito>
@@ -165,7 +165,7 @@
         <version.com.h2database>2.4.240</version.com.h2database>
         <version.org.postgresql>42.7.10</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.8</version.org.mariadb.jdbc>
-        <version.mysql.mysql-connector-j>9.6.0</version.mysql.mysql-connector-j>
+        <version.mysql.mysql-connector-j>9.7.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.4.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.26.1.0.0</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>13.4.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
@@ -188,7 +188,7 @@
         <version.dev.snowdrop>4.0.0</version.dev.snowdrop>
         <version.io.agroal>3.0.1</version.io.agroal>
 
-        <version.jsoup>1.22.1</version.jsoup>
+        <version.jsoup>1.22.2</version.jsoup>
         <version.snakeyaml>2.6</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
