@@ -9,8 +9,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 env.PROJECT = "search"
 // Set to `true` *only* on branches where you want a scheduled release.
-// Also uncomment the `FULLY_AUTOMATIC` property and related steps.
-def RELEASE_ON_SCHEDULE = false
+def RELEASE_ON_SCHEDULE = true
 
 // Avoid running the pipeline on branch indexing
 if (currentBuild.getBuildCauses().toString().contains('BranchIndexingCause')) {
@@ -59,12 +58,11 @@ pipeline {
 		disableConcurrentBuilds(abortPrevious: false)
 	}
 	parameters {
-// 	UNCOMMENT: on branches where you want to enable automatic releases:
-// 		booleanParam(
-// 				name: 'FULLY_AUTOMATIC',
-// 				defaultValue: true,
-// 				description: 'If true, simulate the "timer triggered release", without asking for any release/development versions and trigger the Jira release.'
-// 		)
+		booleanParam(
+				name: 'FULLY_AUTOMATIC',
+				defaultValue: true,
+				description: 'If true, simulate the "timer triggered release", without asking for any release/development versions and trigger the Jira release.'
+		)
 		string(
 				name: 'RELEASE_VERSION',
 				defaultValue: '',
@@ -84,28 +82,27 @@ pipeline {
 		)
 	}
 	stages {
-// 	UNCOMMENT: on branches where you want to enable automatic releases:
-// 	    stage('Validate release type') {
-//             steps {
-//                 script {
-//                     if (params.FULLY_AUTOMATIC) {
-//                         print "INFO: Manually requested a fully automatic release."
-//                         def warning = ''
-//                         if (params.RELEASE_VERSION) {
-//                             warning += "Release version MUST be empty, but got '${params.RELEASE_VERSION}'."
-//                         }
-//                         if (params.DEVELOPMENT_VERSION) {
-//                             warning += "Development version MUST be empty, but got '${params.DEVELOPMENT_VERSION}'."
-//                         }
-//                         if (warning) {
-//                             throw new Exception("Cannot proceed with a release: ${warning}")
-//                         }
-//                         manualRelease = false
-//                         cronRelease = true
-//                     }
-//                 }
-//             }
-//         }
+	    stage('Validate release type') {
+            steps {
+                script {
+                    if (params.FULLY_AUTOMATIC) {
+                        print "INFO: Manually requested a fully automatic release."
+                        def warning = ''
+                        if (params.RELEASE_VERSION) {
+                            warning += "Release version MUST be empty, but got '${params.RELEASE_VERSION}'."
+                        }
+                        if (params.DEVELOPMENT_VERSION) {
+                            warning += "Development version MUST be empty, but got '${params.DEVELOPMENT_VERSION}'."
+                        }
+                        if (warning) {
+                            throw new Exception("Cannot proceed with a release: ${warning}")
+                        }
+                        manualRelease = false
+                        cronRelease = true
+                    }
+                }
+            }
+        }
 		stage('Release') {
 			steps {
 				script {
@@ -232,18 +229,14 @@ pipeline {
                             configFile(fileId: 'release.config.ssh', targetLocation: "${env.HOME}/.ssh/config"),
                             configFile(fileId: 'release.config.ssh.knownhosts', targetLocation: "${env.HOME}/.ssh/known_hosts")
                     ]) {
-                        withCredentials([
-                                gitUsernamePassword(credentialsId: 'username-and-token.Hibernate-CI.github.com', gitToolName: 'Default')
-                        ]) {
-                            sshagent( ['ed25519.Hibernate-CI.github.com'] ) {
-                                dir( '.release/hibernate.org' ) {
-                                    checkout scmGit(
-                                            branches: [[name: '*/production']],
-                                            extensions: [],
-                                            userRemoteConfigs: [[credentialsId: 'ed25519.Hibernate-CI.github.com', url: 'https://github.com/hibernate/hibernate.org.git']]
-                                    )
-                                    sh "../scripts/website-release.sh ${env.SCRIPT_OPTIONS} ${env.PROJECT} ${env.RELEASE_VERSION}"
-                                }
+                        sshagent( ['ed25519.Hibernate-CI.github.com'] ) {
+                            dir( '.release/hibernate.org' ) {
+                                checkout scmGit(
+                                        branches: [[name: '*/production']],
+                                        extensions: [],
+                                        userRemoteConfigs: [[credentialsId: 'ed25519.Hibernate-CI.github.com', url: 'https://github.com/hibernate/hibernate.org.git']]
+                                )
+                                sh "../scripts/website-release.sh ${env.SCRIPT_OPTIONS} ${env.PROJECT} ${env.RELEASE_VERSION}"
                             }
                         }
                     }
