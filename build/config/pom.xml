@@ -250,6 +250,9 @@
                                 <argument>^org\.hibernate\.query\.spi\.QueryParameterBindingTypeResolver$</argument>
                                 <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
                                 <argument>^org\.hibernate\.sql\.results\.graph\.Fetchable$</argument>
+
+                                <!-- Types that are not used directly and are pulled by a "stable" interface -->
+                                <argument>^org\.hibernate\.mapping\.SoftDeletable$</argument>
                             </arguments>
                             <!--
                                 While this will include more than we really need, it is easier to do so.

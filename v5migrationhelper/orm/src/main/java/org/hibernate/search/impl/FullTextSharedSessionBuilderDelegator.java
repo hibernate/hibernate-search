@@ -5,6 +5,7 @@
 package org.hibernate.search.impl;
 
 import java.sql.Connection;
+import java.time.Instant;
 import java.util.TimeZone;
 import java.util.function.UnaryOperator;
 
@@ -60,6 +61,18 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	@Override
 	public FullTextSharedSessionBuilder autoClose() {
 		builder.autoClose();
+		return this;
+	}
+
+	@Override
+	public SharedSessionBuilder asOf(Instant instant) {
+		builder.asOf( instant );
+		return this;
+	}
+
+	@Override
+	public SharedSessionBuilder atChangeset(Object changesetId) {
+		builder.atChangeset( changesetId );
 		return this;
 	}
 
