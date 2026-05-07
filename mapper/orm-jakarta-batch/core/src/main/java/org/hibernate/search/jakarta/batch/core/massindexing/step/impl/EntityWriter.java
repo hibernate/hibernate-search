@@ -19,7 +19,6 @@ import jakarta.persistence.LockModeType;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -171,6 +170,7 @@ public class EntityWriter extends AbstractItemWriter {
 		JakartaBatchLog.INSTANCE.closingEntityWriter( partitionIdStr, entityName );
 	}
 
+	@SuppressWarnings({ "removal" }) // because there is no alternative till we get ORM 8 and JPA 4 ...
 	private List<?> loadEntities(SessionImplementor session, List<Object> entityIds) {
 		return type.createLoadingQuery( session, ID_PARAMETER_NAME )
 				.setParameter( ID_PARAMETER_NAME, entityIds )
@@ -178,7 +178,7 @@ public class EntityWriter extends AbstractItemWriter {
 				.setCacheable( false )
 				.setLockMode( LockModeType.NONE )
 				.setCacheMode( cacheMode )
-				.setQueryFlushMode( QueryFlushMode.NO_FLUSH ) // FlushMode.MANUAL
+				.setQueryFlushMode( org.hibernate.query.QueryFlushMode.NO_FLUSH ) // FlushMode.MANUAL
 				.setFetchSize( entityFetchSize )
 				.list();
 	}

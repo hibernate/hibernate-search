@@ -15,7 +15,6 @@ import jakarta.persistence.Id;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -73,6 +72,7 @@ class AutomaticIndexingSessionFlushIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings({ "removal" }) // because there is no alternative till we get ORM 8 and JPA 4 ...
 	@Test
 	void onAutoFlush() {
 		with( sessionFactory ).runInTransaction( session -> {
@@ -86,7 +86,7 @@ class AutomaticIndexingSessionFlushIT {
 
 			// An auto flush is performed on query invocation
 			List<?> resultList = session.createQuery( "select i from IndexedEntity i", IndexedEntity.class )
-					.setQueryFlushMode( QueryFlushMode.DEFAULT ) // FlushMode.AUTO
+					.setQueryFlushMode( org.hibernate.query.QueryFlushMode.DEFAULT ) // FlushMode.AUTO
 					.getResultList();
 
 			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {

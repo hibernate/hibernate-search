@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.hibernate.LockMode;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.query.QueryFlushMode;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
@@ -58,13 +57,14 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 		return typeQueryLoader.findMultiple( session, identifiers, options.cacheMode(), LockMode.NONE );
 	}
 
+	@SuppressWarnings({ "removal" }) // because there is no alternative till we get ORM 8 and JPA 4 ...
 	private List<E> queryByIds(List<I> identifiers) {
 		return typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
 				.setParameter( ID_PARAMETER_NAME, identifiers )
 				.setCacheMode( options.cacheMode() )
 				.setHibernateLockMode( LockMode.NONE )
 				.setCacheable( false )
-				.setQueryFlushMode( QueryFlushMode.NO_FLUSH )
+				.setQueryFlushMode( org.hibernate.query.QueryFlushMode.NO_FLUSH )
 				.setFetchSize( identifiers.size() )
 				.list();
 	}

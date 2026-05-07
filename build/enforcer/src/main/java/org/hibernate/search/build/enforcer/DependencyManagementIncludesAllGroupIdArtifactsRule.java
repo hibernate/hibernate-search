@@ -136,6 +136,7 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		}
 
 		List<String> problems = new ArrayList<>();
+        StringBuilder dependencyString = new StringBuilder();
 		for ( Artifact artifact : foundArtifacts ) {
 			String toCheck = artifact.formattedString();
 			if ( shouldSkip( toCheck, skip ) ) {
@@ -144,11 +145,14 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 			if ( !dependencies.remove( toCheck ) ) {
 				// The artifact is NOT in the dependencies
 				problems.add( "`" + toCheck + "` is missing from the dependency management section" );
+                dependencyString.append("\n<dependency>\n\t<groupId>").append(artifact.g).append("</groupId>\n\t<artifactId>")
+                        .append(artifact.a).append("</artifactId>\n\t<version>${version.bom.").append(artifact.g).append("}</version>\n</dependency>");
 			}
 		}
 
 		if ( !problems.isEmpty() ) {
-			throw new EnforcerRuleException( String.join( ";\n", problems ) );
+			throw new EnforcerRuleException(
+					String.join( ";\n", problems ) + "\nPossible example to include:\n" + dependencyString );
 		}
 	}
 
