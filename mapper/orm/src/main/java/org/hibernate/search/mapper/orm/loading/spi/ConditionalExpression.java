@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.orm.loading.spi;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,10 @@ public final class ConditionalExpression {
 
 	public void param(String name, Object value) {
 		params.put( name, value );
+	}
+
+	public Map<String, Object> params() {
+		return Collections.unmodifiableMap( params );
 	}
 
 	public void applyParams(Query<?> query) {

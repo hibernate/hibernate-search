@@ -6,7 +6,9 @@ package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.IdClass;
@@ -15,7 +17,7 @@ import org.hibernate.metamodel.mapping.EmbeddableMappingType;
 import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
 import org.hibernate.metamodel.mapping.ModelPart;
 import org.hibernate.metamodel.model.domain.NavigableRole;
-import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchReindexCondition;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 
 /**
@@ -53,19 +55,13 @@ public class CompositeIdOrder<E> implements IdOrder {
 	}
 
 	@Override
-	public ConditionalExpression idGreater(String paramNamePrefix, Object idObj) {
-		return restrictLexicographically( paramNamePrefix, idObj, ">", false );
+	public HibernateOrmBatchReindexCondition idGreater(String paramNamePrefix, Object idObj, boolean inclusive) {
+		return restrictLexicographically( paramNamePrefix, idObj, ">", inclusive );
 	}
 
 	@Override
-	public ConditionalExpression idGreaterOrEqual(String paramNamePrefix, Object idObj) {
-		// Caution, using ">=" here won't cut it, we really need to separate the strict operator from the equals.
-		return restrictLexicographically( paramNamePrefix, idObj, ">", true );
-	}
-
-	@Override
-	public ConditionalExpression idLesser(String paramNamePrefix, Object idObj) {
-		return restrictLexicographically( paramNamePrefix, idObj, "<", false );
+	public HibernateOrmBatchReindexCondition idLesser(String paramNamePrefix, Object idObj, boolean inclusive) {
+		return restrictLexicographically( paramNamePrefix, idObj, "<", inclusive );
 	}
 
 	@Override
@@ -81,7 +77,7 @@ public class CompositeIdOrder<E> implements IdOrder {
 		return builder.toString();
 	}
 
-	private ConditionalExpression restrictLexicographically(String paramNamePrefix, Object idObj,
+	private HibernateOrmBatchReindexCondition restrictLexicographically(String paramNamePrefix, Object idObj,
 			String strictOperator, boolean orEquals) {
 		List<String> orClauses = new ArrayList<>();
 
@@ -109,12 +105,12 @@ public class CompositeIdOrder<E> implements IdOrder {
 			orClauses.add( junction( andClauses, " and " ) );
 		}
 
-		var expression = new ConditionalExpression( junction( orClauses, " or " ) );
 		Object[] selectableValues = idMappingType.getValues( idObj );
+		Map<String, Object> params = new HashMap<>();
 		for ( int i = 0; i < selectableValues.length; i++ ) {
-			expression.param( paramNamePrefix + i, selectableValues[i] );
+			params.put( paramNamePrefix + i, selectableValues[i] );
 		}
-		return expression;
+		return new BatchCoreHqlReindexCondition( junction( orClauses, " or " ), params );
 	}
 
 	private String toPath(ModelPart subPart) {

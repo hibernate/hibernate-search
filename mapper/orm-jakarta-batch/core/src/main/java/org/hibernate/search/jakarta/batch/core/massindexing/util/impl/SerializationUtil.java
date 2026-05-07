@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
-import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchReindexCondition;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.StringHelper;
 
@@ -106,21 +106,19 @@ public final class SerializationUtil {
 		}
 	}
 
-	public static ConditionalExpression parseReindexOnlyParameters(String reindexOnlyHql,
+	public static HibernateOrmBatchReindexCondition parseReindexOnlyParameters(
+			String reindexOnlyHql,
 			String serializedReindexOnlyParameters)
 			throws IOException, ClassNotFoundException {
 		if ( reindexOnlyHql == null ) {
 			return null;
 		}
 		else {
-			ConditionalExpression reindexOnly = new ConditionalExpression( reindexOnlyHql );
 			@SuppressWarnings("unchecked")
-			Map<String, ?> params = (Map<String, ?>) SerializationUtil.deserialize( serializedReindexOnlyParameters );
-			if ( params != null ) {
-				params.forEach( reindexOnly::param );
-			}
-			return reindexOnly;
+			Map<String, Object> params = (Map<String, Object>) SerializationUtil.deserialize( serializedReindexOnlyParameters );
+			return new BatchCoreHqlReindexCondition( reindexOnlyHql, params );
 		}
 
 	}
+
 }

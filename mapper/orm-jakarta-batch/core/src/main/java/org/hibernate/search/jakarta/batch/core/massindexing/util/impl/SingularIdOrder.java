@@ -4,7 +4,9 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import java.util.Map;
+
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchReindexCondition;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingTypeContext;
 
 /**
@@ -24,18 +26,13 @@ public class SingularIdOrder<E> implements IdOrder {
 	}
 
 	@Override
-	public ConditionalExpression idGreater(String paramNamePrefix, Object idObj) {
-		return restrict( paramNamePrefix, ">", idObj );
+	public HibernateOrmBatchReindexCondition idGreater(String paramNamePrefix, Object idObj, boolean inclusive) {
+		return restrict( paramNamePrefix, inclusive ? ">=" : ">", idObj );
 	}
 
 	@Override
-	public ConditionalExpression idGreaterOrEqual(String paramNamePrefix, Object idObj) {
-		return restrict( paramNamePrefix, ">=", idObj );
-	}
-
-	@Override
-	public ConditionalExpression idLesser(String paramNamePrefix, Object idObj) {
-		return restrict( paramNamePrefix, "<", idObj );
+	public HibernateOrmBatchReindexCondition idLesser(String paramNamePrefix, Object idObj, boolean inclusive) {
+		return restrict( paramNamePrefix, inclusive ? "<=" : "<", idObj );
 	}
 
 	@Override
@@ -43,11 +40,12 @@ public class SingularIdOrder<E> implements IdOrder {
 		return idPropertyName + " asc";
 	}
 
-	private ConditionalExpression restrict(String paramNamePrefix, String operator, Object idObj) {
+	private HibernateOrmBatchReindexCondition restrict(String paramNamePrefix, String operator, Object idObj) {
 		String paramName = paramNamePrefix + "REF";
-		var expression = new ConditionalExpression( idPropertyName + " " + operator + " :" + paramName );
-		expression.param( paramName, idObj );
-		return expression;
+		return new BatchCoreHqlReindexCondition(
+				idPropertyName + " " + operator + " :" + paramName,
+				Map.of( paramName, idObj )
+		);
 	}
 
 }

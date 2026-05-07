@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchReindexCondition;
 
 /**
  * Provides ID-based, order-sensitive restrictions
@@ -19,23 +19,18 @@ public interface IdOrder {
 	/**
 	 * @param paramNamePrefix A unique prefix for the name of parameters added by the resulting expression.
 	 * @param idObj The ID all results should be lesser than.
+	 * @param inclusive Whether the {@code idObj} should also be included.
 	 * @return A "strictly greater than" restriction on the ID.
 	 */
-	ConditionalExpression idGreater(String paramNamePrefix, Object idObj);
+	HibernateOrmBatchReindexCondition idGreater(String paramNamePrefix, Object idObj, boolean inclusive);
 
 	/**
 	 * @param paramNamePrefix A unique prefix for the name of parameters added by the resulting expression.
 	 * @param idObj The ID all results should be lesser than.
-	 * @return A "greater or equal" restriction on the ID.
-	 */
-	ConditionalExpression idGreaterOrEqual(String paramNamePrefix, Object idObj);
-
-	/**
-	 * @param paramNamePrefix A unique prefix for the name of parameters added by the resulting expression.
-	 * @param idObj The ID all results should be lesser than.
+	 * @param inclusive Whether the {@code idObj} should also be included.
 	 * @return A "lesser than" restriction on the ID.
 	 */
-	ConditionalExpression idLesser(String paramNamePrefix, Object idObj);
+	HibernateOrmBatchReindexCondition idLesser(String paramNamePrefix, Object idObj, boolean inclusive);
 
 	String ascOrder();
 

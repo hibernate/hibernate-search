@@ -6,8 +6,10 @@ package org.hibernate.search.jakarta.batch.core.massindexing.step.spi;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 import jakarta.batch.api.BatchProperty;
 import jakarta.batch.api.chunk.AbstractItemReader;
@@ -16,13 +18,8 @@ import jakarta.batch.runtime.context.StepContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.LockModeType;
 
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchPartitionScoped;
 import org.hibernate.search.jakarta.batch.core.logging.impl.JakartaBatchLog;
@@ -30,13 +27,15 @@ import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParam
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.PartitionContextData;
-import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.BatchCoreEntityTypeDescriptor;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.JobContextUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PartitionBound;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
-import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchIdentifierLoader;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchIdentifierLoadingOptions;
+import org.hibernate.search.mapper.orm.loading.batch.HibernateOrmBatchReindexCondition;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -115,12 +114,12 @@ public class EntityIdReader extends AbstractItemReader {
 	private String serializedUpperBound;
 
 	private EntityManagerFactory emf;
-	private EntityTypeDescriptor<?, ?> type;
+	private BatchCoreEntityTypeDescriptor<?, ?> type;
 	private TenancyConfiguration tenancyConfiguration;
 
 	private int idFetchSize;
 	private Integer maxResults;
-	private ConditionalExpression reindexOnly;
+	private HibernateOrmBatchReindexCondition reindexOnly;
 	private Object upperBound;
 	private Object lowerBound;
 
@@ -255,7 +254,7 @@ public class EntityIdReader extends AbstractItemReader {
 
 	private class ChunkState implements AutoCloseable {
 		private StatelessSession session;
-		private ScrollableResults<?> scroll;
+		private HibernateOrmBatchIdentifierLoader identifierLoader;
 
 		private CheckpointInfo lastCheckpointInfo;
 		private int processedEntityCount = 0;
@@ -267,23 +266,30 @@ public class EntityIdReader extends AbstractItemReader {
 
 		/**
 		 * Get the next element for the current chunk.
+		 *
 		 * @return The next element for this chunk.
 		 */
 		public Object next() {
-			if ( scroll == null ) {
+			if ( identifierLoader == null ) {
 				start();
 			}
-			if ( !scroll.next() ) {
+			if ( !identifierLoader.hasNext() ) {
 				return null;
 			}
-			Object id = scroll.get();
+			Object id = identifierLoader.next();
 			lastProcessedEntityId = id;
 			++processedEntityCount;
 			return id;
 		}
 
+		private <E> HibernateOrmBatchIdentifierLoader createIdentifierLoader(BatchCoreEntityTypeDescriptor<E, ?> type,
+				HibernateOrmBatchIdentifierLoadingOptions options) {
+			return type.batchLoadingStrategy().createIdentifierLoader( type, options );
+		}
+
 		/**
 		 * End a chunk.
+		 *
 		 * @return The checkpoint info for the chunk that just ended.
 		 */
 		public Serializable end() {
@@ -308,9 +314,9 @@ public class EntityIdReader extends AbstractItemReader {
 		@Override
 		public void close() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				if ( scroll != null ) {
-					closer.push( ScrollableResults::close, scroll );
-					scroll = null;
+				if ( identifierLoader != null ) {
+					closer.push( HibernateOrmBatchIdentifierLoader::close, identifierLoader );
+					identifierLoader = null;
 				}
 				if ( session != null ) {
 					closer.push( StatelessSession::close, session );
@@ -322,7 +328,13 @@ public class EntityIdReader extends AbstractItemReader {
 		private void start() {
 			session = PersistenceUtil.openStatelessSession( emf, tenancyConfiguration.convert( tenantId ) );
 			try {
-				scroll = createScroll( type, session );
+				boolean hasNoPreviousCheckpoint = lastCheckpointInfo == null;
+				HibernateOrmBatchIdentifierLoadingOptions options = new LoadingOptions( session,
+						idFetchSize, actualMaxResults(), upperBound,
+						hasNoPreviousCheckpoint ? lowerBound : lastCheckpointInfo.getLastProcessedEntityId(),
+						hasNoPreviousCheckpoint, reindexOnly
+				);
+				identifierLoader = createIdentifierLoader( type, options );
 			}
 			catch (Throwable t) {
 				try {
@@ -335,24 +347,7 @@ public class EntityIdReader extends AbstractItemReader {
 			}
 		}
 
-		private <E, I> ScrollableResults<I> createScroll(EntityTypeDescriptor<E, I> type, StatelessSession session) {
-			List<ConditionalExpression> conditions = new ArrayList<>();
-			if ( reindexOnly != null ) {
-				conditions.add( reindexOnly );
-			}
-			if ( upperBound != null ) {
-				conditions.add( type.idOrder().idLesser( "HIBERNATE_SEARCH_PARTITION_UPPER_BOUND_", upperBound ) );
-			}
-			if ( lastCheckpointInfo != null ) {
-				conditions.add( type.idOrder().idGreater( "HIBERNATE_SEARCH_LAST_CHECKPOINT_",
-						lastCheckpointInfo.getLastProcessedEntityId() ) );
-			}
-			else if ( lowerBound != null ) {
-				conditions.add( type.idOrder().idGreaterOrEqual( "HIBERNATE_SEARCH_PARTITION_LOWER_BOUND_", lowerBound ) );
-			}
-
-			SelectionQuery<I> query = type.createIdentifiersQuery( (SharedSessionContractImplementor) session, conditions );
-
+		private Integer actualMaxResults() {
 			if ( maxResults != null ) {
 				int remaining;
 				if ( lastCheckpointInfo != null ) {
@@ -361,15 +356,9 @@ public class EntityIdReader extends AbstractItemReader {
 				else {
 					remaining = maxResults;
 				}
-				query.setMaxResults( remaining );
+				return remaining;
 			}
-
-			return query
-					.setReadOnly( true )
-					.setCacheable( false )
-					.setLockMode( LockModeType.NONE )
-					.setFetchSize( idFetchSize )
-					.scroll( ScrollMode.FORWARD_ONLY );
+			return null;
 		}
 	}
 
@@ -400,4 +389,75 @@ public class EntityIdReader extends AbstractItemReader {
 		}
 	}
 
+	private static class LoadingOptions implements HibernateOrmBatchIdentifierLoadingOptions {
+		private final HibernateOrmBatchReindexCondition reindexOnly;
+		private final Map<Class<?>, Object> contextData;
+		private final int fetchSize;
+		private final Integer maxResults;
+		private final Object upperBound;
+		private final Object lowerBound;
+		private final boolean lowerBoundInclusive;
+
+
+		LoadingOptions(StatelessSession session,
+				int fetchSize, Integer maxResults, Object upperBound, Object lowerBound,
+				boolean lowerBoundInclusive, HibernateOrmBatchReindexCondition reindexOnly) {
+			this.fetchSize = fetchSize;
+			this.maxResults = maxResults;
+			this.upperBound = upperBound;
+			this.lowerBound = lowerBound;
+			this.reindexOnly = reindexOnly;
+			this.lowerBoundInclusive = lowerBoundInclusive;
+
+			this.contextData = new HashMap<>();
+
+			this.contextData.put( StatelessSession.class, session );
+		}
+
+		@Override
+		public int fetchSize() {
+			return fetchSize;
+		}
+
+		@Override
+		public OptionalInt maxResults() {
+			return maxResults == null ? OptionalInt.empty() : OptionalInt.of( maxResults );
+		}
+
+		@Override
+		public OptionalInt offset() {
+			return OptionalInt.empty();
+		}
+
+		@Override
+		public Optional<HibernateOrmBatchReindexCondition> reindexOnlyCondition() {
+			return Optional.ofNullable( reindexOnly );
+		}
+
+		@Override
+		public Optional<Object> upperBound() {
+			return Optional.ofNullable( upperBound );
+		}
+
+		@Override
+		public boolean upperBoundInclusive() {
+			return false;
+		}
+
+		@Override
+		public Optional<Object> lowerBound() {
+			return Optional.ofNullable( lowerBound );
+		}
+
+		@Override
+		public boolean lowerBoundInclusive() {
+			return lowerBoundInclusive;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T context(Class<T> contextType) {
+			return (T) contextData.get( contextType );
+		}
+	}
 }
