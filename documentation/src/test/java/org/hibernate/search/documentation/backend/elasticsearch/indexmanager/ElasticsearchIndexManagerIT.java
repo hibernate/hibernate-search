@@ -15,6 +15,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class ElasticsearchIndexManagerIT {
 		String readName = descriptor.readName();// <5>
 		String writeName = descriptor.writeName();// <5>
 		//end::readWriteName[]
-		assertThat( readName ).isEqualTo( "book-read" );
-		assertThat( writeName ).isEqualTo( "book-write" );
+		assertThat( readName ).isEqualTo( TestForkPrefix.PREFIX + "book-read" );
+		assertThat( writeName ).isEqualTo( TestForkPrefix.PREFIX + "book-write" );
 	}
 }

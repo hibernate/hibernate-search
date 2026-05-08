@@ -116,7 +116,7 @@ jobs:
       - name: Build code and run unit tests and basic checks
         run: |
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
-          -Pjqassistant -Pdist -Pci-build -DskipITs
+          -Pjqassistant -Pdist -Pci-build -Pparallel-tests -DskipITs
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
@@ -133,7 +133,7 @@ jobs:
       - name: Run integration tests in the default environment
         run: |
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
-          -Pskip-checks \
+          -Pskip-checks -Pparallel-tests \
           ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"

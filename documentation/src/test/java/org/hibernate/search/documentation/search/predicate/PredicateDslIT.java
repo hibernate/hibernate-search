@@ -5,6 +5,7 @@
 package org.hibernate.search.documentation.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfigurationSupport.isKnnSupportedByElasticsearch;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -18,6 +19,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfigurationSupport;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.RewriteMethod;
@@ -35,7 +37,6 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -60,11 +61,7 @@ class PredicateDslIT {
 	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static boolean isVectorSearchSupported() {
 		return BackendConfiguration.isLucene()
-				|| ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.12.0" ),
-						os -> !os.isLessThan( "2.9.0" ),
-						aoss -> true
-				);
+				|| ElasticsearchBackendConfigurationSupport.isVectorSearchSupportedByElasticsearch();
 	}
 
 	@BeforeEach
@@ -1355,11 +1352,7 @@ class PredicateDslIT {
 		} );
 
 		if ( !BackendConfiguration.isElasticsearch()
-				|| ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.12.0" ),
-						os -> !os.isLessThan( "2.9.0" ),
-						aoss -> true
-				) ) {
+				|| ElasticsearchBackendConfigurationSupport.isKnnSupportedByElasticsearch() ) {
 			withinSearchSession( searchSession -> {
 				// tag::knn-and-match[]
 				float[] coverImageEmbeddingsVector = /*...*/
@@ -1381,11 +1374,7 @@ class PredicateDslIT {
 
 		// similarity is only applicable to Lucene and an Elastic distribution of Elasticsearch:
 		if ( BackendConfiguration.isLucene()
-				|| ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.12.0" ),
-						os -> false,
-						aoss -> false
-				) ) {
+				|| ElasticsearchBackendConfigurationSupport.isKnnSimilaritySupportedByElasticsearch() ) {
 			withinSearchSession( searchSession -> {
 				// tag::knn-similarity[]
 				float[] coverImageEmbeddingsVector = /*...*/

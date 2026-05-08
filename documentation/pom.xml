@@ -190,6 +190,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.lucene}</forkCount>
                             <skip>${test.lucene.skip}</skip>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
@@ -200,6 +201,7 @@
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-elasticsearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
@@ -215,6 +217,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.elasticsearch}</forkCount>
                             <skip>${test.elasticsearch.skip}</skip>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch</reportNameSuffix>
@@ -224,6 +227,7 @@
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
@@ -244,6 +248,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.elasticsearch}</forkCount>
                             <skip>${test.elasticsearch.skip}</skip>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch.rest5}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-rest5</reportNameSuffix>
@@ -253,6 +258,7 @@
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
@@ -269,6 +275,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.elasticsearch}</forkCount>
                             <skip>${test.elasticsearch.skip}</skip>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch.opensearch}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-opensearch</reportNameSuffix>
@@ -278,6 +285,7 @@
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
@@ -294,6 +302,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.elasticsearch}</forkCount>
                             <skip>${test.elasticsearch.skip}</skip>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.elasticsearch.jdk}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-elasticsearch-jdk</reportNameSuffix>
@@ -304,6 +313,7 @@
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>

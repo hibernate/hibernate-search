@@ -423,6 +423,7 @@ stage('Default build') {
 			String commonMavenArgs = """ \
 					--fail-at-end \
 					-Pcoverage \
+					-Pparallel-tests \
 					${toTestEnvironmentArgs(environments.content.jdk.default)} \
 			"""
 
@@ -1071,6 +1072,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	mvn """ \
 			clean install -Pci-build \
 					${toTestEnvironmentArgs(buildEnv)} \
+					-Pparallel-tests \
 					--fail-at-end \
 					$args \
 	"""
