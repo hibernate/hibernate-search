@@ -25,6 +25,7 @@ import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Book;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.Test;
@@ -69,10 +70,10 @@ class ElasticsearchSchemaManagerExporterIT {
 		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 						"  \"aliases\": {" +
-						"    \"book-write\": {" +
+						"    \"" + TestForkPrefix.PREFIX + "book-write\": {" +
 						"      \"is_write_index\": true" +
 						"    }," +
-						"    \"book-read\": {" +
+						"    \"" + TestForkPrefix.PREFIX + "book-read\": {" +
 						"      \"is_write_index\": false" +
 						"    }" +
 						"  }," +
@@ -107,10 +108,10 @@ class ElasticsearchSchemaManagerExporterIT {
 		assertJsonEquals(
 				"{" +
 						"  \"aliases\": {" +
-						"    \"article-write\": {" +
+						"    \"" + TestForkPrefix.PREFIX + "article-write\": {" +
 						"      \"is_write_index\": true" +
 						"    }," +
-						"    \"article-read\": {" +
+						"    \"" + TestForkPrefix.PREFIX + "article-read\": {" +
 						"      \"is_write_index\": false" +
 						"    }" +
 						"  }," +

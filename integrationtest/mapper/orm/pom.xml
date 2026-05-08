@@ -16,6 +16,8 @@
         <surefire.jvm.args.module>
             ${test.mockito.agent.jvm.args}
         </surefire.jvm.args.module>
+        <!-- bytecode enhanced tests cannot run in parallel for now and require a fix in the engine. -->
+        <test.parallel.forkCount>1</test.parallel.forkCount>
     </properties>
 
     <dependencies>
@@ -66,11 +68,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <systemPropertyVariables combine.self="append">
-                        <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
         </plugins>
     </build>
