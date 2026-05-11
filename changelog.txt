@@ -1,6 +1,42 @@
 Hibernate Search Changelog
 ==========================
 
+8.4.0.CR1 (2026-05-11)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/37437
+
+
+** Bug
+    * HSEARCH-5595 `checkstyle:check` is not build cache relocatable due to project resources including the workspace root
+
+** Improvement
+    * HSEARCH-5623 Update to Hibernate ORM 7.4.0.CR1
+    * HSEARCH-5622 Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.0
+    * HSEARCH-5621 Update Elasticsearch client (elasticsearch-rest-client) to 9.4.0
+    * HSEARCH-5620 Add compatibility with Elasticsearch 9.4
+    * HSEARCH-5619 Upgrade to GSON 2.14.0
+    * HSEARCH-5618 Update Jackson to 2.21.3
+    * HSEARCH-5617 Update to AWS SDK 2.44.1
+    * HSEARCH-5616 Update Elasticsearch client (elasticsearch-rest-client) to 9.3.4
+    * HSEARCH-5613 Use Maven 3.9.15 as a required minimum version for the build
+    * HSEARCH-5612 Upgrade to commons-codec 1.22.0
+    * HSEARCH-5611 Update Apache HTTP Client components to 5.6.1
+    * HSEARCH-5609 Update Elasticsearch client (elasticsearch-rest-client) to 9.3.3
+    * HSEARCH-5608 Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.4
+    * HSEARCH-5607 Update Elasticsearch rest client (opensearch-rest-client) to 3.6.0
+    * HSEARCH-5606 Add compatibility with OpenSearch 3.6
+    * HSEARCH-5601 Update to commons-logging to 1.3.6
+    * HSEARCH-5600 Update Jackson to 2.21.2
+    * HSEARCH-5599 Update Apache HTTP Core client components to 5.4.2
+    * HSEARCH-5598 Update Elasticsearch client (elasticsearch-rest-client) to 9.3.2
+    * HSEARCH-5597 Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.3
+
+** Task
+    * HSEARCH-5596 Use changeDetection config option instead of the deprecated overwrite in maven-resources-plugin
+    * HSEARCH-5280 Look into `OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT#agentJoined` test
+    * HSEARCH-5242 Investigate why building hibernate-search-integrationtest-performance-backend-lucene fails on some envs
+
 8.3.0.Final (2026-03-20)
 -------------------------
 
