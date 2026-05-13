@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
@@ -41,8 +42,8 @@ class ElasticsearchIndexDescriptorIT {
 		ElasticsearchIndexDescriptor indexDescriptor = index.toApi()
 				.unwrap( ElasticsearchIndexManager.class ).descriptor();
 
-		assertThat( indexDescriptor.readName() ).isEqualTo( "indexname-read" );
-		assertThat( indexDescriptor.writeName() ).isEqualTo( "indexname-write" );
+		assertThat( indexDescriptor.readName() ).isEqualTo( TestForkPrefix.PREFIX + "indexname-read" );
+		assertThat( indexDescriptor.writeName() ).isEqualTo( TestForkPrefix.PREFIX + "indexname-write" );
 		assertThat( indexDescriptor.hibernateSearchName() ).isEqualTo( index.name() );
 	}
 

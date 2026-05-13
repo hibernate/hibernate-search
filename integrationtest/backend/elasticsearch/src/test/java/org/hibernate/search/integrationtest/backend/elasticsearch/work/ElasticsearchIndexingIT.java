@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -24,6 +25,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -44,8 +46,10 @@ class ElasticsearchIndexingIT {
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
 				Arguments.of( null, defaultWriteAlias( index.name() ) ),
-				Arguments.of( "no-alias", encodeName( index.name() ) ),
-				Arguments.of( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-write" ) )
+				Arguments.of( new ForkAwareNoAliasLayoutStrategy(), encodeName( TestForkPrefix.PREFIX + index.name() ) ),
+				Arguments.of( new StubSingleIndexLayoutStrategy(
+						TestForkPrefix.PREFIX + "custom-write", TestForkPrefix.PREFIX + "custom-read" ),
+						encodeName( TestForkPrefix.PREFIX + "custom-write" ) )
 		);
 	}
 
@@ -167,6 +171,23 @@ class ElasticsearchIndexingIT {
 		);
 		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
+	}
+
+	private static class ForkAwareNoAliasLayoutStrategy implements IndexLayoutStrategy {
+		@Override
+		public String createInitialElasticsearchIndexName(String hibernateSearchIndexName) {
+			return TestForkPrefix.PREFIX + hibernateSearchIndexName;
+		}
+
+		@Override
+		public String createWriteAlias(String hibernateSearchIndexName) {
+			return null;
+		}
+
+		@Override
+		public String createReadAlias(String hibernateSearchIndexName) {
+			return null;
+		}
 	}
 
 	private static class IndexBinding {
