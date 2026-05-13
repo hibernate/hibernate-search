@@ -1320,6 +1320,7 @@
                         <systemPropertyVariables>
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
                             <test.fork.count>${test.parallel.forkCount}</test.fork.count>
+                            <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1347,6 +1348,7 @@
                             <org.hibernate.search.integrationtest.container.directory>${rootProject.directory}/build/container</org.hibernate.search.integrationtest.container.directory>
                             <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
                             <test.fork.count>${test.parallel.forkCount}</test.fork.count>
+                            <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

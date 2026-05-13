@@ -15,15 +15,22 @@ public final class TestForkPrefix {
 			parallelForks = Integer.parseInt( forkCountStr ) > 1;
 		}
 		catch (NumberFormatException e) {
-			// forkCount uses Surefire's multiplier format (e.g. "0.5C") — parallel is enabled
 			parallelForks = true;
 		}
+
+		// TODO drop test.parallel.modules.enabled once the bytecode enhancement engine supports forkCount>1
+		//  for ORM modules — at that point forkCount alone will be sufficient for fork isolation.
+		boolean parallelModules = Boolean.parseBoolean(
+				System.getProperty( "test.parallel.modules.enabled", "false" ) );
+
+		boolean needsIsolation = parallelForks || parallelModules;
+
 		String forkNumber = System.getProperty( "test.fork.number", System.getProperty( "surefire.forkNumber", "" ) );
-		if ( parallelForks && ( forkNumber.isBlank() || !isNumber( forkNumber ) ) ) {
+		if ( needsIsolation && ( forkNumber.isBlank() || !isNumber( forkNumber ) ) ) {
 			throw new IllegalStateException( "Test Fork number must be specified." );
 		}
 
-		PREFIX = parallelForks ? "fork_" + forkNumber + "_" : "";
+		PREFIX = needsIsolation ? "fork_" + forkNumber + "_" : "";
 	}
 
 	private static boolean isNumber(String maybeNumber) {

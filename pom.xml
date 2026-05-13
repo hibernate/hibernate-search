@@ -398,12 +398,17 @@
         <test.database.run.kind>h2</test.database.run.kind>
 
         <!-- Parallel test execution: number of forked JVMs. Default 1 (sequential).
-             Use -Pparallel-tests for 0.5C (half CPU cores), or set explicitly.
+             Use -Pparallel-tests for 0.6C (60% of CPU cores), or set explicitly.
              Backend-specific properties allow different parallelism for ES (I/O-bound, shared container)
-             vs Lucene (CPU-bound, local). -->
+             vs Lucene (CPU-bound, local).
+             TODO: test.parallel.modules.enabled is a workaround for modules pinned to forkCount=1
+             (orm, orm-outbox-polling) due to the bytecode enhancement engine not supporting parallel forks.
+             Once the engine is fixed and all modules use forkCount>1, drop this property — forkCount alone
+             will be sufficient for fork isolation. -->
         <test.parallel.forkCount>1</test.parallel.forkCount>
         <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
         <test.parallel.forkCount.lucene>1</test.parallel.forkCount.lucene>
+        <test.parallel.modules.enabled>false</test.parallel.modules.enabled>
 
         <test.elasticsearch.run.image.pull>true</test.elasticsearch.run.image.pull>
 
@@ -1281,9 +1286,28 @@
         <profile>
             <id>parallel-tests</id>
             <properties>
-                <test.parallel.forkCount>0.5C</test.parallel.forkCount>
+                <test.parallel.forkCount>0.6C</test.parallel.forkCount>
                 <test.parallel.forkCount.elasticsearch>4</test.parallel.forkCount.elasticsearch>
-                <test.parallel.forkCount.lucene>0.5C</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.lucene>0.6C</test.parallel.forkCount.lucene>
+                <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
+            </properties>
+        </profile>
+        <profile>
+            <id>parallel-tests-github</id>
+            <properties>
+                <test.parallel.forkCount>2</test.parallel.forkCount>
+                <test.parallel.forkCount.elasticsearch>2</test.parallel.forkCount.elasticsearch>
+                <test.parallel.forkCount.lucene>2</test.parallel.forkCount.lucene>
+                <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
+            </properties>
+        </profile>
+        <profile>
+            <id>parallel-tests-jenkins</id>
+            <properties>
+                <test.parallel.forkCount>4</test.parallel.forkCount>
+                <test.parallel.forkCount.elasticsearch>2</test.parallel.forkCount.elasticsearch>
+                <test.parallel.forkCount.lucene>4</test.parallel.forkCount.lucene>
+                <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
             </properties>
         </profile>
 
