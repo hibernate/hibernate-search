@@ -400,7 +400,7 @@
         <test.database.run.kind>h2</test.database.run.kind>
 
         <!-- Parallel test execution: number of forked JVMs. Default 1 (sequential).
-             Use -Pparallel-tests for 0.5C (half CPU cores), or set explicitly.
+             Use -Pparallel-tests for 0.6C (60% of CPU cores), or set explicitly.
              Backend-specific properties allow different parallelism for ES (I/O-bound, shared container)
              vs Lucene (CPU-bound, local). -->
         <test.parallel.forkCount>1</test.parallel.forkCount>
@@ -1283,9 +1283,25 @@
         <profile>
             <id>parallel-tests</id>
             <properties>
-                <test.parallel.forkCount>0.5C</test.parallel.forkCount>
+                <test.parallel.forkCount>0.6C</test.parallel.forkCount>
                 <test.parallel.forkCount.elasticsearch>4</test.parallel.forkCount.elasticsearch>
-                <test.parallel.forkCount.lucene>0.5C</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.lucene>0.6C</test.parallel.forkCount.lucene>
+            </properties>
+        </profile>
+        <profile>
+            <id>parallel-tests-github</id>
+            <properties>
+                <test.parallel.forkCount>2</test.parallel.forkCount>
+                <test.parallel.forkCount.elasticsearch>2</test.parallel.forkCount.elasticsearch>
+                <test.parallel.forkCount.lucene>2</test.parallel.forkCount.lucene>
+            </properties>
+        </profile>
+        <profile>
+            <id>parallel-tests-jenkins</id>
+            <properties>
+                <test.parallel.forkCount>4</test.parallel.forkCount>
+                <test.parallel.forkCount.elasticsearch>2</test.parallel.forkCount.elasticsearch>
+                <test.parallel.forkCount.lucene>4</test.parallel.forkCount.lucene>
             </properties>
         </profile>
 
