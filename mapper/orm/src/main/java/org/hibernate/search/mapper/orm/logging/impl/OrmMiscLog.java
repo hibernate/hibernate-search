@@ -18,11 +18,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
+import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -161,5 +163,9 @@ public interface OrmMiscLog {
 
 	@Message(id = ID_OFFSET + 143,
 			value = "Hibernate Search does not support working with %s session type")
-	SearchException unsupportedSessionType(Class<?> session);
+	SearchException unsupportedSessionType(@FormatWith(ClassFormatter.class) Class<?> session);
+
+	@Message(id = ID_OFFSET + 144,
+			value = "Hibernate Search cannot convert the underlying Hibernate ORM session to %s")
+	SearchException sessionImplementorIsNot(@FormatWith(ClassFormatter.class) Class<?> session);
 }
