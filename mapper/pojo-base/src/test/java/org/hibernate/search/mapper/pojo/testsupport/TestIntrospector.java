@@ -17,17 +17,17 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 
 public class TestIntrospector extends AbstractPojoModelsBootstrapIntrospector {
 	private final PojoModelsGenericContextHelper genericContextHelper = new PojoModelsGenericContextHelper( this );
 
-	public TestIntrospector(ValueHandleFactory valueHandleFactory) {
+	public TestIntrospector(HibernateAccessorFactory valueHandleFactory) {
 		this( valueHandleFactory, AggregatedClassLoader.createDefault() );
 	}
 
-	private TestIntrospector(ValueHandleFactory valueHandleFactory, AggregatedClassLoader aggregatedClassLoader) {
+	private TestIntrospector(HibernateAccessorFactory valueHandleFactory, AggregatedClassLoader aggregatedClassLoader) {
 		super( DefaultClassResolver.create( aggregatedClassLoader ), DefaultResourceResolver.create( aggregatedClassLoader ),
 				null, valueHandleFactory );
 	}

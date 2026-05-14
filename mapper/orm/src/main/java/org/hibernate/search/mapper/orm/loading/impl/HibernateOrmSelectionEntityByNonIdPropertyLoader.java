@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Hibernate;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
@@ -16,7 +17,6 @@ import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.LoadingLog;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
  * An entity loader for indexed entities whose document ID is not the entity ID,
@@ -28,13 +28,13 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 
 	private final PojoLoadingTypeContext<E> targetEntityTypeContext;
 	private final String documentIdSourcePropertyName;
-	private final ValueReadHandle<?> documentIdSourceHandle;
+	private final HibernateAccessorValueReader<?> documentIdSourceHandle;
 
 	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityMappingType entityMappingType,
 			PojoLoadingTypeContext<E> targetEntityTypeContext,
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
-			ValueReadHandle<?> documentIdSourceHandle,
+			HibernateAccessorValueReader<?> documentIdSourceHandle,
 			HibernateOrmLoadingSessionContext sessionContext,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( entityMappingType, queryFactory, sessionContext, loadingOptions );

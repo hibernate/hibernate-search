@@ -7,9 +7,9 @@ package org.hibernate.search.mapper.orm.model.impl;
 import java.util.Map;
 import java.util.Objects;
 
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 
-final class HibernateOrmDynamicMapValueReadHandle<T> implements ValueReadHandle<T> {
+final class HibernateOrmDynamicMapValueReadHandle<T> implements HibernateAccessorValueReader<T> {
 
 	private final String name;
 	private final Class<T> type;

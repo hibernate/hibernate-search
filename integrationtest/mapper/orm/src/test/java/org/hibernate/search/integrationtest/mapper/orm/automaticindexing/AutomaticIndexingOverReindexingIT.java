@@ -56,7 +56,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * 				PojoImplicitReindexingResolverDirtinessFilterNode {
  *					dirtyPropertiesTriggeringReindexing=[property1]
  *					delegate=PojoImplicitReindexingResolverPropertyNode {
- *						handle=MethodHandleValueReadHandle[level1]
+ *						handle=HibernateAccessorValueReader[level1]
  *						nestedNodes=[
  * 							PojoImplicitReindexingResolverOriginalTypeNode { // This is type node #2
  *								shouldMarkForReindexing=true

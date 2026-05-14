@@ -15,7 +15,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 
 @Incubating
 public final class SearchMappingBuilder {
@@ -27,8 +27,8 @@ public final class SearchMappingBuilder {
 				.annotatedTypeSource( annotatedTypeSource );
 	}
 
-	/* package-protected */ SearchMappingBuilder valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
-		booterBuilder.valueReadHandleFactory( valueHandleFactory );
+	/* package-protected */ SearchMappingBuilder accessorFactory(HibernateAccessorFactory accessorFactory) {
+		booterBuilder.accessorFactory(accessorFactory);
 		return this;
 	}
 
