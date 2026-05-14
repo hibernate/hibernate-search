@@ -25,7 +25,7 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.models.spi.ModelsConfiguration;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,8 +34,8 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
-				Arguments.of( ValueHandleFactory.usingJavaLangReflect() ),
-				Arguments.of( ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) )
+				Arguments.of( HibernateAccessorFactory.reflection() ),
+				Arguments.of( HibernateAccessorFactory.lambda( MethodHandles.publicLookup() ) )
 		);
 	}
 
@@ -49,7 +49,7 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 	}
 
 	@SuppressWarnings("deprecation") // There's no other way to access the reflection manager
-	final HibernateOrmBootstrapIntrospector createIntrospector(ValueHandleFactory valueHandleFactory,
+	final HibernateOrmBootstrapIntrospector createIntrospector(HibernateAccessorFactory valueHandleFactory,
 			Class<?>... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 		// Some properties that are not relevant to our test, but necessary to create the Metadata

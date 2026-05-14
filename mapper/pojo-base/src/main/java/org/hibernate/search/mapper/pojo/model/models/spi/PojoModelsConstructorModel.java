@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
-import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.accessor.HibernateAccessorInstantiator;
 
 public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 
@@ -27,7 +27,7 @@ public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 	private final Constructor<T> constructor;
 
 	private List<PojoMethodParameterModel<?>> declaredParameters;
-	private ValueCreateHandle<T> handleCache;
+	private HibernateAccessorInstantiator<T> handleCache;
 
 	public PojoModelsConstructorModel(AbstractPojoModelsBootstrapIntrospector introspector,
 			AbstractPojoModelsRawTypeModel<T, ?> declaringTypeModel, Constructor<T> constructor) {
@@ -53,7 +53,7 @@ public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 	}
 
 	@Override
-	public ValueCreateHandle<T> handle() {
+	public HibernateAccessorInstantiator<T> handle() {
 		if ( handleCache == null ) {
 			try {
 				handleCache = introspector.createValueCreateHandle( constructor );

@@ -7,10 +7,10 @@ package org.hibernate.search.mapper.orm.model.impl;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.search.mapper.orm.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 
@@ -20,7 +20,7 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 	private final String name;
 	private final HibernateOrmBasicDynamicMapPropertyMetadata ormPropertyMetadata;
 
-	private ValueReadHandle<T> handle;
+	private HibernateAccessorValueReader<T> handle;
 	private PojoTypeModel<T> typeModel;
 
 	HibernateOrmDynamicMapPropertyModel(HibernateOrmBootstrapIntrospector introspector,
@@ -59,10 +59,10 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // We will just trust ORM metadata on this one.
-	public ValueReadHandle<T> handle() {
+	public HibernateAccessorValueReader<T> handle() {
 		if ( handle == null ) {
 			try {
-				handle = (ValueReadHandle<T>) new HibernateOrmDynamicMapValueReadHandle<>(
+				handle = (HibernateAccessorValueReader<T>) new HibernateOrmDynamicMapValueReadHandle<>(
 						name, typeModel().rawType().typeIdentifier().javaClass()
 				);
 			}

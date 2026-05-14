@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
@@ -24,14 +25,13 @@ import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
 
 	private final Metadata metadata;
-	private final ValueHandleFactory valueHandleFactory;
+	private final HibernateAccessorFactory accessorFactory;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 	private final ClassDetailsRegistry classDetailsRegistry;
@@ -40,9 +40,9 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.serviceRegistry;
-		this.valueHandleFactory = builder.valueHandleFactory != null
-				? builder.valueHandleFactory
-				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
+		this.accessorFactory = builder.accessorFactory != null
+				? builder.accessorFactory
+				: HibernateAccessorFactory.lambda( MethodHandles.publicLookup() );
 		this.preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 
@@ -83,7 +83,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			);
 		}
 
-		preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, valueHandleFactory )
+		preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, accessorFactory )
 				.set( propertyCollector );
 	}
 
@@ -167,7 +167,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmIntegrationPartialBuildState partialBuildState =
-				preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, valueHandleFactory );
+				preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, accessorFactory );
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,
@@ -185,7 +185,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		private final ServiceRegistry serviceRegistry;
 		private final ClassDetailsRegistry classDetailsRegistry;
 
-		private ValueHandleFactory valueHandleFactory;
+		private HibernateAccessorFactory accessorFactory;
 
 		public BuilderImpl(Metadata metadata, ServiceRegistry serviceRegistry, ClassDetailsRegistry classDetailsRegistry) {
 			this.metadata = metadata;
@@ -195,8 +195,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 
 		@Override
-		public Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
-			this.valueHandleFactory = valueHandleFactory;
+		public Builder accessorFactory(HibernateAccessorFactory accessorFactory) {
+			this.accessorFactory = accessorFactory;
 			return this;
 		}
 

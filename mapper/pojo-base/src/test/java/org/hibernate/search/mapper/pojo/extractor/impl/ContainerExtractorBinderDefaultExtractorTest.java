@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.testsupport.TestBeanResolver;
 import org.hibernate.search.mapper.pojo.testsupport.TestIntrospector;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -111,7 +111,7 @@ class ContainerExtractorBinderDefaultExtractorTest {
 	}
 
 	private final TestIntrospector introspector =
-			new TestIntrospector( ValueHandleFactory.usingMethodHandle( MethodHandles.lookup() ) );
+			new TestIntrospector( HibernateAccessorFactory.lambda( MethodHandles.lookup() ) );
 	private ContainerExtractorBinder binder;
 
 	@BeforeEach

@@ -12,22 +12,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 public final class AnnotationHelper {
 
-	private final ValueHandleFactory handleFactory;
+	private final HibernateAccessorFactory handleFactory;
 
-	private final Map<Class<? extends Annotation>, ValueReadHandle<Annotation[]>> containedAnnotationsHandleCache =
+	private final Map<Class<? extends Annotation>, HibernateAccessorValueReader<Annotation[]>> containedAnnotationsHandleCache =
 			new HashMap<>();
 
-	public AnnotationHelper(ValueHandleFactory handleFactory) {
+	public AnnotationHelper(HibernateAccessorFactory handleFactory) {
 		this.handleFactory = handleFactory;
 	}
 
 	public Stream<? extends Annotation> expandRepeatableContainingAnnotation(Annotation containingAnnotationCandidate) {
 		Class<? extends Annotation> containingAnnotationCandidateType = containingAnnotationCandidate.annotationType();
-		ValueReadHandle<Annotation[]> containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(
+		HibernateAccessorValueReader<Annotation[]> containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(
 				containingAnnotationCandidateType, this::createContainedAnnotationsHandle
 		);
 		if ( containedAnnotationsHandle != null ) {
@@ -45,7 +47,7 @@ public final class AnnotationHelper {
 		return Stream.of( containingAnnotationCandidate );
 	}
 
-	private ValueReadHandle<Annotation[]> createContainedAnnotationsHandle(
+	private HibernateAccessorValueReader<Annotation[]> createContainedAnnotationsHandle(
 			Class<? extends Annotation> containingAnnotationCandidateType) {
 		Method valueMethod;
 		try {
@@ -61,17 +63,10 @@ public final class AnnotationHelper {
 			if ( Annotation.class.isAssignableFrom( elementType ) ) {
 				Repeatable repeatable = elementType.getAnnotation( Repeatable.class );
 				if ( repeatable != null && containingAnnotationCandidateType.equals( repeatable.value() ) ) {
-					try {
-						@SuppressWarnings("unchecked") // Checked using reflection just above
-						ValueReadHandle<Annotation[]> result =
-								(ValueReadHandle<Annotation[]>) handleFactory.createForMethod( valueMethod );
-						return result;
-					}
-					catch (IllegalAccessException e) {
-						CommonMiscLog.INSTANCE.cannotAccessRepeateableContainingAnnotationValue(
-								containingAnnotationCandidateType, e
-						);
-					}
+					@SuppressWarnings("unchecked") // Checked using reflection just above
+					HibernateAccessorValueReader<Annotation[]> result =
+							(HibernateAccessorValueReader<Annotation[]>) handleFactory.valueReader( valueMethod );
+					return result;
 				}
 			}
 		}

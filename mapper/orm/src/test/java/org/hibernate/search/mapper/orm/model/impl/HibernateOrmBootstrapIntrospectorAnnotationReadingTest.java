@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +26,7 @@ class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void singleAnnotation(ValueHandleFactory valueHandleFactory) {
+	void singleAnnotation(HibernateAccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
 				valueHandleFactory, EntityWithSingleFieldAnnotation.class );
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
@@ -49,7 +49,7 @@ class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3614")
-	void repeatedAnnotation(ValueHandleFactory valueHandleFactory) {
+	void repeatedAnnotation(HibernateAccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
 				valueHandleFactory, EntityWithRepeatedFieldAnnotation.class );
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );

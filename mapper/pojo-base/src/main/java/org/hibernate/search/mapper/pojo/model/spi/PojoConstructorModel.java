@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.accessor.HibernateAccessorInstantiator;
 
 public interface PojoConstructorModel<T> {
 
@@ -25,7 +25,7 @@ public interface PojoConstructorModel<T> {
 	/**
 	 * @return A handle to call this constructor.
 	 */
-	ValueCreateHandle<T> handle();
+	HibernateAccessorInstantiator<T> handle();
 
 	/**
 	 * @param index The index of a {@link #declaredParameters() declared parameter} in this constructor.

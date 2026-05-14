@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
@@ -20,7 +21,6 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		extends AbstractHibernateOrmLoadingStrategy<E, I> {
@@ -35,7 +35,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	private static <E, I> HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> create(
 			PersistentClass persistentClass,
 			Class<I> documentIdSourcePropertyClass, String documentIdSourcePropertyName,
-			ValueReadHandle<? extends I> documentIdSourceHandle) {
+			HibernateAccessorValueReader<? extends I> documentIdSourceHandle) {
 		var idProperty = persistentClass.getIdentifierProperty();
 		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>(
 				persistentClass.getRootClass().getEntityName(),
@@ -49,7 +49,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 
 	private final String entityName;
 	private final String documentIdSourcePropertyName;
-	private final ValueReadHandle<? extends I> documentIdSourceHandle;
+	private final HibernateAccessorValueReader<? extends I> documentIdSourceHandle;
 	private final boolean uniquePropertyIsTheEntityId;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(String rootEntityName, String entityName,
@@ -57,7 +57,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			Class<I> documentIdSourcePropertyType,
 			String documentIdSourcePropertyName,
 			boolean uniquePropertyIsTheEntityId,
-			ValueReadHandle<? extends I> documentIdSourceHandle) {
+			HibernateAccessorValueReader<? extends I> documentIdSourceHandle) {
 		super( rootEntityName, documentIdSourcePropertyType, documentIdSourcePropertyName, groupingAllowed );
 		this.entityName = entityName;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
@@ -75,13 +75,12 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		// If the entity type or document ID property is different,
 		// the factories may be working with separate ID spaces and should be used separately.
 		return entityName.equals( other.entityName )
-				&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName )
-				&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
+				&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( entityName, documentIdSourcePropertyName, documentIdSourceHandle );
+		return Objects.hash( entityName, documentIdSourcePropertyName );
 	}
 
 	@Override

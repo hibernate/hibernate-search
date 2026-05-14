@@ -30,8 +30,8 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
@@ -57,13 +57,13 @@ class StandalonePojoIntegrationBooterIT {
 	public BackendMock backendMock = BackendMock.create();
 
 	@Mock
-	private ValueReadHandle<Integer> idValueReadHandleMock;
+	private HibernateAccessorValueReader<Integer> idValueReadHandleMock;
 
 	@Mock
-	private ValueReadHandle<String> textValueReadHandleMock;
+	private HibernateAccessorValueReader<String> textValueReadHandleMock;
 
 	@Mock
-	private ValueHandleFactory valueHandleFactoryMock;
+	private HibernateAccessorFactory valueHandleFactoryMock;
 
 	@AfterEach
 	void cleanup() throws Exception {
@@ -77,7 +77,7 @@ class StandalonePojoIntegrationBooterIT {
 	void twoPhaseBoot() throws Exception {
 		CompletableFuture<BackendMappingHandle> mappingHandlePromise = new CompletableFuture<>();
 		StandalonePojoIntegrationBooter preBooter = StandalonePojoIntegrationBooter.builder()
-				.valueReadHandleFactory( valueHandleFactoryMock )
+				.accessorFactory( valueHandleFactoryMock )
 				.property(
 						EngineSettings.BACKEND + "." + BackendSettings.TYPE,
 						backendMock.factory( mappingHandlePromise )
@@ -97,14 +97,14 @@ class StandalonePojoIntegrationBooterIT {
 				b2 -> b2.analyzerName( AnalyzerNames.DEFAULT ) ) );
 		// Pre-booting should retrieve value-read handles
 		// Simulate a custom handle from a framework, e.g. Quarkus
-		when( valueHandleFactoryMock.createForField( IndexedEntity.ID_FIELD ) )
-				.thenReturn( (ValueReadHandle) idValueReadHandleMock );
-		when( valueHandleFactoryMock.createForField( IndexedEntity.TEXT_FIELD ) )
-				.thenReturn( (ValueReadHandle) textValueReadHandleMock );
+		when( valueHandleFactoryMock.valueReader( IndexedEntity.ID_FIELD ) )
+				.thenReturn( (HibernateAccessorValueReader) idValueReadHandleMock );
+		when( valueHandleFactoryMock.valueReader( IndexedEntity.TEXT_FIELD ) )
+				.thenReturn( (HibernateAccessorValueReader) textValueReadHandleMock );
 		preBooter.preBoot( preBooterGeneratedProperties::put );
 		backendMock.verifyExpectationsMet();
-		verify( valueHandleFactoryMock ).createForField( IndexedEntity.ID_FIELD );
-		verify( valueHandleFactoryMock ).createForField( IndexedEntity.TEXT_FIELD );
+		verify( valueHandleFactoryMock ).valueReader( IndexedEntity.ID_FIELD );
+		verify( valueHandleFactoryMock ).valueReader( IndexedEntity.TEXT_FIELD );
 
 		StandalonePojoIntegrationBooter actualBooter = StandalonePojoIntegrationBooter.builder()
 				.properties( preBooterGeneratedProperties )

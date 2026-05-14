@@ -37,7 +37,7 @@ public interface PojoImplicitReindexingResolverRootContext extends ContainerExtr
 	 * or ignores it so that the property is skipped.
 	 *
 	 * @param exception A {@link RuntimeException} thrown while accessing a property.
-	 * @see org.hibernate.search.util.common.reflect.spi.ValueReadHandle#get(Object)
+	 * @see org.hibernate.accessor.HibernateAccessorValueReader#get(Object)
 	 */
 	void propagateOrIgnorePropertyAccessException(RuntimeException exception);
 

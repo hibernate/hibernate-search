@@ -12,11 +12,11 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.processor.impl.HibernateSearchMetamodelProcessorContext;
 import org.hibernate.search.processor.mapping.impl.ProcessorPojoModelsBootstrapIntrospector;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class ProcessorPojoPropertyModel<T> implements PojoPropertyModel<T> {
 
@@ -67,15 +67,15 @@ public class ProcessorPojoPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ValueReadHandle<T> handle() {
-		return (ValueReadHandle<T>) ProcessorValueReadHandle.INSTANCE;
+	public HibernateAccessorValueReader<T> handle() {
+		return (HibernateAccessorValueReader<T>) ProcessorValueReadHandle.INSTANCE;
 	}
 
-	private static class ProcessorValueReadHandle<T> implements ValueReadHandle<T> {
+	private static class ProcessorValueReadHandle<T> implements HibernateAccessorValueReader<T> {
 		static final ProcessorValueReadHandle<?> INSTANCE = new ProcessorValueReadHandle<>();
 
 		@Override
-		public T get(Object thiz) {
+		public T get(Object instance) {
 			throw new UnsupportedOperationException();
 		}
 	}

@@ -12,13 +12,13 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoModelsBootstrapIntrospector>
 		implements PojoPropertyModel<T> {
@@ -35,7 +35,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 	protected final List<MemberDetails> declaredProperties;
 	private final List<Member> members;
 
-	private ValueReadHandle<T> handleCache;
+	private HibernateAccessorValueReader<T> handleCache;
 	private PojoTypeModel<T> typeModelCache;
 	private Member memberCache;
 
@@ -79,7 +79,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 	}
 
 	@Override
-	public final ValueReadHandle<T> handle() {
+	public final HibernateAccessorValueReader<T> handle() {
 		if ( handleCache == null ) {
 			try {
 				handleCache = createHandle( member() );
@@ -102,7 +102,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 		return memberCache;
 	}
 
-	protected abstract ValueReadHandle<T> createHandle(Member member) throws ReflectiveOperationException;
+	protected abstract HibernateAccessorValueReader<T> createHandle(Member member) throws ReflectiveOperationException;
 
 	final Type getterGenericReturnType() {
 		Member member = member();

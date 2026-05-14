@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.testsupport.TestIntrospector;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
@@ -28,7 +28,7 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 class TypePatternMatcherFactoryTest {
 
 	private final TestIntrospector introspector =
-			new TestIntrospector( ValueHandleFactory.usingMethodHandle( MethodHandles.lookup() ) );
+			new TestIntrospector( HibernateAccessorFactory.lambda( MethodHandles.lookup() ) );
 	private final TypePatternMatcherFactory factory = new TypePatternMatcherFactory( introspector );
 
 	@Test

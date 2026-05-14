@@ -6,10 +6,10 @@ package org.hibernate.search.mapper.orm.bootstrap.spi;
 
 import java.util.function.BiConsumer;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.models.spi.ClassDetailsRegistry;
 import org.hibernate.search.mapper.orm.bootstrap.impl.HibernateOrmIntegrationBooterImpl;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
 public interface HibernateOrmIntegrationBooter {
@@ -20,7 +20,7 @@ public interface HibernateOrmIntegrationBooter {
 	}
 
 	interface Builder {
-		Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory);
+		Builder accessorFactory(HibernateAccessorFactory accessorFactory);
 
 		HibernateOrmIntegrationBooter build();
 	}
