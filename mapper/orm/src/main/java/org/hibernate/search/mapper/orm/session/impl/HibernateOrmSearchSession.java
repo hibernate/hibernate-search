@@ -16,8 +16,8 @@ import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.TransactionCompletionCallbacks;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.engine.spi.TransactionCompletionCallbacks;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -93,15 +93,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return searchSession;
 		}
 		else {
-			// TODO: For a stateless session need a different impl of the search session
-			throw new UnsupportedOperationException(
-					"Cannot create Search Session using a non stateful ORM session: " + sessionImplementor.getClass() );
+			throw OrmMiscLog.INSTANCE.unsupportedSessionType( sessionImplementor.getClass() );
 		}
 	}
 
 	private final HibernateOrmSearchSessionMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-	private final SessionImplementor sessionImplementor;
+	private final SharedSessionContractImplementor sessionImplementor;
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
 	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
 	private ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter;
@@ -206,23 +204,34 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return mappingContext.createScope( rootScope, classes );
 	}
 
-	// TODO: won't be able to use these (toEntityManager / toOrmSession / session) in a stateless session case...
-	//  options ?
-	//    = deprecate and introduce some shared session interface instead ?
-	//    = keep two search session interfaces one for stateless one for stateful ?
 	@Override
 	public EntityManager toEntityManager() {
-		return sessionImplementor;
+		if ( sessionImplementor instanceof EntityManager entityManager ) {
+			return entityManager;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( EntityManager.class );
+		}
 	}
 
 	@Override
 	public Session toOrmSession() {
-		return sessionImplementor;
+		if ( sessionImplementor instanceof Session session ) {
+			return session;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( Session.class );
+		}
 	}
 
 	@Override
 	public SessionImplementor session() {
-		return sessionImplementor;
+		if ( sessionImplementor instanceof SessionImplementor session ) {
+			return session;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( SessionImplementor.class );
+		}
 	}
 
 	@Override
@@ -341,7 +350,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return new HibernateOrmSelectionLoadingContext.Builder( mappingContext, this );
 	}
 
-	private void registerSynchronization(SessionImplementor sessionImplementor, Synchronization synchronization) {
+	private void registerSynchronization(SharedSessionContractImplementor sessionImplementor, Synchronization synchronization) {
 		//use {Before|After}TransactionCompletionProcess instead of registerSynchronization because it does not
 		//swallow transactions.
 		/*
@@ -354,10 +363,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		 * In a JTA env, the before transaction completion is called before the flush, so not all changes are yet
 		 * written. However, Synchronization-s do propagate exceptions, so they can be safely used.
 		 */
-
-		// TODO: There's no action queue with stateless session ...
-		//  Hence it would be great if we could just have an SPI in ORM to deal with this instead?
-		// TODO: Have a closer look at this part to figure the best way to deal with stateless sessions..
 		final TransactionCompletionCallbacks completionCallbacks = sessionImplementor.getTransactionCompletionCallbacks();
 		SynchronizationAdapter adapter = new SynchronizationAdapter( synchronization );
 
@@ -376,7 +381,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		completionCallbacks.registerCallback( (AfterTransactionCompletionProcess) adapter );
 	}
 
-	private boolean isLocalTransaction(SessionImplementor sessionImplementor) {
+	private boolean isLocalTransaction(SharedSessionContractImplementor sessionImplementor) {
 		return !sessionImplementor
 				.getTransactionCoordinator()
 				.getTransactionCoordinatorBuilder()
@@ -396,12 +401,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		private final HibernateOrmSearchSessionMappingContext mappingContext;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 		private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
-		private final SessionImplementor sessionImplementor;
+		private final SharedSessionContractImplementor sessionImplementor;
 
 		public Builder(HibernateOrmSearchSessionMappingContext mappingContext,
 				HibernateOrmSessionTypeContextProvider typeContextProvider,
 				ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy,
-				SessionImplementor sessionImplementor) {
+				SharedSessionContractImplementor sessionImplementor) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.automaticIndexingStrategy = automaticIndexingStrategy;
