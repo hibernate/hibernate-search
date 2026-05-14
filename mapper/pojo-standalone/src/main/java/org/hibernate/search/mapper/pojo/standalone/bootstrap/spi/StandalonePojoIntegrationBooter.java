@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.impl.StandalonePojoIntegrationBooterImpl;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 @Incubating
 public interface StandalonePojoIntegrationBooter {
@@ -25,7 +25,7 @@ public interface StandalonePojoIntegrationBooter {
 	interface Builder {
 		Builder annotatedTypeSource(AnnotatedTypeSource source);
 
-		Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory);
+		Builder accessorFactory(HibernateAccessorFactory accessorFactory);
 
 		@Incubating
 		Builder introspectorCustomizer(Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> customize);

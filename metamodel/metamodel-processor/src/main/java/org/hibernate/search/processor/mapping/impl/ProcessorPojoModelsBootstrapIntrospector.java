@@ -20,7 +20,7 @@ import org.hibernate.search.processor.model.impl.BuiltInBridgeResolverTypes;
 import org.hibernate.search.processor.model.impl.HibernateSearchProcessorEnum;
 import org.hibernate.search.processor.model.impl.ProcessorPojoRawTypeModel;
 import org.hibernate.search.processor.model.impl.ProcessorTypeOrdering;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 
 public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
@@ -92,7 +92,7 @@ public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIn
 	}
 
 	@Override
-	public ValueHandleFactory annotationValueHandleFactory() {
+	public HibernateAccessorFactory annotationValueHandleFactory() {
 		return delegate.annotationValueHandleFactory();
 	}
 

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -34,7 +35,6 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMa
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingKey;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegrationBooter {
 
@@ -48,14 +48,14 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 
 	private final List<AnnotatedTypeSource> annotatedTypeSources;
 	private final ConfigurationPropertyChecker propertyChecker;
-	private final ValueHandleFactory valueHandleFactory;
+	private final HibernateAccessorFactory accessorFactory;
 	private final Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer;
 	private final ConfigurationPropertySource propertySource;
 
 	private StandalonePojoIntegrationBooterImpl(BuilderImpl builder) {
 		annotatedTypeSources = builder.annotatedTypeSources;
 		propertyChecker = ConfigurationPropertyChecker.create();
-		valueHandleFactory = builder.valueHandleFactory;
+		accessorFactory = builder.accessorFactory;
 		introspectorCustomizer = builder.introspectorCustomizer;
 
 		propertySource = propertyChecker.wrap(
@@ -97,9 +97,9 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 							environment.classResolver(),
 							environment.resourceResolver(),
 							null,
-							valueHandleFactory != null
-									? valueHandleFactory
-									: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
+							accessorFactory != null
+									? accessorFactory
+									: HibernateAccessorFactory.lambda( MethodHandles.publicLookup() ) );
 			introspector = introspectorCustomizer.apply( introspector );
 			StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();
 			StandalonePojoMappingInitiator mappingInitiator = new StandalonePojoMappingInitiator( introspector );
@@ -151,7 +151,7 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	public static class BuilderImpl implements Builder {
 		private final List<AnnotatedTypeSource> annotatedTypeSources = new ArrayList<>();
 		private final Map<String, Object> properties = new HashMap<>();
-		private ValueHandleFactory valueHandleFactory;
+		private HibernateAccessorFactory accessorFactory;
 		private Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer = Function.identity();
 
 		public BuilderImpl() {
@@ -164,8 +164,8 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		}
 
 		@Override
-		public BuilderImpl valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
-			this.valueHandleFactory = valueHandleFactory;
+		public BuilderImpl accessorFactory(HibernateAccessorFactory accessorFactory) {
+			this.accessorFactory = accessorFactory;
 			return this;
 		}
 

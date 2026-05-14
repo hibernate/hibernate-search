@@ -25,6 +25,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.accessor</groupId>
+            <artifactId>hibernate-accessor-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>

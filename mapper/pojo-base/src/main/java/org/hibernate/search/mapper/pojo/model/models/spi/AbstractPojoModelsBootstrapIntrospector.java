@@ -24,6 +24,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.HibernateAccessorInstantiator;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -38,9 +41,6 @@ import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
-import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 import org.jboss.jandex.IndexView;
 
@@ -48,21 +48,23 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 
 	private static final String INDEX_MODELS_CONFIG_PARAM = "hibernate.models.jandex.index";
 
+	protected final HibernateAccessorFactory valueHandleFactory;
+	private final HibernateAccessorFactory annotationValueHandleFactory;
 	private final PojoModelsClassOrdering typeOrdering;
-	protected final ValueHandleFactory valueHandleFactory;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassResolver classResolver, ResourceResolver resourceResolver,
 			IndexView indexView,
-			ValueHandleFactory valueHandleFactory) {
+			HibernateAccessorFactory valueHandleFactory) {
 		this( simpleClassDetailsRegistry( classResolver, resourceResolver, indexView ), valueHandleFactory );
 	}
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
-			ValueHandleFactory valueHandleFactory) {
+			HibernateAccessorFactory valueHandleFactory) {
 		this.classDetailsRegistry = classDetailsRegistry;
 		this.typeOrdering = new PojoModelsClassOrdering( classDetailsRegistry );
 		this.valueHandleFactory = valueHandleFactory;
+		this.annotationValueHandleFactory = HibernateAccessorFactory.reflection();
 	}
 
 	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver,
@@ -77,8 +79,8 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 	}
 
 	@Override
-	public ValueHandleFactory annotationValueHandleFactory() {
-		return valueHandleFactory;
+	public HibernateAccessorFactory annotationValueHandleFactory() {
+		return annotationValueHandleFactory;
 	}
 
 	public Stream<? extends Annotation> annotations(AnnotationTarget annotationTarget) {
@@ -110,20 +112,20 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		return typeOrdering.descendingSuperTypes( classDetails ).map( this::toClass );
 	}
 
-	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor)
+	protected <T> HibernateAccessorInstantiator<T> createValueCreateHandle(Constructor<T> constructor)
 			throws IllegalAccessException {
 		throw new AssertionFailure( this + " doesn't support constructor handles."
 				+ " '" + getClass().getName() + " should be updated to implement createValueCreateHandle(Constructor)." );
 	}
 
-	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
+	protected HibernateAccessorValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
-			return valueHandleFactory.createForMethod( method );
+			return valueHandleFactory.valueReader( method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
-			return valueHandleFactory.createForField( field );
+			return valueHandleFactory.valueReader( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

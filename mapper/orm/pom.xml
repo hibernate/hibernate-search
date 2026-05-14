@@ -38,6 +38,10 @@
             <artifactId>hibernate-search-util-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.accessor</groupId>
+            <artifactId>hibernate-accessor-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>

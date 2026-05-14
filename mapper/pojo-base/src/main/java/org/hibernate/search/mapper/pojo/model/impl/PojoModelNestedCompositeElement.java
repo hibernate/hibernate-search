@@ -6,6 +6,7 @@ package org.hibernate.search.mapper.pojo.model.impl;
 
 import java.util.Collection;
 
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
@@ -15,7 +16,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
  * @param <T> The type holding the property.
@@ -68,7 +68,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 		return modelPath.type();
 	}
 
-	ValueReadHandle<P> getHandle() {
+	HibernateAccessorValueReader<P> getHandle() {
 		return modelPath.getParent().getPropertyModel().handle();
 	}
 }

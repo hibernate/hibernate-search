@@ -6,6 +6,7 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 
 import java.util.List;
 
+import org.hibernate.accessor.HibernateAccessorInstantiator;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
@@ -18,7 +19,6 @@ import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
@@ -26,14 +26,14 @@ public final class PojoConstructorProjectionDefinition<T>
 		implements CompositeProjectionDefinition<T>, ToStringTreeAppendable {
 
 	private final PojoConstructorIdentifier constructor;
-	private final ValueCreateHandle<? extends T> handle;
+	private final HibernateAccessorInstantiator<? extends T> handle;
 	private final List<BeanHolder<? extends ProjectionDefinition<?>>> parameters;
 
 	public PojoConstructorProjectionDefinition(PojoConstructorIdentifier constructor,
-			ValueCreateHandle<? extends T> valueCreateHandle,
+			HibernateAccessorInstantiator<? extends T> instantiator,
 			List<BeanHolder<? extends ProjectionDefinition<?>>> parameters) {
 		this.constructor = constructor;
-		this.handle = valueCreateHandle;
+		this.handle = instantiator;
 		this.parameters = parameters;
 	}
 
@@ -70,7 +70,7 @@ public final class PojoConstructorProjectionDefinition<T>
 			for ( i = 0; i < parameters.size(); i++ ) {
 				innerProjections[i] = parameters.get( i ).get().create( context );
 			}
-			return initialStep.from( innerProjections ).asArray( handle );
+			return initialStep.from( innerProjections ).asArray(handle::create);
 		}
 		catch (ConstructorProjectionApplicationException e) {
 			// We already know what prevented from applying a projection constructor correctly,

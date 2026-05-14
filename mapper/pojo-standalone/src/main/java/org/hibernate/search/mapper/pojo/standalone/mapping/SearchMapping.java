@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.standalone.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
+import org.hibernate.accessor.HibernateAccessorFactory;
 
 /**
  * The Hibernate Search mapping between the POJO model and the backend(s).
@@ -94,8 +94,18 @@ public interface SearchMapping extends SearchScopeProvider {
 	 * @see AnnotatedTypeSource
 	 */
 	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource, MethodHandles.Lookup lookup) {
+		return builder( annotatedTypeSource, HibernateAccessorFactory.lambda( lookup ) );
+	}
+
+	/**
+	 * @param annotatedTypeSource A source of types to be processed for annotations by Hibernate Search.
+	 * @param accessorFactory An accessor factory to perform access operations on mapped types.
+	 * @return A {@link SearchMapping} builder.
+	 * @see AnnotatedTypeSource
+	 */
+	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource, HibernateAccessorFactory accessorFactory) {
 		return builder( annotatedTypeSource )
-				.valueReadHandleFactory( ValueHandleFactory.usingMethodHandle( lookup ) );
+				.accessorFactory( accessorFactory );
 	}
 
 }
