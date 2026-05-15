@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.models.internal.ClassLoaderServiceLoading;
@@ -24,8 +25,8 @@ import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.models.spi.ModelsConfiguration;
 import org.hibernate.models.spi.ModelsContext;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.accessor.HibernateAccessorFactory;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,8 +35,8 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
-				Arguments.of( HibernateAccessorFactory.reflection() ),
-				Arguments.of( HibernateAccessorFactory.lambda( MethodHandles.publicLookup() ) )
+				Arguments.of( AccessorFactory.reflection() ),
+				Arguments.of( AccessorFactory.lambda( MethodHandles.publicLookup() ) )
 		);
 	}
 
@@ -49,7 +50,7 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 	}
 
 	@SuppressWarnings("deprecation") // There's no other way to access the reflection manager
-	final HibernateOrmBootstrapIntrospector createIntrospector(HibernateAccessorFactory valueHandleFactory,
+	final HibernateOrmBootstrapIntrospector createIntrospector(AccessorFactory accessorFactory,
 			Class<?>... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 		// Some properties that are not relevant to our test, but necessary to create the Metadata
@@ -70,7 +71,7 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 
 		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, context.getClassDetailsRegistry(),
-				valueHandleFactory
+				new AccessorFactoriesContext( accessorFactory, AccessorFactory.reflection() )
 		);
 	}
 

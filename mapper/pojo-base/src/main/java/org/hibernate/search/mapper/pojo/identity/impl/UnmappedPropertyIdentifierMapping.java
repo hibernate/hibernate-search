@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.pojo.identity.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
@@ -17,11 +17,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 public final class UnmappedPropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
 
 	private final PojoCaster<? super I> caster;
-	private final HibernateAccessorValueReader<I> property;
+	private final ValueReader<I> property;
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 
 	public UnmappedPropertyIdentifierMapping(PojoRawTypeIdentifier<E> typeIdentifier, PojoCaster<? super I> caster,
-			HibernateAccessorValueReader<I> property) {
+			ValueReader<I> property) {
 		this.caster = caster;
 		this.property = property;
 		this.typeIdentifier = typeIdentifier;

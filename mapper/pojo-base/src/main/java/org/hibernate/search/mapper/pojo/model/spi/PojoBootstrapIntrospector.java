@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -26,9 +26,9 @@ public interface PojoBootstrapIntrospector {
 	PojoRawTypeModel<?> typeModel(String name);
 
 	/**
-	 * @return A {@link HibernateAccessorFactory} for reading annotation attributes.
+	 * @return A {@link AccessorFactory} for reading annotation attributes.
 	 */
-	HibernateAccessorFactory annotationValueHandleFactory();
+	AccessorFactory annotationValueHandleFactory();
 
 	@Incubating
 	static String noPrefix(String methodName) {

@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 
 import java.util.List;
 
-import org.hibernate.accessor.HibernateAccessorInstantiator;
+import org.hibernate.accessor.Instantiator;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
@@ -26,11 +26,11 @@ public final class PojoConstructorProjectionDefinition<T>
 		implements CompositeProjectionDefinition<T>, ToStringTreeAppendable {
 
 	private final PojoConstructorIdentifier constructor;
-	private final HibernateAccessorInstantiator<? extends T> handle;
+	private final Instantiator<? extends T> handle;
 	private final List<BeanHolder<? extends ProjectionDefinition<?>>> parameters;
 
 	public PojoConstructorProjectionDefinition(PojoConstructorIdentifier constructor,
-			HibernateAccessorInstantiator<? extends T> instantiator,
+			Instantiator<? extends T> instantiator,
 			List<BeanHolder<? extends ProjectionDefinition<?>>> parameters) {
 		this.constructor = constructor;
 		this.handle = instantiator;
@@ -70,7 +70,7 @@ public final class PojoConstructorProjectionDefinition<T>
 			for ( i = 0; i < parameters.size(); i++ ) {
 				innerProjections[i] = parameters.get( i ).get().create( context );
 			}
-			return initialStep.from( innerProjections ).asArray(handle::create);
+			return initialStep.from( innerProjections ).asArray( handle::create );
 		}
 		catch (ConstructorProjectionApplicationException e) {
 			// We already know what prevented from applying a projection constructor correctly,

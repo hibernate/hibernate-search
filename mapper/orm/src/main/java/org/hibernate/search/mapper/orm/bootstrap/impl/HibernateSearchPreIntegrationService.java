@@ -35,9 +35,9 @@ import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.orm.logging.impl.VersionLog;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceContributor;
@@ -220,7 +220,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 	abstract HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
 			ClassDetailsRegistry classDetailsRegistry,
-			HibernateAccessorFactory valueHandleFactory);
+			AccessorFactoriesContext accessorFactories);
 
 	static class NotBooted extends HibernateSearchPreIntegrationService {
 
@@ -255,7 +255,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
 				ClassDetailsRegistry classDetailsRegistry,
-				HibernateAccessorFactory valueHandleFactory) {
+				AccessorFactoriesContext accessorFactories) {
 			HibernateOrmMappingInitiator mappingInitiator = null;
 			SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 			try {
@@ -263,7 +263,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 				HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, classDetailsRegistry,
-						valueHandleFactory, serviceRegistry );
+						accessorFactories, serviceRegistry );
 				builder.addMappingInitiator( mappingKey, mappingInitiator );
 
 				searchIntegrationPartialBuildState = builder.prepareBuild();
@@ -314,7 +314,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-				ClassDetailsRegistry classDetailsRegistry, HibernateAccessorFactory valueHandleFactory) {
+				ClassDetailsRegistry classDetailsRegistry, AccessorFactoriesContext accessorFactories) {
 			return partialBuildState;
 		}
 	}

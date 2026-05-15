@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.models.spi.MemberDetails;
 import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -35,7 +35,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 	protected final List<MemberDetails> declaredProperties;
 	private final List<Member> members;
 
-	private HibernateAccessorValueReader<T> handleCache;
+	private ValueReader<T> handleCache;
 	private PojoTypeModel<T> typeModelCache;
 	private Member memberCache;
 
@@ -79,7 +79,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 	}
 
 	@Override
-	public final HibernateAccessorValueReader<T> handle() {
+	public final ValueReader<T> handle() {
 		if ( handleCache == null ) {
 			try {
 				handleCache = createHandle( member() );
@@ -102,7 +102,7 @@ public abstract class AbstractPojoModelsPropertyModel<T, I extends AbstractPojoM
 		return memberCache;
 	}
 
-	protected abstract HibernateAccessorValueReader<T> createHandle(Member member) throws ReflectiveOperationException;
+	protected abstract ValueReader<T> createHandle(Member member) throws ReflectiveOperationException;
 
 	final Type getterGenericReturnType() {
 		Member member = member();

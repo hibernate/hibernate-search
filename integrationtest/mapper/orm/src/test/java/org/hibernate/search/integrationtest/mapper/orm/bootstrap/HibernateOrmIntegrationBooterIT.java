@@ -21,6 +21,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
@@ -39,8 +41,6 @@ import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrateg
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
@@ -68,13 +68,13 @@ class HibernateOrmIntegrationBooterIT {
 	public BackendMock backendMock = BackendMock.create();
 
 	@Mock
-	private HibernateAccessorValueReader<Integer> idValueReadHandleMock;
+	private ValueReader<Integer> idValueReadHandleMock;
 
 	@Mock
-	private HibernateAccessorValueReader<String> textValueReadHandleMock;
+	private ValueReader<String> textValueReadHandleMock;
 
 	@Mock
-	private HibernateAccessorFactory valueHandleFactoryMock;
+	private AccessorFactory valueHandleFactoryMock;
 
 	@AfterEach
 	void cleanup() throws Exception {
@@ -96,9 +96,9 @@ class HibernateOrmIntegrationBooterIT {
 		// Pre-booting should retrieve value-read handles
 		// Simulate a custom handle from a framework, e.g. Quarkus
 		when( valueHandleFactoryMock.valueReader( IndexedEntity.ID_FIELD ) )
-				.thenReturn( (HibernateAccessorValueReader) idValueReadHandleMock );
+				.thenReturn( (ValueReader) idValueReadHandleMock );
 		when( valueHandleFactoryMock.valueReader( IndexedEntity.TEXT_FIELD ) )
-				.thenReturn( (HibernateAccessorValueReader) textValueReadHandleMock );
+				.thenReturn( (ValueReader) textValueReadHandleMock );
 		booter.preBoot( booterGeneratedProperties::put );
 		backendMock.verifyExpectationsMet();
 		verify( valueHandleFactoryMock ).valueReader( IndexedEntity.ID_FIELD );

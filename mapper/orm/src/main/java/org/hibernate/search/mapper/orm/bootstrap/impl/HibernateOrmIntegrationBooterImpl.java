@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.OrmMiscLog;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -31,7 +32,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 
 	private final Metadata metadata;
-	private final HibernateAccessorFactory accessorFactory;
+	private final AccessorFactoriesContext accessorFactories;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 	private final ClassDetailsRegistry classDetailsRegistry;
@@ -40,9 +41,14 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.serviceRegistry;
-		this.accessorFactory = builder.accessorFactory != null
-				? builder.accessorFactory
-				: HibernateAccessorFactory.lambda( MethodHandles.publicLookup() );
+		this.accessorFactories = new AccessorFactoriesContext(
+				builder.accessorFactory != null
+						? builder.accessorFactory
+						: AccessorFactory.lambda( MethodHandles.publicLookup() ),
+				builder.annotationAccessorFactory != null
+						? builder.annotationAccessorFactory
+						: AccessorFactory.reflection()
+		);
 		this.preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 
@@ -83,7 +89,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			);
 		}
 
-		preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, accessorFactory )
+		preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, accessorFactories )
 				.set( propertyCollector );
 	}
 
@@ -167,7 +173,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmIntegrationPartialBuildState partialBuildState =
-				preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, accessorFactory );
+				preIntegrationService.doBootFirstPhase( metadata, classDetailsRegistry, accessorFactories );
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,
@@ -185,7 +191,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		private final ServiceRegistry serviceRegistry;
 		private final ClassDetailsRegistry classDetailsRegistry;
 
-		private HibernateAccessorFactory accessorFactory;
+		private AccessorFactory accessorFactory;
+		private AccessorFactory annotationAccessorFactory;
 
 		public BuilderImpl(Metadata metadata, ServiceRegistry serviceRegistry, ClassDetailsRegistry classDetailsRegistry) {
 			this.metadata = metadata;
@@ -195,8 +202,14 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 
 		@Override
-		public Builder accessorFactory(HibernateAccessorFactory accessorFactory) {
+		public Builder accessorFactory(AccessorFactory accessorFactory) {
 			this.accessorFactory = accessorFactory;
+			return this;
+		}
+
+		@Override
+		public Builder annotationAccessorFactory(AccessorFactory annotationAccessorFactory) {
+			this.annotationAccessorFactory = annotationAccessorFactory;
 			return this;
 		}
 

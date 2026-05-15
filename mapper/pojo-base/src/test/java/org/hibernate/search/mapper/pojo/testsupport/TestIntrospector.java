@@ -6,30 +6,31 @@ package org.hibernate.search.mapper.pojo.testsupport;
 
 import java.lang.reflect.Type;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 
 public class TestIntrospector extends AbstractPojoModelsBootstrapIntrospector {
 	private final PojoModelsGenericContextHelper genericContextHelper = new PojoModelsGenericContextHelper( this );
 
-	public TestIntrospector(HibernateAccessorFactory valueHandleFactory) {
+	public TestIntrospector(AccessorFactory valueHandleFactory) {
 		this( valueHandleFactory, AggregatedClassLoader.createDefault() );
 	}
 
-	private TestIntrospector(HibernateAccessorFactory valueHandleFactory, AggregatedClassLoader aggregatedClassLoader) {
+	private TestIntrospector(AccessorFactory valueHandleFactory, AggregatedClassLoader aggregatedClassLoader) {
 		super( DefaultClassResolver.create( aggregatedClassLoader ), DefaultResourceResolver.create( aggregatedClassLoader ),
-				null, valueHandleFactory );
+				null, new AccessorFactoriesContext( valueHandleFactory, AccessorFactory.reflection() ) );
 	}
 
 	@Override

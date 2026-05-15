@@ -14,13 +14,13 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.processor.model.impl.BuiltInBridgeResolverTypes;
 import org.hibernate.search.processor.model.impl.HibernateSearchProcessorEnum;
 import org.hibernate.search.processor.model.impl.ProcessorPojoRawTypeModel;
 import org.hibernate.search.processor.model.impl.ProcessorTypeOrdering;
-import org.hibernate.accessor.HibernateAccessorFactory;
 
 public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIntrospector {
 
@@ -92,7 +92,7 @@ public class ProcessorPojoModelsBootstrapIntrospector implements PojoBootstrapIn
 	}
 
 	@Override
-	public HibernateAccessorFactory annotationValueHandleFactory() {
+	public AccessorFactory annotationValueHandleFactory() {
 		return delegate.annotationValueHandleFactory();
 	}
 

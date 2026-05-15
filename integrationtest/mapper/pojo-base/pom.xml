@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.accessor</groupId>
-            <artifactId>hibernate-accessor-core</artifactId>
+            <artifactId>hibernate-accessor</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

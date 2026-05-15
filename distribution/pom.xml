@@ -358,6 +358,10 @@
                                             <groupId>io.smallrye</groupId>
                                             <artifactId>jandex</artifactId>
                                         </dependency>
+                                        <dependency>
+                                            <groupId>org.hibernate.accessor</groupId>
+                                            <artifactId>hibernate-accessor</artifactId>
+                                        </dependency>
                                     </dependenciesToSkip>
                                 </allLuceneNextDependenciesCopiedRule>
                             </rules>

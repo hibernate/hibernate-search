@@ -7,7 +7,7 @@ package org.hibernate.search.mapper.pojo.model.spi;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 
 public interface PojoPropertyModel<T> {
 
@@ -30,6 +30,6 @@ public interface PojoPropertyModel<T> {
 	/**
 	 * @return A handle to read the value of this property on a instance of its hosting type.
 	 */
-	HibernateAccessorValueReader<T> handle();
+	ValueReader<T> handle();
 
 }

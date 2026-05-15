@@ -7,6 +7,7 @@ package org.hibernate.search.mapper.pojo.standalone.mapping;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
@@ -17,7 +18,6 @@ import org.hibernate.search.mapper.pojo.standalone.scope.SearchScopeProvider;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.accessor.HibernateAccessorFactory;
 
 /**
  * The Hibernate Search mapping between the POJO model and the backend(s).
@@ -94,7 +94,7 @@ public interface SearchMapping extends SearchScopeProvider {
 	 * @see AnnotatedTypeSource
 	 */
 	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource, MethodHandles.Lookup lookup) {
-		return builder( annotatedTypeSource, HibernateAccessorFactory.lambda( lookup ) );
+		return builder( annotatedTypeSource, AccessorFactory.lambda( lookup ) );
 	}
 
 	/**
@@ -103,7 +103,7 @@ public interface SearchMapping extends SearchScopeProvider {
 	 * @return A {@link SearchMapping} builder.
 	 * @see AnnotatedTypeSource
 	 */
-	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource, HibernateAccessorFactory accessorFactory) {
+	static SearchMappingBuilder builder(AnnotatedTypeSource annotatedTypeSource, AccessorFactory accessorFactory) {
 		return builder( annotatedTypeSource )
 				.accessorFactory( accessorFactory );
 	}

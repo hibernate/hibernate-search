@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.pojo.identity.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
@@ -18,10 +18,10 @@ import org.hibernate.search.util.common.impl.Closer;
 public final class PropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
 
 	private final PojoCaster<? super I> caster;
-	private final HibernateAccessorValueReader<I> property;
+	private final ValueReader<I> property;
 	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
 
-	public PropertyIdentifierMapping(PojoCaster<? super I> caster, HibernateAccessorValueReader<I> property,
+	public PropertyIdentifierMapping(PojoCaster<? super I> caster, ValueReader<I> property,
 			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
 		this.caster = caster;
 		this.property = property;
