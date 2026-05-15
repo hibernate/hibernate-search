@@ -24,9 +24,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorInstantiator;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.Instantiator;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -38,6 +38,7 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingExcepti
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
@@ -48,23 +49,23 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 
 	private static final String INDEX_MODELS_CONFIG_PARAM = "hibernate.models.jandex.index";
 
-	protected final HibernateAccessorFactory valueHandleFactory;
-	private final HibernateAccessorFactory annotationValueHandleFactory;
+	protected final AccessorFactory valueHandleFactory;
+	private final AccessorFactory annotationValueHandleFactory;
 	private final PojoModelsClassOrdering typeOrdering;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassResolver classResolver, ResourceResolver resourceResolver,
 			IndexView indexView,
-			HibernateAccessorFactory valueHandleFactory) {
-		this( simpleClassDetailsRegistry( classResolver, resourceResolver, indexView ), valueHandleFactory );
+			AccessorFactoriesContext accessorFactories) {
+		this( simpleClassDetailsRegistry( classResolver, resourceResolver, indexView ), accessorFactories );
 	}
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
-			HibernateAccessorFactory valueHandleFactory) {
+			AccessorFactoriesContext accessorFactories) {
 		this.classDetailsRegistry = classDetailsRegistry;
 		this.typeOrdering = new PojoModelsClassOrdering( classDetailsRegistry );
-		this.valueHandleFactory = valueHandleFactory;
-		this.annotationValueHandleFactory = HibernateAccessorFactory.reflection();
+		this.valueHandleFactory = accessorFactories.accessorFactory();
+		this.annotationValueHandleFactory = accessorFactories.annotationAccessorFactory();
 	}
 
 	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver,
@@ -79,7 +80,7 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 	}
 
 	@Override
-	public HibernateAccessorFactory annotationValueHandleFactory() {
+	public AccessorFactory annotationValueHandleFactory() {
 		return annotationValueHandleFactory;
 	}
 
@@ -112,13 +113,13 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		return typeOrdering.descendingSuperTypes( classDetails ).map( this::toClass );
 	}
 
-	protected <T> HibernateAccessorInstantiator<T> createValueCreateHandle(Constructor<T> constructor)
+	protected <T> Instantiator<T> createValueCreateHandle(Constructor<T> constructor)
 			throws IllegalAccessException {
 		throw new AssertionFailure( this + " doesn't support constructor handles."
 				+ " '" + getClass().getName() + " should be updated to implement createValueCreateHandle(Constructor)." );
 	}
 
-	protected HibernateAccessorValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
+	protected ValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			return valueHandleFactory.valueReader( method );

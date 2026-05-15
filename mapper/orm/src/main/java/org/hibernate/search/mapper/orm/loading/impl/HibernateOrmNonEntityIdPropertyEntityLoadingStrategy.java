@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
@@ -35,7 +35,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	private static <E, I> HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> create(
 			PersistentClass persistentClass,
 			Class<I> documentIdSourcePropertyClass, String documentIdSourcePropertyName,
-			HibernateAccessorValueReader<? extends I> documentIdSourceHandle) {
+			ValueReader<? extends I> documentIdSourceHandle) {
 		var idProperty = persistentClass.getIdentifierProperty();
 		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>(
 				persistentClass.getRootClass().getEntityName(),
@@ -49,7 +49,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 
 	private final String entityName;
 	private final String documentIdSourcePropertyName;
-	private final HibernateAccessorValueReader<? extends I> documentIdSourceHandle;
+	private final ValueReader<? extends I> documentIdSourceHandle;
 	private final boolean uniquePropertyIsTheEntityId;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(String rootEntityName, String entityName,
@@ -57,7 +57,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			Class<I> documentIdSourcePropertyType,
 			String documentIdSourcePropertyName,
 			boolean uniquePropertyIsTheEntityId,
-			HibernateAccessorValueReader<? extends I> documentIdSourceHandle) {
+			ValueReader<? extends I> documentIdSourceHandle) {
 		super( rootEntityName, documentIdSourcePropertyType, documentIdSourcePropertyName, groupingAllowed );
 		this.entityName = entityName;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;

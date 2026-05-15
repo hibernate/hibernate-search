@@ -12,24 +12,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.util.common.logging.impl.CommonMiscLog;
 
 public final class AnnotationHelper {
 
-	private final HibernateAccessorFactory handleFactory;
+	private final AccessorFactory handleFactory;
 
-	private final Map<Class<? extends Annotation>, HibernateAccessorValueReader<Annotation[]>> containedAnnotationsHandleCache =
+	private final Map<Class<? extends Annotation>, ValueReader<Annotation[]>> containedAnnotationsHandleCache =
 			new HashMap<>();
 
-	public AnnotationHelper(HibernateAccessorFactory handleFactory) {
+	public AnnotationHelper(AccessorFactory handleFactory) {
 		this.handleFactory = handleFactory;
 	}
 
 	public Stream<? extends Annotation> expandRepeatableContainingAnnotation(Annotation containingAnnotationCandidate) {
 		Class<? extends Annotation> containingAnnotationCandidateType = containingAnnotationCandidate.annotationType();
-		HibernateAccessorValueReader<Annotation[]> containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(
+		ValueReader<Annotation[]> containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(
 				containingAnnotationCandidateType, this::createContainedAnnotationsHandle
 		);
 		if ( containedAnnotationsHandle != null ) {
@@ -47,7 +47,7 @@ public final class AnnotationHelper {
 		return Stream.of( containingAnnotationCandidate );
 	}
 
-	private HibernateAccessorValueReader<Annotation[]> createContainedAnnotationsHandle(
+	private ValueReader<Annotation[]> createContainedAnnotationsHandle(
 			Class<? extends Annotation> containingAnnotationCandidateType) {
 		Method valueMethod;
 		try {
@@ -64,8 +64,8 @@ public final class AnnotationHelper {
 				Repeatable repeatable = elementType.getAnnotation( Repeatable.class );
 				if ( repeatable != null && containingAnnotationCandidateType.equals( repeatable.value() ) ) {
 					@SuppressWarnings("unchecked") // Checked using reflection just above
-					HibernateAccessorValueReader<Annotation[]> result =
-							(HibernateAccessorValueReader<Annotation[]>) handleFactory.valueReader( valueMethod );
+					ValueReader<Annotation[]> result =
+							(ValueReader<Annotation[]>) handleFactory.valueReader( valueMethod );
 					return result;
 				}
 			}

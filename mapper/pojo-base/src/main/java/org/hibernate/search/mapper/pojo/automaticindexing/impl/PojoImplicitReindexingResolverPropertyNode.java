@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -26,12 +26,12 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 public class PojoImplicitReindexingResolverPropertyNode<T, P> extends PojoImplicitReindexingResolverNode<T> {
 
-	private final HibernateAccessorValueReader<P> handle;
+	private final ValueReader<P> handle;
 	private final PojoImplicitReindexingResolverNode<? super P> nested;
 
 	private final PojoModelPath modelPath;
 
-	public PojoImplicitReindexingResolverPropertyNode(HibernateAccessorValueReader<P> handle,
+	public PojoImplicitReindexingResolverPropertyNode(ValueReader<P> handle,
 			PojoImplicitReindexingResolverNode<? super P> nested,
 			PojoModelPath modelPath) {
 		this.handle = handle;

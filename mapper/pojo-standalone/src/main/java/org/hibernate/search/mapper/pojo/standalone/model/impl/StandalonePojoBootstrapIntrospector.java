@@ -10,14 +10,14 @@ import java.lang.reflect.Member;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorInstantiator;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.Instantiator;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoSimpleModelsRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -34,8 +34,8 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 		implements PojoBootstrapIntrospector {
 
 	public static StandalonePojoBootstrapIntrospector create(ClassResolver classResolver, ResourceResolver resourceResolver,
-			IndexView indexView, HibernateAccessorFactory accessorFactory) {
-		return new StandalonePojoBootstrapIntrospector( classResolver, resourceResolver, indexView, accessorFactory );
+			IndexView indexView, AccessorFactoriesContext accessorFactories) {
+		return new StandalonePojoBootstrapIntrospector( classResolver, resourceResolver, indexView, accessorFactories );
 	}
 
 	private final PojoModelsGenericContextHelper genericContextHelper;
@@ -43,8 +43,8 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	private StandalonePojoBootstrapIntrospector(ClassResolver classResolver, ResourceResolver resourceResolver,
-			IndexView indexView, HibernateAccessorFactory accessorFactory) {
-		super( classResolver, resourceResolver, indexView, accessorFactory );
+			IndexView indexView, AccessorFactoriesContext accessorFactories) {
+		super( classResolver, resourceResolver, indexView, accessorFactories );
 		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
 
@@ -67,13 +67,13 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoModelsBoots
 	}
 
 	@Override
-	protected HibernateAccessorValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
+	protected ValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		setAccessible( member );
 		return super.createValueReadHandle( member );
 	}
 
 	@Override
-	protected <T> HibernateAccessorInstantiator<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
+	protected <T> Instantiator<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
 		setAccessible( constructor );
 		return valueHandleFactory.instantiator( constructor );
 	}

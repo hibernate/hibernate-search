@@ -13,12 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.hibernate.accessor.Instantiator;
 import org.hibernate.search.mapper.pojo.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
-import org.hibernate.accessor.HibernateAccessorInstantiator;
 
 public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 
@@ -27,7 +27,7 @@ public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 	private final Constructor<T> constructor;
 
 	private List<PojoMethodParameterModel<?>> declaredParameters;
-	private HibernateAccessorInstantiator<T> handleCache;
+	private Instantiator<T> handleCache;
 
 	public PojoModelsConstructorModel(AbstractPojoModelsBootstrapIntrospector introspector,
 			AbstractPojoModelsRawTypeModel<T, ?> declaringTypeModel, Constructor<T> constructor) {
@@ -53,7 +53,7 @@ public class PojoModelsConstructorModel<T> implements PojoConstructorModel<T> {
 	}
 
 	@Override
-	public HibernateAccessorInstantiator<T> handle() {
+	public Instantiator<T> handle() {
 		if ( handleCache == null ) {
 			try {
 				handleCache = introspector.createValueCreateHandle( constructor );

@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -15,9 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorInstantiator;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.Instantiator;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.mapping.PersistentClass;
@@ -26,6 +24,7 @@ import org.hibernate.search.mapper.orm.logging.impl.MappingLog;
 import org.hibernate.search.mapper.pojo.model.models.spi.AbstractPojoModelsBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.models.spi.PojoModelsGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -37,9 +36,9 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 	public static HibernateOrmBootstrapIntrospector create(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ClassDetailsRegistry classDetailsRegistry,
-			HibernateAccessorFactory accessorFactory) {
+			AccessorFactoriesContext accessorFactories) {
 		return new HibernateOrmBootstrapIntrospector(
-				basicTypeMetadataProvider, classDetailsRegistry, accessorFactory
+				basicTypeMetadataProvider, classDetailsRegistry, accessorFactories
 		);
 	}
 
@@ -61,8 +60,8 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 	private HibernateOrmBootstrapIntrospector(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ClassDetailsRegistry classDetailsRegistry,
-			HibernateAccessorFactory accessorFactory) {
-		super( classDetailsRegistry, accessorFactory );
+			AccessorFactoriesContext accessorFactories) {
+		super( classDetailsRegistry, accessorFactories );
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.genericContextHelper = new PojoModelsGenericContextHelper( this );
 	}
@@ -101,16 +100,16 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoModelsBootstr
 	}
 
 	@Override
-	protected <T> HibernateAccessorInstantiator<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
+	protected <T> Instantiator<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
 		return valueHandleFactory.instantiator( constructor );
 	}
 
 	@Override
-	protected HibernateAccessorValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
+	protected ValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		return super.createValueReadHandle( member );
 	}
 
-	HibernateAccessorValueReader<?> createValueReadHandle(Class<?> holderClass, Member member,
+	ValueReader<?> createValueReadHandle(Class<?> holderClass, Member member,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata)
 			throws IllegalAccessException {
 		if ( member instanceof Field && ormPropertyMetadata != null && !ormPropertyMetadata.isId() ) {

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Hibernate;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
@@ -28,13 +28,13 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 
 	private final PojoLoadingTypeContext<E> targetEntityTypeContext;
 	private final String documentIdSourcePropertyName;
-	private final HibernateAccessorValueReader<?> documentIdSourceHandle;
+	private final ValueReader<?> documentIdSourceHandle;
 
 	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityMappingType entityMappingType,
 			PojoLoadingTypeContext<E> targetEntityTypeContext,
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
-			HibernateAccessorValueReader<?> documentIdSourceHandle,
+			ValueReader<?> documentIdSourceHandle,
 			HibernateOrmLoadingSessionContext sessionContext,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( entityMappingType, queryFactory, sessionContext, loadingOptions );
