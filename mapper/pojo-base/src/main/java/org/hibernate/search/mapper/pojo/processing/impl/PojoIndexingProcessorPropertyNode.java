@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.logging.impl.IndexingLog;
@@ -24,12 +24,12 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcessor<T> {
 
-	private final HibernateAccessorValueReader<P> handle;
+	private final ValueReader<P> handle;
 	private final PojoIndexingProcessor<? super P> nested;
 
 	private final PojoModelPath modelPath;
 
-	public PojoIndexingProcessorPropertyNode(HibernateAccessorValueReader<P> handle, PojoIndexingProcessor<? super P> nested,
+	public PojoIndexingProcessorPropertyNode(ValueReader<P> handle, PojoIndexingProcessor<? super P> nested,
 			PojoModelPath modelPath) {
 		this.handle = handle;
 		this.nested = nested;

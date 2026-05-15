@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorInstantiator;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.Instantiator;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,14 +29,14 @@ class ValueCreateHandleTest {
 	public static List<? extends Arguments> params() {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		return Arrays.asList(
-				Arguments.of( HibernateAccessorFactory.lambda( lookup ) ),
-				Arguments.of( HibernateAccessorFactory.reflection() )
+				Arguments.of( AccessorFactory.lambda( lookup ) ),
+				Arguments.of( AccessorFactory.reflection() )
 		);
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void privateConstructor(HibernateAccessorFactory factory) throws Exception {
+	void privateConstructor(AccessorFactory factory) throws Exception {
 		testValueCreateHandleSuccess( PrivateConstructorClass.class, PrivateConstructorClass::getValue, factory );
 	}
 
@@ -58,7 +58,7 @@ class ValueCreateHandleTest {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void packagePrivateConstructor(HibernateAccessorFactory factory) throws Exception {
+	void packagePrivateConstructor(AccessorFactory factory) throws Exception {
 		testValueCreateHandleSuccess( PackagePrivateConstructorClass.class, PackagePrivateConstructorClass::getValue,
 				factory
 		);
@@ -82,7 +82,7 @@ class ValueCreateHandleTest {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void protectedConstructor(HibernateAccessorFactory factory) throws Exception {
+	void protectedConstructor(AccessorFactory factory) throws Exception {
 		testValueCreateHandleSuccess( ProtectedConstructorClass.class, ProtectedConstructorClass::getValue, factory );
 	}
 
@@ -104,7 +104,7 @@ class ValueCreateHandleTest {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void publicConstructor(HibernateAccessorFactory factory) throws Exception {
+	void publicConstructor(AccessorFactory factory) throws Exception {
 		testValueCreateHandleSuccess( PublicConstructorClass.class, PublicConstructorClass::getValue, factory );
 	}
 
@@ -126,10 +126,10 @@ class ValueCreateHandleTest {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void failure_error(HibernateAccessorFactory factory) throws Exception {
+	void failure_error(AccessorFactory factory) throws Exception {
 		Constructor<?> constructor = ErrorConstructorClass.class.getDeclaredConstructor( String.class );
 
-		HibernateAccessorInstantiator<?> instantiator = factory.instantiator( constructor );
+		Instantiator<?> instantiator = factory.instantiator( constructor );
 
 		assertThatThrownBy( () -> instantiator.create( "someValue" ) )
 				.isInstanceOf( SimulatedError.class )
@@ -144,10 +144,10 @@ class ValueCreateHandleTest {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void failure_runtimeException(HibernateAccessorFactory factory) throws Exception {
+	void failure_runtimeException(AccessorFactory factory) throws Exception {
 		Constructor<?> constructor = RuntimeExceptionConstructorClass.class.getDeclaredConstructor( Object.class, int.class );
 
-		HibernateAccessorInstantiator<?> instantiator = factory.instantiator( constructor );
+		Instantiator<?> instantiator = factory.instantiator( constructor );
 
 		assertThatThrownBy( () -> instantiator.create( "someValue", 42 ) )
 				.hasMessageContaining( "runtimeExceptionThrowingConstructor" );
@@ -160,12 +160,12 @@ class ValueCreateHandleTest {
 	}
 
 	private <T> void testValueCreateHandleSuccess(Class<T> clazz, Function<T, String> getter,
-			HibernateAccessorFactory factory)
+			AccessorFactory factory)
 			throws IllegalAccessException, NoSuchMethodException {
 		Constructor<T> constructor = clazz.getDeclaredConstructor( String.class );
 		setAccessible( constructor );
 
-		HibernateAccessorInstantiator<T> instantiator = factory.instantiator( constructor );
+		Instantiator<T> instantiator = factory.instantiator( constructor );
 
 		String argument = "someArgument_" + clazz.getName();
 		T created = instantiator.create( argument );

@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.ValueReader;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,90 +30,90 @@ class ValueReadHandleTest {
 	public static List<? extends Arguments> params() {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		return Arrays.asList(
-				Arguments.of( HibernateAccessorFactory.lambda( lookup ) ),
-				Arguments.of( HibernateAccessorFactory.reflection() )
+				Arguments.of( AccessorFactory.lambda( lookup ) ),
+				Arguments.of( AccessorFactory.reflection() )
 		);
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void privateField(HibernateAccessorFactory factory) throws Exception {
+	void privateField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "privateField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void privateFinalField(HibernateAccessorFactory factory) throws Exception {
+	void privateFinalField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "privateFinalField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void packagePrivateField(HibernateAccessorFactory factory) throws Exception {
+	void packagePrivateField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "packagePrivateField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void packagePrivateFinalField(HibernateAccessorFactory factory) throws Exception {
+	void packagePrivateFinalField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "packagePrivateFinalField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void protectedField(HibernateAccessorFactory factory) throws Exception {
+	void protectedField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "protectedField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void protectedFinalField(HibernateAccessorFactory factory) throws Exception {
+	void protectedFinalField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "protectedFinalField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void publicField(HibernateAccessorFactory factory) throws Exception {
+	void publicField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "publicField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void publicFinalField(HibernateAccessorFactory factory) throws Exception {
+	void publicFinalField(AccessorFactory factory) throws Exception {
 		testFieldValueReadHandleSuccess( factory, "publicFinalField" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void privateMethod(HibernateAccessorFactory factory) throws Exception {
+	void privateMethod(AccessorFactory factory) throws Exception {
 		testMethodValueReadHandleSuccess( factory, "privateMethod" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void packagePrivateMethod(HibernateAccessorFactory factory) throws Exception {
+	void packagePrivateMethod(AccessorFactory factory) throws Exception {
 		testMethodValueReadHandleSuccess( factory, "packagePrivateMethod" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void protectedMethod(HibernateAccessorFactory factory) throws Exception {
+	void protectedMethod(AccessorFactory factory) throws Exception {
 		testMethodValueReadHandleSuccess( factory, "protectedMethod" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void publicMethod(HibernateAccessorFactory factory) throws Exception {
+	void publicMethod(AccessorFactory factory) throws Exception {
 		testMethodValueReadHandleSuccess( factory, "publicMethod" );
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void failure_method_error(HibernateAccessorFactory factory) throws Exception {
+	void failure_method_error(AccessorFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "errorThrowingMethod" );
 		setAccessible( method );
 
-		HibernateAccessorValueReader<?> valueReadHandle = factory.valueReader( method );
+		ValueReader<?> valueReadHandle = factory.valueReader( method );
 
 		EntityType entity = new EntityType();
 		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
@@ -123,11 +123,11 @@ class ValueReadHandleTest {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void failure_method_runtimeException(HibernateAccessorFactory factory) throws Exception {
+	void failure_method_runtimeException(AccessorFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
 		setAccessible( method );
 
-		HibernateAccessorValueReader<?> valueReadHandle = factory.valueReader( method );
+		ValueReader<?> valueReadHandle = factory.valueReader( method );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
 		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
@@ -136,11 +136,11 @@ class ValueReadHandleTest {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void failure_method_secondFailureInToString_runtimeException(HibernateAccessorFactory factory) throws Exception {
+	void failure_method_secondFailureInToString_runtimeException(AccessorFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
 		setAccessible( method );
 
-		HibernateAccessorValueReader<?> valueReadHandle = factory.valueReader( method );
+		ValueReader<?> valueReadHandle = factory.valueReader( method );
 
 		SimulatedRuntimeException toStringRuntimeException = new SimulatedRuntimeException( "toString" );
 		EntityType entity = new EntityType( () -> {
@@ -150,24 +150,24 @@ class ValueReadHandleTest {
 				.isInstanceOfAny( SimulatedRuntimeException.class, RuntimeException.class );
 	}
 
-	private void testFieldValueReadHandleSuccess(HibernateAccessorFactory factory, String fieldName)
+	private void testFieldValueReadHandleSuccess(AccessorFactory factory, String fieldName)
 			throws IllegalAccessException, NoSuchFieldException {
 		String expectedValue = fieldName + "Value";
 		Field field = EntityType.class.getDeclaredField( fieldName );
 		setAccessible( field );
 
-		HibernateAccessorValueReader<?> valueReadHandle = factory.valueReader( field );
+		ValueReader<?> valueReadHandle = factory.valueReader( field );
 
 		assertThat( valueReadHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 	}
 
-	private void testMethodValueReadHandleSuccess(HibernateAccessorFactory factory, String methodName)
+	private void testMethodValueReadHandleSuccess(AccessorFactory factory, String methodName)
 			throws IllegalAccessException, NoSuchMethodException {
 		String expectedValue = methodName + "Value";
 		Method method = EntityType.class.getDeclaredMethod( methodName );
 		setAccessible( method );
 
-		HibernateAccessorValueReader<?> valueReadHandle = factory.valueReader( method );
+		ValueReader<?> valueReadHandle = factory.valueReader( method );
 		assertThat( valueReadHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 	}
 

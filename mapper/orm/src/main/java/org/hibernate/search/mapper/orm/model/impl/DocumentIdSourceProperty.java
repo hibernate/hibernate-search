@@ -4,13 +4,13 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 public class DocumentIdSourceProperty<I> {
 	public final Class<? super I> clazz;
 	public final String name;
-	public final HibernateAccessorValueReader<I> handle;
+	public final ValueReader<I> handle;
 
 	public DocumentIdSourceProperty(PojoPropertyModel<I> documentIdSourceProperty) {
 		this.clazz = documentIdSourceProperty.typeModel().rawType().typeIdentifier().javaClass();

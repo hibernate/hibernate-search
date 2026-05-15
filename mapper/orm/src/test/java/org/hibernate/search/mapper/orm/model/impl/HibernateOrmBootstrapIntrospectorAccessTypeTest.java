@@ -23,9 +23,9 @@ import jakarta.persistence.MapKeyClass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorValueReader;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,7 +35,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void entity_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void entity_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
 				valueHandleFactory, EntityWithDefaultFieldAccess.class );
 		testEntityWithDefaultFieldAccess( introspector );
@@ -43,7 +43,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void entity_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void entity_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
 				valueHandleFactory, EntityWithDefaultMethodAccess.class );
 		testEntityWithDefaultMethodAccess( introspector );
@@ -51,7 +51,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddedId_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddedId_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
 				valueHandleFactory, EntityWithEmbeddedIdWithDefaultFieldAccess.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
@@ -59,7 +59,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddedId_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddedId_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
 				valueHandleFactory, EntityWithEmbeddedIdWithDefaultMethodAccess.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
@@ -67,21 +67,21 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embedded_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embedded_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector( valueHandleFactory, EntityWithEmbedded.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embedded_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embedded_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector( valueHandleFactory, EntityWithEmbedded.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableElementCollection_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableElementCollection_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollection.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
@@ -89,7 +89,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableElementCollection_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableElementCollection_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollection.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
@@ -97,7 +97,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableAssociationMapKey_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableAssociationMapKey_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapKey.class, OtherEntity.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
@@ -105,7 +105,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableAssociationMapKey_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableAssociationMapKey_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapKey.class, OtherEntity.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
@@ -113,7 +113,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableAssociationMapValue_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableAssociationMapValue_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapValue.class, OtherEntity.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
@@ -121,7 +121,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableAssociationMapValue_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableAssociationMapValue_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapValue.class, OtherEntity.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
@@ -129,7 +129,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableElementCollectionMapKey_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableElementCollectionMapKey_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapKey.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
@@ -137,7 +137,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableElementCollectionMapKey_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableElementCollectionMapKey_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapKey.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
@@ -145,7 +145,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableElementCollectionMapValue_defaultFieldAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableElementCollectionMapValue_defaultFieldAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapValue.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
@@ -153,7 +153,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")
 	@MethodSource("params")
-	void embeddableElementCollectionMapValue_defaultMethodAccess(HibernateAccessorFactory valueHandleFactory) {
+	void embeddableElementCollectionMapValue_defaultMethodAccess(AccessorFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
 				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapValue.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
@@ -169,7 +169,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		HibernateAccessorValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultFieldAccess" ).handle();
+		ValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.propertyWithDefaultFieldAccess );
 		valueReadHandle = typeModel.property( "idWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.idWithDefaultFieldAccess );
@@ -187,7 +187,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		HibernateAccessorValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultMethodAccess" ).handle();
+		ValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.getPropertyWithDefaultMethodAccess() );
 		valueReadHandle = typeModel.property( "idWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.getIdWithDefaultMethodAccess() );
@@ -205,7 +205,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		HibernateAccessorValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultFieldAccess" ).handle();
+		ValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.propertyWithDefaultFieldAccess );
 		valueReadHandle = typeModel.property( "propertyWithNonDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.getPropertyWithNonDefaultMethodAccess() );
@@ -233,7 +233,7 @@ class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		HibernateAccessorValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultMethodAccess" ).handle();
+		ValueReader<?> valueReadHandle = typeModel.property( "propertyWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.getPropertyWithDefaultMethodAccess() );
 		valueReadHandle = typeModel.property( "propertyWithNonDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.propertyWithNonDefaultFieldAccess );

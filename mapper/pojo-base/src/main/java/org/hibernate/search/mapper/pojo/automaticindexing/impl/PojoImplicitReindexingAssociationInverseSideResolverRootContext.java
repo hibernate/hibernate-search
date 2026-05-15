@@ -23,7 +23,7 @@ public interface PojoImplicitReindexingAssociationInverseSideResolverRootContext
 	 * or ignores it so that the property is skipped.
 	 *
 	 * @param exception A {@link RuntimeException} thrown while accessing a property.
-	 * @see org.hibernate.accessor.HibernateAccessorValueReader#get(Object)
+	 * @see org.hibernate.accessor.ValueReader#get(Object)
 	 */
 	void propagateOrIgnorePropertyAccessException(RuntimeException exception);
 
