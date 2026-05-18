@@ -377,10 +377,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public PojoTypeIndexingPlan currentIndexingPlanIfTypeIncluded(
-			SharedSessionContractImplementor sessionImplementor,
+			SharedSessionContractImplementor session,
 			PojoRawTypeIdentifier<?> typeIdentifier) {
 		try {
-			SessionImplementor session = (SessionImplementor) sessionImplementor;
 			HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
 			if ( searchSession != null ) {
 				// If the session exist, rely on the session-level filter
@@ -403,7 +402,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			}
 		}
 		catch (PersistenceException e) {
-			throw OrmMiscLog.INSTANCE.unsupportedSessionType( sessionImplementor.getClass() );
+			throw OrmMiscLog.INSTANCE.unsupportedSessionType( session.getClass() );
 		}
 	}
 
@@ -464,7 +463,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public HibernateOrmSearchSession.Builder createSessionBuilder(
-			SessionImplementor sessionImplementor) {
+			SharedSessionContractImplementor sessionImplementor) {
 		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
 
 		if ( !givenSessionFactory.equals( sessionFactory ) ) {

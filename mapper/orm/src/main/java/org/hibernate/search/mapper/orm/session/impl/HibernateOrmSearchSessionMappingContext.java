@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.TypedSearchScopeImpl;
@@ -26,7 +26,7 @@ public interface HibernateOrmSearchSessionMappingContext
 			Collection<String> entityNames);
 
 	HibernateOrmSearchSession.Builder createSessionBuilder(
-			SessionImplementor sessionImplementor);
+			SharedSessionContractImplementor sessionImplementor);
 
 	ConfiguredSearchIndexingPlanFilter applicationIndexingPlanFilter();
 

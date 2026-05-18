@@ -16,6 +16,7 @@ import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.TransactionCompletionCallbacks;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
@@ -66,7 +67,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
-			SessionImplementor sessionImplementor) {
+			SharedSessionContractImplementor sessionImplementor) {
 		return get( context, sessionImplementor, true );
 	}
 
@@ -75,14 +76,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
-			SessionImplementor sessionImplementor, boolean createIfDoesNotExist) {
-		HibernateOrmSearchSessionHolder holder =
-				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
-		if ( holder == null ) {
-			// Can only happen if createIfDoesNotExist is false
-			return null;
-		}
-		HibernateOrmSearchSession searchSession = holder.searchSession();
+			SharedSessionContractImplementor sessionImplementor, boolean createIfDoesNotExist) {
+		HibernateOrmSearchSessionExtension extension = HibernateOrmSearchSessionExtension.get( sessionImplementor );
+		HibernateOrmSearchSession searchSession = extension.searchSession();
 		if ( searchSession != null ) {
 			return searchSession;
 		}
@@ -91,14 +87,19 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return null;
 		}
 
-		searchSession = context.createSessionBuilder( sessionImplementor ).build();
-		holder.searchSession( searchSession );
-		return searchSession;
+		if ( sessionImplementor instanceof SessionImplementor implementor ) {
+			searchSession = context.createSessionBuilder( implementor ).build();
+			extension.searchSession( searchSession );
+			return searchSession;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.unsupportedSessionType( sessionImplementor.getClass() );
+		}
 	}
 
 	private final HibernateOrmSearchSessionMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-	private final SessionImplementor sessionImplementor;
+	private final SharedSessionContractImplementor sessionImplementor;
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
 	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
 	private ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter;
@@ -205,12 +206,32 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public EntityManager toEntityManager() {
-		return sessionImplementor;
+		if ( sessionImplementor instanceof EntityManager entityManager ) {
+			return entityManager;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( EntityManager.class );
+		}
 	}
 
 	@Override
 	public Session toOrmSession() {
-		return sessionImplementor;
+		if ( sessionImplementor instanceof Session session ) {
+			return session;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( Session.class );
+		}
+	}
+
+	@Override
+	public SessionImplementor session() {
+		if ( sessionImplementor instanceof SessionImplementor session ) {
+			return session;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( SessionImplementor.class );
+		}
 	}
 
 	@Override
@@ -255,11 +276,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SessionImplementor session() {
-		return sessionImplementor;
-	}
-
-	@Override
 	public EntityReferenceFactory entityReferenceFactory() {
 		return mappingContext.entityReferenceFactory();
 	}
@@ -276,9 +292,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public PojoIndexingPlan currentIndexingPlan(boolean createIfDoesNotExist) {
-		HibernateOrmSearchSessionHolder holder =
-				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
-		if ( holder == null ) {
+		HibernateOrmSearchSessionExtension extension =
+				HibernateOrmSearchSessionExtension.get( sessionImplementor );
+		if ( extension.searchSession() == null ) {
 			// Can only happen if createIfDoesNotExist is false
 			return null;
 		}
@@ -291,7 +307,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			transactionIdentifier = null;
 		}
 
-		PojoIndexingPlan plan = holder.pojoIndexingPlan( transactionIdentifier );
+		PojoIndexingPlan plan = extension.pojoIndexingPlan( transactionIdentifier );
 		if ( plan != null ) {
 			return plan;
 		}
@@ -303,11 +319,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		ConfiguredIndexingPlanSynchronizationStrategy currentSynchronizationStrategy =
 				indexingPlanSynchronizationStrategy;
 		plan = automaticIndexingStrategy.createIndexingPlan( this, currentSynchronizationStrategy );
-		holder.pojoIndexingPlan( transactionIdentifier, plan );
+		extension.pojoIndexingPlan( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			Synchronization txSync = automaticIndexingStrategy.createTransactionWorkQueueSynchronization(
-					plan, holder, transactionIdentifier,
+					plan, extension, transactionIdentifier,
 					currentSynchronizationStrategy
 			);
 			registerSynchronization( sessionImplementor, txSync );
@@ -334,7 +350,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return new HibernateOrmSelectionLoadingContext.Builder( mappingContext, this );
 	}
 
-	private void registerSynchronization(SessionImplementor sessionImplementor, Synchronization synchronization) {
+	private void registerSynchronization(SharedSessionContractImplementor sessionImplementor, Synchronization synchronization) {
 		//use {Before|After}TransactionCompletionProcess instead of registerSynchronization because it does not
 		//swallow transactions.
 		/*
@@ -365,14 +381,14 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		completionCallbacks.registerCallback( (AfterTransactionCompletionProcess) adapter );
 	}
 
-	private boolean isLocalTransaction(SessionImplementor sessionImplementor) {
+	private boolean isLocalTransaction(SharedSessionContractImplementor sessionImplementor) {
 		return !sessionImplementor
 				.getTransactionCoordinator()
 				.getTransactionCoordinatorBuilder()
 				.isJta();
 	}
 
-	private static void checkOpen(SessionImplementor session) {
+	private static void checkOpen(SharedSessionContractImplementor session) {
 		try {
 			session.checkOpen();
 		}
@@ -385,12 +401,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		private final HibernateOrmSearchSessionMappingContext mappingContext;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 		private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
-		private final SessionImplementor sessionImplementor;
+		private final SharedSessionContractImplementor sessionImplementor;
 
 		public Builder(HibernateOrmSearchSessionMappingContext mappingContext,
 				HibernateOrmSessionTypeContextProvider typeContextProvider,
 				ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy,
-				SessionImplementor sessionImplementor) {
+				SharedSessionContractImplementor sessionImplementor) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.automaticIndexingStrategy = automaticIndexingStrategy;
