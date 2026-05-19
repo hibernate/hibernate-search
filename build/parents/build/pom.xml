@@ -168,7 +168,7 @@
         <version.org.mariadb.jdbc>3.5.8</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.7.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.4.0</version.com.ibm.db2.jcc>
-        <version.com.oracle.database.jdbc>23.26.1.0.0</version.com.oracle.database.jdbc>
+        <version.com.oracle.database.jdbc>23.26.2.0.0</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>13.4.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
@@ -187,7 +187,7 @@
         <version.org.springframework.boot>4.0.1</version.org.springframework.boot>
         <!-- Spring Boot 3 JTA starter and related libs version: -->
         <version.dev.snowdrop>4.0.0</version.dev.snowdrop>
-        <version.io.agroal>3.1</version.io.agroal>
+        <version.io.agroal>3.1.2</version.io.agroal>
 
         <version.jsoup>1.22.2</version.jsoup>
         <version.snakeyaml>2.6</version.snakeyaml>
