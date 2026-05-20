@@ -131,7 +131,7 @@ See <<search-dsl>> for details.
 |<<coordination-outbox-polling-schema,Extra tables>>
 
 .2+|[[listener-triggered-indexing-possible-limitations]]Limitations
-3+|Listener-triggered indexing ignores: <<limitations-changes-in-session,JPQL/SQL queries>>, <<limitations-changes-asymmetric-association-updates,asymmetric association updates>>
+3+|Listener-triggered indexing ignores: <<limitations-changes-in-session,JPQL/SQL queries>>, <<limitations-changes-asymmetric-association-updates,asymmetric association updates>>; <<limitations-stateless-session,does not work with `StatelessSession`>>
 2+d|Out-of-sync indexes in rare situations: <<limitations-parallel-embedded-update,concurrent `@IndexedEmbedded`>>, <<limitations-backend-indexing-error,backend I/O errors>>
 |No other known limitation
 |===

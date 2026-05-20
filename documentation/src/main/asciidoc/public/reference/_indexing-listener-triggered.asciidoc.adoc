@@ -93,6 +93,7 @@ calls to `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
 
 This works great for most applications, but you need to consider some limitations:
 
+* <<limitations-stateless-session>>
 * <<limitations-changes-in-session>>
 * <<limitations-changes-asymmetric-association-updates>>
 
