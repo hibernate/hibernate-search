@@ -210,7 +210,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return entityManager;
 		}
 		else {
-			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( EntityManager.class );
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( sessionImplementor.getClass(), EntityManager.class );
 		}
 	}
 
@@ -220,7 +220,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return session;
 		}
 		else {
-			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( Session.class );
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( sessionImplementor.getClass(), Session.class );
 		}
 	}
 
@@ -230,7 +230,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return session;
 		}
 		else {
-			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( SessionImplementor.class );
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( sessionImplementor.getClass(), SessionImplementor.class );
 		}
 	}
 

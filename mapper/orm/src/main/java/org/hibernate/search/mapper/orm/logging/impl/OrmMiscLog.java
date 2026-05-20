@@ -166,6 +166,7 @@ public interface OrmMiscLog {
 	SearchException unsupportedSessionType(@FormatWith(ClassFormatter.class) Class<?> session);
 
 	@Message(id = ID_OFFSET + 144,
-			value = "Hibernate Search cannot convert the underlying Hibernate ORM session to %s")
-	SearchException sessionImplementorIsNot(@FormatWith(ClassFormatter.class) Class<?> session);
+			value = "Hibernate Search cannot convert the underlying Hibernate ORM session of type %1$s to %2$s")
+	SearchException sessionImplementorIsNot(@FormatWith(ClassFormatter.class) Class<?> actualType,
+			@FormatWith(ClassFormatter.class) Class<?> expectedType);
 }
