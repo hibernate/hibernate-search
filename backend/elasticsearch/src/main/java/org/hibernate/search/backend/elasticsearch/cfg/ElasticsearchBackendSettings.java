@@ -355,14 +355,18 @@ public final class ElasticsearchBackendSettings {
 	 */
 	public static final String QUERY_SHARD_FAILURE_IGNORE = "query.shard_failure.ignore";
 
-	/// Specifies which client factory to use when creating a REST client for the backend
-	/// to communicate with the Elasticsearch cluster.
+	/// Specifies which client factory to use when creating a REST client for the backend to communicate with the
+	/// Elasticsearch cluster.
 	///
 	/// One of the following values can be provided:
 	/// * `jdk-rest`, no additional requirements.
-	/// * `elasticsearch-rest`, current default, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
-	/// * `elasticsearch-rest5`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
-	/// * `opensearch-rest`, requires that the `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the classpath.
+	/// * `elasticsearch-rest`, current default, requires that the
+	///   `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
+	/// * `elasticsearch-rest5`, requires that the
+	///   `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
+	/// * `opensearch-rest`, requires that the
+	///   `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the
+	///   classpath.
 	///
 	/// Defaults to [Defaults#CLIENT_FACTORY].
 	@Incubating
