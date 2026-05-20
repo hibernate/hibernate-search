@@ -15,7 +15,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +58,8 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 	private static final int MAX_RETRIES = 5;
 	private static final int RETRY_DELAY_SECONDS = 2;
 	private static final String GAV_FORMAT = "%s:%s:%s";
+	private static final String CACHE_DIR = ".cache/enforcer";
+	private static final String CACHE_FILE_NAME = "dependency-management-includes-all.json";
 
 
 	// Inject needed Maven components
@@ -124,15 +131,32 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		final Gson gson = new GsonBuilder().create();
 		Set<Artifact> foundArtifacts = new TreeSet<>();
 
-		StatusSummary mavenStatus = fetch( gson, MAVEN_STATUS_URL, StatusSummary.class, StatusSummary::empty );
+		String inputHash = computeInputHash( toQuery, dependencies, include );
+		Path cacheFile = session.getCurrentProject().getBasedir().toPath()
+				.resolve( CACHE_DIR )
+				.resolve( CACHE_FILE_NAME );
+		CacheData cachedData = loadCache( cacheFile, gson );
 
-		if ( mavenStatus.isSearchAvailable() ) {
-			for ( Artifact filter : toQuery ) {
-				mavenCentralSolrSearch( filter, gson, foundArtifacts );
+		if ( cachedData != null && inputHash.equals( cachedData.inputHash() ) ) {
+			getLog().info( "Dependencies unchanged, using cached Maven Central results from " + cacheFile );
+			for ( String gav : cachedData.foundArtifacts() ) {
+				String[] parts = gav.split( ":" );
+				foundArtifacts.add( new Artifact( parts[0], parts[1], parts[2] ) );
 			}
 		}
 		else {
-			getLog().warn( "maven.search.org is down. Skipping search of artifacts. Check incomplete." );
+			StatusSummary mavenStatus = fetch( gson, MAVEN_STATUS_URL, StatusSummary.class, StatusSummary::empty );
+
+			if ( mavenStatus.isSearchAvailable() ) {
+				for ( Artifact filter : toQuery ) {
+					mavenCentralSolrSearch( filter, gson, foundArtifacts );
+				}
+			}
+			else {
+				getLog().warn( "maven.search.org is down. Skipping search of artifacts. Check incomplete." );
+			}
+
+			writeCache( cacheFile, gson, inputHash, foundArtifacts );
 		}
 
 		List<String> problems = new ArrayList<>();
@@ -155,6 +179,60 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 		if ( !problems.isEmpty() ) {
 			throw new EnforcerRuleException(
 					String.join( ";\n", problems ) + "\nPossible example to include:\n" + dependencyString );
+		}
+	}
+
+	private String computeInputHash(Set<Artifact> toQuery, Set<String> dependencies, Set<String> include) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance( "SHA-256" );
+			new TreeSet<>( toQuery ).forEach( a -> digestEntry( digest, a.formattedString() ) );
+			new TreeSet<>( dependencies ).forEach( s -> digestEntry( digest, s ) );
+			new TreeSet<>( include ).forEach( s -> digestEntry( digest, s ) );
+			dependenciesToSkip.stream()
+					.map( DependencyManagementIncludesAllGroupIdArtifactsRule::dependencyString )
+					.sorted()
+					.forEach( s -> digestEntry( digest, s ) );
+			return HexFormat.of().formatHex( digest.digest() );
+		}
+		catch (NoSuchAlgorithmException e) {
+			getLog().warn( "SHA-256 not available, skipping cache" );
+			return "";
+		}
+	}
+
+	private static void digestEntry(MessageDigest digest, String value) {
+		digest.update( value.getBytes( StandardCharsets.UTF_8 ) );
+		digest.update( (byte) 0 );
+	}
+
+	private CacheData loadCache(Path cacheFile, Gson gson) {
+		try {
+			if ( Files.exists( cacheFile ) ) {
+				String json = Files.readString( cacheFile );
+				return gson.fromJson( json, CacheData.class );
+			}
+		}
+		catch (IOException | RuntimeException e) {
+			getLog().warn( "Failed to read enforcer cache, will re-fetch: " + e.getMessage() );
+		}
+		return null;
+	}
+
+	private void writeCache(Path cacheFile, Gson gson, String inputHash, Set<Artifact> foundArtifacts) {
+		try {
+			Files.createDirectories( cacheFile.getParent() );
+			CacheData data = new CacheData(
+					inputHash,
+					foundArtifacts.stream()
+							.map( Artifact::formattedString )
+							.sorted()
+							.collect( Collectors.toList() )
+			);
+			Files.writeString( cacheFile, gson.toJson( data ) );
+			getLog().info( "Enforcer cache written to " + cacheFile );
+		}
+		catch (IOException e) {
+			getLog().warn( "Failed to write enforcer cache: " + e.getMessage() );
 		}
 	}
 
@@ -363,6 +441,9 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 			res.response.docs = List.of();
 			return res;
 		}
+	}
+
+	private record CacheData(String inputHash, List<String> foundArtifacts) {
 	}
 
 	public static class ResponseData {
