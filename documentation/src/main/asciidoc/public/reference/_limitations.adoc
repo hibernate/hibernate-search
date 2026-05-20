@@ -195,6 +195,41 @@ would also solve the problem.
 This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3513],
 but is long-term goal.
 
+[[limitations-stateless-session]]
+== Listener-triggered indexing does not work with `StatelessSession`
+
+[[limitations-stateless-session-description]]
+=== Description
+
+Hibernate Search's <<listener-triggered-indexing,listener-triggered indexing>> does not support
+Hibernate ORM's `StatelessSession`.
+
+If an application persists or updates <<mapping-entityindexmapping,indexed entities>> through a `StatelessSession`,
+Hibernate Search will throw an exception.
+
+Non-indexed entities can be persisted through a `StatelessSession` without any issues,
+even if Hibernate Search is enabled.
+
+[[limitations-stateless-session-solution]]
+=== Solutions and workarounds
+
+If you need to use a `StatelessSession` to persist or update indexed entities,
+you can disable the <<indexing-automatic-configuration,listener-triggered indexing>>:
+
+* Globally, by setting the configuration property
+`hibernate.search.indexing.listeners.enabled` to `false`.
+* For a specific session, by <<indexing-plan-filter,configuring an indexing plan filter>>.
+
+You will then need to index these entities explicitly,
+either using the <<indexing-massindexer,`MassIndexer`>>,
+using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
+or <<indexing-explicit,explicitly through a `SearchIndexingPlan`>>.
+
+[[limitations-stateless-session-roadmap]]
+=== Roadmap
+
+Hibernate ORM's stateless session compatibility is planned for a future version of Hibernate Search.
+
 [[limitations-indexing-plan-serialization]]
 == Listener-triggered indexing is not compatible with `Session` serialization
 
