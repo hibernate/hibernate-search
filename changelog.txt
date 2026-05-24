@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+8.3.2.Final (2026-05-24)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/39106
+
+
+** Improvement
+    * HSEARCH-5629 Use Maven 3.9.16 as a required minimum version for the build
+
 8.3.1.Final (2026-05-11)
 -------------------------
 
