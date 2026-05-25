@@ -237,7 +237,7 @@ pipeline {
                                 checkout scmGit(
                                         branches: [[name: '*/production']],
                                         extensions: [],
-                                        userRemoteConfigs: [[credentialsId: 'ed25519.Hibernate-CI.github.com', url: 'https://github.com/hibernate/hibernate.org.git']]
+                                        userRemoteConfigs: [[credentialsId: 'ed25519.Hibernate-CI.github.com', url: 'git@github.com:hibernate/hibernate.org.git']]
                                 )
                                 sh "../scripts/website-release.sh ${env.SCRIPT_OPTIONS} ${env.PROJECT} ${env.RELEASE_VERSION}"
                             }
