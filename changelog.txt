@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+8.4.0.Final (2026-05-27)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HSEARCH/versions/39072
+
+
+** Improvement
+    * HSEARCH-5630 Update to Hibernate ORM 7.4.0.Final
+    * HSEARCH-5629 Use Maven 3.9.16 as a required minimum version for the build
+    * HSEARCH-5627 Switch from the Search session holder to a Hibernate ORM session extension
+    * HSEARCH-5626 Update Elasticsearch client (elasticsearch-rest-client) to 9.4.1
+    * HSEARCH-5625 Test against latest Elasticsearch 9.4.1
+    * HSEARCH-5624 Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.1
+
 8.4.0.CR1 (2026-05-11)
 -------------------------
 
