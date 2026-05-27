@@ -17,16 +17,10 @@
 :version-selector-enabled: true
 :stem: latexmath
 
-This release is here to provide the Hibernate ORM 7.4 compatibility.
+This release is here to provide the Hibernate ORM 8.0 compatibility.
 
 == Dependency upgrades
 
 [[orm-version]]
 Hibernate ORM::
-Hibernate Search targets the Hibernate ORM 7.4 series.
-[[elasticsearch-version]]
-Elasticsearch::
-The Elasticsearch backend works with Elasticsearch 9.4, as well as other already compatible versions.
-[[opensearch-version]]
-OpenSearch::
-The Elasticsearch backend works with OpenSearch 3.6, as well as other already compatible versions.
+Hibernate Search targets the Hibernate ORM 8.0 series.

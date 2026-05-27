@@ -44,32 +44,8 @@ and only then to later versions (which will be significantly easier).
 [[requirements]]
 == Requirements
 
-[[requirements-orm]]
-=== Hibernate ORM
-
-Hibernate Search {hibernateSearchVersion} ORM mapper now targets Hibernate ORM 7.4.
-
-You will need to upgrade Hibernate ORM to 7.4.x when upgrading to Hibernate Search {hibernateSearchVersion}.
-Or you can use one of the Hibernate Search platform BOMs
-to keep dependency versions aligned automatically:
-
-[source, xml, subs="+attributes"]
-----
-<dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-platform-bom</artifactId>
-            <version>{hibernateSearchVersion}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
-----
-
-See link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#compatibility-search-dependencies-platform[Hibernate Search Platform]
-for more details.
+The requirements of Hibernate Search {hibernateSearchVersion}
+are the same as those of Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[artifact-changes]]
 == Artifacts
@@ -121,15 +97,3 @@ is, in general, backward-compatible with Hibernate Search {hibernateSearchPrevio
 
 The behavior of Hibernate Search {hibernateSearchVersion}
 is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-[[behavior-stateless-session]]
-=== `StatelessSession` usage with indexed entities now throws an explicit exception
-
-Hibernate Search now explicitly detects when
-link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#limitations-stateless-session[listener-triggered indexing]
-is used with a `StatelessSession` and throws an exception.
-
-Previously, this scenario could lead to confusing errors or silently incorrect behavior.
-
-If you need to use a `StatelessSession` to persist or update indexed entities,
-see the link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#limitations-stateless-session-solution[workarounds documented in the reference guide].
