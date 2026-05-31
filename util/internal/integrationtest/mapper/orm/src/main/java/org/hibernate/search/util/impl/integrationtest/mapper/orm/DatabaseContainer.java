@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
@@ -13,6 +15,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.script.ScriptException;
 
@@ -28,7 +32,7 @@ import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.ext.ScriptUtils;
-import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.DockerImageName;
 
 /*
  * Suppress "Resource leak: '<unassigned Closeable value>' is never closed". Testcontainers take care of closing
@@ -53,8 +57,7 @@ public final class DatabaseContainer {
 		DATABASE = SupportedDatabase.from( name );
 
 		DATABASE_CONTAINER = DATABASE.container(
-				containers.resolve( "database" ).resolve( name + ".Dockerfile" ),
-				name
+				containers.resolve( "database" ).resolve( name + ".Dockerfile" )
 		);
 	}
 
@@ -85,6 +88,33 @@ public final class DatabaseContainer {
 		}
 	}
 
+	static DockerImageName parseDockerImageName(Path dockerfile) {
+		try {
+			final Pattern DOCKERFILE_FROM_LINE_PATTERN = Pattern.compile( "FROM ([^@:\\s]+)(?::([^@\\s]+))?(@.+)?" );
+			return Files.lines( dockerfile )
+					.map( DOCKERFILE_FROM_LINE_PATTERN::matcher )
+					.filter( Matcher::matches )
+					.map( matcher -> {
+						String name = matcher.group( 1 );
+						String maybeTag = matcher.group( 2 );
+						String maybeHash = matcher.group( 3 );
+
+						if ( maybeHash == null ) {
+							return DockerImageName.parse( name ).withTag( maybeTag );
+						}
+						else {
+							return DockerImageName.parse( name + maybeHash );
+						}
+					} )
+					.findAny().orElseThrow( () -> new IllegalStateException(
+							"Dockerfile " + dockerfile
+									+ " has unexpected structure. It *must* contain a single FROM line." ) );
+		}
+		catch (IOException e) {
+			throw new IllegalStateException( "Unable to read Dockerfile " + dockerfile, e );
+		}
+	}
+
 	public enum SupportedDatabase {
 		H2 {
 			@Override
@@ -110,7 +140,7 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return null;
 			}
 		},
@@ -121,9 +151,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"org.postgresql.Driver",
 						"jdbc:postgresql://%s:%d/hibernate_orm_test",
 						5432,
@@ -145,9 +175,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"org.mariadb.jdbc.Driver",
 						"jdbc:mariadb://%s:%d/hibernate_orm_test",
 						3306,
@@ -169,9 +199,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"com.mysql.jdbc.Driver",
 						"jdbc:mysql://%s:%d/hibernate_orm_test",
 						3306,
@@ -193,10 +223,10 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"com.ibm.db2.jcc.DB2Driver",
 						"jdbc:db2://%s:%d/hreact:sslConnection=false;",
 						50000,
@@ -228,9 +258,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"oracle.jdbc.OracleDriver",
 						"jdbc:oracle:thin:@%s:%d/FREEPDB1",
 						1521,
@@ -250,9 +280,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"com.microsoft.sqlserver.jdbc.SQLServerDriver",
 						"jdbc:sqlserver://%s:%d;databaseName=tempdb;encrypt=true;trustServerCertificate=true;",
 						1433,
@@ -271,9 +301,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name) {
+			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						dockerfile, name,
+						parseDockerImageName( dockerfile ),
 						"org.postgresql.Driver",
 						"jdbc:postgresql://%s:%d/defaultdb?sslmode=disable",
 						26257,
@@ -337,7 +367,7 @@ public final class DatabaseContainer {
 
 		abstract String dialect();
 
-		abstract HibernateSearchJdbcDatabaseContainer container(Path dockerfile, String name);
+		abstract HibernateSearchJdbcDatabaseContainer container(Path dockerfile);
 
 		static SupportedDatabase from(String name) {
 			for ( SupportedDatabase database : values() ) {
@@ -360,17 +390,17 @@ public final class DatabaseContainer {
 		private final String testQueryString;
 		private final Optional<WaitStrategy> customWaitStrategy;
 
-		public HibernateSearchJdbcDatabaseContainer(Path dockerfile, String name, String driverClassName, String jdbcUrlPattern,
+		public HibernateSearchJdbcDatabaseContainer(DockerImageName dockerImageName, String driverClassName,
+				String jdbcUrlPattern,
 				int port, String username, String password, String testQueryString) {
-			this( dockerfile, name, driverClassName, jdbcUrlPattern, port, username, password, testQueryString, null );
+			this( dockerImageName, driverClassName, jdbcUrlPattern, port, username, password, testQueryString, null );
 		}
 
-		public HibernateSearchJdbcDatabaseContainer(Path dockerfile, String name, String driverClassName, String jdbcUrlPattern,
+		public HibernateSearchJdbcDatabaseContainer(DockerImageName dockerImageName, String driverClassName,
+				String jdbcUrlPattern,
 				int port, String username, String password, String testQueryString, WaitStrategy waitStrategy,
 				Integer... additionalExposedPorts) {
-			// IMPORTANT: we do not want to delete the image on exit as then we cannot use container reuse.
-			// (these two options are somewhat mutually exclusive).
-			super( new ImageFromDockerfile( "hibernate-search-" + name, false ).withDockerfile( dockerfile ) );
+			super( dockerImageName );
 			this.driverClassName = driverClassName;
 			this.jdbcUrlPattern = jdbcUrlPattern;
 			this.port = port;
