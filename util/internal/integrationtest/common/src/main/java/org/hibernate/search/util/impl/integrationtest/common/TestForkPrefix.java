@@ -18,8 +18,6 @@ public final class TestForkPrefix {
 			parallelForks = true;
 		}
 
-		// TODO drop test.parallel.modules.enabled once the bytecode enhancement engine supports forkCount>1
-		//  for ORM modules — at that point forkCount alone will be sufficient for fork isolation.
 		boolean parallelModules = Boolean.parseBoolean(
 				System.getProperty( "test.parallel.modules.enabled", "false" ) );
 
@@ -30,7 +28,13 @@ public final class TestForkPrefix {
 			throw new IllegalStateException( "Test Fork number must be specified." );
 		}
 
-		PREFIX = needsIsolation ? "fork_" + forkNumber + "_" : "";
+		String moduleId = System.getProperty( "test.module.id", "" );
+		// Use a hash of the module artifactId to keep the prefix short.
+		// PostgreSQL limits database names to 63 characters; full artifactIds easily exceed that.
+		String modulePrefix = moduleId.isEmpty()
+				? ""
+				: Integer.toHexString( moduleId.hashCode() & 0x7fffffff ) + "_";
+		PREFIX = needsIsolation ? modulePrefix + "fork_" + forkNumber + "_" : "";
 	}
 
 	private static boolean isNumber(String maybeNumber) {

@@ -14,8 +14,6 @@
 
     <properties>
         <surefire.module>coord-outbox</surefire.module>
-        <!-- bytecode enhanced tests cannot run in parallel for now and require a fix in the engine. -->
-        <test.parallel.forkCount>1</test.parallel.forkCount>
     </properties>
 
     <dependencies>

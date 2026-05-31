@@ -1321,6 +1321,7 @@
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
                             <test.fork.count>${test.parallel.forkCount}</test.fork.count>
                             <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
+                            <test.module.id>${project.artifactId}</test.module.id>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1349,6 +1350,7 @@
                             <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
                             <test.fork.count>${test.parallel.forkCount}</test.fork.count>
                             <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
+                            <test.module.id>${project.artifactId}</test.module.id>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
