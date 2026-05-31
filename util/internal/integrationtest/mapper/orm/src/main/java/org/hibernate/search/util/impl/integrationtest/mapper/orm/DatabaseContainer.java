@@ -193,7 +193,10 @@ public final class DatabaseContainer {
 						"hibernate_orm_test",
 						"hibernate_orm_test",
 						"select 1"
-				).withCommand( "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci" )
+				).withCommand( "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+						+ " --innodb-flush-log-at-trx-commit=0"
+						+ " --innodb-doublewrite=0"
+						+ " --performance-schema=OFF" )
 						.withEnv( "MYSQL_USER", "hibernate_orm_test" )
 						.withEnv( "MYSQL_PASSWORD", "hibernate_orm_test" )
 						.withEnv( "MYSQL_DATABASE", "hibernate_orm_test" )
@@ -217,7 +220,10 @@ public final class DatabaseContainer {
 						"hibernate_orm_test",
 						"hibernate_orm_test",
 						"select 1"
-				).withCommand( "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci" )
+				).withCommand( "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+						+ " --innodb-flush-log-at-trx-commit=0"
+						+ " --innodb-doublewrite=0"
+						+ " --performance-schema=OFF" )
 						.withEnv( "MYSQL_USER", "hibernate_orm_test" )
 						.withEnv( "MYSQL_PASSWORD", "hibernate_orm_test" )
 						.withEnv( "MYSQL_DATABASE", "hibernate_orm_test" )
