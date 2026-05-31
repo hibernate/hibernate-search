@@ -323,15 +323,24 @@ public final class DatabaseContainer {
 							// see https://www.cockroachlabs.com/docs/stable/configure-replication-zones#replication-zone-variables
 							// Smaller values can save disk space and improve performance if values are frequently overwritten or for queue-like workloads
 							ScriptUtils.executeDatabaseScript( getDatabaseDelegate(), null,
+									// Aggressive MVCC GC for test workloads:
 									"ALTER DATABASE defaultdb CONFIGURE ZONE USING gc.ttlseconds = 60;\n"
-											+ "ALTER RANGE default CONFIGURE ZONE USING gc.ttlseconds = 60;"
+											+ "ALTER RANGE default CONFIGURE ZONE USING gc.ttlseconds = 60;\n"
+							// Disable background work unnecessary for a single-node test instance:
+											+ "SET CLUSTER SETTING sql.stats.automatic_collection.enabled = false;\n"
+											+ "SET CLUSTER SETTING sql.stats.flush.interval = '0s';\n"
+											+ "SET CLUSTER SETTING diagnostics.reporting.enabled = false;\n"
+											+ "SET CLUSTER SETTING kv.range_merge.queue_enabled = false;\n"
+											+ "SET CLUSTER SETTING kv.rangefeed.enabled = false;\n"
+											+ "SET CLUSTER SETTING jobs.retention_time = '1m';"
 							);
 						}
 						catch (ScriptException e) {
 							throw new AssertionFailure( "Cannot start an instance of CockroachDB", e );
 						}
 					}
-				}.withCommand( "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost" )
+				}.withCommand( "start-single-node --insecure --store=type=mem,size=0.25"
+						+ " --advertise-addr=localhost" )
 						.withStartupTimeout( EXTENDED_TIMEOUT )
 						.withCreateContainerCmdModifier( cmd -> {
 							HostConfig hostConfig = cmd.getHostConfig();
