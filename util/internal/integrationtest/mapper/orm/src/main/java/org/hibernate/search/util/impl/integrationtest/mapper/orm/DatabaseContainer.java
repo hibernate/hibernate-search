@@ -163,9 +163,18 @@ public final class DatabaseContainer {
 						new LogMessageWaitStrategy()
 								.withRegEx( ".*database system is ready to accept connections.*\\s" )
 								.withTimes( 2 )
+				).withCommand(
+						"postgres"
+								+ " -c fsync=off"
+								+ " -c full_page_writes=off"
+								+ " -c synchronous_commit=off"
+								+ " -c wal_level=minimal"
+								+ " -c max_wal_senders=0"
+								+ " -c checkpoint_timeout=60min"
 				).withEnv( "POSTGRES_USER", "hibernate_orm_test" )
 						.withEnv( "POSTGRES_PASSWORD", "hibernate_orm_test" )
-						.withEnv( "POSTGRES_DB", "hibernate_orm_test" );
+						.withEnv( "POSTGRES_DB", "hibernate_orm_test" )
+						.withTmpFs( Collections.singletonMap( "/var/lib/postgresql", "" ) );
 			}
 		},
 		MARIADB {
