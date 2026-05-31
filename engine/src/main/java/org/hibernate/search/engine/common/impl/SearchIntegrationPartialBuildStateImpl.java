@@ -115,6 +115,12 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public <PBM extends MappingPartialBuildState> PBM mappingPartialBuildState(MappingKey<PBM, ?> mappingKey) {
+		return (PBM) partiallyBuiltMappings.get( mappingKey );
+	}
+
+	@Override
 	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
 			ConfigurationPropertyChecker configurationPropertyChecker) {
 		return new SearchIntegrationFinalizerImpl(

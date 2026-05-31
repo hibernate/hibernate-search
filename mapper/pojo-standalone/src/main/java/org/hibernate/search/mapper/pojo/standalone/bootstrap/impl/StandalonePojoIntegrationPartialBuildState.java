@@ -17,6 +17,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingKey;
+import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingPartialBuildState;
 import org.hibernate.search.util.common.AssertionFailure;
 
 final class StandalonePojoIntegrationPartialBuildState {
@@ -56,6 +57,10 @@ final class StandalonePojoIntegrationPartialBuildState {
 		propertyCollector.accept( StandalonePojoMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE, this );
 	}
 
+	StandalonePojoMappingPartialBuildState mappingPartialBuildState() {
+		return integrationBuildState.mappingPartialBuildState( mappingKey );
+	}
+
 	BeanResolver beanResolver() {
 		return integrationBuildState.beanResolver();
 	}
@@ -64,7 +69,7 @@ final class StandalonePojoIntegrationPartialBuildState {
 			ConfigurationPropertyChecker propertyChecker) {
 		SearchIntegrationFinalizer finalizer = integrationBuildState.finalizer( propertySource, propertyChecker );
 
-		@SuppressWarnings("resource") // For the eclipse-compiler: complains on mapping not bing closed
+		@SuppressWarnings("resource") // For the eclipse-compiler: complains on mapping not being closed
 		StandalonePojoMapping mapping = finalizer.finalizeMapping(
 				mappingKey,
 				(context, partialMapping) -> partialMapping.finalizeMapping( context )

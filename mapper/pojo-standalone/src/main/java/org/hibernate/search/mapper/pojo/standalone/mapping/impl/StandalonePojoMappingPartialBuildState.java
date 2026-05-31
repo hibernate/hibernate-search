@@ -4,16 +4,21 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizationContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingDefaultCleanOperation;
+import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoPartialMapping;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
+import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 
-public class StandalonePojoMappingPartialBuildState implements MappingPartialBuildState {
+public class StandalonePojoMappingPartialBuildState implements MappingPartialBuildState, StandalonePojoPartialMapping {
 
 	private static final ConfigurationProperty<SchemaManagementStrategyName> SCHEMA_MANAGEMENT_STRATEGY =
 			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
@@ -36,11 +41,6 @@ public class StandalonePojoMappingPartialBuildState implements MappingPartialBui
 		this.typeContextContainer = typeContextContainer;
 	}
 
-	@Override
-	public void closeOnFailure() {
-		mappingDelegate.close();
-	}
-
 	public StandalonePojoMapping finalizeMapping(MappingFinalizationContext context) {
 		SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get(
 				context.configurationPropertySource() );
@@ -49,4 +49,18 @@ public class StandalonePojoMappingPartialBuildState implements MappingPartialBui
 				INDEXING_MASS_DEFAULT_CLEAN_OPERATION.get( context.configurationPropertySource() ) );
 	}
 
+	@Override
+	public Collection<SearchIndexedEntity<?>> allIndexedEntities() {
+		return Collections.unmodifiableCollection( typeContextContainer.allIndexed() );
+	}
+
+	@Override
+	public void closeOnFailure() {
+		mappingDelegate.close();
+	}
+
+	@Override
+	public void close() {
+		closeOnFailure();
+	}
 }
