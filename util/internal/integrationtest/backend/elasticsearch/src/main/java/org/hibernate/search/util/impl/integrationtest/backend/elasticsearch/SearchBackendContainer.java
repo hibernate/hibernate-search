@@ -5,9 +5,14 @@
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,8 +83,55 @@ public final class SearchBackendContainer {
 			synchronized (SEARCH_CONTAINER) {
 				if ( !SEARCH_CONTAINER.isRunning() ) {
 					SEARCH_CONTAINER.start();
+					applyTestIndexDefaults();
 				}
 			}
+		}
+	}
+
+	private static void applyTestIndexDefaults() {
+		String url = "http://" + SEARCH_CONTAINER.getHost()
+				+ ":" + SEARCH_CONTAINER.getMappedPort( 9200 )
+				+ "/_index_template/test-optimization-defaults";
+		// "index.translog.durability" -- don't wait for index operation to write ot translog, return faster
+		// "index.translog.sync_interval" -- the background writes happen less frequently
+		// "number_of_replicas" -- we need no replicas, so let's not waste resources on them
+		String body = """
+				{
+				"index_patterns": ["*"],
+				"priority": 0,
+				"template": {
+					"settings": {
+					"index.translog.durability": "async",
+					"index.translog.sync_interval": "120s",
+					"number_of_replicas": 0
+					}
+				}
+				}
+				""";
+		HttpClient client = HttpClient.newHttpClient();
+
+		// to let jdk 17 pass but actually close things on 21+
+		// need to cast to Object because of EJC
+		try ( var c = ( (Object) client ) instanceof AutoCloseable ac ? ac : null ) {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri( URI.create( url ) )
+					.header( "Content-Type", "application/json" )
+					.PUT( HttpRequest.BodyPublishers.ofString( body ) )
+					.build();
+			HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
+
+			if ( response.statusCode() >= 300 ) {
+				throw new IllegalStateException(
+						"Failed to apply test index template: HTTP " + response.statusCode() + " - " + response.body() );
+			}
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException( "Interrupted while waiting for a response from a search backend.", e );
+		}
+		catch (Exception e) {
+			throw new IllegalStateException( "Failed to apply test index template", e );
 		}
 	}
 
@@ -182,7 +234,8 @@ public final class SearchBackendContainer {
 				.withExposedPorts( 9200, 9300 )
 				.waitingFor( new HttpWaitStrategy().forPort( 9200 ).forStatusCode( 200 ) )
 				.withStartupTimeout( Duration.ofMinutes( 5 ) )
-				.withReuse( true );
+				.withReuse( true )
+				.withTmpFs( Map.of( "/usr/share/elasticsearch/data", "rw,size=1g" ) );
 	}
 
 
