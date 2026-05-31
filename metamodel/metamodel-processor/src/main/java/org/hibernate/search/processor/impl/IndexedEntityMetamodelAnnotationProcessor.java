@@ -34,9 +34,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
+import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoPartialMapping;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
-import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.processor.annotation.processing.impl.ProcessorAnnotationProcessorContext;
 import org.hibernate.search.processor.annotation.processing.impl.ProcessorPropertyMappingAnnotationProcessor;
@@ -64,7 +64,7 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 		TypeElement indexedAnnotation = context.elementUtils().getTypeElement( ANNOTATION_INDEXED );
 		Set<? extends Element> indexedEntities = roundEnv.getElementsAnnotatedWith( indexedAnnotation );
 
-		try ( CloseableSearchMapping searchMapping = StandalonePojoIntegrationBooter.builder()
+		try ( StandalonePojoPartialMapping partialMapping = StandalonePojoIntegrationBooter.builder()
 				.introspectorCustomizer( this::wrapIntrospector )
 				.property( "hibernate.search.backend.directory.type", "local-heap" )
 				.property( "hibernate.search.backend.version_check.enabled", "false" )
@@ -121,11 +121,11 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 								}
 							}
 						} )
-				).build().boot() ) {
+				).build().bootPartial() ) {
 
 			boolean ormMapperPresent = context.isOrmMapperPresent();
 
-			for ( SearchIndexedEntity<?> entity : searchMapping.allIndexedEntities() ) {
+			for ( SearchIndexedEntity<?> entity : partialMapping.allIndexedEntities() ) {
 				TypeElement typeElement = introspectorContext.typeElementsByName( entity.name() );
 				String packageName = context.elementUtils().getPackageOf( typeElement ).getQualifiedName().toString();
 

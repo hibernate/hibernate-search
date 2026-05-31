@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedT
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooterBehavior;
+import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoPartialMapping;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.logging.impl.ConfigurationLog;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMapping;
@@ -126,6 +127,11 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 				SearchIntegrationEnvironment.builder( propertySource, propertyChecker );
 		BEAN_PROVIDER.get( propertySource ).ifPresent( environmentBuilder::beanProvider );
 		return environmentBuilder.build();
+	}
+
+	@Override
+	public StandalonePojoPartialMapping bootPartial() {
+		return doBootFirstPhase().mappingPartialBuildState();
 	}
 
 	@Override

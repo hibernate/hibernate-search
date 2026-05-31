@@ -41,4 +41,17 @@ public interface StandalonePojoIntegrationBooter {
 
 	CloseableSearchMapping boot();
 
+	/**
+	 * Runs only Phase 1 of bootstrap (mapping and index model creation),
+	 * skipping Phase 2 (backend and index manager startup).
+	 * <p>
+	 * The returned partial mapping provides access to indexed entity metadata
+	 * (including index field descriptors).
+	 *
+	 * @return A partial mapping that must be {@link StandalonePojoPartialMapping#close() closed}
+	 * to release Phase 1 resources.
+	 */
+	@Incubating
+	StandalonePojoPartialMapping bootPartial();
+
 }
