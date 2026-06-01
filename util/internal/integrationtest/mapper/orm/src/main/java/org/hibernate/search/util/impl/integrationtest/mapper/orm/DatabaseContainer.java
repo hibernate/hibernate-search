@@ -279,13 +279,15 @@ public final class DatabaseContainer {
 						"oracle.jdbc.OracleDriver",
 						"jdbc:oracle:thin:@%s:%d/FREEPDB1",
 						1521,
-						"SYSTEM",
+						"hibernate_orm_test",
 						"hibernate_orm_test",
 						"select 1 from dual",
 						new LogMessageWaitStrategy()
 								.withRegEx( ".*DATABASE IS READY TO USE!.*\\s" )
 								.withTimes( 1 )
-				).withEnv( "ORACLE_PASSWORD", "hibernate_orm_test" );
+				).withEnv( "ORACLE_PASSWORD", "hibernate_orm_test" )
+						.withEnv( "APP_USER", "hibernate_orm_test" )
+						.withEnv( "APP_USER_PASSWORD", "hibernate_orm_test" );
 			}
 		},
 		MSSQL {
