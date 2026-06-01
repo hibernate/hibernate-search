@@ -1,3 +1,3 @@
 # PostgreSQL
 # See https://hub.docker.com/_/postgres
-FROM docker.io/postgres:18.3@sha256:78481659c47e862334611ccdaf7c369c986b3046da9857112f3b309114a65fb4
+FROM docker.io/postgres:18.4@sha256:8ff36f3c66371cba71d20ceedccfc3de9669a68737607888c4ef0af93abe8e39
