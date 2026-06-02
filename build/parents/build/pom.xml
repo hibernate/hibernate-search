@@ -350,16 +350,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -668,11 +658,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-v5migrationhelper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -735,16 +720,6 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-v5migrationhelper-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -131,18 +131,6 @@
 			</includes>
 		</dependencySet>
 		<dependencySet>
-			<outputDirectory>dist/v5migrationhelper/</outputDirectory>
-			<scope>runtime</scope>
-			<useProjectArtifact>false</useProjectArtifact>
-			<useTransitiveDependencies>true</useTransitiveDependencies>
-			<useTransitiveFiltering>true</useTransitiveFiltering>
-			<useStrictFiltering>true</useStrictFiltering>
-			<includes>
-				<include>org.hibernate.search:hibernate-search-v5migrationhelper-engine</include>
-				<include>org.hibernate.search:hibernate-search-v5migrationhelper-orm</include>
-			</includes>
-		</dependencySet>
-		<dependencySet>
 			<outputDirectory>dist/mapper/orm/outbox-polling</outputDirectory>
 			<scope>runtime</scope>
 			<useProjectArtifact>false</useProjectArtifact>

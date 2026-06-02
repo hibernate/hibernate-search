@@ -28,19 +28,6 @@ If you're looking to migrate from an earlier version,
 you should migrate step-by-step, from one minor version to the next,
 following the migration guide of link:https://hibernate.org/search/documentation/migrate/[each version].
 
-[WARNING]
-====
-**To Hibernate Search 5 users**
-
-Be aware that a lot of APIs have changed since Hibernate Search 5, some only because of a package change,
-others because of more fundamental changes
-(like moving away from using Lucene types in Hibernate Search APIs).
-
-When migrating from Hibernate Search 5, you are encouraged to migrate first to Hibernate Search 6.0
-using the https://docs.hibernate.org/search/6.0/migration/html_single/[6.0 migration guide],
-and only then to later versions (which will be significantly easier).
-====
-
 [[requirements]]
 == Requirements
 
@@ -50,7 +37,13 @@ are the same as those of Hibernate Search {hibernateSearchPreviousStableVersionS
 [[artifact-changes]]
 == Artifacts
 
-The coordinates of Maven artifacts in Hibernate Search {hibernateSearchVersion}
+[[v5migrationhelper-removal]]
+=== Hibernate Search 5 migration helper removed
+
+The `hibernate-search-v5migrationhelper-engine` and `hibernate-search-v5migrationhelper-orm` artifacts are no longer published.
+If you are still using the migration helper, you will need to migrate to the current Hibernate Search APIs.
+
+Other than the migration helper removal, the coordinates of Maven artifacts in Hibernate Search {hibernateSearchVersion}
 are the same as in Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[data-format]]

@@ -26,8 +26,6 @@
         <module>mapper/orm-outbox-polling</module>
         <module>mapper/orm-jakarta-batch</module>
         <module>performance</module>
-        <module>v5migrationhelper/engine</module>
-        <module>v5migrationhelper/orm</module>
     </modules>
 
     <profiles>
