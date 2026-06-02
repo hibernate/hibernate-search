@@ -217,9 +217,32 @@ stage('Configure') {
                             condition: TestCondition.AFTER_MERGE),
                     new DatabaseBuildEnvironment(dbName: 'mssql', mavenProfile: 'ci-mssql',
                             condition: TestCondition.AFTER_MERGE),
-                    new DatabaseBuildEnvironment(dbName: 'cockroachdb', mavenProfile: 'ci-cockroachdb',
+                    // CockroachDB is split into two parallel CI jobs to stay within CI timeouts.
+                    // cockroachdb-1: ORM + Jakarta Batch
+                    // cockroachdb-2: Outbox Polling + remaining
+                    // TODO: merge them back once we improve the overall test execution time for the ORM modules
+                    new DatabaseBuildEnvironment(dbName: 'cockroachdb-1', mavenProfile: 'ci-cockroachdb',
                             slow: true,
-                            condition: TestCondition.AFTER_MERGE),
+                            condition: TestCondition.AFTER_MERGE,
+                            mavenModules: [
+                                    'hibernate-search-integrationtest-mapper-orm',
+                                    'hibernate-search-integrationtest-mapper-orm-jakarta-batch',
+                                    'hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene-next'
+                            ]),
+                    new DatabaseBuildEnvironment(dbName: 'cockroachdb-2', mavenProfile: 'ci-cockroachdb',
+                            slow: true,
+                            condition: TestCondition.AFTER_MERGE,
+                            mavenModules: [
+                                    'hibernate-search-integrationtest-mapper-orm-outbox-polling',
+                                    'hibernate-search-integrationtest-mapper-orm-realbackend',
+                                    'hibernate-search-integrationtest-mapper-orm-realbackend-lucene-next',
+                                    'hibernate-search-integrationtest-mapper-orm-envers',
+                                    'hibernate-search-integrationtest-mapper-orm-cdi',
+                                    'hibernate-search-integrationtest-showcase-library',
+                                    'hibernate-search-integrationtest-showcase-library-lucene-next',
+                                    'hibernate-search-integrationtest-spring-repackaged-application',
+                                    'hibernate-search-integrationtest-spring-repackaged-model'
+                            ]),
 			],
 			localElasticsearch: [
 					// --------------------------------------------
@@ -529,7 +552,7 @@ stage('Non-default environments') {
 					// Some modules are likely to fail for reasons unrelated to Hibernate Search anyway
 					// (for example because we didn't configure the tests to handle other DBs),
 					// so we skip them.
-					String mavenBuildAdditionalArgs = ''' \
+					String mavenBuildAdditionalArgs = buildEnv.mavenModules ? '' : ''' \
 							-pl !documentation \
 							-pl !integrationtest/mapper/orm-spring \
 							-pl !integrationtest/v5migrationhelper/orm \
@@ -539,7 +562,6 @@ stage('Non-default environments') {
 							-pl !lucene-next/documentation \
 							-pl !lucene-next/integrationtest/java/modules/orm-lucene \
 					'''
-					String mavenDockerArgs = ""
 					def startedContainers = false
 					tryFinally({
 						mavenNonDefaultBuild buildEnv, """ \
@@ -548,10 +570,6 @@ stage('Non-default environments') {
 								$mavenBuildAdditionalArgs \
 								""",
 								artifactsToTest
-					}, { // Finally
-						if ( startedContainers ) {
-							sh "mvn docker:stop $mavenDockerArgs"
-						}
 					})
 				}
 			}
@@ -786,6 +804,7 @@ enum TestCondition {
 abstract class BuildEnvironment {
 	boolean isDefault = false
 	TestCondition condition
+	List<String> mavenModules = []
 	String toString() { getTag() }
 	abstract String getTag()
 	boolean isDefault() { isDefault }
@@ -1058,7 +1077,10 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 		//   by disabling a few misbehaving plugins whose output is already there anyway.
 		args += ' -Pskip-checks'
 	}
-	if ( artifactsToTest ) {
+	if ( buildEnv.mavenModules ) {
+		args += ' -pl ' + buildEnv.mavenModules.collect { ":$it" }.join(',')
+	}
+	else if ( artifactsToTest ) {
 		args += ' -pl ' + sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim()
 	}
 	if ( buildEnv.generatesCoverage() ) {
