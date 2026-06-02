@@ -27,7 +27,6 @@
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
         <version.bom.org.jboss.logging>3.6.3.Final</version.bom.org.jboss.logging>
         <version.bom.org.hibernate.models>1.1.1</version.bom.org.hibernate.models>
-        <version.bom.org.checkerframework>3.54.0</version.bom.org.checkerframework>
         <version.bom.org.apache.avro>1.12.1</version.bom.org.apache.avro>
         <version.bom.com.carrotsearch>0.10.0</version.bom.com.carrotsearch>
         <version.bom.com.google.code.gson>2.14.0</version.bom.com.google.code.gson>
@@ -788,57 +787,6 @@
                 <version>${version.bom.org.apache.httpcomponents.httpclient}</version>
             </dependency>
 
-            <!-- checker -->
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual-android</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-util</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>dataflow-errorprone</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>dataflow-nullaway</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>dataflow-shaded</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>dataflow</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>framework-test</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>javacutil</artifactId>
-                <version>${version.bom.org.checkerframework}</version>
-            </dependency>
 
         </dependencies>
     </dependencyManagement>
