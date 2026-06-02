@@ -142,16 +142,6 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-v5migrationhelper-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-mapper-orm-outbox-polling</artifactId>
             <scope>test</scope>
         </dependency>
@@ -208,9 +198,6 @@
                             <rules>
                                 <dependenciesIncludeAllTestCoverageModules>
                                     <excludes>
-                                        <!-- These modules are legacy and we don't care about test coverage. -->
-                                        <exclude>hibernate-search-v5migrationhelper-engine</exclude>
-                                        <exclude>hibernate-search-v5migrationhelper-orm</exclude>
                                         <!-- These modules do not actually contain code to be covered or test executions,
                                              they are basically false positives. -->
                                         <exclude>hibernate-search-integrationtest-backend-tck</exclude>

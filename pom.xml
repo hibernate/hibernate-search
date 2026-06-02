@@ -186,8 +186,6 @@
         <module>mapper/orm-batch-jsr352/jberet</module>
         <module>mapper/orm-jakarta-batch/core</module>
         <module>mapper/orm-jakarta-batch/jberet</module>
-        <module>v5migrationhelper/engine</module>
-        <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>
         <module>build/parents/integrationtest</module>
         <module>build/parents/springtest</module>

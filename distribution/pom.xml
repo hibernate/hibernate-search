@@ -107,16 +107,6 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-outbox-polling</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -260,8 +250,6 @@
                         -->
                         <id>generate-javadoc</id>
                         <configuration>
-                            <!-- We don't include the v5migrationhelper modules here,
-                                 so as not to confuse the documentation with obsolete API -->
                             <!-- While the generated sources will unlikely contain any public classes for which we
                                  have to generate any JavaDocs, we still include them for completeness -->
                             <sourcepath>
@@ -342,14 +330,8 @@
                         <configuration>
                             <rules>
                                 <javadocSourcePathIncludesAllPublicArtifactsRule>
-                                    <!-- We don't include the v5migrationhelper modules here,
-                                        so as not to confuse the documentation with obsolete API -->
                                     <pathsToSkip>
-                                        <path>v5migrationhelper/engine/src/main/java</path>
-                                        <path>v5migrationhelper/orm/src/main/java</path>
                                         <path>lucene-next/backend/lucene/src/main/java</path>
-                                        <path>v5migrationhelper/orm/target/generated-sources/annotations</path>
-                                        <path>v5migrationhelper/engine/target/generated-sources/annotations</path>
                                         <path>lucene-next/backend/lucene/target/generated-sources/annotations</path>
                                     </pathsToSkip>
                                 </javadocSourcePathIncludesAllPublicArtifactsRule>
