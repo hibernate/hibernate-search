@@ -20,11 +20,13 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-1108")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MappedSuperclassIT {
 
 	private static final String INDEX_NAME = "IndexedEntity";
@@ -37,7 +39,7 @@ class MappedSuperclassIT {
 
 	private SessionFactory sessionFactory;
 
-	@BeforeEach
+	@BeforeAll
 	void setup() {
 		backendMock.expectSchema(
 				INDEX_NAME, b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );

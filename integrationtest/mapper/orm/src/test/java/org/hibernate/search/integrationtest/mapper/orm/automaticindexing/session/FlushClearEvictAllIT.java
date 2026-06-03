@@ -30,11 +30,13 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-1350")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FlushClearEvictAllIT {
 
 	@RegisterExtension
@@ -45,7 +47,7 @@ class FlushClearEvictAllIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@BeforeEach
+	@BeforeAll
 	void before() {
 		backendMock.expectAnySchema( Post.NAME );
 		backendMock.expectAnySchema( Comment.NAME );

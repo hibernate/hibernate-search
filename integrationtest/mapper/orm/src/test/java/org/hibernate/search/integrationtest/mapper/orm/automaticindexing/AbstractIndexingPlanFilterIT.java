@@ -29,9 +29,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractIndexingPlanFilterIT {
 
 	@RegisterExtension
@@ -118,11 +121,14 @@ public abstract class AbstractIndexingPlanFilterIT {
 		return setupContext.setup();
 	}
 
+	@BeforeAll
+	void setupSessionFactory() {
+		sessionFactory = setup();
+	}
+
 	@SuppressWarnings("unused") // For EJC and lambda arg
 	@BeforeEach
 	void clearFilter() throws Exception {
-		sessionFactory = setup();
-
 		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> { /*clear out any settings from tests*/ }
 		);

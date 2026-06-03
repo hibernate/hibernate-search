@@ -30,8 +30,10 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.common.extension.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -40,6 +42,7 @@ import org.awaitility.Awaitility;
 /**
  * Test interruption of a currently executing {@link MassIndexer}.
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MassIndexingInterruptionIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
@@ -56,7 +59,7 @@ class MassIndexingInterruptionIT {
 
 	private SessionFactory sessionFactory;
 
-	@BeforeEach
+	@BeforeAll
 	void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
@@ -66,7 +69,10 @@ class MassIndexingInterruptionIT {
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
+	}
 
+	@BeforeEach
+	void prepareData() {
 		initData();
 	}
 
