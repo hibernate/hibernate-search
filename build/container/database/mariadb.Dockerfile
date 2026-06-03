@@ -1,3 +1,3 @@
 # MariaDB
 # See https://hub.docker.com/_/mariadb/tags
-FROM docker.io/mariadb:12.2.2@sha256:6a4c4bbf0447c2247801309513fcc0dd17c3f35390368139ce419387fdd1144d
+FROM docker.io/mariadb:12.3.2@sha256:b1c7bf836e64ed9406a8984af29509f40089d55cea14b32f12c4726a1f17104b
