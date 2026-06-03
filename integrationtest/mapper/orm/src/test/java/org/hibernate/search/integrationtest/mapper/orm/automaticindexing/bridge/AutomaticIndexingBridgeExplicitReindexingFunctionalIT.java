@@ -32,8 +32,9 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * tests the feature works correctly but in a setup that wouldn't require this feature.
  */
 @TestForIssue(jiraKey = "HSEARCH-3297")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
 	@RegisterExtension
@@ -54,7 +56,7 @@ class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
 	private SessionFactory sessionFactory;
 
-	@BeforeEach
+	@BeforeAll
 	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "typeBridge", b2 -> b2

@@ -21,10 +21,12 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProxyIT {
 
 	@RegisterExtension
@@ -35,7 +37,7 @@ class ProxyIT {
 
 	private SessionFactory sessionFactory;
 
-	@BeforeEach
+	@BeforeAll
 	void setup() {
 		backendMock.expectSchema( EntityWithPropertyAccessTypeForId.INDEX, b -> b
 				.field( "text", String.class )

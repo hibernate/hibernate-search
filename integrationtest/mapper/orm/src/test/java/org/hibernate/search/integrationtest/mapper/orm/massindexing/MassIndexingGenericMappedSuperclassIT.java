@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -58,19 +59,21 @@ class MassIndexingGenericMappedSuperclassIT {
 	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@SuppressWarnings("unused") // For EJC and lambda arg
-	@BeforeEach
+	@BeforeAll
 	void setup() {
-		backendMock.resetExpectations();
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start().withPropertyRadical(
 				HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes( Book.class );
-
 
 		// We add the schema expectation as a part of a configuration, and as a last configuration.
 		// this way we will only set the expectation only when the entire config was a success:
 		setupContext.withConfiguration( ignored -> backendMock.expectAnySchema( Book.INDEX ) );
 		sessionFactory = setupContext.setup();
+	}
 
+	@BeforeEach
+	void prepareData() {
+		backendMock.resetExpectations();
 		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
