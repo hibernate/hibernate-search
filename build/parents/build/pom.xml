@@ -186,7 +186,7 @@
         <version.org.springframework.boot>4.0.1</version.org.springframework.boot>
         <!-- Spring Boot 3 JTA starter and related libs version: -->
         <version.dev.snowdrop>4.0.0</version.dev.snowdrop>
-        <version.io.agroal>3.1.2</version.io.agroal>
+        <version.io.agroal>3.2</version.io.agroal>
 
         <version.jsoup>1.22.2</version.jsoup>
         <version.snakeyaml>2.6</version.snakeyaml>
