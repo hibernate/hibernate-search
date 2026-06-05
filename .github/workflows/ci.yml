@@ -49,13 +49,14 @@ env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
   TESTCONTAINERS_REUSE_ENABLE: true
 
-permissions:
-  contents: read
+permissions: { } # none, jobs are defining their own if they need any
 
 jobs:
   build:
     name: ${{matrix.os.name}}
     runs-on: ${{ matrix.os.runs-on }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -115,11 +116,14 @@ jobs:
 
       - name: Build code and run unit tests and basic checks
         run: |
-          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
-          -Pjqassistant -Pdist -Pci-build -DskipITs
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
+          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean install \
+              -Pjqassistant -Pdist -Pci-build -DskipITs
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
+          MAVEN_MATRIX_ARGS: ${{ matrix.os.maven.args }}
       # For jobs running on 'pull_request', upload build scan data.
       # The actual publishing must be done in a separate job (see ci-report.yml).
       # We don't write to the remote cache as that would be unsafe.
@@ -132,12 +136,16 @@ jobs:
 
       - name: Run integration tests in the default environment
         run: |
-          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
-          -Pskip-checks \
-          ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
+          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean verify \
+              -Pskip-checks \
+              "$MAVEN_INCREMENTAL_BUILD"
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
+          MAVEN_MATRIX_ARGS: ${{ matrix.os.maven.args }}
+          MAVEN_INCREMENTAL_BUILD: ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
       # Same as above, but for the build scan of the latest Maven run.
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
