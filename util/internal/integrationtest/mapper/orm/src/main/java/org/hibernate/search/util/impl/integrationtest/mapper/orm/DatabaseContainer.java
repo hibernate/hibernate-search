@@ -5,8 +5,11 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -58,7 +61,7 @@ public final class DatabaseContainer {
 
 	private static final SupportedDatabase DATABASE;
 	private static final HibernateSearchJdbcDatabaseContainer DATABASE_CONTAINER;
-
+	private static final Path CONTAINER_LOCK_FILE;
 
 	static {
 		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.kind", "" );
@@ -68,6 +71,10 @@ public final class DatabaseContainer {
 		DATABASE_CONTAINER = DATABASE.container(
 				containers.resolve( "database" ).resolve( name + ".Dockerfile" )
 		);
+		// Lock file under project-root/target/ — scoped to this checkout, avoids cross-project collisions.
+		// containers = <root>/build/container, so parent.parent = <root>
+		CONTAINER_LOCK_FILE = containers.getParent().getParent().resolve( "target" )
+				.resolve( "hs-test-db-" + name + ".lock" );
 	}
 
 	static String forkDatabaseName(String baseName) {
@@ -91,11 +98,7 @@ public final class DatabaseContainer {
 		}
 		else {
 			if ( DATABASE_CONTAINER != null && !DATABASE_CONTAINER.isRunning() ) {
-				synchronized (DATABASE_CONTAINER) {
-					if ( !DATABASE_CONTAINER.isRunning() ) {
-						DATABASE_CONTAINER.start();
-					}
-				}
+				startContainerWithLock();
 			}
 			if ( !forkDatabaseInitialized
 					&& !TestForkPrefix.PREFIX.isEmpty()
@@ -108,6 +111,33 @@ public final class DatabaseContainer {
 				}
 			}
 			return DATABASE.configuration( DATABASE_CONTAINER );
+		}
+	}
+
+	private static void startContainerWithLock() {
+		// Use a file lock to serialize container startup across forked JVMs.
+		// With testcontainers reuse enabled, the first fork starts the container
+		// and subsequent forks reuse it instead of starting their own.
+		try {
+			Files.createDirectories( CONTAINER_LOCK_FILE.getParent() );
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(
+					"Failed to create lock file directory: " + CONTAINER_LOCK_FILE.getParent(), e );
+		}
+		try (
+				FileChannel channel = FileChannel.open(
+						CONTAINER_LOCK_FILE,
+						StandardOpenOption.CREATE, StandardOpenOption.WRITE
+				);
+				FileLock ignored = channel.lock()
+		) {
+			if ( !DATABASE_CONTAINER.isRunning() ) {
+				DATABASE_CONTAINER.start();
+			}
+		}
+		catch (IOException e) {
+			throw new IllegalStateException( "Failed to acquire database container lock: " + CONTAINER_LOCK_FILE, e );
 		}
 	}
 
