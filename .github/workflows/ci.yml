@@ -138,9 +138,10 @@ jobs:
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
           read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
+          read -ra mvn_incremental <<< "$MAVEN_INCREMENTAL_BUILD"
           ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean verify \
               -Pskip-checks \
-              "$MAVEN_INCREMENTAL_BUILD"
+              "${mvn_incremental[@]}"
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
