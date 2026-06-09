@@ -76,7 +76,12 @@ are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVers
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 in Hibernate Search {hibernateSearchVersion}
-is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort},
+with the following exceptions:
+
+* Both JPA and Hibernate ORM query adapters alongside with `Search.toJpaQuery()` and `Search.toOrmQuery()`
+have been removed after being deprecated for a while now.
+Use Hibernate Search query DSL API to work with your query and results.
 
 [[spi]]
 == SPI
