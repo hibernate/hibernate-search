@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.mapping.impl;
 
+import static org.hibernate.search.mapper.orm.outboxpolling.mapping.impl.AdditionalMappingAnnotations.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,29 +16,19 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Index;
 
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.boot.models.HibernateAnnotations;
-import org.hibernate.boot.models.JpaAnnotations;
-import org.hibernate.boot.models.annotations.internal.AccessJpaAnnotation;
-import org.hibernate.boot.models.annotations.internal.ColumnJpaAnnotation;
-import org.hibernate.boot.models.annotations.internal.EntityJpaAnnotation;
-import org.hibernate.boot.models.annotations.internal.EnumeratedJpaAnnotation;
-import org.hibernate.boot.models.annotations.internal.IndexJpaAnnotation;
-import org.hibernate.boot.models.annotations.internal.JdbcTypeCodeAnnotation;
-import org.hibernate.boot.models.annotations.internal.TableJpaAnnotation;
-import org.hibernate.boot.models.annotations.internal.UuidGeneratorAnnotation;
 import org.hibernate.boot.spi.MetadataBuildingContext;
-import org.hibernate.models.internal.MutableClassDetailsRegistry;
-import org.hibernate.models.internal.jdk.JdkBuilders;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.MutableClassDetails;
 import org.hibernate.models.spi.MutableMemberDetails;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public class AdditionalMappingBuilder {
 
 	private final MetadataBuildingContext buildingContext;
 	private final Class<?> type;
 	private final String name;
+	private final TableAnnotation tableAnnotation = new TableAnnotation();
 	private final List<BiConsumer<ModelsContext, MutableClassDetails>> contributors = new ArrayList<>();
 
 	public AdditionalMappingBuilder(MetadataBuildingContext buildingContext, Class<?> type, String name) {
@@ -46,15 +38,9 @@ public class AdditionalMappingBuilder {
 	}
 
 	public AdditionalMappingBuilder table(String schema, String catalog, String table) {
-		contributors.add( (context, classDetails) -> {
-			TableJpaAnnotation tableUsage = (TableJpaAnnotation) classDetails.applyAnnotationUsage(
-					JpaAnnotations.TABLE,
-					context
-			);
-			tableUsage.schema( schema );
-			tableUsage.catalog( catalog );
-			tableUsage.name( table );
-		} );
+		tableAnnotation.schema( schema );
+		tableAnnotation.catalog( catalog );
+		tableAnnotation.name( table );
 		return this;
 	}
 
@@ -63,18 +49,15 @@ public class AdditionalMappingBuilder {
 	}
 
 	public AdditionalMappingBuilder index(String name, String columns) {
-		contributors.add( (context, classDetails) -> {
-			TableJpaAnnotation tableUsage = (TableJpaAnnotation) classDetails.applyAnnotationUsage(
-					JpaAnnotations.TABLE,
-					context
-			);
+		final IndexAnnotation indexUsage = new IndexAnnotation();
+		indexUsage.name( name );
+		indexUsage.columnList( columns );
 
-			IndexJpaAnnotation indexUsage = JpaAnnotations.INDEX.createUsage( context );
-			indexUsage.name( name );
-			indexUsage.columnList( columns );
-
-			tableUsage.indexes( new Index[] { indexUsage } );
-		} );
+		final Index[] existing = tableAnnotation.indexes();
+		final Index[] updated = new Index[existing.length + 1];
+		System.arraycopy( existing, 0, updated, 0, existing.length );
+		updated[existing.length] = indexUsage;
+		tableAnnotation.indexes( updated );
 		return this;
 	}
 
@@ -90,7 +73,7 @@ public class AdditionalMappingBuilder {
 	public AdditionalMappingBuilder tenantId(String name) {
 		contributors.add( (context, classDetails) -> {
 			final MutableMemberDetails field = (MutableMemberDetails) classDetails.findFieldByName( name );
-			field.applyAnnotationUsage( HibernateAnnotations.TENANT_ID, context );
+			field.addAnnotationUsage( new TenantIdAnnotation() );
 		} );
 		return this;
 	}
@@ -99,11 +82,9 @@ public class AdditionalMappingBuilder {
 		createAttribute( name, length, nullable );
 		contributors.add( (context, classDetails) -> {
 			final MutableMemberDetails field = (MutableMemberDetails) classDetails.findFieldByName( name );
-			EnumeratedJpaAnnotation entityUsage = (EnumeratedJpaAnnotation) field.applyAnnotationUsage(
-					JpaAnnotations.ENUMERATED,
-					context
-			);
-			entityUsage.value( EnumType.STRING );
+			final EnumeratedAnnotation enumeratedUsage = new EnumeratedAnnotation();
+			enumeratedUsage.value( EnumType.STRING );
+			field.addAnnotationUsage( enumeratedUsage );
 		} );
 		return this;
 	}
@@ -112,21 +93,16 @@ public class AdditionalMappingBuilder {
 		contributors.add( (context, classDetails) -> {
 			final MutableMemberDetails field = (MutableMemberDetails) classDetails.findFieldByName( "id" );
 
-			field.applyAnnotationUsage( JpaAnnotations.ID, context );
+			field.addAnnotationUsage( new IdAnnotation() );
 
-			UuidGeneratorAnnotation uuidGeneratorUsage = (UuidGeneratorAnnotation) field.applyAnnotationUsage(
-					HibernateAnnotations.UUID_GENERATOR,
-					context
-			);
-			uuidGeneratorUsage.style(
-					UuidGenerator.Style.valueOf( strategy.toUpperCase( Locale.ROOT ) )
-			);
+			final UuidGeneratorAnnotation uuidGeneratorUsage = new UuidGeneratorAnnotation();
+			uuidGeneratorUsage.style( UuidGenerator.Style.valueOf( strategy.toUpperCase( Locale.ROOT ) ) );
+			field.addAnnotationUsage( uuidGeneratorUsage );
+
 			if ( type != null ) {
-				JdbcTypeCodeAnnotation jdbcTypeCodeUsage = (JdbcTypeCodeAnnotation) field.applyAnnotationUsage(
-						HibernateAnnotations.JDBC_TYPE_CODE,
-						context
-				);
+				final JdbcTypeCodeAnnotation jdbcTypeCodeUsage = new JdbcTypeCodeAnnotation();
 				jdbcTypeCodeUsage.value( type );
+				field.addAnnotationUsage( jdbcTypeCodeUsage );
 			}
 		} );
 
@@ -134,32 +110,27 @@ public class AdditionalMappingBuilder {
 	}
 
 	public ClassDetails build() {
-		ModelsContext context = buildingContext.getBootstrapContext().getModelsContext();
-		final MutableClassDetails classDetails = JdkBuilders.buildClassDetailsStatic(
-				type,
-				context
-		);
+		final ModelsContext context = buildingContext.getBootstrapContext().getModelsContext();
+		if ( context.getClassDetailsRegistry()
+				.resolveClassDetails( type.getName() ) instanceof MutableClassDetails classDetails ) {
+			EntityAnnotation entityUsage = new EntityAnnotation();
+			entityUsage.name( name );
+			classDetails.addAnnotationUsage( entityUsage );
 
-		EntityJpaAnnotation entityUsage = (EntityJpaAnnotation) classDetails.applyAnnotationUsage(
-				JpaAnnotations.ENTITY,
-				context
-		);
-		entityUsage.name( name );
-		AccessJpaAnnotation accessUsage = (AccessJpaAnnotation) classDetails.applyAnnotationUsage(
-				JpaAnnotations.ACCESS,
-				context
-		);
-		accessUsage.value( AccessType.FIELD );
+			AccessAnnotation accessUsage = new AccessAnnotation();
+			accessUsage.value( AccessType.FIELD );
+			classDetails.addAnnotationUsage( accessUsage );
+			classDetails.addAnnotationUsage( tableAnnotation );
 
-		for ( BiConsumer<ModelsContext, MutableClassDetails> contributor : contributors ) {
-			contributor.accept( context, classDetails );
+			for ( BiConsumer<ModelsContext, MutableClassDetails> contributor : contributors ) {
+				contributor.accept( context, classDetails );
+			}
+
+			return classDetails;
 		}
-
-		context.getClassDetailsRegistry()
-				.as( MutableClassDetailsRegistry.class )
-				.addClassDetails( type.getName(), classDetails );
-
-		return classDetails;
+		else {
+			throw new AssertionFailure( "Cannot build mutable class details for " + type );
+		}
 	}
 
 	private void createAttribute(String name, Integer size, boolean nullable) {
@@ -169,10 +140,7 @@ public class AdditionalMappingBuilder {
 	private void createAttribute(String name, Integer length, boolean nullable, Integer type) {
 		contributors.add( (context, classDetails) -> {
 			final MutableMemberDetails field = (MutableMemberDetails) classDetails.findFieldByName( name );
-			ColumnJpaAnnotation columnUsage = (ColumnJpaAnnotation) field.applyAnnotationUsage(
-					JpaAnnotations.COLUMN,
-					context
-			);
+			ColumnAnnotation columnUsage = new ColumnAnnotation();
 
 			columnUsage.name( name );
 			columnUsage.nullable( nullable );
@@ -180,10 +148,12 @@ public class AdditionalMappingBuilder {
 				columnUsage.length( length );
 			}
 
+			field.addAnnotationUsage( columnUsage );
+
 			if ( type != null ) {
-				JdbcTypeCodeAnnotation jdbcTypeCodeUsage =
-						(JdbcTypeCodeAnnotation) field.applyAnnotationUsage( HibernateAnnotations.JDBC_TYPE_CODE, context );
+				final JdbcTypeCodeAnnotation jdbcTypeCodeUsage = new JdbcTypeCodeAnnotation();
 				jdbcTypeCodeUsage.value( type );
+				field.addAnnotationUsage( jdbcTypeCodeUsage );
 			}
 		} );
 	}

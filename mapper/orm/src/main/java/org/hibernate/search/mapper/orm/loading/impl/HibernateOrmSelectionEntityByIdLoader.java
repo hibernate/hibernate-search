@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.metamodel.mapping.EntityMappingType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -41,7 +41,7 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 		List<E> loadedEntities = createListContainingNulls( allIds.size() );
 
 		int fetchSize = loadingOptions.fetchSize();
-		Query<E> query = createQuery( fetchSize, timeout );
+		SelectionQuery<E> query = createQuery( fetchSize, timeout );
 
 		List<Object> ids = new ArrayList<>( fetchSize );
 		for ( int i = 0; i < keys.length; i++ ) {

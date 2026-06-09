@@ -12,7 +12,8 @@ import jakarta.persistence.FindOption;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.RootGraph;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
+import org.hibernate.query.spi.SelectionQueryImplementor;
 
 class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
 
@@ -30,7 +31,7 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	}
 
 	@Override
-	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+	public SelectionQuery<Long> createQueryForCount(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		return createQueryWithTypesFilter( session,
 				"select count(e) from " + ormEntityName + " e",
@@ -39,16 +40,15 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	}
 
 	@Override
-	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+	public SelectionQuery<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		return createQueryWithTypesFilter( session,
 				"select e. " + uniquePropertyName + " from " + ormEntityName + " e",
 				uniquePropertyType, "e", includedTypesFilter );
 	}
 
-	@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
 	@Override
-	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
+	public SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
 		return session.createQuery(
 				"select e from " + ormEntityName
 						+ " e where " + uniquePropertyName + " in (:" + parameterName + ")",
@@ -68,14 +68,13 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 		return session.findMultiple( rootGraph, ids, options );
 	}
 
-	private <T> Query<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,
+	private <T> SelectionQuery<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,
 			String hql, Class<T> returnedType, String entityAlias,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		if ( !includedTypesFilter.isEmpty() ) {
 			hql += " where type(" + entityAlias + ") in (:types)";
 		}
-		@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
-		Query<T> query = session.createQuery( hql, returnedType );
+		SelectionQuery<T> query = session.createQuery( hql, returnedType );
 		if ( !includedTypesFilter.isEmpty() ) {
 			query.setParameterList( "types", includedTypesFilter );
 		}

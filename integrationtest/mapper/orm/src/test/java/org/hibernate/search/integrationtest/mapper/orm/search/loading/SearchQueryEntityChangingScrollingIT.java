@@ -20,7 +20,7 @@ import jakarta.persistence.Id;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -101,7 +101,7 @@ class SearchQueryEntityChangingScrollingIT {
 
 		// checking that changes above had an effect
 		try ( Session session = sessionFactory.openSession() ) {
-			Query<SimpleEntity> query = session.createQuery( "from SimpleEntity", SimpleEntity.class );
+			SelectionQuery<SimpleEntity> query = session.createQuery( "from SimpleEntity", SimpleEntity.class );
 			assertThat( query.getResultList() ).extracting( "name" ).contains( NEW_NAME );
 		}
 	}

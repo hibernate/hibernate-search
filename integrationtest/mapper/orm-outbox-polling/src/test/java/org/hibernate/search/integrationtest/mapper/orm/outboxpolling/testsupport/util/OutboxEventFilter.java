@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEventAndPredicate;
@@ -139,7 +139,7 @@ public class OutboxEventFilter {
 		}
 
 		@Override
-		public void setParams(Query<?> query) {
+		public void setParams(SelectionQuery<?> query) {
 			// HSEARCH-4818: copy the values so that they don't change
 			// between the binding and when the query actually executes.
 			query.setParameter( "ids", new ArrayList<>( allowedIds ) );

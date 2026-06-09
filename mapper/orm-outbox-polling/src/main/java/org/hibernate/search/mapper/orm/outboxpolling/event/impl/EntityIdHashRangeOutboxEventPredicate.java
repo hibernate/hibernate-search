@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
 import java.util.Optional;
 
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
@@ -66,7 +66,7 @@ public final class EntityIdHashRangeOutboxEventPredicate implements OutboxEventP
 	}
 
 	@Override
-	public void setParams(Query<?> query) {
+	public void setParams(SelectionQuery<?> query) {
 		if ( lowerBoundIncluded != null ) {
 			query.setParameter( LOWER_BOUND_PARAM_NAME, lowerBoundIncluded );
 		}

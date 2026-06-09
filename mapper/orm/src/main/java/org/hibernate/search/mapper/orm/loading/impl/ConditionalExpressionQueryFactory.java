@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 
 public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQueryFactory<E, I> {
@@ -33,7 +33,8 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	}
 
 	@Override
-	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
+	public SelectionQuery<Long> createQueryForCount(SharedSessionContractImplementor session,
+			EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions) {
 		return createQueryWithConditionalExpressionsOrOrder( session,
@@ -43,7 +44,7 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	}
 
 	@Override
-	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+	public SelectionQuery<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order) {
@@ -54,7 +55,7 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 		);
 	}
 
-	private <T> Query<T> createQueryWithConditionalExpressionsOrOrder(SharedSessionContractImplementor session,
+	private <T> SelectionQuery<T> createQueryWithConditionalExpressionsOrOrder(SharedSessionContractImplementor session,
 			String hql, Class<T> returnedType, String entityAlias,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order) {
@@ -73,7 +74,7 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 		return createQueryWithConditionalExpressionsOrOrder( session, hql, returnedType, allConditionalExpressions, order );
 	}
 
-	private <T> Query<T> createQueryWithConditionalExpressionsOrOrder(SharedSessionContractImplementor session,
+	private <T> SelectionQuery<T> createQueryWithConditionalExpressionsOrOrder(SharedSessionContractImplementor session,
 			String hql, Class<T> returnedType,
 			List<ConditionalExpression> conditionalExpressions, String order) {
 		StringBuilder hqlBuilder = new StringBuilder( hql );
@@ -93,8 +94,7 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 		if ( order != null ) {
 			hqlBuilder.append( " order by " ).append( order );
 		}
-		@SuppressWarnings({ "deprecation", "removal" }) // QueryProducerImplementor is marked for removal, while the createQuery() is also present in other interfaces
-		Query<T> query = session.createQuery( hqlBuilder.toString(), returnedType );
+		SelectionQuery<T> query = session.createQuery( hqlBuilder.toString(), returnedType );
 		for ( ConditionalExpression expression : conditionalExpressions ) {
 			expression.applyParams( query );
 		}

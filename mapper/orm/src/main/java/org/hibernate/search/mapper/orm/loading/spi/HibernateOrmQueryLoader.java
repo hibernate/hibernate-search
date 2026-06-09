@@ -10,14 +10,14 @@ import jakarta.persistence.FindOption;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 
 public interface HibernateOrmQueryLoader<E, I> {
-	Query<Long> createCountQuery(SharedSessionContractImplementor session);
+	SelectionQuery<Long> createCountQuery(SharedSessionContractImplementor session);
 
-	Query<I> createIdentifiersQuery(SharedSessionContractImplementor session);
+	SelectionQuery<I> createIdentifiersQuery(SharedSessionContractImplementor session);
 
-	Query<E> createLoadingQuery(SessionImplementor session, String idParameterName);
+	SelectionQuery<E> createLoadingQuery(SessionImplementor session, String idParameterName);
 
 	/**
 	 * @deprecated Use {@link #findMultiple(SessionImplementor, List, FindOption...)} instead.

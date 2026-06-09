@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityGraph;
 
 import org.hibernate.graph.GraphSemantic;
-import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 /**
@@ -27,7 +26,7 @@ public interface SearchLoadingOptionsStep {
 	 *
 	 * @param fetchSize The fetch size. Must be positive or zero.
 	 * @return {@code this} for method chaining.
-	 * @see Query#setFetchSize(int)
+	 * @see org.hibernate.query.SelectionQuery#setFetchSize(int)
 	 */
 	SearchLoadingOptionsStep fetchSize(int fetchSize);
 
@@ -47,7 +46,6 @@ public interface SearchLoadingOptionsStep {
 	 * @param semantic The semantic to use when applying the graph.
 	 * @return {@code this} for method chaining.
 	 * @see org.hibernate.Session#createEntityGraph(Class)
-	 * @see org.hibernate.Session#createEntityGraph(String)
 	 * @see org.hibernate.Session#getEntityGraph(String)
 	 */
 	SearchLoadingOptionsStep graph(EntityGraph<?> graph, GraphSemantic semantic);

@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -254,7 +254,7 @@ class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			 * Note this approach is rather limited as it does not allow batching.
 			 * HSEARCH-1937 should address this problem.
 			 */
-			Query<String> query = session.createQuery(
+			SelectionQuery<String> query = session.createQuery(
 					"select c.includedInTypeBridge from contained c"
 							+ " where c.parent = :parent and c.includedInTypeBridge is not null"
 							+ " order by c.includedInTypeBridge",

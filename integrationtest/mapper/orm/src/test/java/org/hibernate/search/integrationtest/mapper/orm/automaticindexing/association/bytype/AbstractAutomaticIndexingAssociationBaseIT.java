@@ -422,21 +422,21 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		if ( DatabaseContainer.configuration().is( DatabaseContainer.SupportedDatabase.MARIADB,
 				DatabaseContainer.SupportedDatabase.MYSQL ) ) {
 			setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
-				session.createMutationQuery( "update containing c set c.parent = null" ).executeUpdate();
+				session.createMutationQuery( "update containing c set c.parent = null" ).execute();
 			} ) );
 		}
 		if ( isAssociationOwnedByContainedSide() ) {
 			setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
-				session.createMutationQuery( "delete from contained" ).executeUpdate();
-				session.createMutationQuery( "delete from containing" ).executeUpdate();
-				session.createMutationQuery( "delete from indexed" ).executeUpdate();
+				session.createMutationQuery( "delete from contained" ).execute();
+				session.createMutationQuery( "delete from containing" ).execute();
+				session.createMutationQuery( "delete from indexed" ).execute();
 			} ) );
 		}
 		else {
 			setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
-				session.createMutationQuery( "delete from containing" ).executeUpdate();
-				session.createMutationQuery( "delete from indexed" ).executeUpdate();
-				session.createMutationQuery( "delete from contained" ).executeUpdate();
+				session.createMutationQuery( "delete from containing" ).execute();
+				session.createMutationQuery( "delete from indexed" ).execute();
+				session.createMutationQuery( "delete from contained" ).execute();
 			} ) );
 		}
 		sessionFactory = additionalSetup( setupContext ).setup();

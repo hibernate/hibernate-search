@@ -227,6 +227,7 @@
                                 <argument>^org\.hibernate\.query\.MutationQuery$</argument>
                                 <argument>^org\.hibernate\.query\.BindableType$</argument>
                                 <argument>^org\.hibernate\.query\.BindingContext$</argument>
+                                <argument>^org\.hibernate\.query\.spi\.QueryImplementor$</argument>
 
                                 <argument>^org\.hibernate\.dialect\.lock\.spi\.LockingSupport$</argument>
 
