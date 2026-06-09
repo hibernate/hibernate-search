@@ -1322,6 +1322,7 @@
                             <test.fork.count>${test.parallel.forkCount}</test.fork.count>
                             <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
                             <test.module.id>${project.artifactId}</test.module.id>
+                            <test.elasticsearch.container.count>${test.elasticsearch.container.count}</test.elasticsearch.container.count>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1351,6 +1352,7 @@
                             <test.fork.count>${test.parallel.forkCount}</test.fork.count>
                             <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
                             <test.module.id>${project.artifactId}</test.module.id>
+                            <test.elasticsearch.container.count>${test.elasticsearch.container.count}</test.elasticsearch.container.count>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

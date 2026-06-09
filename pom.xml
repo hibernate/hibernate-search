@@ -407,6 +407,7 @@
         <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
         <test.parallel.forkCount.lucene>1</test.parallel.forkCount.lucene>
         <test.parallel.modules.enabled>false</test.parallel.modules.enabled>
+        <test.elasticsearch.container.count>1</test.elasticsearch.container.count>
 
         <test.elasticsearch.run.image.pull>true</test.elasticsearch.run.image.pull>
 
@@ -1289,6 +1290,7 @@
                 <test.parallel.forkCount.elasticsearch>4</test.parallel.forkCount.elasticsearch>
                 <test.parallel.forkCount.lucene>0.6C</test.parallel.forkCount.lucene>
                 <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
+                <test.elasticsearch.container.count>4</test.elasticsearch.container.count>
             </properties>
         </profile>
         <profile>
@@ -1298,6 +1300,7 @@
                 <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
                 <test.parallel.forkCount.lucene>2</test.parallel.forkCount.lucene>
                 <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
+                <test.elasticsearch.container.count>2</test.elasticsearch.container.count>
             </properties>
         </profile>
         <profile>
@@ -1307,6 +1310,7 @@
                 <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
                 <test.parallel.forkCount.lucene>2</test.parallel.forkCount.lucene>
                 <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
+                <test.elasticsearch.container.count>2</test.elasticsearch.container.count>
             </properties>
         </profile>
 
