@@ -671,59 +671,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 
 This query object supports all <<search-dsl-query-fetching-results,`fetch*` methods supported by the query DSL>>.
 The main advantage over calling these methods directly at the end of a query definition
-is mostly related to <<troubleshooting,troubleshooting>>,
-but the query object can also be useful if you need an adapter to another API.
-
-Hibernate Search provides an adapter to JPA and Hibernate ORM's native APIs,
-i.e. a way to turn a `SearchQuery` into a `javax.persistence.TypedQuery` (JPA)
-or a `org.hibernate.query.Query` (native ORM API):
-
-.Turning a `SearchQuery` into a JPA or Hibernate ORM query
-====
-[source, java, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=searchQuery-toORM]
-----
-<1> Build the query as usual.
-<2> Retrieve a `SearchQuery` object.
-<3> Turn the `SearchQuery` object into a JPA query.
-<4> Turn the `SearchQuery` object into a Hibernate ORM query.
-====
-[WARNING]
-====
-Both JPA and Hibernate ORM query adapters are deprecated and will be removed in the future version of Hibernate Search.
-====
-
-// Search 5 anchors backward compatibility
-[[_resulttransformer]]
-[WARNING]
-====
-The resulting query *does not support all operations*,
-so it is recommended to only convert search queries when absolutely required,
-for example when integrating with code that only works with Hibernate ORM queries.
-
-The following operations are expected to work correctly in most cases,
-even though they may behave slightly differently from what is expected from a JPA `TypedQuery`
-or Hibernate ORM `Query` in some cases
-(including, but not limited to, the type of thrown exceptions):
-
-* Direct hit retrieval methods: `list`, `getResultList`, `uniqueResult`, ...
-* Scrolling: `scroll()`, `scroll(ScrollMode)` (but only with `ScrollMode.FORWARDS_ONLY`).
-* `setFirstResult`/`setMaxResults` and getters.
-* `setFetchSize`
-* `unwrap`
-* `setHint`
-
-The following operations are known not to work correctly,
-with no plan to fix them at the moment:
-
-* `getHints`
-* Parameter-related methods: `setParameter`, ...
-* Result transformer: `setResultTransformer`, ...
-Use <<search-dsl-projection-composite,composite projections>> instead.
-* Lock-related methods: `setLockOptions`, ...
-* And more: this list is not exhaustive.
-====
+is mostly related to <<troubleshooting,troubleshooting>>.
 
 [[search-dsl-query-explain]]
 == `explain(...)`: Explaining scores

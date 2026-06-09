@@ -6,13 +6,10 @@ package org.hibernate.search.mapper.orm;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.TypedQuery;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.query.Query;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
@@ -80,50 +77,6 @@ public final class Search {
 	public static SearchSession session(EntityManager entityManager) {
 		Session session = HibernateOrmUtils.toSession( entityManager );
 		return createSearchSession( session );
-	}
-
-	/**
-	 * Convert a {@link SearchQuery} to a {@link TypedQuery JPA query}.
-	 * <p>
-	 * Note that the resulting query <strong>does not support all operations</strong>
-	 * and may behave slightly differently from what is expected from a {@link TypedQuery} in some cases
-	 * (including, but not limited to, the type of thrown exceptions).
-	 * For these reasons, it is recommended to only use this method when absolutely required,
-	 * for example when integrating to an external library that expects JPA queries.
-	 *
-	 * @param searchQuery The search query to convert.
-	 * @param <H> The type of query hits.
-	 * @return A representation of the given query as a JPA query.
-	 *
-	 * @deprecated This method is deprecated for removal with no alternative.
-	 * Use Hibernate Search query DSL API to work with your query and results.
-	 */
-	@SuppressWarnings("removal")
-	@Deprecated(since = "8.1", forRemoval = true)
-	public static <H> TypedQuery<H> toJpaQuery(SearchQuery<H> searchQuery) {
-		return org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter.create( searchQuery );
-	}
-
-	/**
-	 * Convert a {@link SearchQuery} to a {@link Query Hibernate ORM query}.
-	 * <p>
-	 * Note that the resulting query <strong>does not support all operations</strong>
-	 * and may behave slightly differently from what is expected from a {@link Query} in some cases
-	 * (including, but not limited to, the type of thrown exceptions).
-	 * For these reasons, it is recommended to only use this method when absolutely required,
-	 * for example when integrating to an external library that expects Hibernate ORM queries.
-	 *
-	 * @param searchQuery The search query to convert.
-	 * @param <H> The type of query hits.
-	 * @return A representation of the given query as a Hibernate ORM query.
-	 *
-	 * @deprecated This method is deprecated for removal with no alternative.
-	 * Use Hibernate Search query DSL API to work with your query and results.
-	 */
-	@SuppressWarnings("removal")
-	@Deprecated(since = "8.1", forRemoval = true)
-	public static <H> Query<H> toOrmQuery(SearchQuery<H> searchQuery) {
-		return org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
 	private static SearchMapping getSearchMapping(SessionFactoryImplementor sessionFactoryImplementor) {

@@ -17,7 +17,8 @@
 :version-selector-enabled: true
 :stem: latexmath
 
-This release is here to provide the Hibernate ORM 8.0 compatibility.
+This release is here to provide the Hibernate ORM 8.0 compatibility
+It also cleans up previously deprecated APIs.
 
 == Removals
 
@@ -25,6 +26,11 @@ This release is here to provide the Hibernate ORM 8.0 compatibility.
 Hibernate Search 5 migration helper::
 The `hibernate-search-v5migrationhelper-engine` and `hibernate-search-v5migrationhelper-orm` artifacts are no longer published.
 If you are still using the migration helper, you will need to migrate to the current Hibernate Search APIs.
+
+[[jpa-orm-query-adapter-removal]]
+JPA/Hibernate ORM query adapters::
+Both JPA and Hibernate ORM query adapters alongside with `Search#toJpaQuery` and `Search#toOrmQuery` have been removed.
+Use Hibernate Search query DSL API to work with your query and results.
 
 == Dependency upgrades
 

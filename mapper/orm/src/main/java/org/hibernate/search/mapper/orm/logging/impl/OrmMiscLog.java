@@ -13,7 +13,6 @@ import java.lang.invoke.MethodHandles;
 
 import jakarta.transaction.Synchronization;
 
-import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.SearchException;
@@ -50,10 +49,6 @@ public interface OrmMiscLog {
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 36,
 			value = "Unable to guess the transaction status: not starting a JTA transaction.")
 	void cannotGuessTransactionStatus(@Cause Exception e);
-
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 39, value = "Unable to properly close scroll in ScrollableResults.")
-	void unableToCloseSearcherInScrollableResult(@Cause Exception e);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 276, value = "No transaction active. Consider increasing the connection time-out.")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing();
@@ -104,32 +99,6 @@ public interface OrmMiscLog {
 	@LogMessage(level = Logger.Level.ERROR)
 	@Message(id = ID_OFFSET + 35, value = "Unable to shut down Hibernate Search:")
 	void shutdownFailed(@Cause Throwable cause);
-
-	@Message(id = ID_OFFSET + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"
-			+ " only ScrollMode.FORWARDS_ONLY is supported.")
-	SearchException canOnlyUseScrollWithScrollModeForwardsOnly(ScrollMode scrollMode);
-
-	@Message(id = ID_OFFSET + 37, value = "Cannot scroll backwards with Hibernate Search scrolls: they are forwards-only."
-			+ " Ensure you always increment the scroll position, and never decrement it.")
-	SearchException cannotScrollBackwards();
-
-	@Message(id = ID_OFFSET + 38, value = "Cannot set the scroll position relative to the end with Hibernate Search scrolls."
-			+ " Ensure you always pass a positive number to setRowNumber().")
-	SearchException cannotSetScrollPositionRelativeToEnd();
-
-	@Message(id = ID_OFFSET + 39, value = "Cannot use this ScrollableResults instance: it is closed.")
-	SearchException cannotUseClosedScrollableResults();
-
-	@LogMessage(level = Logger.Level.INFO)
-	@Message(id = ID_OFFSET + 56, value = "Ignoring unrecognized query hint [%s]")
-	void ignoringUnrecognizedQueryHint(String hintName);
-
-	@Message(id = ID_OFFSET + 57,
-			value = "Cannot set the fetch size of Hibernate Search ScrollableResults after having created them."
-					+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
-					+ " for example with .loading(o -> o.fetchSize(50))."
-					+ " See the reference documentation for more information.")
-	SearchException cannotSetFetchSize();
 
 	@LogMessage(level = Logger.Level.TRACE)
 	@Message(id = ID_OFFSET + 127,

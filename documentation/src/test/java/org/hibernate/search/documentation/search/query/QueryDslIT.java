@@ -287,7 +287,6 @@ class QueryDslIT {
 		} );
 	}
 
-	@SuppressWarnings("removal")
 	@Test
 	void searchQuery() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
@@ -303,22 +302,6 @@ class QueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
-		with( entityManagerFactory ).runInTransaction( entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			// tag::searchQuery-toORM[]
-			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
-					.where( f -> f.matchAll() )
-					.toQuery(); // <2>
-			jakarta.persistence.TypedQuery<Book> jpaQuery = Search.toJpaQuery( query ); // <3>
-			org.hibernate.query.Query<Book> ormQuery = Search.toOrmQuery( query ); // <4>
-			// end::searchQuery-toORM[]
-			List<Book> hits = jpaQuery.getResultList();
-			assertThat( hits ).extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
-			hits = ormQuery.list();
-			assertThat( hits ).extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
-		} );
 	}
 
 	@Test
