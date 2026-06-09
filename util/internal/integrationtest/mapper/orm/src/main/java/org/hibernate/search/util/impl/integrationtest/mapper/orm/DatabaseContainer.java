@@ -16,6 +16,7 @@ import java.util.function.BiConsumer;
 
 import javax.script.ScriptException;
 
+import org.hibernate.cfg.DialectSpecificSettings;
 import org.hibernate.cfg.JdbcSettings;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -494,6 +495,9 @@ public final class DatabaseContainer {
 			map.put( JdbcSettings.USER, this.user );
 			map.put( JdbcSettings.PASS, this.pass );
 			map.put( JdbcSettings.ISOLATION, this.isolation );
+			if ( database == DatabaseContainer.SupportedDatabase.ORACLE ) {
+				map.put( DialectSpecificSettings.ORACLE_VALUE_LOB_ENABLED, Boolean.FALSE );
+			}
 		}
 
 		public void addAsSpring(BiConsumer<String, String> consumer) {
@@ -501,6 +505,9 @@ public final class DatabaseContainer {
 			consumer.accept( "spring.datasource.url", this.url );
 			consumer.accept( "spring.datasource.username", this.user );
 			consumer.accept( "spring.datasource.password", this.pass );
+			if ( database == DatabaseContainer.SupportedDatabase.ORACLE ) {
+				consumer.accept( DialectSpecificSettings.ORACLE_VALUE_LOB_ENABLED, Boolean.FALSE.toString() );
+			}
 		}
 
 		private Configuration withDriver(String driver) {
