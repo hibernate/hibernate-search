@@ -9,7 +9,7 @@ public final class TestForkPrefix {
 	public static final String PREFIX;
 
 	static {
-		String forkCountStr = System.getProperty( "test.fork.count", "1" );
+		String forkCountStr = System.getProperty( "test.parallel.fork.count", "1" );
 		boolean parallelForks;
 		try {
 			parallelForks = Integer.parseInt( forkCountStr ) > 1;
@@ -23,12 +23,12 @@ public final class TestForkPrefix {
 
 		boolean needsIsolation = parallelForks || parallelModules;
 
-		String forkNumber = System.getProperty( "test.fork.number", System.getProperty( "surefire.forkNumber", "" ) );
+		String forkNumber = System.getProperty( "test.parallel.fork.number", System.getProperty( "surefire.forkNumber", "" ) );
 		if ( needsIsolation && ( forkNumber.isBlank() || !isNumber( forkNumber ) ) ) {
 			throw new IllegalStateException( "Test Fork number must be specified." );
 		}
 
-		String moduleId = System.getProperty( "test.module.id", "" );
+		String moduleId = System.getProperty( "test.parallel.module.id", "" );
 		// Use a hash of the module artifactId to keep the prefix short.
 		// PostgreSQL limits database names to 63 characters; full artifactIds easily exceed that.
 		String modulePrefix = moduleId.isEmpty()

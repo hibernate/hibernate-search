@@ -406,15 +406,16 @@
         <test.parallel.forkCount>1</test.parallel.forkCount>
         <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
         <test.parallel.forkCount.lucene>1</test.parallel.forkCount.lucene>
+        <test.parallel.forkCount.orm>1</test.parallel.forkCount.orm>
         <test.parallel.modules.enabled>false</test.parallel.modules.enabled>
-        <test.elasticsearch.container.count>1</test.elasticsearch.container.count>
+        <test.parallel.elasticsearch.container.count>1</test.parallel.elasticsearch.container.count>
 
         <test.elasticsearch.run.image.pull>true</test.elasticsearch.run.image.pull>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
         <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
-        <surefire.jvm.args.misc>-Djdk.attach.allowAttachSelf=false -Dtest.fork.number=${surefire.forkNumber} ${surefire.jvm.args.misc.module-specific}</surefire.jvm.args.misc>
+        <surefire.jvm.args.misc>-Djdk.attach.allowAttachSelf=false -Dtest.parallel.fork.number=${surefire.forkNumber} ${surefire.jvm.args.misc.module-specific}</surefire.jvm.args.misc>
         <surefire.jvm.args.misc.module-specific></surefire.jvm.args.misc.module-specific>
         <!-- JVM args to be customized depending on the Java version -->
         <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
@@ -1289,8 +1290,9 @@
                 <test.parallel.forkCount>0.6C</test.parallel.forkCount>
                 <test.parallel.forkCount.elasticsearch>4</test.parallel.forkCount.elasticsearch>
                 <test.parallel.forkCount.lucene>0.6C</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.orm>0.6C</test.parallel.forkCount.orm>
                 <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
-                <test.elasticsearch.container.count>4</test.elasticsearch.container.count>
+                <test.parallel.elasticsearch.container.count>4</test.parallel.elasticsearch.container.count>
             </properties>
         </profile>
         <profile>
@@ -1298,9 +1300,10 @@
             <properties>
                 <test.parallel.forkCount>1</test.parallel.forkCount>
                 <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
-                <test.parallel.forkCount.lucene>2</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.lucene>4</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.orm>4</test.parallel.forkCount.orm>
                 <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
-                <test.elasticsearch.container.count>2</test.elasticsearch.container.count>
+                <test.parallel.elasticsearch.container.count>1</test.parallel.elasticsearch.container.count>
             </properties>
         </profile>
         <profile>
@@ -1308,9 +1311,10 @@
             <properties>
                 <test.parallel.forkCount>1</test.parallel.forkCount>
                 <test.parallel.forkCount.elasticsearch>1</test.parallel.forkCount.elasticsearch>
-                <test.parallel.forkCount.lucene>2</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.lucene>4</test.parallel.forkCount.lucene>
+                <test.parallel.forkCount.orm>4</test.parallel.forkCount.orm>
                 <test.parallel.modules.enabled>true</test.parallel.modules.enabled>
-                <test.elasticsearch.container.count>2</test.elasticsearch.container.count>
+                <test.parallel.elasticsearch.container.count>1</test.parallel.elasticsearch.container.count>
             </properties>
         </profile>
 

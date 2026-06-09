@@ -42,7 +42,7 @@ public final class SearchBackendContainer {
 		Path containers = Path.of( System.getProperty( "org.hibernate.search.integrationtest.container.directory", "" ) );
 
 		CONTAINER_COUNT = Integer.parseInt(
-				System.getProperty( "test.elasticsearch.container.count", "1" ) );
+				System.getProperty( "test.parallel.elasticsearch.container.count", "1" ) );
 		CONTAINER_LOCK_FILE = containers.getParent().getParent().resolve( "target" )
 				.resolve( "hs-test-es.lock" );
 
@@ -80,7 +80,7 @@ public final class SearchBackendContainer {
 	}
 
 	private static GenericContainer<?> containerForCurrentFork() {
-		String forkNumber = System.getProperty( "test.fork.number",
+		String forkNumber = System.getProperty( "test.parallel.fork.number",
 				System.getProperty( "surefire.forkNumber", "" ) );
 		int index = 0;
 		try {

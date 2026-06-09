@@ -1319,10 +1319,10 @@
                     <configuration>
                         <systemPropertyVariables>
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
-                            <test.fork.count>${test.parallel.forkCount}</test.fork.count>
+                            <test.parallel.fork.count>${test.parallel.forkCount}</test.parallel.fork.count>
                             <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
-                            <test.module.id>${project.artifactId}</test.module.id>
-                            <test.elasticsearch.container.count>${test.elasticsearch.container.count}</test.elasticsearch.container.count>
+                            <test.parallel.module.id>${project.artifactId}</test.parallel.module.id>
+                            <test.parallel.elasticsearch.container.count>${test.parallel.elasticsearch.container.count}</test.parallel.elasticsearch.container.count>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1349,10 +1349,10 @@
                             <org.hibernate.search.integrationtest.orm.database.kind>${test.database.run.kind}</org.hibernate.search.integrationtest.orm.database.kind>
                             <org.hibernate.search.integrationtest.container.directory>${rootProject.directory}/build/container</org.hibernate.search.integrationtest.container.directory>
                             <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
-                            <test.fork.count>${test.parallel.forkCount}</test.fork.count>
+                            <test.parallel.fork.count>${test.parallel.forkCount}</test.parallel.fork.count>
                             <test.parallel.modules.enabled>${test.parallel.modules.enabled}</test.parallel.modules.enabled>
-                            <test.module.id>${project.artifactId}</test.module.id>
-                            <test.elasticsearch.container.count>${test.elasticsearch.container.count}</test.elasticsearch.container.count>
+                            <test.parallel.module.id>${project.artifactId}</test.parallel.module.id>
+                            <test.parallel.elasticsearch.container.count>${test.parallel.elasticsearch.container.count}</test.parallel.elasticsearch.container.count>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
