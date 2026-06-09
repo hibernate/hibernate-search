@@ -223,7 +223,7 @@
                                 <argument>^org\.hibernate\.Timeouts$</argument>
 
                                 <argument>^org\.hibernate\.query\.Query$</argument>
-                                <argument>^org\.hibernate\.query\.SelectionQuery$</argument>
+                                <argument>^org\.hibernate\.query\.SelectionQuery\b.*+$</argument>
                                 <argument>^org\.hibernate\.query\.MutationQuery$</argument>
                                 <argument>^org\.hibernate\.query\.BindableType$</argument>
                                 <argument>^org\.hibernate\.query\.BindingContext$</argument>
