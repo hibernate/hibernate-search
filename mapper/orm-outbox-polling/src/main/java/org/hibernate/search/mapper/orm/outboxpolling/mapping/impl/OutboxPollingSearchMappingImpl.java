@@ -15,7 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.MutationQuery;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
@@ -66,7 +66,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	private long doCountAbortedEvents(Function<SessionFactory, SessionBuilder> sessionCreator) {
 		try ( Session session = sessionCreator.apply( sessionFactory ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
+				SelectionQuery<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.getSingleResult();
 			} );
@@ -98,7 +98,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 				MutationQuery query = session.createMutationQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
-				return query.executeUpdate();
+				return query.execute();
 			} );
 		}
 	}
@@ -127,7 +127,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				MutationQuery query = session.createMutationQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				return query.executeUpdate();
+				return query.execute();
 			} );
 		}
 	}

@@ -26,6 +26,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.FlushSettings;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridge;
@@ -118,6 +119,8 @@ class ProgrammaticMappingSmokeIT {
 
 		sessionFactory = ormSetupHelper.start().withProperty(
 				HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
+				// TODO: remove with the next update of ORM when https://github.com/hibernate/hibernate-orm/pull/12797 is merged
+				.withProperty( FlushSettings.FLUSH_QUEUE_TYPE, "legacy" )
 				.withAnnotatedTypes(
 						IndexedEntity.class,
 						ParentIndexedEntity.class,

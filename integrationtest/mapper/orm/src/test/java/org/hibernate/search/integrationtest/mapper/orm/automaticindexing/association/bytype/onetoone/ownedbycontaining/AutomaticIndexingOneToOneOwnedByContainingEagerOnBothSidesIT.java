@@ -87,7 +87,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 
 		setupContext.withAnnotatedTypes( CascadingParent.class, CascadableChildMapsId.class );
 		setupContext.dataClearing( config -> config.manualDatabaseCleanup( session -> {
-			session.getSessionFactory().getSchemaManager().truncateMappedObjects();
+			session.getSessionFactory().getSchemaManager().truncate();
 		} ) );
 		backendMock.expectAnySchema( CascadableChildMapsId.INDEX );
 

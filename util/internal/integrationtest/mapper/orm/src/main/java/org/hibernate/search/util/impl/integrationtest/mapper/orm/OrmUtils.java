@@ -13,7 +13,7 @@ import jakarta.persistence.EntityTransaction;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
@@ -117,7 +117,7 @@ public final class OrmUtils {
 	}
 
 	public static Number countAll(EntityManager entityManager, Class<?> entityType) {
-		return (Number) entityManager.createQuery( "select count(*) from " + entityType.getName() )
+		return entityManager.createQuery( "select count(*) from " + entityType.getName(), Long.class )
 				.getSingleResult();
 	}
 
@@ -125,7 +125,7 @@ public final class OrmUtils {
 		return queryAll( entityManager, entityType ).getResultList();
 	}
 
-	public static <T> Query<T> queryAll(EntityManager entityManager, Class<T> entityType) {
+	public static <T> SelectionQuery<T> queryAll(EntityManager entityManager, Class<T> entityType) {
 		return entityManager.unwrap( Session.class )
 				.createQuery( "select e from " + entityType.getName() + " e", entityType );
 	}

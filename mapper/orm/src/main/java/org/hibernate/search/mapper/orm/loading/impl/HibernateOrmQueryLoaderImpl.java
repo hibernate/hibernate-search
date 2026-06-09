@@ -13,7 +13,7 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 
@@ -44,14 +44,14 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 	}
 
 	@Override
-	public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
+	public SelectionQuery<Long> createCountQuery(SharedSessionContractImplementor session) {
 		return conditionalExpressions.isEmpty()
 				? queryFactory.createQueryForCount( session, includedTypesFilter )
 				: queryFactory.createQueryForCount( session, entityDomainType, includedTypesFilter, conditionalExpressions );
 	}
 
 	@Override
-	public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
+	public SelectionQuery<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
 		return conditionalExpressions.isEmpty() && order == null
 				? queryFactory.createQueryForIdentifierListing( session, includedTypesFilter )
 				: queryFactory.createQueryForIdentifierListing( session, entityDomainType, includedTypesFilter,
@@ -59,7 +59,7 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 	}
 
 	@Override
-	public Query<E> createLoadingQuery(SessionImplementor session, String idParameterName) {
+	public SelectionQuery<E> createLoadingQuery(SessionImplementor session, String idParameterName) {
 		return queryFactory.createQueryForLoadByUniqueProperty( session, idParameterName );
 	}
 

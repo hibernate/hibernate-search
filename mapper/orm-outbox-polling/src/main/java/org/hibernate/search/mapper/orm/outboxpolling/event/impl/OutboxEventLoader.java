@@ -19,7 +19,7 @@ import org.hibernate.Session;
 import org.hibernate.Timeouts;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.lock.spi.LockTimeoutType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingEventsLog;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
@@ -76,7 +76,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 
 	List<OutboxEvent> loadLocking(Session session, Set<UUID> ids, String processorName) {
 		try {
-			Query<OutboxEvent> query = session.createQuery( LOAD_QUERY_STRING, OutboxEvent.class );
+			SelectionQuery<OutboxEvent> query = session.createQuery( LOAD_QUERY_STRING, OutboxEvent.class );
 			query.setParameter( "ids", ids );
 			query.setHibernateLockMode( lockMode );
 			return query.getResultList();

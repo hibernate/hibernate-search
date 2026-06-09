@@ -11,7 +11,8 @@ import jakarta.persistence.PersistenceException;
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.metamodel.mapping.EntityMappingType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
+import org.hibernate.query.spi.SelectionQueryImplementor;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
@@ -69,21 +70,20 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 	abstract List<E> doLoadEntities(List<?> allIds, Long timeout);
 
 	@SuppressWarnings("unchecked")
-	final Query<E> createQuery(int fetchSize, Long timeout) {
-		Query<E> query = queryFactory.createQueryForLoadByUniqueProperty( sessionContext.session(), IDS_PARAMETER_NAME );
+	final SelectionQuery<E> createQuery(int fetchSize, Long timeout) {
+		// TODO: HSEARCH-5318 use different API for the entity graphs:
+		final EntityGraphHint<E> entityGraphHint =
+				(EntityGraphHint<E>) loadingOptions.entityGraphHintOrNullForType( entityMappingType );
+		final SelectionQueryImplementor<E> query =
+				queryFactory.createQueryForLoadByUniqueProperty( sessionContext.session(), IDS_PARAMETER_NAME );
 
 		query.setFetchSize( fetchSize );
 		if ( timeout != null ) {
 			query.setHint( HibernateOrmSearchQueryHints.JAVAX_TIMEOUT, Math.toIntExact( timeout ) );
 		}
 
-		// TODO: HSEARCH-5318 use different API for the entity graphs:
-		EntityGraphHint<E> entityGraphHint =
-				(EntityGraphHint<E>) loadingOptions.entityGraphHintOrNullForType( entityMappingType );
-		if ( entityGraphHint != null ) {
-			query.setEntityGraph( entityGraphHint.graph, entityGraphHint.semantic );
-		}
-
-		return query;
+		return entityGraphHint == null
+				? query
+				: query.asSelectionQuery( entityGraphHint.graph, entityGraphHint.semantic );
 	}
 }

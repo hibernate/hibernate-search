@@ -33,4 +33,5 @@ public interface IndexSearchDocumentRepository {
 
 	void purge();
 
+	void deleteAll();
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.hibernate.Hibernate;
 import org.hibernate.metamodel.mapping.EntityMappingType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.logging.impl.LoadingLog;
@@ -48,7 +48,7 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 		Map<Object, E> entityById = CollectionHelper.newHashMap( allIds.size() );
 
 		int fetchSize = loadingOptions.fetchSize();
-		Query<E> query = createQuery( fetchSize, timeout );
+		SelectionQuery<E> query = createQuery( fetchSize, timeout );
 
 		List<Object> ids = new ArrayList<>( fetchSize );
 		for ( Object documentIdSourceValue : allIds ) {

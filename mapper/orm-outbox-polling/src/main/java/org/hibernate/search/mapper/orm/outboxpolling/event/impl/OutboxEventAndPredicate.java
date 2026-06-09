@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.event.impl;
 
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 
 public class OutboxEventAndPredicate implements OutboxEventPredicate {
 
@@ -26,7 +26,7 @@ public class OutboxEventAndPredicate implements OutboxEventPredicate {
 	}
 
 	@Override
-	public void setParams(Query<?> query) {
+	public void setParams(SelectionQuery<?> query) {
 		// Assuming no conflicts...
 		left.setParams( query );
 		right.setParams( query );

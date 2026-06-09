@@ -57,8 +57,8 @@ class OutOfSyncIndexIT {
 
 		// Simulate an external delete that Hibernate Search will not be able to detect
 		with( entityManagerFactory ).runInTransaction(
-				entityManager -> entityManager.createQuery( "DELETE FROM book WHERE MOD(id, 2) = 0" )
-						.executeUpdate()
+				entityManager -> entityManager.createStatement( "DELETE FROM book WHERE MOD(id, 2) = 0" )
+						.execute()
 		);
 
 		// Check that document counts are off

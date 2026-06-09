@@ -152,4 +152,10 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		Search.session( entityManager ).schemaManager( Document.class )
 				.dropAndCreate();
 	}
+
+	@Override
+	public void deleteAll() {
+		// TODO: remove when Spring Data can work with JPA 4
+		entityManager.createStatement( "delete from Document" ).execute();
+	}
 }

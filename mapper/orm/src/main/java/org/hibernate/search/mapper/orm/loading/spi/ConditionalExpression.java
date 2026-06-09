@@ -7,7 +7,7 @@ package org.hibernate.search.mapper.orm.loading.spi;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 
 public final class ConditionalExpression {
 
@@ -34,7 +34,7 @@ public final class ConditionalExpression {
 		params.put( name, value );
 	}
 
-	public void applyParams(Query<?> query) {
+	public void applyParams(SelectionQuery<?> query) {
 		for ( Map.Entry<String, Object> entry : params.entrySet() ) {
 			query.setParameter( entry.getKey(), entry.getValue() );
 		}

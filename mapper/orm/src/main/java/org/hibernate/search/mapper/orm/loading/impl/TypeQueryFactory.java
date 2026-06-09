@@ -15,7 +15,8 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
+import org.hibernate.query.spi.SelectionQueryImplementor;
 import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 
 public interface TypeQueryFactory<E, I> {
@@ -41,21 +42,22 @@ public interface TypeQueryFactory<E, I> {
 		}
 	}
 
-	Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+	SelectionQuery<Long> createQueryForCount(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter);
 
-	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+	SelectionQuery<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter);
 
-	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
+	SelectionQuery<Long> createQueryForCount(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions);
 
-	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityDomainType<?> entityDomainType,
+	SelectionQuery<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+			EntityDomainType<?> entityDomainType,
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order);
 
-	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
+	SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 
 	/**
 	 * @deprecated Use {@link #findMultiple(SessionImplementor, List, FindOption...)} instead.

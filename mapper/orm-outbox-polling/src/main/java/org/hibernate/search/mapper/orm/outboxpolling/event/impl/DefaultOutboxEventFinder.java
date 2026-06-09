@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class DefaultOutboxEventFinder implements OutboxEventFinder {
@@ -57,23 +57,23 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 
 	@Override
 	public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
-		Query<OutboxEvent> query = createOutboxEventQuery( session );
+		SelectionQuery<OutboxEvent> query = createOutboxEventQuery( session );
 		query.setMaxResults( maxResults );
 		return query.list();
 	}
 
-	public Query<OutboxEvent> createOutboxEventQuery(Session session) {
-		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
+	public SelectionQuery<OutboxEvent> createOutboxEventQuery(Session session) {
+		SelectionQuery<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
 		if ( predicate.isPresent() ) {
 			predicate.get().setParams( query );
 		}
 		return query;
 	}
 
-	public <T> Query<T> createOutboxEventQueryForTests(Session session,
+	public <T> SelectionQuery<T> createOutboxEventQueryForTests(Session session,
 			Function<String, String> selectClauseFunction, Class<T> resultType, OutboxEventOrder order) {
 		String queryStringForTests = createQueryString( predicate, selectClauseFunction, order != null ? order : this.order );
-		Query<T> query = session.createQuery( queryStringForTests, resultType );
+		SelectionQuery<T> query = session.createQuery( queryStringForTests, resultType );
 		if ( predicate.isPresent() ) {
 			predicate.get().setParams( query );
 		}
@@ -96,7 +96,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 		}
 
 		@Override
-		public void setParams(Query<?> query) {
+		public void setParams(SelectionQuery<?> query) {
 			query.setParameter( "now", Instant.now() );
 		}
 	}
@@ -109,7 +109,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 		}
 
 		@Override
-		public void setParams(Query<?> query) {
+		public void setParams(SelectionQuery<?> query) {
 			query.setParameter( "status", OutboxEvent.Status.PENDING );
 		}
 	}

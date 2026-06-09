@@ -137,7 +137,7 @@ class OrmSetupHelperCleaner {
 			}
 		}
 
-		sessionFactory.getSchemaManager().truncateMappedObjects();
+		sessionFactory.getSchemaManager().truncate();
 	}
 
 	public OrmSetupHelperCleaner appendConfiguration(Consumer<DataClearConfig> configurer) {

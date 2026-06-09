@@ -11,6 +11,7 @@ import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.QueryFlushMode;
 
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -86,7 +87,7 @@ class AutomaticIndexingSessionFlushIT {
 
 			// An auto flush is performed on query invocation
 			List<?> resultList = session.createQuery( "select i from IndexedEntity i", IndexedEntity.class )
-					.setQueryFlushMode( org.hibernate.query.QueryFlushMode.DEFAULT ) // FlushMode.AUTO
+					.setQueryFlushMode( QueryFlushMode.DEFAULT ) // FlushMode.AUTO
 					.getResultList();
 
 			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {

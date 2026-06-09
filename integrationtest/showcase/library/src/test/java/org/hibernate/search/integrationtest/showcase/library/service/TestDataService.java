@@ -7,7 +7,6 @@ package org.hibernate.search.integrationtest.showcase.library.service;
 import java.util.Locale;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
@@ -261,10 +260,5 @@ public class TestDataService {
 					"literature,poem,afterlife"
 			);
 		}
-	}
-
-	public void executeHql(String hql) {
-		Query query = entityManager.createQuery( hql );
-		query.executeUpdate();
 	}
 }
