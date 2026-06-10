@@ -31,3 +31,6 @@ If you are still using the migration helper, you will need to migrate to the cur
 [[orm-version]]
 Hibernate ORM::
 Hibernate Search targets the Hibernate ORM 8.0 series.
+[[opensearch-version]]
+OpenSearch::
+Hibernate Search is now also compatible with OpenSearch 3.7 as well as with previously compatible versions of OpenSearch.
