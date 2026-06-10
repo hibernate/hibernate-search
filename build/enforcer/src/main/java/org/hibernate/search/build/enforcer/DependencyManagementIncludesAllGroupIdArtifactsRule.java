@@ -38,6 +38,7 @@ import javax.inject.Named;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.google.gson.JsonSyntaxException;
 import org.apache.maven.enforcer.rule.api.AbstractEnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.execution.MavenSession;
@@ -303,8 +304,12 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 					getLog().info( "Fetching from " + url );
 					HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
 
-					return gson.fromJson( response.body(), klass );
-				}, empty
+                    try {
+                        return gson.fromJson( response.body(), klass );
+                    } catch (JsonSyntaxException e) {
+						throw new RuntimeException( "Received response: " + response.body(), e );
+                    }
+                }, empty
 		);
 	}
 
@@ -321,7 +326,11 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 
 					HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
 
-					return gson.fromJson( response.body(), klass );
+					try {
+						return gson.fromJson( response.body(), klass );
+					} catch (JsonSyntaxException e) {
+						throw new RuntimeException( "Received response: " + response.body(), e );
+					}
 				}, empty
 		);
 	}
