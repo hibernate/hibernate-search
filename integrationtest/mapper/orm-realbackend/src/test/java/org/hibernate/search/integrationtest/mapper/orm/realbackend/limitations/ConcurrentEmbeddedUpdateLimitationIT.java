@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.ThrowingRunnable;
 
 /**
@@ -91,13 +92,37 @@ class ConcurrentEmbeddedUpdateLimitationIT {
 
 		reproducer();
 
-		Awaitility.await()
-				.timeout( 20, TimeUnit.SECONDS )
-				.until( () -> noMoreOutboxEvents( sessionFactory ) );
+		StringBuilder sbcheck = new StringBuilder( "OUTBOX EVENTS from check:" ).append( System.lineSeparator() );
+		try {
+			Awaitility.await()
+					.timeout( 20, TimeUnit.SECONDS )
+					.until( () -> noMoreOutboxEvents( sessionFactory, sbcheck ) );
+		}
+		catch (ConditionTimeoutException e) {
+			throw new RuntimeException( dumpOutboxEvents( sessionFactory ) + sbcheck, e );
+		}
 
 		verify( () -> assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L ) );
 		verify( () -> assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 1L ) );
 		verify( () -> assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 0L ) );
+	}
+
+	private static String dumpOutboxEvents(SessionFactory sessionFactory) {
+		StringBuilder sb = new StringBuilder();
+		try ( Session session = sessionFactory.openSession() ) {
+			List<OutboxEvent> events = session.createQuery( "select e from " + ENTITY_NAME
+					+ " e order by id", OutboxEvent.class ).list();
+			sb.append( "OUTBOX EVENTS (count=" ).append( events.size() ).append( ")" )
+					.append( System.lineSeparator() );
+			for ( OutboxEvent event : events ) {
+				sb.append( "  Event id=" ).append( event.getId() ).append( " entityName=" ).append( event.getEntityName() )
+						.append( " entityId=" ).append( event.getEntityId() ).append( " status=" ).append( event.getStatus() )
+						.append( " retries=" ).append( event.getRetries() ).append( " processAfter=" )
+						.append( event.getProcessAfter() ).append( System.lineSeparator() );
+			}
+			sb.append( "========================" ).append( System.lineSeparator() );
+		}
+		return sb.toString();
 	}
 
 	private void reproducer() throws Throwable {
@@ -190,10 +215,22 @@ class ConcurrentEmbeddedUpdateLimitationIT {
 		} );
 	}
 
-	private static boolean noMoreOutboxEvents(SessionFactory sessionFactory) {
+	private static boolean noMoreOutboxEvents(SessionFactory sessionFactory, StringBuilder sb) {
 		try ( Session session = sessionFactory.openSession() ) {
-			return session.createQuery( "select e from " + ENTITY_NAME
-					+ " e order by id", OutboxEvent.class ).list().isEmpty();
+			List<OutboxEvent> list = session.createQuery( "select e from " + ENTITY_NAME
+					+ " e order by id", OutboxEvent.class ).list();
+
+			sb.append( "CHECK OUTBOX EVENTS (count=" ).append( list.size() ).append( ")" )
+					.append( System.lineSeparator() );
+			for ( OutboxEvent event : list ) {
+				sb.append( "  Event id=" ).append( event.getId() ).append( " entityName=" ).append( event.getEntityName() )
+						.append( " entityId=" ).append( event.getEntityId() ).append( " status=" ).append( event.getStatus() )
+						.append( " retries=" ).append( event.getRetries() ).append( " processAfter=" )
+						.append( event.getProcessAfter() ).append( System.lineSeparator() );
+			}
+			sb.append( "========================" ).append( System.lineSeparator() );
+
+			return list.isEmpty();
 		}
 	}
 
