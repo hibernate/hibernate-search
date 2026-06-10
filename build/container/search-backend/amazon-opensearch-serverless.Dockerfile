@@ -4,4 +4,4 @@
 # IMPORTANT! When updating the version of OpenSearch in this Dockerfile,
 # make sure to update `version.org.opensearch.latest` property in a POM file,
 # and to update the version in opensearch.Dockerfile as well.
-FROM docker.io/opensearchproject/opensearch:3.6.0@sha256:b5dd1512af2a99748c942cfbbd7f32162623336b210667d0fc6333c6321f171d
+FROM docker.io/opensearchproject/opensearch:3.7.0@sha256:123e6591a47b1d54686890551bdb35739c85193ecded381219fc9e059e18128f
