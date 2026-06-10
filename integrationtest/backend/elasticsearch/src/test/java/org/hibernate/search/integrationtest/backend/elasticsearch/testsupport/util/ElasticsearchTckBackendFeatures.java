@@ -573,10 +573,19 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean canHandleDeepNestedPredicate(FieldTypeDescriptor<?, ?> fieldTypeDescriptor) {
 		if ( ByteVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
 			// https://github.com/elastic/elasticsearch/issues/141830
+			// https://github.com/opensearch-project/k-NN/issues/3359
 			return isActualVersion(
 					es -> !es.isBetween( "9.3.0", "9.3.3" ),
-					os -> true,
-					aoss -> true
+					os -> !os.isMatching( "3.7.0" ),
+					aoss -> false
+			);
+		}
+		if ( FloatVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
+			// https://github.com/opensearch-project/k-NN/issues/3359
+			return isActualVersion(
+					es -> true,
+					os -> !os.isMatching( "3.7.0" ),
+					aoss -> false
 			);
 		}
 		return super.canHandleDeepNestedPredicate( fieldTypeDescriptor );
