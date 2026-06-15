@@ -6,8 +6,7 @@ package org.hibernate.search.engine.backend.types.converter.runtime;
 
 import org.hibernate.search.util.common.SearchException;
 
-@SuppressWarnings("deprecation")
-public interface ToDocumentValueConvertContext extends ToDocumentFieldValueConvertContext {
+public interface ToDocumentValueConvertContext {
 
 	/**
 	 * Extend the current context with the given extension,

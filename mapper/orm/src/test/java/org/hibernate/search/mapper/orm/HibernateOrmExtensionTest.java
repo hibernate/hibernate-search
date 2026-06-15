@@ -80,30 +80,12 @@ class HibernateOrmExtensionTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
-	void toDocumentFieldValueConverter() {
-		org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext context =
-				new ToDocumentValueConvertContextImpl( mappingContext );
-		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
-	}
-
-	@Test
-	@SuppressWarnings("deprecation") // for ejc
 	void toDocumentValueConverter() {
 		ToDocumentValueConvertContext context = new ToDocumentValueConvertContextImpl( mappingContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
-	void fromDocumentFieldValueConverter() {
-		org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext context =
-				new FromDocumentValueConvertContextImpl( sessionContext );
-		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-	}
-
-	@Test
-	@SuppressWarnings("deprecation") // for ejc
 	void fromDocumentValueConverter() {
 		FromDocumentValueConvertContext context = new FromDocumentValueConvertContextImpl( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );

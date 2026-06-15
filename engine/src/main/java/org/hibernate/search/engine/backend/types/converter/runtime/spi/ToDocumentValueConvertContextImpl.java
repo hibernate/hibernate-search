@@ -17,14 +17,6 @@ public class ToDocumentValueConvertContextImpl implements ToDocumentValueConvert
 	}
 
 	@Override
-	@Deprecated(since = "6.1")
-	public <T> T extension(
-			org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension<
-					T> extension) {
-		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, mappingContext ) );
-	}
-
-	@Override
 	public <T> T extension(ToDocumentValueConvertContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, mappingContext ) );
 	}
