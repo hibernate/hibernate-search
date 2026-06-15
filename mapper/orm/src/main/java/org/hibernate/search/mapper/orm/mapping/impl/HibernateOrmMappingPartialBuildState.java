@@ -10,7 +10,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizati
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredListenerTriggeredIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -19,16 +19,16 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 	private final PojoMappingDelegate mappingDelegate;
 	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
 	private final BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
-	private final ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
+	private final ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing;
 
 	HibernateOrmMappingPartialBuildState(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder,
 			BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder,
-			ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy) {
+			ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing) {
 		this.mappingDelegate = mappingDelegate;
 		this.typeContextContainerBuilder = typeContextContainerBuilder;
 		this.coordinationStrategyHolder = coordinationStrategyHolder;
-		this.configuredAutomaticIndexingStrategy = configuredAutomaticIndexingStrategy;
+		this.configuredListenerTriggeredIndexing = configuredListenerTriggeredIndexing;
 	}
 
 	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
@@ -37,7 +37,7 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 		return HibernateOrmMapping.create( mappingDelegate,
 				typeContextContainerBuilder.build( mappingDelegate.typeContextProvider(), sessionFactory ),
 				coordinationStrategyHolder,
-				configuredAutomaticIndexingStrategy,
+				configuredListenerTriggeredIndexing,
 				sessionFactory,
 				context.configurationPropertySource()
 		);
@@ -46,7 +46,7 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 	@Override
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
+			closer.push( ConfiguredListenerTriggeredIndexingStrategy::stop, configuredListenerTriggeredIndexing );
 			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 			closer.push( PojoMappingDelegate::close, mappingDelegate );

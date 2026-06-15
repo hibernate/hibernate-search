@@ -39,11 +39,6 @@ public interface ConfigurationLog {
 			value = "Hibernate Search was not initialized.")
 	SearchException hibernateSearchNotInitialized();
 
-	@Message(id = ID_OFFSET + 3,
-			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation,
-			List<String> validRepresentations);
-
 	@Message(id = ID_OFFSET + 18,
 			value = "Invalid entity loading cache lookup strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidEntityLoadingCacheLookupStrategyName(String invalidRepresentation,

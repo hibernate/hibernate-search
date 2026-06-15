@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface SearchIndexingPlanSessionContext {
 
-	ConfiguredIndexingPlanSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy();
+	ConfiguredIndexingPlanSynchronizationStrategy configuredIndexingPlanSynchronizationStrategy();
 
 	PojoRuntimeIntrospector runtimeIntrospector();
 

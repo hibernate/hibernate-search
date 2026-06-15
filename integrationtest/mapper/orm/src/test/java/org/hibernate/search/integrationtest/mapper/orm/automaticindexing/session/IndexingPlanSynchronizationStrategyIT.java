@@ -205,7 +205,7 @@ class IndexingPlanSynchronizationStrategyIT {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
-				sessionFactory, new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ),
+				sessionFactory, new CustomIndexingPlanSynchronizationStrategy( futureThatTookTooLong ),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -222,7 +222,7 @@ class IndexingPlanSynchronizationStrategyIT {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		SessionFactory sessionFactory = setup(
-				new CustomAutomaticIndexingSynchronizationStrategy(
+				new CustomIndexingPlanSynchronizationStrategy(
 						futureThatTookTooLong, OperationSubmitter.blocking() )
 		);
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
@@ -245,7 +245,7 @@ class IndexingPlanSynchronizationStrategyIT {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		SessionFactory sessionFactory = setup(
-				new CustomAutomaticIndexingSynchronizationStrategy(
+				new CustomIndexingPlanSynchronizationStrategy(
 						futureThatTookTooLong, OperationSubmitter.rejecting() )
 		);
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
@@ -428,7 +428,7 @@ class IndexingPlanSynchronizationStrategyIT {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
-				sessionFactory, new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ),
+				sessionFactory, new CustomIndexingPlanSynchronizationStrategy( futureThatTookTooLong ),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -448,7 +448,7 @@ class IndexingPlanSynchronizationStrategyIT {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		SessionFactory sessionFactory = setup(
-				new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ) );
+				new CustomIndexingPlanSynchronizationStrategy( futureThatTookTooLong ) );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -651,17 +651,17 @@ class IndexingPlanSynchronizationStrategyIT {
 
 	}
 
-	private static class CustomAutomaticIndexingSynchronizationStrategy implements IndexingPlanSynchronizationStrategy {
+	private static class CustomIndexingPlanSynchronizationStrategy implements IndexingPlanSynchronizationStrategy {
 
 		private final AtomicReference<CompletableFuture<?>> futureThatTookTooLong;
 
 		private final OperationSubmitter operationSubmitter;
 
-		private CustomAutomaticIndexingSynchronizationStrategy(AtomicReference<CompletableFuture<?>> futureThatTookTooLong) {
+		private CustomIndexingPlanSynchronizationStrategy(AtomicReference<CompletableFuture<?>> futureThatTookTooLong) {
 			this( futureThatTookTooLong, OperationSubmitter.blocking() );
 		}
 
-		private CustomAutomaticIndexingSynchronizationStrategy(
+		private CustomIndexingPlanSynchronizationStrategy(
 				AtomicReference<CompletableFuture<?>> futureThatTookTooLong,
 				OperationSubmitter operationSubmitter) {
 			this.futureThatTookTooLong = futureThatTookTooLong;

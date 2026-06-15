@@ -72,7 +72,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		if ( plan == null ) {
 			return;
 		}
-		sessionContext.configuredAutomaticIndexingSynchronizationStrategy()
+		sessionContext.configuredIndexingPlanSynchronizationStrategy()
 				.executeAndSynchronize( plan );
 	}
 

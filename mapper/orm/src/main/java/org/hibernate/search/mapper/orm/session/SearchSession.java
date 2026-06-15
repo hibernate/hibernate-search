@@ -250,22 +250,6 @@ public interface SearchSession extends SearchScopeProvider {
 	Session toOrmSession();
 
 	/**
-	 * Set the {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy} to use for this session.
-	 * <p>
-	 * Behavior is undefined if called while entity changes are pending:
-	 * be sure to call this only just after creating a session,
-	 * or just after committing a transaction.
-	 *
-	 * @param synchronizationStrategy The synchronization strategy to use
-	 * @see org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy
-	 *
-	 * @deprecated Use {@link #indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy)} instead.
-	 */
-	@Deprecated(since = "6.2")
-	void automaticIndexingSynchronizationStrategy(
-			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
-
-	/**
 	 * Set the {@link IndexingPlanSynchronizationStrategy} to use for this session.
 	 * <p>
 	 * Behavior is undefined if called while entity changes are pending:
