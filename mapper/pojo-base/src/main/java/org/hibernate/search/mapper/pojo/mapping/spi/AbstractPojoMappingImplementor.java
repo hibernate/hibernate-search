@@ -47,23 +47,14 @@ public abstract class AbstractPojoMappingImplementor<M>
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
-	@SuppressWarnings("deprecation") // For EJC
-	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate) {
-		this( delegate, PojoEntityReference::new );
-	}
-
 	/**
 	 * @param delegate The {@link PojoMappingDelegate}
-	 * @param entityReferenceFactoryDelegate The {@link PojoEntityReferenceFactoryDelegate},
 	 * used to implement the {@link EntityReferenceFactory}.
-	 * @deprecated Use {@link AbstractPojoMappingImplementor}.
 	 * This constructor is only present for backwards compatibility, for mappers that expose a custom entity reference type.
 	 */
-	@Deprecated(since = "6.2")
-	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate,
-			PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate) {
+	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate) {
 		this.delegate = delegate;
-		this.entityReferenceFactoryDelegate = entityReferenceFactoryDelegate;
+		this.entityReferenceFactoryDelegate = PojoEntityReference::new;
 		this.entityReferenceFactory = delegate.createEntityReferenceFactory( entityReferenceFactoryDelegate );
 		this.toDocumentValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 		this.toDocumentIdentifierContext = new IdentifierBridgeToDocumentIdentifierContextImpl( this );

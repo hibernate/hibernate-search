@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -18,7 +19,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -37,7 +37,6 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <E> A supertype of all types in this scope.
  */
-@SuppressWarnings("deprecation")
 public interface SearchScope<E> {
 
 	/**
@@ -87,7 +86,6 @@ public interface SearchScope<E> {
 	 * @return A projection factory.
 	 * @see SearchProjectionFactory
 	 */
-	@SuppressWarnings("deprecation")
 	SearchProjectionFactory<EntityReference, E> projection();
 
 	/**

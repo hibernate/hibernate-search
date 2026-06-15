@@ -11,6 +11,7 @@ import java.util.Collections;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -46,10 +47,9 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	default <T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
@@ -69,10 +69,9 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	<T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
@@ -88,10 +87,9 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	<SR, T> SearchQuerySelectStep<SR,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
@@ -107,10 +105,9 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	<T> SearchQuerySelectStep<?,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
@@ -126,11 +123,10 @@ public interface SearchSession extends SearchScopeProvider {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	@Incubating
 	<SR, T> SearchQuerySelectStep<SR,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,

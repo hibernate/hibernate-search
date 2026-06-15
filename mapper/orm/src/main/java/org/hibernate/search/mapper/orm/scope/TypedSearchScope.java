@@ -7,6 +7,7 @@ package org.hibernate.search.mapper.orm.scope;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.TypedSearchAggregationFactory;
@@ -16,7 +17,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.TypedSearchSortFactory;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -31,7 +31,6 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <E> A supertype of all types in this scope.
  */
-@SuppressWarnings("deprecation")
 public interface TypedSearchScope<SR, E> extends SearchScope<E> {
 
 	/**
@@ -84,7 +83,6 @@ public interface TypedSearchScope<SR, E> extends SearchScope<E> {
 	 * @see TypedSearchProjectionFactory
 	 */
 	@Override
-	@SuppressWarnings("deprecation")
 	TypedSearchProjectionFactory<SR, EntityReference, E> projection();
 
 	/**
