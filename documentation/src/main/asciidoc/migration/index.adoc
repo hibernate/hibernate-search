@@ -69,7 +69,14 @@ no database schema update is necessary for these tables.
 == Configuration
 
 The configuration properties in Hibernate Search {hibernateSearchVersion}, in general,
-are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort},
+with the following exceptions:
+
+* The deprecated `hibernate.search.automatic_indexing.*` configuration properties have been removed:
+** `hibernate.search.automatic_indexing.enabled` -- use `hibernate.search.indexing.listeners.enabled` instead.
+** `hibernate.search.automatic_indexing.strategy` -- use `hibernate.search.indexing.listeners.enabled` instead (note: it expects a boolean value, not a strategy name).
+** `hibernate.search.automatic_indexing.synchronization.strategy` -- use `hibernate.search.indexing.plan.synchronization.strategy` instead.
+** `hibernate.search.automatic_indexing.enable_dirty_check` -- removed without replacement; dirty check is now always performed.
 
 [[api]]
 == API
@@ -83,12 +90,44 @@ with the following exceptions:
 have been removed after being deprecated for a while now.
 Use Hibernate Search query DSL API to work with your query and results.
 
+* The `AutomaticIndexingSynchronizationStrategy` interface, `AutomaticIndexingSynchronizationStrategyNames`,
+`AutomaticIndexingSynchronizationConfigurationContext`, and `AutomaticIndexingStrategyName` enum have been removed.
+Use `IndexingPlanSynchronizationStrategy` and related types instead.
+The `SearchSession#automaticIndexingSynchronizationStrategy(...)` method has been removed;
+use `SearchSession#indexingPlanSynchronizationStrategy(...)` instead.
+
+* The `org.hibernate.search.mapper.orm.common.EntityReference` interface has been removed.
+Use `org.hibernate.search.engine.common.EntityReference` instead.
+The `org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport` interface has been removed;
+use `org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport` instead.
+
+* The deprecated converter interfaces with "Field" in the name have been removed:
+`FromDocumentFieldValueConverter`, `ToDocumentFieldValueConverter`,
+`FromDocumentFieldValueConvertContext`, `ToDocumentFieldValueConvertContext`,
+`FromDocumentFieldValueConvertContextExtension`, `ToDocumentFieldValueConvertContextExtension`.
+Use their renamed counterparts: `FromDocumentValueConverter`, `ToDocumentValueConverter`, etc.
+
+* The `entityReferences()` and `entityReference(Object)` methods on `EntityIndexingFailureContext`
+and `MassIndexingEntityFailureContext` have been removed.
+Use `failingEntityReferences()` and `failingEntityReference(EntityReference)` instead.
+
+* The `ValueReadHandleFactory` SPI interface has been removed. Use `ValueHandleFactory` instead.
+
+* The `Version.getVersionString()` method has been removed. Use `Version.versionString()` instead.
+
 [[spi]]
 == SPI
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
 in Hibernate Search {hibernateSearchVersion}
-is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort},
+with the following exceptions:
+
+* The `AutomaticIndexingStrategyStartContext` SPI interface has been removed. It was introduced by mistake and was never used.
+
+* The `ValueReadHandleFactory` SPI interface has been removed. Use `ValueHandleFactory` instead.
+
+* The `ElasticsearchBackendImplSettings` class (both `cfg.impl` and `cfg.spi` variants) has been removed.
 
 [[behavior]]
 == Behavior
