@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
@@ -33,7 +34,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQ
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
@@ -70,7 +70,6 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.util.common.impl.Closer;
 
-@SuppressWarnings("deprecation")
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
 		implements SearchMapping, AutoCloseable, HibernateOrmMappingContext,
 		HibernateOrmListenerContextProvider, BatchMappingContext,
@@ -156,7 +155,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			int fetchSize,
 			SchemaManagementListener schemaManagementListener,
 			MassIndexingDefaultCleanOperation massIndexingDefaultCleanOperation) {
-		super( mappingDelegate, org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference::new );
+		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
 		this.coordinationStrategyHolder = coordinationStrategyHolder;

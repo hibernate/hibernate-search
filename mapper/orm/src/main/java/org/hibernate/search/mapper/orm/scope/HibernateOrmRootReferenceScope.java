@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.orm.scope;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.reference.RootReferenceScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -14,8 +15,7 @@ public interface HibernateOrmRootReferenceScope<SR, T> extends RootReferenceScop
 
 	TypedSearchScope<SR, T> scope(SearchScopeProvider scopeProvider);
 
-	@SuppressWarnings("deprecation")
-	default SearchQuerySelectStep<SR, ?, org.hibernate.search.mapper.orm.common.EntityReference, T, ?, ?, ?> search(
+	default SearchQuerySelectStep<SR, ?, EntityReference, T, ?, ?, ?> search(
 			SearchSession session) {
 		return session.search( scope( session ) );
 	}

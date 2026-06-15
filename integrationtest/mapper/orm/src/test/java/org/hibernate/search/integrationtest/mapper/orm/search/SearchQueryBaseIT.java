@@ -694,7 +694,7 @@ class SearchQueryBaseIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			SearchQuery<org.hibernate.search.mapper.orm.common.EntityReference> query = searchSession.search( scope )
+			SearchQuery<EntityReference> query = searchSession.search( scope )
 					.select( f -> f.entityReference() )
 					.where( f -> f.matchAll() )
 					.toQuery();
@@ -710,11 +710,9 @@ class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME,
-							1 ),
-					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME,
-							2 ),
-					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 3 )
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 2 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 3 )
 			);
 		} );
 	}

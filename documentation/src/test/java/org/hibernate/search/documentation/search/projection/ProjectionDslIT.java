@@ -851,6 +851,7 @@ class ProjectionDslIT {
 		} );
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	void highlight() {
 		withinSearchSession( searchSession -> {

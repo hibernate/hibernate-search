@@ -11,9 +11,9 @@ import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -45,10 +45,9 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <T> SearchQuerySelectStep<NonStaticMetamodelScope,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
@@ -58,10 +57,9 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <SR, T> SearchQuerySelectStep<SR,
 			?,
-			org.hibernate.search.mapper.orm.common.EntityReference,
+			EntityReference,
 			T,
 			SearchLoadingOptionsStep,
 			?,
@@ -69,19 +67,17 @@ public class DelegatingSearchSession implements SearchSession {
 		return getDelegate().search( scope );
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public <T> SearchQuerySelectStep<?, ?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(SearchScope<T> scope) {
 		return getDelegate().search( scope );
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <
 			SR,
 			T> SearchQuerySelectStep<SR,
 					?,
-					org.hibernate.search.mapper.orm.common.EntityReference,
+					EntityReference,
 					T,
 					SearchLoadingOptionsStep,
 					?,
