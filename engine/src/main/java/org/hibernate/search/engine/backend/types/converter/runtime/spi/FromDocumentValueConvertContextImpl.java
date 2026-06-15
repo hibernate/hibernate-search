@@ -17,14 +17,6 @@ public class FromDocumentValueConvertContextImpl implements FromDocumentValueCon
 	}
 
 	@Override
-	@Deprecated(since = "6.1")
-	public <T> T extension(
-			org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension<
-					T> extension) {
-		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
-	}
-
-	@Override
 	public <T> T extension(FromDocumentValueConvertContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
 	}
