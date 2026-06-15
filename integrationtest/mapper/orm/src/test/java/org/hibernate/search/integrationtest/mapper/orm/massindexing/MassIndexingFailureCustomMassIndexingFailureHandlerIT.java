@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.EntityReference;
@@ -231,20 +230,11 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 				.isEqualTo( failingOperationAsString );
 		assertThat( context.failingEntityReferences() )
 				.hasSize( 1 );
-		// Also check the legacy method
-		@SuppressWarnings("deprecation")
-		List<Object> legacyReferences = context.entityReferences();
-		assertThat( legacyReferences )
-				.hasSize( 1 );
 
 		if ( entityReference != null ) {
 			assertThat( context.failingEntityReferences() )
 					.element( 0 )
 					.isEqualTo( entityReference );
-			assertThat( legacyReferences )
-					.element( 0 )
-					.asString()
-					.isEqualTo( entityReference.toString() );
 		}
 	}
 }
