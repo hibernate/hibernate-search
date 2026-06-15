@@ -99,7 +99,6 @@ class BootstrapLogsIT {
 
 		// Also check that retrieving the version string explicitly returns the right version string.
 		assertThat( Version.versionString() ).isEqualTo( expectedHibernateSearchVersion );
-		assertThat( Version.getVersionString() ).isEqualTo( expectedHibernateSearchVersion );
 	}
 
 	@Test
