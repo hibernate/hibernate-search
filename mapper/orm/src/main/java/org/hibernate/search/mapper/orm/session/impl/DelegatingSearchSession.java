@@ -136,13 +136,6 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
-	public void automaticIndexingSynchronizationStrategy(
-			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		getDelegate().automaticIndexingSynchronizationStrategy( synchronizationStrategy );
-	}
-
-	@Override
 	public void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		getDelegate().indexingPlanSynchronizationStrategy( synchronizationStrategy );
 	}

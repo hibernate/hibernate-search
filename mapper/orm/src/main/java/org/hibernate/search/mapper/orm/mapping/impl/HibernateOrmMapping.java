@@ -50,7 +50,7 @@ import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContex
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.TypedSearchScopeImpl;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredListenerTriggeredIndexingStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
@@ -104,7 +104,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public static MappingImplementor<HibernateOrmMapping> create(
 			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
 			BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder,
-			ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy,
+			ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing,
 			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource) {
 		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
 				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
@@ -121,7 +121,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				mappingDelegate,
 				typeContextContainer, sessionFactory,
 				coordinationStrategyHolder,
-				configuredAutomaticIndexingStrategy,
+				configuredListenerTriggeredIndexing,
 				cacheLookupStrategy, fetchSize,
 				schemaManagementListener,
 				massIndexingDefaultCleanOperation
@@ -131,7 +131,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
-	private final ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
+	private final ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 	private final int fetchSize;
 
@@ -151,7 +151,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
 			BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder,
-			ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy,
+			ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			int fetchSize,
 			SchemaManagementListener schemaManagementListener,
@@ -160,7 +160,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
 		this.coordinationStrategyHolder = coordinationStrategyHolder;
-		this.configuredAutomaticIndexingStrategy = configuredAutomaticIndexingStrategy;
+		this.configuredListenerTriggeredIndexing = configuredListenerTriggeredIndexing;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
 		this.schemaManagementListener = schemaManagementListener;
@@ -179,7 +179,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public CompletableFuture<?> start(MappingStartContext context) {
 		integrationHandle = context.integrationHandle();
 		// This may fail and normally doesn't involve I/O, so do it first
-		configuredAutomaticIndexingStrategy.start(
+		configuredListenerTriggeredIndexing.start(
 				this,
 				new AutomaticIndexingStrategyStartContextImpl( context ),
 				this
@@ -219,7 +219,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	protected void doStop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
+			closer.push( ConfiguredListenerTriggeredIndexingStrategy::stop, configuredListenerTriggeredIndexing );
 			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 			closer.push( TenancyConfiguration::close, tenancyConfiguration );
@@ -414,10 +414,10 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public ConfiguredIndexingPlanSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(
+	public ConfiguredIndexingPlanSynchronizationStrategy currentIndexingPlanSynchronizationStrategy(
 			SessionImplementor session) {
 		return HibernateOrmSearchSession.get( this, session )
-				.configuredAutomaticIndexingSynchronizationStrategy();
+				.configuredIndexingPlanSynchronizationStrategy();
 	}
 
 	@Override
@@ -471,7 +471,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 
 		return new HibernateOrmSearchSession.Builder( this, typeContextContainer,
-				configuredAutomaticIndexingStrategy, sessionImplementor );
+				configuredListenerTriggeredIndexing, sessionImplementor );
 	}
 
 	@Override

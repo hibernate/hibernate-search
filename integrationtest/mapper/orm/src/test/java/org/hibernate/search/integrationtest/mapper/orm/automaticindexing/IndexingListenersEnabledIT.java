@@ -4,33 +4,28 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
- * Test warning message for enabling/disabling the dirty check.
+ * Test enabling/disabling indexing listeners.
  */
-@TestForIssue(jiraKey = "HSEARCH-4866")
-class AutomaticIndexingDirtyCheckIT {
-
-	private static final String DEPRECATED_PROPERTY_MESSAGE = "Configuration property "
-			+ "'hibernate.search.automatic_indexing.enable_dirty_check' is deprecated. "
-			+ "This setting will be removed in a future version. "
-			+ "There will be no alternative provided to replace it. "
-			+ "After the removal of this property in a future version, "
-			+ "a dirty check will always be performed when considering whether to trigger reindexing.";
+@TestForIssue(jiraKey = { "HSEARCH-4268", "HSEARCH-4616" })
+class IndexingListenersEnabledIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -38,16 +33,13 @@ class AutomaticIndexingDirtyCheckIT {
 	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@RegisterExtension
-	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
-
 	private SessionFactory setup(Boolean enabled) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class )
 		);
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.enable_dirty_check", enabled )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, enabled )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 		return sessionFactory;
@@ -55,28 +47,49 @@ class AutomaticIndexingDirtyCheckIT {
 
 	@Test
 	void enabled_default() {
-		logged.expectMessage( DEPRECATED_PROPERTY_MESSAGE ).never();
+		SessionFactory sessionFactory = setup( null );
 
-		setup( null );
+		with( sessionFactory ).runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.NAME )
+					.add( "1", b -> b
+							.field( "text", entity1.getText() )
+					);
+		} );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	void enabled_explicit() {
-		logged.expectMessage( DEPRECATED_PROPERTY_MESSAGE ).never();
+		SessionFactory sessionFactory = setup( true );
 
-		setup( true );
+		with( sessionFactory ).runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.NAME )
+					.add( "1", b -> b
+							.field( "text", entity1.getText() )
+					);
+		} );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	void disabled() {
-		logged.expectMessage( DEPRECATED_PROPERTY_MESSAGE ).once();
+		SessionFactory sessionFactory = setup( false );
 
-		setup( false );
+		with( sessionFactory ).runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
+			session.persist( entity1 );
+
+			// Do not expect any work
+		} );
 		backendMock.verifyExpectationsMet();
 	}
 

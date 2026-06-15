@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMapperHints;
-import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredListenerTriggeredIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
@@ -92,7 +92,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 
 	private BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
-	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
+	private ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing;
 
 	private HibernateOrmMappingInitiator(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
@@ -110,7 +110,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
+			closer.push( ConfiguredListenerTriggeredIndexingStrategy::stop, configuredListenerTriggeredIndexing );
 			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 		}
@@ -129,12 +129,12 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		CoordinationConfigurationContextImpl coordinationStrategyConfiguration =
 				preIntegrationService.coordinationStrategyConfiguration();
 		coordinationStrategyHolder = coordinationStrategyConfiguration.strategyHolder();
-		configuredAutomaticIndexingStrategy = coordinationStrategyConfiguration.createAutomaticIndexingStrategy();
+		configuredListenerTriggeredIndexing = coordinationStrategyConfiguration.createListenerTriggeredIndexingConfiguration();
 
 		// If the underlying coordination strategy uses an event queue,
 		// it will need to send events relative to contained entities,
 		// and thus contained entities need to have an identity mapping.
-		containedEntityIdentityMappingRequired( configuredAutomaticIndexingStrategy.usesAsyncProcessing() );
+		containedEntityIdentityMappingRequired( configuredListenerTriggeredIndexing.usesAsyncProcessing() );
 
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
@@ -171,6 +171,6 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	@Override
 	protected PojoMapperDelegate<HibernateOrmMappingPartialBuildState> createMapperDelegate() {
 		return new HibernateOrmMapperDelegate( basicTypeMetadataProvider, coordinationStrategyHolder,
-				configuredAutomaticIndexingStrategy );
+				configuredListenerTriggeredIndexing );
 	}
 }

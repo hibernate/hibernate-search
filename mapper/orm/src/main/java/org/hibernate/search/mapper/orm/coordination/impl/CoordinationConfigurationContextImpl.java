@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingPr
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredListenerTriggeredIndexingStrategy;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class CoordinationConfigurationContextImpl implements CoordinationConfigurationContext, AutoCloseable {
@@ -83,8 +83,8 @@ public final class CoordinationConfigurationContextImpl implements CoordinationC
 		return strategyHolder;
 	}
 
-	public ConfiguredAutomaticIndexingStrategy createAutomaticIndexingStrategy() {
-		return new ConfiguredAutomaticIndexingStrategy( senderFactory, enlistsInTransaction );
+	public ConfiguredListenerTriggeredIndexingStrategy createListenerTriggeredIndexingConfiguration() {
+		return new ConfiguredListenerTriggeredIndexingStrategy( senderFactory, enlistsInTransaction );
 	}
 
 	public List<HibernateSearchOrmMappingProducer> mappingProducers() {

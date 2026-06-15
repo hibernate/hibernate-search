@@ -22,7 +22,7 @@ public interface HibernateOrmListenerContextProvider {
 	PojoTypeIndexingPlan currentIndexingPlanIfTypeIncluded(SharedSessionContractImplementor session,
 			PojoRawTypeIdentifier<?> typeIdentifier);
 
-	ConfiguredIndexingPlanSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(
+	ConfiguredIndexingPlanSynchronizationStrategy currentIndexingPlanSynchronizationStrategy(
 			SessionImplementor session);
 
 }

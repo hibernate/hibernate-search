@@ -251,7 +251,7 @@ public final class HibernateSearchEventListener
 		// since the execute phase is supposed to be triggered by the transaction commit
 		if ( !session.isTransactionInProgress() ) {
 			// out of transaction it will trigger both of them
-			contextProvider.currentAutomaticIndexingSynchronizationStrategy( session )
+			contextProvider.currentIndexingPlanSynchronizationStrategy( session )
 					.executeAndSynchronize( plan );
 		}
 	}

@@ -9,7 +9,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMappingHints;
-import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredListenerTriggeredIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
@@ -22,20 +22,20 @@ public final class HibernateOrmMapperDelegate
 
 	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
 	private final BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
-	private final ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
+	private final ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing;
 
 	HibernateOrmMapperDelegate(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder,
-			ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy) {
+			ConfiguredListenerTriggeredIndexingStrategy configuredListenerTriggeredIndexing) {
 		typeContextContainerBuilder = new HibernateOrmTypeContextContainer.Builder( basicTypeMetadataProvider );
 		this.coordinationStrategyHolder = coordinationStrategyHolder;
-		this.configuredAutomaticIndexingStrategy = configuredAutomaticIndexingStrategy;
+		this.configuredListenerTriggeredIndexing = configuredListenerTriggeredIndexing;
 	}
 
 	@Override
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
+			closer.push( ConfiguredListenerTriggeredIndexingStrategy::stop, configuredListenerTriggeredIndexing );
 			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 		}
@@ -56,7 +56,7 @@ public final class HibernateOrmMapperDelegate
 	@Override
 	public HibernateOrmMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
 		return new HibernateOrmMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder,
-				coordinationStrategyHolder, configuredAutomaticIndexingStrategy );
+				coordinationStrategyHolder, configuredListenerTriggeredIndexing );
 	}
 
 	@Override

@@ -21,7 +21,6 @@ import org.hibernate.engine.spi.TransactionCompletionCallbacks;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
@@ -101,7 +100,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final SharedSessionContractImplementor sessionImplementor;
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
-	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
+	private final ConfiguredListenerTriggeredIndexingStrategy listenerTriggeredIndexing;
 	private ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter;
 	private ConfiguredIndexingPlanSynchronizationStrategy indexingPlanSynchronizationStrategy;
 
@@ -111,12 +110,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		super( builder.mappingContext );
 		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
-		this.automaticIndexingStrategy = builder.automaticIndexingStrategy;
+		this.listenerTriggeredIndexing = builder.listenerTriggeredIndexing;
 		this.sessionImplementor = builder.sessionImplementor;
 		this.runtimeIntrospector = builder.buildRuntimeIntrospector();
 		// make sure that even if a session filter is not configured we will fall back to an application one if needed.
 		this.configuredIndexingPlanFilter = mappingContext.applicationIndexingPlanFilter();
-		this.indexingPlanSynchronizationStrategy = automaticIndexingStrategy.defaultIndexingPlanSynchronizationStrategy();
+		this.indexingPlanSynchronizationStrategy = listenerTriggeredIndexing.defaultIndexingPlanSynchronizationStrategy();
 	}
 
 	@Override
@@ -243,20 +242,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	@SuppressWarnings("deprecation") // need to keep OLD API still implemented
-	public void automaticIndexingSynchronizationStrategy(
-			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		indexingPlanSynchronizationStrategy(
-				synchronizationStrategy instanceof DelegatingAutomaticIndexingSynchronizationStrategy
-						? ( (DelegatingAutomaticIndexingSynchronizationStrategy) synchronizationStrategy ).delegate()
-						: new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
-		);
-	}
-
-	@Override
 	public void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlanSynchronizationStrategy =
-				automaticIndexingStrategy.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
+				listenerTriggeredIndexing.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
 	}
 
 	@Override
@@ -264,7 +252,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		ConfiguredSearchIndexingPlanFilter configuredFilter = mappingContext.configuredSearchIndexingPlanFilter(
 				filter );
 
-		if ( automaticIndexingStrategy.usesAsyncProcessing() && !configuredFilter.supportsAsyncProcessing() ) {
+		if ( listenerTriggeredIndexing.usesAsyncProcessing() && !configuredFilter.supportsAsyncProcessing() ) {
 			throw ConfigurationLog.INSTANCE.cannotApplySessionFilterWhenAsyncProcessingIsUsed();
 		}
 		configuredIndexingPlanFilter = configuredFilter;
@@ -318,11 +306,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 		ConfiguredIndexingPlanSynchronizationStrategy currentSynchronizationStrategy =
 				indexingPlanSynchronizationStrategy;
-		plan = automaticIndexingStrategy.createIndexingPlan( this, currentSynchronizationStrategy );
+		plan = listenerTriggeredIndexing.createIndexingPlan( this, currentSynchronizationStrategy );
 		extension.pojoIndexingPlan( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
-			Synchronization txSync = automaticIndexingStrategy.createTransactionWorkQueueSynchronization(
+			Synchronization txSync = listenerTriggeredIndexing.createTransactionWorkQueueSynchronization(
 					plan, extension, transactionIdentifier,
 					currentSynchronizationStrategy
 			);
@@ -332,7 +320,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan() {
-		return automaticIndexingStrategy
+		return listenerTriggeredIndexing
 				.createIndexingQueueEventProcessingPlan( this, indexingPlanSynchronizationStrategy );
 	}
 
@@ -342,7 +330,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public ConfiguredIndexingPlanSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy() {
+	public ConfiguredIndexingPlanSynchronizationStrategy configuredIndexingPlanSynchronizationStrategy() {
 		return indexingPlanSynchronizationStrategy;
 	}
 
@@ -400,16 +388,16 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public static class Builder {
 		private final HibernateOrmSearchSessionMappingContext mappingContext;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-		private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
+		private final ConfiguredListenerTriggeredIndexingStrategy listenerTriggeredIndexing;
 		private final SharedSessionContractImplementor sessionImplementor;
 
 		public Builder(HibernateOrmSearchSessionMappingContext mappingContext,
 				HibernateOrmSessionTypeContextProvider typeContextProvider,
-				ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy,
+				ConfiguredListenerTriggeredIndexingStrategy listenerTriggeredIndexing,
 				SharedSessionContractImplementor sessionImplementor) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
-			this.automaticIndexingStrategy = automaticIndexingStrategy;
+			this.listenerTriggeredIndexing = listenerTriggeredIndexing;
 			this.sessionImplementor = sessionImplementor;
 		}
 
