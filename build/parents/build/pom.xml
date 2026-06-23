@@ -185,7 +185,7 @@
         <!-- When updating to SB 4 make sure to update the main Jenkinsfile to include the showcase ITs in the non-default builds -->
         <version.org.springframework.boot>4.1.0</version.org.springframework.boot>
         <!-- Spring Boot 3 JTA starter and related libs version: -->
-        <version.dev.snowdrop>4.0.0</version.dev.snowdrop>
+        <version.dev.snowdrop>4.1.0</version.dev.snowdrop>
         <version.io.agroal>3.2</version.io.agroal>
 
         <version.jsoup>1.22.2</version.jsoup>
