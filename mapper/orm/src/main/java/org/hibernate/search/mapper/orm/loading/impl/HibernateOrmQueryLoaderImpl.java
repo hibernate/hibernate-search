@@ -9,7 +9,6 @@ import java.util.Set;
 
 import jakarta.persistence.FindOption;
 
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.query.SelectionQuery;
@@ -58,12 +57,12 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 	}
 
 	@Override
-	public SelectionQuery<E> createLoadingQuery(SessionImplementor session, String idParameterName) {
+	public SelectionQuery<E> createLoadingQuery(SharedSessionContractImplementor session, String idParameterName) {
 		return queryFactory.createQueryForLoadByUniqueProperty( session, idParameterName );
 	}
 
 	@Override
-	public List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options) {
+	public List<E> findMultiple(SharedSessionContractImplementor session, List<?> ids, FindOption... options) {
 		return queryFactory.findMultiple( session, ids, options );
 	}
 

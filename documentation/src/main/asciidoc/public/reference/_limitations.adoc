@@ -212,9 +212,6 @@ Hibernate Search does not determine which properties actually changed.
 As a result, every update is treated as if all properties were modified,
 and the entity will always be reindexed, even if only non-indexed properties changed.
 With a regular `Session`, Hibernate Search would skip reindexing in such cases.
-* At the moment it is not possible to obtain a `SearchSession` (e.g. through `Search.session(...)`)
-from a `StatelessSession`. Search queries and explicit indexing plan access are
-not available from a `StatelessSession`.
 * Updating a contained entity does not reindex containing entities and results in an exception.
 When an entity that is embedded in another entity's index
 (via <<mapping-indexedembedded,`@IndexedEmbedded`>>) is updated through a `StatelessSession`,
@@ -233,7 +230,6 @@ This limitation applies when a _contained_ (non-indexed) entity is updated
 and the update would need to propagate to a _containing_ (indexed) entity.
 Directly inserting or updating the containing entity itself works correctly.
 
-
 [[limitations-stateless-session-solution]]
 === Solutions and workarounds
 
@@ -242,14 +238,13 @@ listener-triggered indexing works transparently with `StatelessSession` --
 no special configuration is needed.
 
 If you need features that are not supported with `StatelessSession`
-(such as optimized dirty checking or search queries),
-use a regular `Session` instead.
+(such as optimized dirty checking, etc.), use a regular `Session` instead.
 
-If your use of `StatelessSession` is not fully covering the listener-triggered indexing,
+If your use of `StatelessSession` is not fully covered by the listener-triggered indexing,
 please report that back to us, and in the meantime you could always index these
 entities explicitly, either using the <<indexing-massindexer,`MassIndexer`>>,
 using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
-or <<indexing-explicit,explicitly through a `SearchIndexingPlan`>>.
+or <<indexing-explicit,explicitly through a `Session` based `SearchIndexingPlan`>>.
 
 [[limitations-indexing-plan-serialization]]
 == Listener-triggered indexing is not compatible with `Session` serialization
