@@ -86,14 +86,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return null;
 		}
 
-		if ( sessionImplementor instanceof SessionImplementor implementor ) {
-			searchSession = context.createSessionBuilder( implementor ).build();
-			extension.searchSession( searchSession );
-			return searchSession;
-		}
-		else {
-			throw OrmMiscLog.INSTANCE.unsupportedSessionType( sessionImplementor.getClass() );
-		}
+		searchSession = context.createSessionBuilder( sessionImplementor ).build();
+		extension.searchSession( searchSession );
+		return searchSession;
 	}
 
 	private final HibernateOrmSearchSessionMappingContext mappingContext;
@@ -125,12 +120,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public String tenantIdentifier() {
-		return session().getTenantIdentifier();
+		return sessionImplementor.getTenantIdentifier();
 	}
 
 	@Override
 	public Object tenantIdentifierValue() {
-		return session().getTenantIdentifierValue();
+		return sessionImplementor.getTenantIdentifierValue();
 	}
 
 	@Override
