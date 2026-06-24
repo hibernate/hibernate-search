@@ -129,6 +129,9 @@ with the following exceptions:
 
 * The `ElasticsearchBackendImplSettings` class (both `cfg.impl` and `cfg.spi` variants) has been removed.
 
+* The `HibernateOrmQueryLoader.createMultiIdentifierLoadAccess(SessionImplementor)` method has been removed.
+Use `HibernateOrmQueryLoader.findMultiple(SessionImplementor, List, FindOption...)` instead.
+
 [[behavior]]
 == Behavior
 
