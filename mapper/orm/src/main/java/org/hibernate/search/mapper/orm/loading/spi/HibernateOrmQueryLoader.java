@@ -19,13 +19,6 @@ public interface HibernateOrmQueryLoader<E, I> {
 
 	SelectionQuery<E> createLoadingQuery(SessionImplementor session, String idParameterName);
 
-	/**
-	 * @deprecated Use {@link #findMultiple(SessionImplementor, List, FindOption...)} instead.
-	 */
-	@Deprecated(forRemoval = true, since = "8.2")
-	@SuppressWarnings("removal")
-	org.hibernate.MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session);
-
 	List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options);
 
 	boolean uniquePropertyIsTheEntityId();

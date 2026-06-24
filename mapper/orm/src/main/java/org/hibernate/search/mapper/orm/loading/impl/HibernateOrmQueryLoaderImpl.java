@@ -9,7 +9,6 @@ import java.util.Set;
 
 import jakarta.persistence.FindOption;
 
-import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
@@ -61,13 +60,6 @@ class HibernateOrmQueryLoaderImpl<E, I> implements HibernateOrmQueryLoader<E, I>
 	@Override
 	public SelectionQuery<E> createLoadingQuery(SessionImplementor session, String idParameterName) {
 		return queryFactory.createQueryForLoadByUniqueProperty( session, idParameterName );
-	}
-
-	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true, since = "8.2")
-	@Override
-	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
-		return queryFactory.createMultiIdentifierLoadAccess( session );
 	}
 
 	@Override

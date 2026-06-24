@@ -15,7 +15,6 @@ import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
-import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
@@ -76,13 +75,6 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 		Path<?> uniquePropertyInRoot = root.get( uniquePropertyName );
 		criteriaQuery.where( uniquePropertyInRoot.in( idsParameter ) );
 		return session.createQuery( criteriaQuery );
-	}
-
-	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true, since = "8.2")
-	@Override
-	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
-		return session.byMultipleIds( entityClass );
 	}
 
 	@Override
