@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.typebridge.ormcontext;
 
-import org.hibernate.Session;
+import org.hibernate.SharedSessionContract;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.mapper.orm.HibernateOrmExtension;
@@ -36,8 +36,8 @@ public class MyEntityTypeBinder implements TypeBinder {
 
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			Session session = context.extension( HibernateOrmExtension.get() ) // <1>
-					.session(); // <2>
+			SharedSessionContract session = context.extension( HibernateOrmExtension.get() ) // <1>
+					.sessionContract(); // <2>
 			// ... do something with the session ...
 			//end::include[]
 			/*

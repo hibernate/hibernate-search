@@ -7,7 +7,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.RepresentationMode;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
@@ -27,7 +27,7 @@ abstract class PersistenceContextThenSecondLevelCacheLookupStrategy
 		implements EntityLoadingCacheLookupStrategyImplementor {
 
 	static EntityLoadingCacheLookupStrategyImplementor create(EntityMappingType entityMappingType,
-			SessionImplementor session) {
+			SharedSessionContractImplementor session) {
 		EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy =
 				PersistenceContextLookupStrategy.create( session );
 		EntityPersister entityPersister = entityMappingType.getEntityPersister();
@@ -60,13 +60,13 @@ abstract class PersistenceContextThenSecondLevelCacheLookupStrategy
 	private final EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy;
 	private final EntityDataAccess cacheAccess;
 	protected final EntityPersister persister;
-	protected final SessionImplementor session;
+	protected final SharedSessionContractImplementor session;
 
 	private PersistenceContextThenSecondLevelCacheLookupStrategy(
 			EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy,
 			EntityPersister persister,
 			EntityDataAccess cacheAccess,
-			SessionImplementor session) {
+			SharedSessionContractImplementor session) {
 		this.persistenceContextLookupStrategy = persistenceContextLookupStrategy;
 		this.persister = persister;
 		this.cacheAccess = cacheAccess;
@@ -113,7 +113,7 @@ abstract class PersistenceContextThenSecondLevelCacheLookupStrategy
 
 		private DynamicMapPersistenceContextThenSecondLevelCacheLookupStrategy(
 				EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy, EntityPersister persister,
-				EntityDataAccess cacheAccess, SessionImplementor session) {
+				EntityDataAccess cacheAccess, SharedSessionContractImplementor session) {
 			super( persistenceContextLookupStrategy, persister, cacheAccess, session );
 		}
 
@@ -129,7 +129,7 @@ abstract class PersistenceContextThenSecondLevelCacheLookupStrategy
 
 		private PojoPersistenceContextThenSecondLevelCacheLookupStrategy(
 				EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy, EntityPersister persister,
-				EntityDataAccess cacheAccess, SessionImplementor session) {
+				EntityDataAccess cacheAccess, SharedSessionContractImplementor session) {
 			super( persistenceContextLookupStrategy, persister, cacheAccess, session );
 		}
 

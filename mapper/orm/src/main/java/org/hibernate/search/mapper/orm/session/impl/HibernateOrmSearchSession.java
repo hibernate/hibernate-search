@@ -8,14 +8,16 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnore
 
 import java.util.Collection;
 
+import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Synchronization;
 
 import org.hibernate.Session;
+import org.hibernate.SharedSessionContract;
+import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.TransactionCompletionCallbacks;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -209,6 +211,16 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public EntityAgent toEntityAgent() {
+		if ( sessionImplementor instanceof EntityAgent entityAgent ) {
+			return entityAgent;
+		}
+		else {
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( sessionImplementor.getClass(), EntityAgent.class );
+		}
+	}
+
+	@Override
 	public Session toOrmSession() {
 		if ( sessionImplementor instanceof Session session ) {
 			return session;
@@ -219,13 +231,29 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SessionImplementor session() {
-		if ( sessionImplementor instanceof SessionImplementor session ) {
-			return session;
+	public StatelessSession toOrmStatelessSession() {
+		if ( sessionImplementor instanceof StatelessSession statelessSession ) {
+			return statelessSession;
 		}
 		else {
-			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( sessionImplementor.getClass(), SessionImplementor.class );
+			throw OrmMiscLog.INSTANCE.sessionImplementorIsNot( sessionImplementor.getClass(), StatelessSession.class );
 		}
+	}
+
+	@Override
+	public SharedSessionContract sessionContract() {
+		return sessionImplementor;
+	}
+
+	@SuppressWarnings({ "deprecation", "removal" })
+	@Override
+	public Session session() {
+		return toOrmSession();
+	}
+
+	@Override
+	public SharedSessionContractImplementor sessionImplementor() {
+		return sessionImplementor;
 	}
 
 	@Override
