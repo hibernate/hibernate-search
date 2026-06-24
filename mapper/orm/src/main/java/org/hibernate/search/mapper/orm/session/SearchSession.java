@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -237,13 +239,27 @@ public interface SearchSession extends SearchScopeProvider {
 
 	/**
 	 * @return The underlying {@link EntityManager} used by this {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the underlying session is of an incompatible type.
 	 */
 	EntityManager toEntityManager();
 
 	/**
+	 * @return The underlying {@link EntityAgent} used by this {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the underlying session is of an incompatible type.
+	 */
+	EntityAgent toEntityAgent();
+
+	/**
 	 * @return The underlying {@link Session} used by this {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the underlying session is of an incompatible type..
 	 */
 	Session toOrmSession();
+
+	/**
+	 * @return The underlying {@link StatelessSession} used by this {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the underlying session is of an incompatible type.
+	 */
+	StatelessSession toOrmStatelessSession();
 
 	/**
 	 * Set the {@link IndexingPlanSynchronizationStrategy} to use for this session.

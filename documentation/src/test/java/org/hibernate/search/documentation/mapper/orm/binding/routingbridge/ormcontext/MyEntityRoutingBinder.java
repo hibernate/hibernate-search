@@ -4,7 +4,7 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.routingbridge.ormcontext;
 
-import org.hibernate.Session;
+import org.hibernate.SharedSessionContract;
 import org.hibernate.search.mapper.orm.HibernateOrmExtension;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.util.common.AssertionFailure;
 
+@SuppressWarnings("deprecation")
 public class MyEntityRoutingBinder implements RoutingBinder {
 
 	@Override
@@ -29,8 +30,8 @@ public class MyEntityRoutingBinder implements RoutingBinder {
 		@Override
 		public void route(DocumentRoutes routes, Object entityIdentifier, MyEntity indexedEntity,
 				RoutingBridgeRouteContext context) {
-			Session session = context.extension( HibernateOrmExtension.get() ) // <1>
-					.session(); // <2>
+			SharedSessionContract session = context.extension( HibernateOrmExtension.get() ) // <1>
+					.sessionContract(); // <2>
 			// ... do something with the session ...
 			//end::include[]
 			/*

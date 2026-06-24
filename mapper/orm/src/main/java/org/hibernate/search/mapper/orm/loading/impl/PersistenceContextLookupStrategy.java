@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.PersistenceContext;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /**
  * A lookup strategy that checks the persistence context (first level cache).
@@ -18,13 +18,13 @@ import org.hibernate.engine.spi.SessionImplementor;
 class PersistenceContextLookupStrategy
 		implements EntityLoadingCacheLookupStrategyImplementor {
 
-	static PersistenceContextLookupStrategy create(SessionImplementor session) {
+	static PersistenceContextLookupStrategy create(SharedSessionContractImplementor session) {
 		return new PersistenceContextLookupStrategy( session );
 	}
 
 	private final PersistenceContext persistenceContext;
 
-	private PersistenceContextLookupStrategy(SessionImplementor session) {
+	private PersistenceContextLookupStrategy(SharedSessionContractImplementor session) {
 		this.persistenceContext = session.getPersistenceContext();
 	}
 

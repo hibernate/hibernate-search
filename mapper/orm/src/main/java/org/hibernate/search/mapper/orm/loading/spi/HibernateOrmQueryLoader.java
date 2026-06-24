@@ -8,7 +8,6 @@ import java.util.List;
 
 import jakarta.persistence.FindOption;
 
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
 
@@ -17,9 +16,9 @@ public interface HibernateOrmQueryLoader<E, I> {
 
 	SelectionQuery<I> createIdentifiersQuery(SharedSessionContractImplementor session);
 
-	SelectionQuery<E> createLoadingQuery(SessionImplementor session, String idParameterName);
+	SelectionQuery<E> createLoadingQuery(SharedSessionContractImplementor session, String idParameterName);
 
-	List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options);
+	List<E> findMultiple(SharedSessionContractImplementor session, List<?> ids, FindOption... options);
 
 	boolean uniquePropertyIsTheEntityId();
 }

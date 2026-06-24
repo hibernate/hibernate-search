@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.PersistenceException;
@@ -75,7 +76,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 		final EntityGraphHint<E> entityGraphHint =
 				(EntityGraphHint<E>) loadingOptions.entityGraphHintOrNullForType( entityMappingType );
 		final SelectionQueryImplementor<E> query =
-				queryFactory.createQueryForLoadByUniqueProperty( sessionContext.session(), IDS_PARAMETER_NAME );
+				queryFactory.createQueryForLoadByUniqueProperty( sessionContext.sessionImplementor(), IDS_PARAMETER_NAME );
 
 		query.setFetchSize( fetchSize );
 		if ( timeout != null ) {
@@ -85,5 +86,13 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 		return entityGraphHint == null
 				? query
 				: query.asSelectionQuery( entityGraphHint.graph, entityGraphHint.semantic );
+	}
+
+	protected static <T> List<T> createListContainingNulls(int size) {
+		List<T> list = new ArrayList<>( size );
+		for ( int i = 0; i < size; i++ ) {
+			list.add( null );
+		}
+		return list;
 	}
 }

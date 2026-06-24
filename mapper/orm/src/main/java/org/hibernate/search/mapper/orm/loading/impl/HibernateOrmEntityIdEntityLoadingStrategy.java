@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.StatelessSessionImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.metamodel.mapping.EntityMappingType;
@@ -100,13 +101,19 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHib
 	private PojoSelectionEntityLoader<?> doCreate(EntityMappingType entityMappingType,
 			HibernateOrmLoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
-		var session = sessionContext.session();
+		var session = sessionContext.sessionImplementor();
 		var sessionFactory = session.getSessionFactory();
 		EntityMappingType rootEntityMappingType = HibernateOrmUtils.entityMappingType( sessionFactory, rootEntityName );
 		if ( !rootEntityClass.isAssignableFrom( entityMappingType.getJavaType().getJavaTypeClass() ) ) {
 			throw invalidTypeException( entityMappingType );
 		}
 
+		TypeQueryFactory<E, ?> factory = createFactory( sessionFactory, entityMappingType );
+
+		if ( session instanceof StatelessSessionImplementor ) {
+			return new HibernateOrmStatelessSelectionEntityByIdLoader<>( rootEntityMappingType,
+					factory, sessionContext, loadingOptions );
+		}
 
 		PersistenceContextLookupStrategy persistenceContextLookup =
 				PersistenceContextLookupStrategy.create( session );
@@ -145,8 +152,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHib
 		// even if we know we actually want instances from the most specific entity type,
 		// because that exception cannot be recovered from.
 		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityMappingType,
-				createFactory( sessionFactory, entityMappingType ),
-				sessionContext,
+				factory, sessionContext,
 				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
 	}
 
