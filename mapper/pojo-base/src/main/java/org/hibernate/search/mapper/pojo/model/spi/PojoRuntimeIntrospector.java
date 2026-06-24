@@ -37,6 +37,17 @@ public interface PojoRuntimeIntrospector {
 	boolean isIgnorableDataAccessThrowable(Throwable throwable);
 
 	/**
+	 * @return {@code true} if reindexing of containing entities triggered by a contained entity change
+	 * can be performed reliably in the current session context.
+	 * Returns {@code false} when the session does not provide an identity map,
+	 * meaning containing entities loaded during reindexing resolution
+	 * would hold stale references to the contained entity's previous state.
+	 */
+	default boolean supportsReindexingContainingEntities() {
+		return true;
+	}
+
+	/**
 	 * @return A simple {@link PojoRuntimeIntrospector} that relies on the object's class to return entity types,
 	 * and assumes objects are not proxyfied.
 	 */

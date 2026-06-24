@@ -4,7 +4,6 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
@@ -17,12 +16,12 @@ public interface HibernateOrmListenerContextProvider {
 
 	boolean listenerEnabled();
 
-	PojoIndexingPlan currentIndexingPlanIfExisting(SessionImplementor session);
+	PojoIndexingPlan currentIndexingPlanIfExisting(SharedSessionContractImplementor session);
 
 	PojoTypeIndexingPlan currentIndexingPlanIfTypeIncluded(SharedSessionContractImplementor session,
 			PojoRawTypeIdentifier<?> typeIdentifier);
 
 	ConfiguredIndexingPlanSynchronizationStrategy currentIndexingPlanSynchronizationStrategy(
-			SessionImplementor session);
+			SharedSessionContractImplementor session);
 
 }

@@ -9,8 +9,8 @@ import java.util.BitSet;
 import org.hibernate.HibernateException;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.engine.spi.StatelessSessionImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.AutoFlushEvent;
@@ -115,6 +115,8 @@ public final class HibernateSearchEventListener
 		if ( dirtyAssociationPaths != null ) {
 			plan.updateAssociationInverseSide( dirtyAssociationPaths, null, event.getDeletedState() );
 		}
+
+		processPerEventIfStateless( event.getSession() );
 	}
 
 	@Override
@@ -147,6 +149,8 @@ public final class HibernateSearchEventListener
 		if ( dirtyAssociationPaths != null ) {
 			plan.updateAssociationInverseSide( dirtyAssociationPaths, null, event.getState() );
 		}
+
+		processPerEventIfStateless( event.getSession() );
 	}
 
 	@Override
@@ -211,6 +215,8 @@ public final class HibernateSearchEventListener
 		if ( dirtyDirectAssociationPaths != null ) {
 			plan.updateAssociationInverseSide( dirtyDirectAssociationPaths, event.getOldState(), event.getState() );
 		}
+
+		processPerEventIfStateless( event.getSession() );
 	}
 
 	@Override
@@ -296,8 +302,17 @@ public final class HibernateSearchEventListener
 		return contextProvider.currentIndexingPlanIfTypeIncluded( sessionImplementor, typeContext.typeIdentifier() );
 	}
 
-	private PojoIndexingPlan getCurrentIndexingPlanIfExisting(SessionImplementor sessionImplementor) {
+	private PojoIndexingPlan getCurrentIndexingPlanIfExisting(SharedSessionContractImplementor sessionImplementor) {
 		return contextProvider.currentIndexingPlanIfExisting( sessionImplementor );
+	}
+
+	private void processPerEventIfStateless(SharedSessionContractImplementor session) {
+		if ( session instanceof StatelessSessionImplementor ) {
+			PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( session );
+			if ( plan != null ) {
+				plan.process();
+			}
+		}
 	}
 
 	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityMappingType entityMappingType) {
@@ -307,6 +322,19 @@ public final class HibernateSearchEventListener
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
 		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
+		// StatelessSession fires collection events with a null EventSource.
+		// The entity-level PostInsert/PostUpdate events already handle reindexing
+		// with "all dirty" logic for StatelessSession, so collection events are redundant (?).
+		EventSource session;
+		try {
+			session = event.getSession();
+		}
+		catch (NullPointerException e) {
+			return;
+		}
+		if ( session == null ) {
 			return;
 		}
 		Object ownerEntity = event.getAffectedOwnerOrNull();
