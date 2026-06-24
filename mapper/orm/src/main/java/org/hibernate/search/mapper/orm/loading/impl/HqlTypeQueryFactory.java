@@ -56,13 +56,6 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 		);
 	}
 
-	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true, since = "8.2")
-	@Override
-	public org.hibernate.MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
-		return session.byMultipleIds( ormEntityName );
-	}
-
 	@Override
 	public List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options) {
 		return session.findMultiple( rootGraph, ids, options );

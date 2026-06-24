@@ -59,13 +59,6 @@ public interface TypeQueryFactory<E, I> {
 
 	SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 
-	/**
-	 * @deprecated Use {@link #findMultiple(SessionImplementor, List, FindOption...)} instead.
-	 */
-	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true, since = "8.2")
-	org.hibernate.MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session);
-
 	List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options);
 
 	boolean uniquePropertyIsTheEntityId();
