@@ -4,9 +4,11 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -20,6 +22,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -235,6 +238,32 @@ class StatelessSessionBaseIT {
 			session.insert( new NonIndexedEntity( 2, "number2" ) );
 			session.insert( new NonIndexedEntity( 3, "number3" ) );
 		} );
+
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void searchFromStatelessSession() {
+		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
+				.add( "1", b -> b
+						.field( "text", "hello" ) );
+
+		sessionFactory.inStatelessTransaction( session -> {
+			session.insert( new IndexedEntity( 1, "hello" ) );
+		} );
+		defaultBackendMock.verifyExpectationsMet();
+
+		try ( StatelessSession session = sessionFactory.openStatelessSession() ) {
+			SearchSession searchSession = Search.session( session );
+			defaultBackendMock.expectCount(
+					Arrays.asList( IndexedEntity.INDEX_NAME ), 1L );
+
+			long count = searchSession.search( IndexedEntity.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount();
+
+			assertThat( count ).isEqualTo( 1L );
+		}
 
 		defaultBackendMock.verifyExpectationsMet();
 	}

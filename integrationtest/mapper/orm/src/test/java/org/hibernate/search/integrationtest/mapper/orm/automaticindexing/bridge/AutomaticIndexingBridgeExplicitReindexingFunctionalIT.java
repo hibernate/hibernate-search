@@ -247,6 +247,7 @@ class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 					.toReference();
 		}
 
+		@SuppressWarnings({ "deprecation", "removal" })
 		@Override
 		public void write(DocumentElement target, IndexedEntity bridgedElement, TypeBridgeWriteContext context) {
 			Session session = context.extension( HibernateOrmExtension.get() ).session();

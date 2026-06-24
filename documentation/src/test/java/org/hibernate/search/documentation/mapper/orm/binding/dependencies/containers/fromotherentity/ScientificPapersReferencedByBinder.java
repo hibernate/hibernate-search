@@ -6,7 +6,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.dependencies.conta
 
 import java.util.List;
 
-import org.hibernate.Session;
+import org.hibernate.SharedSessionContract;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -49,7 +49,7 @@ public class ScientificPapersReferencedByBinder implements TypeBinder {
 		}
 
 		private List<String> findReferencingPaperTitles(TypeBridgeWriteContext context, ScientificPaper paper) {
-			Session session = context.extension( HibernateOrmExtension.get() ).session();
+			SharedSessionContract session = context.extension( HibernateOrmExtension.get() ).sessionContract();
 			SelectionQuery<String> query = session.createQuery(
 					"select p.title from ScientificPaper p where :this member of p.references",
 					String.class );

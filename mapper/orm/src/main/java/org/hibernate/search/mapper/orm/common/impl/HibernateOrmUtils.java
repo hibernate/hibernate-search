@@ -12,10 +12,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -51,6 +53,15 @@ public final class HibernateOrmUtils {
 	public static Session toSession(EntityManager entityManager) {
 		try {
 			return entityManager.unwrap( Session.class );
+		}
+		catch (IllegalStateException e) {
+			throw OrmMiscLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );
+		}
+	}
+
+	public static StatelessSession toStatelessSession(EntityAgent entityAgent) {
+		try {
+			return entityAgent.unwrap( StatelessSession.class );
 		}
 		catch (IllegalStateException e) {
 			throw OrmMiscLog.INSTANCE.hibernateSessionAccessError( e.getMessage(), e );

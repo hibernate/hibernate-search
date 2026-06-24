@@ -11,7 +11,6 @@ import java.util.Set;
 import jakarta.persistence.FindOption;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
@@ -57,9 +56,10 @@ public interface TypeQueryFactory<E, I> {
 			Set<? extends Class<? extends E>> includedTypesFilter,
 			List<ConditionalExpression> conditionalExpressions, String order);
 
-	SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
+	SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SharedSessionContractImplementor session,
+			String parameterName);
 
-	List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options);
+	List<E> findMultiple(SharedSessionContractImplementor session, List<?> ids, FindOption... options);
 
 	boolean uniquePropertyIsTheEntityId();
 

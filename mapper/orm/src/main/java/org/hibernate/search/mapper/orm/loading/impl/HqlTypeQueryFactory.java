@@ -9,7 +9,6 @@ import java.util.Set;
 
 import jakarta.persistence.FindOption;
 
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.query.SelectionQuery;
@@ -48,7 +47,8 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	}
 
 	@Override
-	public SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
+	public SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SharedSessionContractImplementor session,
+			String parameterName) {
 		return session.createQuery(
 				"select e from " + ormEntityName
 						+ " e where " + uniquePropertyName + " in (:" + parameterName + ")",
@@ -57,7 +57,7 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	}
 
 	@Override
-	public List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options) {
+	public List<E> findMultiple(SharedSessionContractImplementor session, List<?> ids, FindOption... options) {
 		return session.findMultiple( rootGraph, ids, options );
 	}
 
