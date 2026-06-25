@@ -1,0 +1,5693 @@
+# Hibernate Search Changelog
+
+## 8.4.0.Final (2026-05-27)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39072)
+
+
+### Improvement
+* [HSEARCH-5630](https://hibernate.atlassian.net/browse/HSEARCH-5630) - Update to Hibernate ORM 7.4.0.Final
+* [HSEARCH-5629](https://hibernate.atlassian.net/browse/HSEARCH-5629) - Use Maven 3.9.16 as a required minimum version for the build
+* [HSEARCH-5627](https://hibernate.atlassian.net/browse/HSEARCH-5627) - Switch from the Search session holder to a Hibernate ORM session extension
+* [HSEARCH-5626](https://hibernate.atlassian.net/browse/HSEARCH-5626) - Update Elasticsearch client (elasticsearch-rest-client) to 9.4.1
+* [HSEARCH-5625](https://hibernate.atlassian.net/browse/HSEARCH-5625) - Test against latest Elasticsearch 9.4.1
+* [HSEARCH-5624](https://hibernate.atlassian.net/browse/HSEARCH-5624) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.1
+
+## 8.4.0.CR1 (2026-05-11)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/37437)
+
+
+### Bug
+* [HSEARCH-5595](https://hibernate.atlassian.net/browse/HSEARCH-5595) - `checkstyle:check` is not build cache relocatable due to project resources including the workspace root
+
+### Improvement
+* [HSEARCH-5623](https://hibernate.atlassian.net/browse/HSEARCH-5623) - Update to Hibernate ORM 7.4.0.CR1
+* [HSEARCH-5622](https://hibernate.atlassian.net/browse/HSEARCH-5622) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.0
+* [HSEARCH-5621](https://hibernate.atlassian.net/browse/HSEARCH-5621) - Update Elasticsearch client (elasticsearch-rest-client) to 9.4.0
+* [HSEARCH-5620](https://hibernate.atlassian.net/browse/HSEARCH-5620) - Add compatibility with Elasticsearch 9.4
+* [HSEARCH-5619](https://hibernate.atlassian.net/browse/HSEARCH-5619) - Upgrade to GSON 2.14.0
+* [HSEARCH-5618](https://hibernate.atlassian.net/browse/HSEARCH-5618) - Update Jackson to 2.21.3
+* [HSEARCH-5617](https://hibernate.atlassian.net/browse/HSEARCH-5617) - Update to AWS SDK 2.44.1
+* [HSEARCH-5616](https://hibernate.atlassian.net/browse/HSEARCH-5616) - Update Elasticsearch client (elasticsearch-rest-client) to 9.3.4
+* [HSEARCH-5613](https://hibernate.atlassian.net/browse/HSEARCH-5613) - Use Maven 3.9.15 as a required minimum version for the build
+* [HSEARCH-5612](https://hibernate.atlassian.net/browse/HSEARCH-5612) - Upgrade to commons-codec 1.22.0
+* [HSEARCH-5611](https://hibernate.atlassian.net/browse/HSEARCH-5611) - Update Apache HTTP Client components to 5.6.1
+* [HSEARCH-5609](https://hibernate.atlassian.net/browse/HSEARCH-5609) - Update Elasticsearch client (elasticsearch-rest-client) to 9.3.3
+* [HSEARCH-5608](https://hibernate.atlassian.net/browse/HSEARCH-5608) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.4
+* [HSEARCH-5607](https://hibernate.atlassian.net/browse/HSEARCH-5607) - Update Elasticsearch rest client (opensearch-rest-client) to 3.6.0
+* [HSEARCH-5606](https://hibernate.atlassian.net/browse/HSEARCH-5606) - Add compatibility with OpenSearch 3.6
+* [HSEARCH-5601](https://hibernate.atlassian.net/browse/HSEARCH-5601) - Update to commons-logging to 1.3.6
+* [HSEARCH-5600](https://hibernate.atlassian.net/browse/HSEARCH-5600) - Update Jackson to 2.21.2
+* [HSEARCH-5599](https://hibernate.atlassian.net/browse/HSEARCH-5599) - Update Apache HTTP Core client components to 5.4.2
+* [HSEARCH-5598](https://hibernate.atlassian.net/browse/HSEARCH-5598) - Update Elasticsearch client (elasticsearch-rest-client) to 9.3.2
+* [HSEARCH-5597](https://hibernate.atlassian.net/browse/HSEARCH-5597) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.3
+
+### Task
+* [HSEARCH-5596](https://hibernate.atlassian.net/browse/HSEARCH-5596) - Use changeDetection config option instead of the deprecated overwrite in maven-resources-plugin
+* [HSEARCH-5280](https://hibernate.atlassian.net/browse/HSEARCH-5280) - Look into `OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT#agentJoined` test
+* [HSEARCH-5242](https://hibernate.atlassian.net/browse/HSEARCH-5242) - Investigate why building hibernate-search-integrationtest-performance-backend-lucene fails on some envs
+
+## 8.3.0.Final (2026-03-20)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/37774)
+
+
+### Improvement
+* [HSEARCH-5594](https://hibernate.atlassian.net/browse/HSEARCH-5594) - Update to AWS SDK 2.42.14
+* [HSEARCH-5592](https://hibernate.atlassian.net/browse/HSEARCH-5592) - Update to JBoss logging 3.6.3.Final
+* [HSEARCH-5591](https://hibernate.atlassian.net/browse/HSEARCH-5591) - Update to Hibernate ORM 7.3.0.Final
+* [HSEARCH-5589](https://hibernate.atlassian.net/browse/HSEARCH-5589) - Update to AWS SDK 2.41.9
+* [HSEARCH-5587](https://hibernate.atlassian.net/browse/HSEARCH-5587) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.2
+* [HSEARCH-5586](https://hibernate.atlassian.net/browse/HSEARCH-5586) - Update to Apache Lucene 10.4.0
+* [HSEARCH-5582](https://hibernate.atlassian.net/browse/HSEARCH-5582) - Test against newer version of OpenSearch 2.19.4
+* [HSEARCH-5581](https://hibernate.atlassian.net/browse/HSEARCH-5581) - Test against newer versions of Elasticsearch 9.2.6 / 8.19.12
+* [HSEARCH-5580](https://hibernate.atlassian.net/browse/HSEARCH-5580) - Update Elasticsearch client (elasticsearch-rest-client) to 9.3.1
+* [HSEARCH-5579](https://hibernate.atlassian.net/browse/HSEARCH-5579) - Test against latest Elasticsearch 9.3.1
+* [HSEARCH-5576](https://hibernate.atlassian.net/browse/HSEARCH-5576) - Update Apache HTTP Core client components to 5.4.1
+* [HSEARCH-5575](https://hibernate.atlassian.net/browse/HSEARCH-5575) - Upgrade to commons-codec 1.21.0
+* [HSEARCH-5571](https://hibernate.atlassian.net/browse/HSEARCH-5571) - Upgrade to Avro 1.11.5
+* [HSEARCH-5570](https://hibernate.atlassian.net/browse/HSEARCH-5570) - Update Elasticsearch rest client (opensearch-rest-client) to 3.5.0
+* [HSEARCH-5568](https://hibernate.atlassian.net/browse/HSEARCH-5568) - Add compatibility with OpenSearch 3.5
+* [HSEARCH-5553](https://hibernate.atlassian.net/browse/HSEARCH-5553) - Update Apache HTTP Client components to 5.6
+
+### Task
+* [HSEARCH-5593](https://hibernate.atlassian.net/browse/HSEARCH-5593) - Use Maven 3.9.14 as a required minimum version for the build
+* [HSEARCH-5588](https://hibernate.atlassian.net/browse/HSEARCH-5588) - Use Maven 3.9.13 as a required minimum version for the build
+* [HSEARCH-5569](https://hibernate.atlassian.net/browse/HSEARCH-5569) - Test against the latest OpenSearch 3.5.0
+* [HSEARCH-5567](https://hibernate.atlassian.net/browse/HSEARCH-5567) - Look into failing OutboxPollingAutomaticIndexingEventSendingIT on Oracle 
+
+## 8.3.0.CR1 (2026-02-05)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/36608)
+
+
+### Bug
+* [HSEARCH-5517](https://hibernate.atlassian.net/browse/HSEARCH-5517) - Document is updated instead of deleted on cascading delete in OneToOne relations
+
+### Improvement
+* [HSEARCH-5566](https://hibernate.atlassian.net/browse/HSEARCH-5566) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.3.0
+* [HSEARCH-5565](https://hibernate.atlassian.net/browse/HSEARCH-5565) - Update Elasticsearch client (elasticsearch-rest-client) to 9.3.0
+* [HSEARCH-5564](https://hibernate.atlassian.net/browse/HSEARCH-5564) - Add compatibility with Elasticsearch 9.3
+* [HSEARCH-5563](https://hibernate.atlassian.net/browse/HSEARCH-5563) - Upgrade to JBoss logging 3.6.2.Final
+* [HSEARCH-5562](https://hibernate.atlassian.net/browse/HSEARCH-5562) - Pass a ROOT locale to loggers to avoid unnecessary class lookups
+* [HSEARCH-5561](https://hibernate.atlassian.net/browse/HSEARCH-5561) - Update to Hibernate ORM 7.3.0.CR2
+* [HSEARCH-5560](https://hibernate.atlassian.net/browse/HSEARCH-5560) - Update Jackson to 2.21.0
+* [HSEARCH-5557](https://hibernate.atlassian.net/browse/HSEARCH-5557) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.4
+* [HSEARCH-5556](https://hibernate.atlassian.net/browse/HSEARCH-5556) - Update Elasticsearch client (elasticsearch-rest-client) to 9.2.4
+* [HSEARCH-5555](https://hibernate.atlassian.net/browse/HSEARCH-5555) - Update to AWS SDK 2.41.2
+* [HSEARCH-5550](https://hibernate.atlassian.net/browse/HSEARCH-5550) - Update Elasticsearch client (elasticsearch-rest-client) to 9.2.3
+* [HSEARCH-5549](https://hibernate.atlassian.net/browse/HSEARCH-5549) - Make ElasticsearchAwsSigningInterceptorProvider capable to handle "preparsed" Elasticsearch versions
+* [HSEARCH-5546](https://hibernate.atlassian.net/browse/HSEARCH-5546) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.3
+* [HSEARCH-5545](https://hibernate.atlassian.net/browse/HSEARCH-5545) - Update Elasticsearch rest client (opensearch-rest-client) to 3.4.0
+* [HSEARCH-5544](https://hibernate.atlassian.net/browse/HSEARCH-5544) - Update Apache HTTP Core client components to 5.4
+* [HSEARCH-5543](https://hibernate.atlassian.net/browse/HSEARCH-5543) - Add compatibility with OpenSearch 3.4.0
+
+### Task
+* [HSEARCH-5558](https://hibernate.atlassian.net/browse/HSEARCH-5558) - Test against latest Elasticsearch 9.2.4
+* [HSEARCH-5548](https://hibernate.atlassian.net/browse/HSEARCH-5548) - Test against latest Elasticsearch 9.2.3
+* [HSEARCH-5547](https://hibernate.atlassian.net/browse/HSEARCH-5547) - Use Maven 3.9.12 as a required minimum version for the build
+* [HSEARCH-5518](https://hibernate.atlassian.net/browse/HSEARCH-5518) - Use Spring Boot 4 and corresponding Narayana starter in ITs
+
+## 8.2.0.Final (2025-12-15)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/36773)
+
+
+### Improvement
+* [HSEARCH-5541](https://hibernate.atlassian.net/browse/HSEARCH-5541) - Update to Hibernate ORM 7.2.0.Final
+* [HSEARCH-5540](https://hibernate.atlassian.net/browse/HSEARCH-5540) - Update to AWS SDK 2.40.4
+* [HSEARCH-5539](https://hibernate.atlassian.net/browse/HSEARCH-5539) - Update to Hibernate ORM 7.2.0.CR4
+* [HSEARCH-5538](https://hibernate.atlassian.net/browse/HSEARCH-5538) - Update Elasticsearch client (elasticsearch-rest-client) to 9.2.2
+* [HSEARCH-5537](https://hibernate.atlassian.net/browse/HSEARCH-5537) - Test against latest Elasticsearch 9.2.2
+* [HSEARCH-5536](https://hibernate.atlassian.net/browse/HSEARCH-5536) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.2
+
+### Task
+* [HSEARCH-5542](https://hibernate.atlassian.net/browse/HSEARCH-5542) - Update what's new document
+
+## 8.2.0.CR1 (2025-12-01)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/33307)
+
+
+### Bug
+* [HSEARCH-5471](https://hibernate.atlassian.net/browse/HSEARCH-5471) - NPE for aggregations that are expected to return null when no field values available
+* [HSEARCH-5456](https://hibernate.atlassian.net/browse/HSEARCH-5456) - Metric aggregation (e.g. min/max) may fail for a Lucene backend when there are `null` values
+
+### Improvement
+* [HSEARCH-5533](https://hibernate.atlassian.net/browse/HSEARCH-5533) - Update documentation theme to the current latest 6.1.2.Final
+* [HSEARCH-5532](https://hibernate.atlassian.net/browse/HSEARCH-5532) - Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+* [HSEARCH-5531](https://hibernate.atlassian.net/browse/HSEARCH-5531) - Update to AWS SDK 2.39.3
+* [HSEARCH-5530](https://hibernate.atlassian.net/browse/HSEARCH-5530) - Update to Hibernate ORM 7.2.0.CR3
+* [HSEARCH-5528](https://hibernate.atlassian.net/browse/HSEARCH-5528) - Update Apache HTTP Client components to 5.5.1
+* [HSEARCH-5527](https://hibernate.atlassian.net/browse/HSEARCH-5527) - Update Apache HTTP Core client components to 5.3.6
+* [HSEARCH-5526](https://hibernate.atlassian.net/browse/HSEARCH-5526) - Upgrade to commons-codec 1.20.0
+* [HSEARCH-5525](https://hibernate.atlassian.net/browse/HSEARCH-5525) - Update to Lucene 10.3.2
+* [HSEARCH-5524](https://hibernate.atlassian.net/browse/HSEARCH-5524) - Update Elasticsearch rest client (opensearch-rest-client) to 3.3.2
+* [HSEARCH-5523](https://hibernate.atlassian.net/browse/HSEARCH-5523) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.2.1
+* [HSEARCH-5522](https://hibernate.atlassian.net/browse/HSEARCH-5522) - Update Elasticsearch client (elasticsearch-rest-client) to 9.2.1
+* [HSEARCH-5519](https://hibernate.atlassian.net/browse/HSEARCH-5519) - Update to AWS SDK 2.38.3
+* [HSEARCH-5516](https://hibernate.atlassian.net/browse/HSEARCH-5516) - Upgrade Jackson to 2.20.1
+* [HSEARCH-5515](https://hibernate.atlassian.net/browse/HSEARCH-5515) - Update to AWS SDK 2.37.3
+* [HSEARCH-5513](https://hibernate.atlassian.net/browse/HSEARCH-5513) - Add a "What's New" document for series
+* [HSEARCH-5510](https://hibernate.atlassian.net/browse/HSEARCH-5510) - Apply the new JDK 25 Javadoc theme
+* [HSEARCH-5509](https://hibernate.atlassian.net/browse/HSEARCH-5509) - Update Elasticsearch client to 9.2.0
+* [HSEARCH-5508](https://hibernate.atlassian.net/browse/HSEARCH-5508) - Add compatibility with Elasticsearch 9.2
+* [HSEARCH-5506](https://hibernate.atlassian.net/browse/HSEARCH-5506) - Update to Avro 1.12.1
+* [HSEARCH-5505](https://hibernate.atlassian.net/browse/HSEARCH-5505) - Update AWS SDK to 2.35.7
+* [HSEARCH-5504](https://hibernate.atlassian.net/browse/HSEARCH-5504) - Add compatibility with OpenSearch 3.3
+* [HSEARCH-5502](https://hibernate.atlassian.net/browse/HSEARCH-5502) - Update to JUnit 6.0.0
+* [HSEARCH-5501](https://hibernate.atlassian.net/browse/HSEARCH-5501) - Update to Hibernate ORM 7.2.0.CR2
+* [HSEARCH-5500](https://hibernate.atlassian.net/browse/HSEARCH-5500) - Upgrade to AWS SDK 2.35.1
+* [HSEARCH-5499](https://hibernate.atlassian.net/browse/HSEARCH-5499) - Test against the latest Elasticsearch 9.1.5
+* [HSEARCH-5498](https://hibernate.atlassian.net/browse/HSEARCH-5498) - Upgrade Elasticsearch client to 9.1.5
+* [HSEARCH-5497](https://hibernate.atlassian.net/browse/HSEARCH-5497) - Update to Lucene 10.3.1
+* [HSEARCH-5493](https://hibernate.atlassian.net/browse/HSEARCH-5493) - Require JDK 25 for the build
+* [HSEARCH-5492](https://hibernate.atlassian.net/browse/HSEARCH-5492) - Apply the unified Hibernat Documentation theme
+* [HSEARCH-5491](https://hibernate.atlassian.net/browse/HSEARCH-5491) - Update to Hibernate ORM 7.1.2.Final
+* [HSEARCH-5488](https://hibernate.atlassian.net/browse/HSEARCH-5488) - Update to Lucene 9.12.3
+* [HSEARCH-5485](https://hibernate.atlassian.net/browse/HSEARCH-5485) - Use annotationProcessorPathsUseDepMgmt where applicable
+* [HSEARCH-5484](https://hibernate.atlassian.net/browse/HSEARCH-5484) - Upgrade to AWS SDK 2.34.1
+* [HSEARCH-5480](https://hibernate.atlassian.net/browse/HSEARCH-5480) - Upgrade Elasticsearch client to 9.1.4
+* [HSEARCH-5478](https://hibernate.atlassian.net/browse/HSEARCH-5478) - Update to Lucene 10.3
+* [HSEARCH-5476](https://hibernate.atlassian.net/browse/HSEARCH-5476) - Update to Hibernate ORM 7.1.1.Final
+* [HSEARCH-5474](https://hibernate.atlassian.net/browse/HSEARCH-5474) - Upgrade to GSON 2.13.2
+* [HSEARCH-5473](https://hibernate.atlassian.net/browse/HSEARCH-5473) - Include license file in the META-INF of published artifacts
+* [HSEARCH-5472](https://hibernate.atlassian.net/browse/HSEARCH-5472) - Upgrade Jackson to 2.20.0
+* [HSEARCH-5470](https://hibernate.atlassian.net/browse/HSEARCH-5470) - Upgrade to AWS SDK 2.33.0
+* [HSEARCH-5465](https://hibernate.atlassian.net/browse/HSEARCH-5465) - Upgrade Elasticsearch client to 9.1.3
+* [HSEARCH-5464](https://hibernate.atlassian.net/browse/HSEARCH-5464) - Groundwork for pluggable rest clients in the Elasticsearch backend
+* [HSEARCH-5459](https://hibernate.atlassian.net/browse/HSEARCH-5459) - Add compatibility with OpenSearch 3.2.0
+* [HSEARCH-5457](https://hibernate.atlassian.net/browse/HSEARCH-5457) - Enable count-values aggregation for string/boolean fields
+* [HSEARCH-5453](https://hibernate.atlassian.net/browse/HSEARCH-5453) - Upgrade Elasticsearch client to 9.1.2
+
+### New Feature
+* [HSEARCH-5482](https://hibernate.atlassian.net/browse/HSEARCH-5482) - Simple Elasticsearch client based on java.net.http.HttpClient
+
+### Task
+* [HSEARCH-5520](https://hibernate.atlassian.net/browse/HSEARCH-5520) - Test against the latest Elasticsearch 9.2.1
+* [HSEARCH-5512](https://hibernate.atlassian.net/browse/HSEARCH-5512) - Test against the latest Elasticsearch 7.10/8.19
+* [HSEARCH-5511](https://hibernate.atlassian.net/browse/HSEARCH-5511) - Test against the latest OpenSearch 3.3.2
+* [HSEARCH-5507](https://hibernate.atlassian.net/browse/HSEARCH-5507) - Test against the latest OpenSearch 3.3.1
+* [HSEARCH-5486](https://hibernate.atlassian.net/browse/HSEARCH-5486) - Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+* [HSEARCH-5481](https://hibernate.atlassian.net/browse/HSEARCH-5481) - Try alternatives to https://search.maven.org/solrsearch in DependencyManagementIncludesAllGroupIdArtifactsRule
+* [HSEARCH-5479](https://hibernate.atlassian.net/browse/HSEARCH-5479) - Test against the latest Elasticsearch 9.1.4
+* [HSEARCH-5466](https://hibernate.atlassian.net/browse/HSEARCH-5466) - Test against the latest Elasticsearch 9.1.3
+* [HSEARCH-5455](https://hibernate.atlassian.net/browse/HSEARCH-5455) - Test against the latest Elasticsearch 8.19.2
+* [HSEARCH-5454](https://hibernate.atlassian.net/browse/HSEARCH-5454) - Test against the latest Elasticsearch 9.1.2
+* [HSEARCH-5441](https://hibernate.atlassian.net/browse/HSEARCH-5441) - Explicitly add mockito agent to the surefire args
+* [HSEARCH-5355](https://hibernate.atlassian.net/browse/HSEARCH-5355) - Move the description of features and enhancements to a file published as part of documentation
+
+## 8.1.0.Final (2025-08-08)
+
+### Improvement
+* [HSEARCH-5448](https://hibernate.atlassian.net/browse/HSEARCH-5448) - Upgrade Elasticsearch client to 9.1.1
+* [HSEARCH-5447](https://hibernate.atlassian.net/browse/HSEARCH-5447) - Upgrade to Hibernate ORM 7.1.0.Final
+
+### Task
+* [HSEARCH-5449](https://hibernate.atlassian.net/browse/HSEARCH-5449) - Test against the latest Elasticsearch 9.1.1
+
+## 8.1.0.CR2 (2025-08-06)
+
+### Improvement
+* [HSEARCH-5446](https://hibernate.atlassian.net/browse/HSEARCH-5446) - Upgrade to Hibernate ORM 7.1.0.CR2
+* [HSEARCH-5439](https://hibernate.atlassian.net/browse/HSEARCH-5439) - Upgrade to Elasticsearch client 9.1.0
+* [HSEARCH-5432](https://hibernate.atlassian.net/browse/HSEARCH-5432) - Upgrade hibernate-models to 1.0.1
+
+## 8.1.0.CR1 (2025-07-31)
+
+### Improvement
+* [HSEARCH-5443](https://hibernate.atlassian.net/browse/HSEARCH-5443) - Upgrade to JUnit 5.13
+* [HSEARCH-5442](https://hibernate.atlassian.net/browse/HSEARCH-5442) - Upgrade to Hibernate ORM 7.1.0.CR1
+* [HSEARCH-5440](https://hibernate.atlassian.net/browse/HSEARCH-5440) - Add Elasticsearch 8.19.0 compatibility
+* [HSEARCH-5439](https://hibernate.atlassian.net/browse/HSEARCH-5439) - Upgrade to Elasticsearch client 9.1.0
+* [HSEARCH-5438](https://hibernate.atlassian.net/browse/HSEARCH-5438) - Add Elasticsearch 9.1.0 compatibility
+
+## 8.1.0.Alpha1 (2025-07-29)
+
+### Bug
+* [HSEARCH-3666](https://hibernate.atlassian.net/browse/HSEARCH-3666) - Lucene terms aggregations (discrete facets) may return wrong results for any sort other than the default one
+
+### Deprecation
+* [HSEARCH-5437](https://hibernate.atlassian.net/browse/HSEARCH-5437) - Deprecate JPA/ORM query extension and Search#toOrmQuery / Search#toOrmQuery for removal
+
+### Improvement
+* [HSEARCH-5436](https://hibernate.atlassian.net/browse/HSEARCH-5436) - Upgrade to AWS SDK 2.32.10
+* [HSEARCH-5435](https://hibernate.atlassian.net/browse/HSEARCH-5435) - Upgrade Jackson to 2.19.2
+* [HSEARCH-5433](https://hibernate.atlassian.net/browse/HSEARCH-5433) - Update to Hibernate ORM 7.0.8.Final
+* [HSEARCH-5431](https://hibernate.atlassian.net/browse/HSEARCH-5431) - Upgrade to Hibernate ORM 7.0.7
+* [HSEARCH-5427](https://hibernate.atlassian.net/browse/HSEARCH-5427) - Upgrade Elasticsearch client to 9.0.4
+* [HSEARCH-5426](https://hibernate.atlassian.net/browse/HSEARCH-5426) - Adjust the count aggregation DSL
+* [HSEARCH-5423](https://hibernate.atlassian.net/browse/HSEARCH-5423) - Introduce search method to reference scopes
+* [HSEARCH-5418](https://hibernate.atlassian.net/browse/HSEARCH-5418) - Upgrade to Hibernate ORM 7.0.6.Final
+* [HSEARCH-5415](https://hibernate.atlassian.net/browse/HSEARCH-5415) - Upgrade to Hibernate ORM 7.0.5.Final
+* [HSEARCH-5413](https://hibernate.atlassian.net/browse/HSEARCH-5413) - Upgrade to Hibernate ORM 7.0.4.Final
+* [HSEARCH-5410](https://hibernate.atlassian.net/browse/HSEARCH-5410) - Add compatibility with OpenSearch 3.1.0
+* [HSEARCH-5408](https://hibernate.atlassian.net/browse/HSEARCH-5408) - Upgrade Elasticsearch client to 9.0.3
+* [HSEARCH-5407](https://hibernate.atlassian.net/browse/HSEARCH-5407) - Upgrade to Hibernate ORM 7.0.3.Final
+* [HSEARCH-5406](https://hibernate.atlassian.net/browse/HSEARCH-5406) - Upgrade to Lucene 10.2.2
+* [HSEARCH-5405](https://hibernate.atlassian.net/browse/HSEARCH-5405) - Upgrade to Lucene 9.12.2
+* [HSEARCH-5402](https://hibernate.atlassian.net/browse/HSEARCH-5402) - Upgrade Jackson to 2.19.1
+* [HSEARCH-5399](https://hibernate.atlassian.net/browse/HSEARCH-5399) - Upgrade to Hibernate ORM 7.0.2.Final
+* [HSEARCH-5397](https://hibernate.atlassian.net/browse/HSEARCH-5397) - Upgrade to Hibernate ORM 7.0.1.Final
+* [HSEARCH-5356](https://hibernate.atlassian.net/browse/HSEARCH-5356) - Introduce the extended (platform) BOM 
+* [HSEARCH-5309](https://hibernate.atlassian.net/browse/HSEARCH-5309) - Limit the time that the outbox polling processor spends trying to lock/load event entities after processing
+
+### New Feature
+* [HSEARCH-5421](https://hibernate.atlassian.net/browse/HSEARCH-5421) - Composite aggregation
+* [HSEARCH-3661](https://hibernate.atlassian.net/browse/HSEARCH-3661) - Setting the value of bucket aggregations to something more than just the document count
+
+### Proposal
+* [HSEARCH-5301](https://hibernate.atlassian.net/browse/HSEARCH-5301) - Consider adding org.apache.lucene:lucene-backward-codecs to BOM
+
+### Remove Feature
+* [HSEARCH-5417](https://hibernate.atlassian.net/browse/HSEARCH-5417) - Deprecate for removal org.hibernate.search.util.common.serialization.spi.SerializationUtils
+
+### Task
+* [HSEARCH-5430](https://hibernate.atlassian.net/browse/HSEARCH-5430) - Test against the latest OpenSearch 2.19.3
+* [HSEARCH-5429](https://hibernate.atlassian.net/browse/HSEARCH-5429) - Test against the latest Elasticsearch 8.18.4
+* [HSEARCH-5428](https://hibernate.atlassian.net/browse/HSEARCH-5428) - Test against the latest Elasticsearch 9.0.4
+* [HSEARCH-5422](https://hibernate.atlassian.net/browse/HSEARCH-5422) - Use Maven 3.9.11 as a required minimum version for the build
+* [HSEARCH-5420](https://hibernate.atlassian.net/browse/HSEARCH-5420) - Switch to  org.wiremock:wiremock
+* [HSEARCH-5416](https://hibernate.atlassian.net/browse/HSEARCH-5416) - Account for the CompletableFuture#reportJoin changes in the newer JDK
+* [HSEARCH-5412](https://hibernate.atlassian.net/browse/HSEARCH-5412) - Test against latest Elasticsearch 8.18.3
+* [HSEARCH-5411](https://hibernate.atlassian.net/browse/HSEARCH-5411) - Test against latest Elasticsearch 7.17.29
+* [HSEARCH-5404](https://hibernate.atlassian.net/browse/HSEARCH-5404) - Stop exporting logging/reporting.impl packages to org.jboss.logging
+* [HSEARCH-5401](https://hibernate.atlassian.net/browse/HSEARCH-5401) - Test against JDK 26
+* [HSEARCH-5400](https://hibernate.atlassian.net/browse/HSEARCH-5400) - Switch to Maven Central publishing
+* [HSEARCH-5398](https://hibernate.atlassian.net/browse/HSEARCH-5398) - Use Maven 3.9.10 as a required minimum version for the build
+* [HSEARCH-5354](https://hibernate.atlassian.net/browse/HSEARCH-5354) - Switch to Central Publishing Portal API for publishing to Maven Central
+* [HSEARCH-5351](https://hibernate.atlassian.net/browse/HSEARCH-5351) - Switch to JReleaser for nexus publishing
+
+## 8.0.0.Final (2025-06-06)
+
+### Improvement
+* [HSEARCH-5396](https://hibernate.atlassian.net/browse/HSEARCH-5396) - Upgrade to Hibernate Models 1.0.0
+* [HSEARCH-5393](https://hibernate.atlassian.net/browse/HSEARCH-5393) - Upgrade Elasticsearch client to 9.0.2
+
+### Task
+* [HSEARCH-5394](https://hibernate.atlassian.net/browse/HSEARCH-5394) - Test against the latest Elasticsearch 9.0.2
+
+## 8.0.0.CR1 (2025-05-31)
+
+### Improvement
+* [HSEARCH-5390](https://hibernate.atlassian.net/browse/HSEARCH-5390) - Use the Hibernate theme for rendered javadocs
+* [HSEARCH-5385](https://hibernate.atlassian.net/browse/HSEARCH-5385) - Move SearchProjectionFactory into the context for ProjectionDefinition
+* [HSEARCH-5384](https://hibernate.atlassian.net/browse/HSEARCH-5384) - Follow up on field refereces to simplify app migration 
+* [HSEARCH-5383](https://hibernate.atlassian.net/browse/HSEARCH-5383) - Upgrade to Hibernate ORM 7.0.0.Final
+* [HSEARCH-5380](https://hibernate.atlassian.net/browse/HSEARCH-5380) - Upgrade to Hibernate ORM 7.0.0.CR2
+
+### Task
+* [HSEARCH-5391](https://hibernate.atlassian.net/browse/HSEARCH-5391) - Test against latest Elasticsearch 8.18.2
+* [HSEARCH-5389](https://hibernate.atlassian.net/browse/HSEARCH-5389) - Use Maven 3.9.9 as a required minimum version for the build
+* [HSEARCH-5388](https://hibernate.atlassian.net/browse/HSEARCH-5388) - Account (in tests) for Lucene query cache being disabled by default starting in Lucene 11
+* [HSEARCH-5382](https://hibernate.atlassian.net/browse/HSEARCH-5382) - Do not include the `distributionManagement` pom section
+* [HSEARCH-5377](https://hibernate.atlassian.net/browse/HSEARCH-5377) - Remove Google Analytics
+
+## 8.0.0.Beta1 (2025-05-13)
+
+### Improvement
+* [HSEARCH-5374](https://hibernate.atlassian.net/browse/HSEARCH-5374) - Upgrade Elasticsearch client to 9.0.1
+* [HSEARCH-5373](https://hibernate.atlassian.net/browse/HSEARCH-5373) - Upgrade to Lucene 10.2.1
+* [HSEARCH-5371](https://hibernate.atlassian.net/browse/HSEARCH-5371) - Upgrade to Jackson 2.19.0
+* [HSEARCH-5370](https://hibernate.atlassian.net/browse/HSEARCH-5370) - Upgrade to GSON 2.13.1
+* [HSEARCH-5368](https://hibernate.atlassian.net/browse/HSEARCH-5368) - Upgrade to Jandex 3.3
+* [HSEARCH-5367](https://hibernate.atlassian.net/browse/HSEARCH-5367) - Upgrade to Hibernate ORM 7.0.0.CR1
+* [HSEARCH-5365](https://hibernate.atlassian.net/browse/HSEARCH-5365) - Add compatibility with Elasticsearch 8.18.0 
+* [HSEARCH-5363](https://hibernate.atlassian.net/browse/HSEARCH-5363) - Add compatibility with OpenSearch 3.0.0
+* [HSEARCH-5362](https://hibernate.atlassian.net/browse/HSEARCH-5362) - Upgrade to Elasticsearch client 9.0.0
+* [HSEARCH-5361](https://hibernate.atlassian.net/browse/HSEARCH-5361) - Add Elasticsearch 9.0.0 compatibility
+* [HSEARCH-5359](https://hibernate.atlassian.net/browse/HSEARCH-5359) - Upgrade to GSON 2.13.0
+* [HSEARCH-5358](https://hibernate.atlassian.net/browse/HSEARCH-5358) - Fail faster if an enclosing instance parameter is encountered in a projection constructor on JDK 25+
+* [HSEARCH-5353](https://hibernate.atlassian.net/browse/HSEARCH-5353) - Upgrade to Apache Lucene 10.2.0
+* [HSEARCH-5347](https://hibernate.atlassian.net/browse/HSEARCH-5347) - Upgrade Elasticsearch client to 8.17.4
+* [HSEARCH-5305](https://hibernate.atlassian.net/browse/HSEARCH-5305) - Support 16,000 vector search embeddings max dimensions using Lucene backend
+
+### New Feature
+* [HSEARCH-3319](https://hibernate.atlassian.net/browse/HSEARCH-3319) - Type-safe field references
+
+### Task
+* [HSEARCH-5378](https://hibernate.atlassian.net/browse/HSEARCH-5378) - Add numbering/copytocliboard extensions from hibernate-asciidoctor-extensions
+* [HSEARCH-5376](https://hibernate.atlassian.net/browse/HSEARCH-5376) - Test against latest Elasticsearch 8.18.1 / 8.17.6
+* [HSEARCH-5375](https://hibernate.atlassian.net/browse/HSEARCH-5375) - Test against the latest Elasticsearch 9.0.1
+* [HSEARCH-5372](https://hibernate.atlassian.net/browse/HSEARCH-5372) - Test against the latest OpenSearch 2.19.2
+* [HSEARCH-5369](https://hibernate.atlassian.net/browse/HSEARCH-5369) - Enforce `since` attribute on @Deperecated
+* [HSEARCH-5360](https://hibernate.atlassian.net/browse/HSEARCH-5360) - Test against the latest Elasticsearch 8.17.5
+* [HSEARCH-5352](https://hibernate.atlassian.net/browse/HSEARCH-5352) - Clean up logger impls from misused imports
+* [HSEARCH-5348](https://hibernate.atlassian.net/browse/HSEARCH-5348) - Test against the latest Elasticsearch 8.17.4
+* [HSEARCH-5300](https://hibernate.atlassian.net/browse/HSEARCH-5300) - Experiment with the annotation processor to generate the metamodel
+
+## 8.0.0.Alpha3 (2025-03-24)
+
+### Improvement
+* [HSEARCH-5346](https://hibernate.atlassian.net/browse/HSEARCH-5346) - Reuse ORM's ClassDetailsRegistry and ignore the BootstrapContext#getJandexView
+* [HSEARCH-5344](https://hibernate.atlassian.net/browse/HSEARCH-5344) - Upgrade to Hibernate ORM 7.0.0.Beta5
+
+### Task
+* [HSEARCH-5345](https://hibernate.atlassian.net/browse/HSEARCH-5345) - Upgrade to JUnit 5.12
+
+## 8.0.0.Alpha2 (2025-03-18)
+
+### Bug
+* [HSEARCH-5334](https://hibernate.atlassian.net/browse/HSEARCH-5334) - Conditional search failure when sorting by nullable fields
+
+### Improvement
+* [HSEARCH-5343](https://hibernate.atlassian.net/browse/HSEARCH-5343) - Upgrade to AWS SDK 2.31.2
+* [HSEARCH-5342](https://hibernate.atlassian.net/browse/HSEARCH-5342) - Use a org.hibernate.models.spi.ClassLoading based on org.hibernate.search.engine.environment.classpath.spi.ClassResolver
+* [HSEARCH-5331](https://hibernate.atlassian.net/browse/HSEARCH-5331) - Upgrade Elasticsearch client to 8.17.3
+* [HSEARCH-5330](https://hibernate.atlassian.net/browse/HSEARCH-5330) - Upgrade to Jackson 2.18.3
+* [HSEARCH-5329](https://hibernate.atlassian.net/browse/HSEARCH-5329) - Upgrade jboss-logging-tools to 3.0.4.Final
+* [HSEARCH-5317](https://hibernate.atlassian.net/browse/HSEARCH-5317) - Add compatibility with OpenSearch 2.19.0
+* [HSEARCH-5315](https://hibernate.atlassian.net/browse/HSEARCH-5315) - Upgrade Elasticsearch client to 8.17.2
+* [HSEARCH-5312](https://hibernate.atlassian.net/browse/HSEARCH-5312) - Upgrade to GSON 2.12.1
+* [HSEARCH-5310](https://hibernate.atlassian.net/browse/HSEARCH-5310) - Upgrade to commons-codec 1.18.0
+* [HSEARCH-5307](https://hibernate.atlassian.net/browse/HSEARCH-5307) - Upgrade Elasticsearch client to 8.17.1
+* [HSEARCH-5306](https://hibernate.atlassian.net/browse/HSEARCH-5306) - Upgrade to AWS SDK 2.30.2
+* [HSEARCH-5299](https://hibernate.atlassian.net/browse/HSEARCH-5299) - Upgrade to commons-codec 1.17.2
+* [HSEARCH-5298](https://hibernate.atlassian.net/browse/HSEARCH-5298) - Upgrade to Hibernate ORM 7.0.0.Beta4
+* [HSEARCH-5295](https://hibernate.atlassian.net/browse/HSEARCH-5295) - Upgrade to Lucene 10.1.0
+* [HSEARCH-3204](https://hibernate.atlassian.net/browse/HSEARCH-3204) - Detect which collection is being recreated in PostCollectionRecreateEvents
+
+### Task
+* [HSEARCH-5335](https://hibernate.atlassian.net/browse/HSEARCH-5335) - Test against latest Elasticsearch 7.17.28
+* [HSEARCH-5333](https://hibernate.atlassian.net/browse/HSEARCH-5333) - Better account for knn test flakiness
+* [HSEARCH-5332](https://hibernate.atlassian.net/browse/HSEARCH-5332) - Test against the latest Elasticsearch 8.17.3
+* [HSEARCH-5328](https://hibernate.atlassian.net/browse/HSEARCH-5328) - Bump groovy-jsr223 to 4.0.26 and enable patch updates for it
+* [HSEARCH-5327](https://hibernate.atlassian.net/browse/HSEARCH-5327) - Do not pull search backend images when running lucene only build
+* [HSEARCH-5325](https://hibernate.atlassian.net/browse/HSEARCH-5325) - Test against the latest OpenSearch 2.19.1
+* [HSEARCH-5319](https://hibernate.atlassian.net/browse/HSEARCH-5319) - Address ExistsPredicateBaseIT issues with OpenSearch backend
+* [HSEARCH-5316](https://hibernate.atlassian.net/browse/HSEARCH-5316) - Test against the latest Elasticsearch 8.17.2
+* [HSEARCH-5308](https://hibernate.atlassian.net/browse/HSEARCH-5308) - Test against latest Elasticsearch 8.17.1
+* [HSEARCH-5302](https://hibernate.atlassian.net/browse/HSEARCH-5302) - Test against latest Elasticsearch 7.17.27
+* [HSEARCH-5297](https://hibernate.atlassian.net/browse/HSEARCH-5297) - Switch to narayana-spring-boot instead of atomikos
+* [HSEARCH-5296](https://hibernate.atlassian.net/browse/HSEARCH-5296) - Add a step to build pdf documentation to the nightly CI job
+* [HSEARCH-5239](https://hibernate.atlassian.net/browse/HSEARCH-5239) - Take advantage of ORM's SchemaManager.truncateMappedObjects() in tests
+
+## 8.0.0.Alpha1 (2024-12-17)
+
+### Bug
+* [HSEARCH-5255](https://hibernate.atlassian.net/browse/HSEARCH-5255) - Issue with cardinality and @ObjectProjection
+* [HSEARCH-5226](https://hibernate.atlassian.net/browse/HSEARCH-5226) - @IndexedEmbedded fail when entity got @formula 
+
+### Improvement
+* [HSEARCH-5292](https://hibernate.atlassian.net/browse/HSEARCH-5292) - Upgrade to Lucene 9.12.1
+* [HSEARCH-5289](https://hibernate.atlassian.net/browse/HSEARCH-5289) - Add Elasticsearch 8.17.0 compatibility
+* [HSEARCH-5288](https://hibernate.atlassian.net/browse/HSEARCH-5288) - Upgrade to Elasticsearch client 8.17.0
+* [HSEARCH-5285](https://hibernate.atlassian.net/browse/HSEARCH-5285) - Add Pojo Standalone mapper Javadocs to the bundle
+* [HSEARCH-5284](https://hibernate.atlassian.net/browse/HSEARCH-5284) - Upgrade to Hibernate ORM 7.0.0.Beta3
+* [HSEARCH-5283](https://hibernate.atlassian.net/browse/HSEARCH-5283) - Upgrade to JBeret 3.1.0.Final
+* [HSEARCH-5282](https://hibernate.atlassian.net/browse/HSEARCH-5282) - Upgrade to Jackson 2.18.2
+* [HSEARCH-5279](https://hibernate.atlassian.net/browse/HSEARCH-5279) - Upgrade jboss-logging-tools to 3.0.3.Final
+* [HSEARCH-5274](https://hibernate.atlassian.net/browse/HSEARCH-5274) - Upgrade Elasticsearch client to 8.16.1
+* [HSEARCH-5270](https://hibernate.atlassian.net/browse/HSEARCH-5270) - Upgrade to Elasticsearch client 8.16.0
+* [HSEARCH-5269](https://hibernate.atlassian.net/browse/HSEARCH-5269) - Add Elasticsearch 8.16.0 compatibility
+* [HSEARCH-5266](https://hibernate.atlassian.net/browse/HSEARCH-5266) - Add compatibility with OpenSearch 2.18.0
+* [HSEARCH-5264](https://hibernate.atlassian.net/browse/HSEARCH-5264) - Upgrade to Jackson 2.18.1
+* [HSEARCH-5263](https://hibernate.atlassian.net/browse/HSEARCH-5263) - Upgrade to AWS SDK 2.29.2
+* [HSEARCH-5258](https://hibernate.atlassian.net/browse/HSEARCH-5258) - Upgrade Elasticsearch client to 8.15.3
+* [HSEARCH-5257](https://hibernate.atlassian.net/browse/HSEARCH-5257) - Upgrade jboss-logging-tools to 3.0.2.Final
+* [HSEARCH-5250](https://hibernate.atlassian.net/browse/HSEARCH-5250) - Upgrade to Jackson 2.18.0
+* [HSEARCH-5248](https://hibernate.atlassian.net/browse/HSEARCH-5248) - Upgrade Elasticsearch client to 8.15.2
+* [HSEARCH-5245](https://hibernate.atlassian.net/browse/HSEARCH-5245) - Add compatibility with OpenSearch 2.17.0
+* [HSEARCH-5244](https://hibernate.atlassian.net/browse/HSEARCH-5244) - Upgrade to Hibernate ORM 6.6.1.Final
+* [HSEARCH-5243](https://hibernate.atlassian.net/browse/HSEARCH-5243) - Upgrade to AWS SDK 2.28.2
+* [HSEARCH-5238](https://hibernate.atlassian.net/browse/HSEARCH-5238) - Upgrade to JBoss logging 3.6.1.Final
+* [HSEARCH-5237](https://hibernate.atlassian.net/browse/HSEARCH-5237) - Upgrade Elasticsearch client to 8.15.1
+* [HSEARCH-5230](https://hibernate.atlassian.net/browse/HSEARCH-5230) - Support RAW model type with metric aggregations
+* [HSEARCH-5228](https://hibernate.atlassian.net/browse/HSEARCH-5228) - Upgrade to JBeret 3.0
+* [HSEARCH-5224](https://hibernate.atlassian.net/browse/HSEARCH-5224) - Upgrade to AWS SDK 2.27.3
+* [HSEARCH-5210](https://hibernate.atlassian.net/browse/HSEARCH-5210) - Upgrade to Lucene 9.12
+* [HSEARCH-5180](https://hibernate.atlassian.net/browse/HSEARCH-5180) - Better mass indexing support for data streams with an initially unknown total size
+* [HSEARCH-5160](https://hibernate.atlassian.net/browse/HSEARCH-5160) - Introduce Lucene 10 compatible backend
+* [HSEARCH-5131](https://hibernate.atlassian.net/browse/HSEARCH-5131) - Remove Security Manager usage
+* [HSEARCH-5082](https://hibernate.atlassian.net/browse/HSEARCH-5082) - Upgrade to Hibernate ORM 7.0
+* [HSEARCH-5045](https://hibernate.atlassian.net/browse/HSEARCH-5045) - Raise default max-connection-per-route for the Elasticsearch backend
+* [HSEARCH-4851](https://hibernate.atlassian.net/browse/HSEARCH-4851) - Upgrade to JDK 17 as the baseline and drop JDK 11 compatibility
+* [HSEARCH-4720](https://hibernate.atlassian.net/browse/HSEARCH-4720) - Throw exceptions instead of logging warnings for failures to configure association inverse path resolution
+* [HSEARCH-2945](https://hibernate.atlassian.net/browse/HSEARCH-2945) - Pass the number of entities to index to the monitor right from the start
+* [HSEARCH-798](https://hibernate.atlassian.net/browse/HSEARCH-798) - Make use of categories instead of fqcn for logging
+
+### New Feature
+* [HSEARCH-5208](https://hibernate.atlassian.net/browse/HSEARCH-5208) - Add a fail-fast configuration option to the mass indexer
+* [HSEARCH-5133](https://hibernate.atlassian.net/browse/HSEARCH-5133) - Support basic metrics aggregations
+* [HSEARCH-4577](https://hibernate.atlassian.net/browse/HSEARCH-4577) - @ProjectionConstructor: aggregating multi-valued field/object projections in Set, SortedSet, etc. instead of List
+
+### Remove Feature
+* [HSEARCH-5241](https://hibernate.atlassian.net/browse/HSEARCH-5241) - Remove the deprecated `org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler`
+* [HSEARCH-5240](https://hibernate.atlassian.net/browse/HSEARCH-5240) - Remove the deprecated `org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor`
+
+### Task
+* [HSEARCH-5291](https://hibernate.atlassian.net/browse/HSEARCH-5291) - Test against latest OpenSearch 1.3.20
+* [HSEARCH-5290](https://hibernate.atlassian.net/browse/HSEARCH-5290) - Test against latest Elasticsearch 7.17.26
+* [HSEARCH-5287](https://hibernate.atlassian.net/browse/HSEARCH-5287) - Test Hibernate Search against JDK 25
+* [HSEARCH-5286](https://hibernate.atlassian.net/browse/HSEARCH-5286) - Switch to ojdbc17 driver for testing against an Oracle DB
+* [HSEARCH-5281](https://hibernate.atlassian.net/browse/HSEARCH-5281) - Do not use `hibernate.dialect` in test configuration
+* [HSEARCH-5275](https://hibernate.atlassian.net/browse/HSEARCH-5275) - Test against latest Elasticsearch 8.16.1
+* [HSEARCH-5272](https://hibernate.atlassian.net/browse/HSEARCH-5272) - Adjust flaky knn test : SimilarityFilterKnnSearchIT
+* [HSEARCH-5271](https://hibernate.atlassian.net/browse/HSEARCH-5271) - Reenable the ORM tests related to bytecode enhancement once next ORM Beta is out
+* [HSEARCH-5265](https://hibernate.atlassian.net/browse/HSEARCH-5265) - Switch to hibernate-develocity-maven-extension 
+* [HSEARCH-5262](https://hibernate.atlassian.net/browse/HSEARCH-5262) - Test against latest Elasticsearch 7.17.25
+* [HSEARCH-5260](https://hibernate.atlassian.net/browse/HSEARCH-5260) - Re-enable DynamicMapBaseIT#toOne
+* [HSEARCH-5259](https://hibernate.atlassian.net/browse/HSEARCH-5259) - Test against latest Elasticsearch 8.15.3
+* [HSEARCH-5252](https://hibernate.atlassian.net/browse/HSEARCH-5252) - Test against the latest OpenSearch 2.17.1
+* [HSEARCH-5249](https://hibernate.atlassian.net/browse/HSEARCH-5249) - Fix a flaky MassIndexingStreamingLoaderIT test
+* [HSEARCH-5247](https://hibernate.atlassian.net/browse/HSEARCH-5247) - Test against latest Elasticsearch 8.15.2
+* [HSEARCH-5246](https://hibernate.atlassian.net/browse/HSEARCH-5246) - Test against latest Elasticsearch 7.17.24
+* [HSEARCH-5236](https://hibernate.atlassian.net/browse/HSEARCH-5236) - Test against latest Elasticsearch 8.15.1
+* [HSEARCH-5234](https://hibernate.atlassian.net/browse/HSEARCH-5234) - Address the change of maven JavaDocs plugin output location
+* [HSEARCH-5233](https://hibernate.atlassian.net/browse/HSEARCH-5233) - Update to new versions of hibernate-infra extensions/theme that depend on AsciidoctorJ 3.0
+* [HSEARCH-5229](https://hibernate.atlassian.net/browse/HSEARCH-5229) - Test against latest OpenSearch 1.3.19
+* [HSEARCH-5222](https://hibernate.atlassian.net/browse/HSEARCH-5222) - Update or remove Elasticsearch upgrade testing
+* [HSEARCH-5157](https://hibernate.atlassian.net/browse/HSEARCH-5157) - Run tests against OpenSearch 2.13 AWS
+
+## 7.2.0.Final (2024-08-09)
+
+### Improvement
+* [HSEARCH-5221](https://hibernate.atlassian.net/browse/HSEARCH-5221) - Upgrade to Elasticsearch client 8.15.0
+* [HSEARCH-5220](https://hibernate.atlassian.net/browse/HSEARCH-5220) - Add Elasticsearch 8.15.0 compatibility
+* [HSEARCH-5219](https://hibernate.atlassian.net/browse/HSEARCH-5219) - Upgrade to Hibernate ORM 6.6.0.Final
+* [HSEARCH-5218](https://hibernate.atlassian.net/browse/HSEARCH-5218) - Add compatibility with OpenSearch 2.16.0
+
+## 7.2.0.CR1 (2024-08-07)
+
+### Bug
+* [HSEARCH-5211](https://hibernate.atlassian.net/browse/HSEARCH-5211) - Possible infinite recursion when creating a SearchWorkspace by calling a deprecated SearchScope#workspace(String)
+* [HSEARCH-5204](https://hibernate.atlassian.net/browse/HSEARCH-5204) - Fix rendering of some definition lists
+* [HSEARCH-5170](https://hibernate.atlassian.net/browse/HSEARCH-5170) - Setting an association to null before removing an entity may not trigger indexing
+* [HSEARCH-5136](https://hibernate.atlassian.net/browse/HSEARCH-5136) - Mapped superclass with generic ID causes MassIndexer to fail
+
+### Improvement
+* [HSEARCH-5217](https://hibernate.atlassian.net/browse/HSEARCH-5217) - Upgrade to Hibernate ORM 6.6.0.CR2
+* [HSEARCH-5212](https://hibernate.atlassian.net/browse/HSEARCH-5212) - Upgrade to Avro 1.12.0
+* [HSEARCH-5207](https://hibernate.atlassian.net/browse/HSEARCH-5207) - Upgrade jboss-logging-tools to 3.0.1.Final
+* [HSEARCH-5203](https://hibernate.atlassian.net/browse/HSEARCH-5203) - Test against latest Elasticsearch 8.14.3
+* [HSEARCH-5202](https://hibernate.atlassian.net/browse/HSEARCH-5202) - Upgrade Elasticsearch client to 8.14.3
+* [HSEARCH-5200](https://hibernate.atlassian.net/browse/HSEARCH-5200) - Upgrade Jackson to 2.17.2
+* [HSEARCH-5195](https://hibernate.atlassian.net/browse/HSEARCH-5195) - Upgrade Elasticsearch client to 8.14.2
+* [HSEARCH-5192](https://hibernate.atlassian.net/browse/HSEARCH-5192) - Make Hibernate Search build produce "reproducible" sources jar
+* [HSEARCH-5189](https://hibernate.atlassian.net/browse/HSEARCH-5189) - Delay creating index names for the Elasticsearch backend till "runtime"
+* [HSEARCH-5187](https://hibernate.atlassian.net/browse/HSEARCH-5187) - Deprecate `ValueConvert` in favor of more a more descriptive enum with more consistent handling
+* [HSEARCH-5184](https://hibernate.atlassian.net/browse/HSEARCH-5184) - Upgrade to Lucene 9.11.1
+* [HSEARCH-5183](https://hibernate.atlassian.net/browse/HSEARCH-5183) - Add a score based alternative to similarity filter in the knn predicate
+* [HSEARCH-5182](https://hibernate.atlassian.net/browse/HSEARCH-5182) - Enable knn similarity filter for the OpenSearch backend
+* [HSEARCH-5181](https://hibernate.atlassian.net/browse/HSEARCH-5181) - Add compatibility with OpenSearch 2.15.0
+* [HSEARCH-5179](https://hibernate.atlassian.net/browse/HSEARCH-5179) - Upgrade to AWS SDK 2.26.4
+* [HSEARCH-5175](https://hibernate.atlassian.net/browse/HSEARCH-5175) - Upgrade to Hibernate ORM 6.6.0.CR1
+* [HSEARCH-5172](https://hibernate.atlassian.net/browse/HSEARCH-5172) - Upgrade Elasticsearch client to 8.14.1
+* [HSEARCH-5167](https://hibernate.atlassian.net/browse/HSEARCH-5167) - Bump com.carrotsearch:hppc from 0.9.1 to 0.10.0
+
+### New Feature
+* [HSEARCH-3906](https://hibernate.atlassian.net/browse/HSEARCH-3906) - Support prefix queries in dsl
+
+### Task
+* [HSEARCH-5214](https://hibernate.atlassian.net/browse/HSEARCH-5214) - Test against latest Elasticsearch 7.17.23
+* [HSEARCH-5213](https://hibernate.atlassian.net/browse/HSEARCH-5213) - Use Maven 3.9.8 as a required minimum version for the build
+* [HSEARCH-5206](https://hibernate.atlassian.net/browse/HSEARCH-5206) - Test against latest OpenSearch 1.3.18
+* [HSEARCH-5196](https://hibernate.atlassian.net/browse/HSEARCH-5196) - Test against latest Elasticsearch 8.14.2
+* [HSEARCH-5194](https://hibernate.atlassian.net/browse/HSEARCH-5194) - Fix flaky KnnPredicateSpecificsIT
+* [HSEARCH-5193](https://hibernate.atlassian.net/browse/HSEARCH-5193) - Add a build step to verify the build reproducibility
+* [HSEARCH-5178](https://hibernate.atlassian.net/browse/HSEARCH-5178) - Reword confusing introduction to coordination in documentation
+* [HSEARCH-5177](https://hibernate.atlassian.net/browse/HSEARCH-5177) - Test against latest Elasticsearch 7.17.22
+* [HSEARCH-5174](https://hibernate.atlassian.net/browse/HSEARCH-5174) - Test against latest OpenSearch 1.3.17
+* [HSEARCH-5173](https://hibernate.atlassian.net/browse/HSEARCH-5173) - Test against latest Elasticsearch 8.14.1
+* [HSEARCH-5171](https://hibernate.atlassian.net/browse/HSEARCH-5171) - Reenable the tests in AbstractAutomaticIndexingAssociationBaseIT
+* [HSEARCH-5155](https://hibernate.atlassian.net/browse/HSEARCH-5155) - Build with JDK 21
+* [HSEARCH-5140](https://hibernate.atlassian.net/browse/HSEARCH-5140) - Switch to the new ORM BytecodeEnhanced extension 
+* [HSEARCH-5123](https://hibernate.atlassian.net/browse/HSEARCH-5123) - Promote the latest version of getting started guides
+
+## 7.2.0.Alpha2 (2024-06-10)
+
+### Bug
+* [HSEARCH-5162](https://hibernate.atlassian.net/browse/HSEARCH-5162) - ORM mass indexer fails when JPA compliance is enabled (hibernate.jpa.compliance.query=true)
+* [HSEARCH-5161](https://hibernate.atlassian.net/browse/HSEARCH-5161) - Prevent mass indexer from dropping the schema on start when requested but multitenancy is configured
+* [HSEARCH-5158](https://hibernate.atlassian.net/browse/HSEARCH-5158) - Standalone mapper's SearchScope#massIndexer(Object tenantId) returns null
+
+### Improvement
+* [HSEARCH-5166](https://hibernate.atlassian.net/browse/HSEARCH-5166) - Upgrade to Lucene 9.11
+* [HSEARCH-5165](https://hibernate.atlassian.net/browse/HSEARCH-5165) - Upgrade to Elasticsearch client 8.14.0
+* [HSEARCH-5164](https://hibernate.atlassian.net/browse/HSEARCH-5164) - Add Elasticsearch 8.14.0 compatibility
+* [HSEARCH-5154](https://hibernate.atlassian.net/browse/HSEARCH-5154) - Upgrade to Hibernate ORM 6.5.2.Final
+* [HSEARCH-5153](https://hibernate.atlassian.net/browse/HSEARCH-5153) - Upgrade to GSON 2.11.0
+* [HSEARCH-5108](https://hibernate.atlassian.net/browse/HSEARCH-5108) - Close unused readers immediately on refresh with the Lucene backend
+* [HSEARCH-5107](https://hibernate.atlassian.net/browse/HSEARCH-5107) - Close unused readers before merging segments with the Lucene backend
+* [HSEARCH-4930](https://hibernate.atlassian.net/browse/HSEARCH-4930) - Use dropAndCreateSchemaOnStart by default on Amazon OpenSearch Service for MassIndexer and JSR-352 integration
+
+### New Feature
+* [HSEARCH-4542](https://hibernate.atlassian.net/browse/HSEARCH-4542) - .within() and .withinAny() for the range predicate
+
+### Task
+* [HSEARCH-5159](https://hibernate.atlassian.net/browse/HSEARCH-5159) - Prepare to switch to char[] from Character[] in the Lucene highlighters
+* [HSEARCH-5156](https://hibernate.atlassian.net/browse/HSEARCH-5156) - Address Spring Boot 3.3 upgrade nested JARs test failures
+* [HSEARCH-5152](https://hibernate.atlassian.net/browse/HSEARCH-5152) - Use env variable for gpg sign plugin configuration
+* [HSEARCH-5148](https://hibernate.atlassian.net/browse/HSEARCH-5148) - Update lucene analysis JavaDocs link
+* [HSEARCH-4971](https://hibernate.atlassian.net/browse/HSEARCH-4971) - Switch project license to Apache License 2.0
+
+## 7.2.0.Alpha1 (2024-05-16)
+
+### Bug
+* [HSEARCH-5124](https://hibernate.atlassian.net/browse/HSEARCH-5124) - Jakarta Batch Job parameter `purgeAllOnStart` will purge all documents instead of just the ones specified in `entityTypes`
+* [HSEARCH-5110](https://hibernate.atlassian.net/browse/HSEARCH-5110) - Error message when the version of Elasticsearch/Opensearch is too old for vector search states wrong requirements
+* [HSEARCH-5089](https://hibernate.atlassian.net/browse/HSEARCH-5089) - Retrieve the schema management strategy on start for the Standalone Pojo Mapper
+* [HSEARCH-5039](https://hibernate.atlassian.net/browse/HSEARCH-5039) - Tenant filter should be a pre-filter for knn predicates
+
+### Epic
+* [HSEARCH-4962](https://hibernate.atlassian.net/browse/HSEARCH-4962) - APIs to support Hibernate Search Tools
+
+### Improvement
+* [HSEARCH-5151](https://hibernate.atlassian.net/browse/HSEARCH-5151) - Add compatibility with OpenSearch 2.14.0
+* [HSEARCH-5150](https://hibernate.atlassian.net/browse/HSEARCH-5150) - Upgrade to Hibernate ORM 6.5.1.Final
+* [HSEARCH-5146](https://hibernate.atlassian.net/browse/HSEARCH-5146) - Upgrade to Elasticsearch 8.13.4 client
+* [HSEARCH-5145](https://hibernate.atlassian.net/browse/HSEARCH-5145) - Upgrade Jackson to 2.17.1
+* [HSEARCH-5144](https://hibernate.atlassian.net/browse/HSEARCH-5144) - Upgrade to JBoss logging 3.6.0.Final
+* [HSEARCH-5142](https://hibernate.atlassian.net/browse/HSEARCH-5142) - Upgrade to Elasticsearch 8.13.3 client
+* [HSEARCH-5139](https://hibernate.atlassian.net/browse/HSEARCH-5139) - Upgrade to Hibernate ORM 6.5.0.Final
+* [HSEARCH-5138](https://hibernate.atlassian.net/browse/HSEARCH-5138) - Test against latest OpenSearch 1.3.16
+* [HSEARCH-5132](https://hibernate.atlassian.net/browse/HSEARCH-5132) - Do not directly rely on the Security Manager in EmbeddedThreadProvider
+* [HSEARCH-5130](https://hibernate.atlassian.net/browse/HSEARCH-5130) - Upgrade to Hibernate ORM 6.5.0.CR2
+* [HSEARCH-5127](https://hibernate.atlassian.net/browse/HSEARCH-5127) - Add Elasticsearch 8.13.0 compatibility
+* [HSEARCH-5125](https://hibernate.atlassian.net/browse/HSEARCH-5125) - Upgrade to Elasticsearch client 8.13.2
+* [HSEARCH-5122](https://hibernate.atlassian.net/browse/HSEARCH-5122) - Add compatibility with OpenSearch 2.13.0
+* [HSEARCH-5121](https://hibernate.atlassian.net/browse/HSEARCH-5121) - Upgrade to Elasticsearch client 8.13.1 and test against Elasticsearch 8.13.1
+* [HSEARCH-5119](https://hibernate.atlassian.net/browse/HSEARCH-5119) - Use `IndexSearcher#setTimeout` instead of a TimeLimitingCollector
+* [HSEARCH-5118](https://hibernate.atlassian.net/browse/HSEARCH-5118) - Generate module-info for `hibernate-search-backend-lucene`
+* [HSEARCH-5114](https://hibernate.atlassian.net/browse/HSEARCH-5114) - Upgrade to Elasticsearch client 8.13.0
+* [HSEARCH-5111](https://hibernate.atlassian.net/browse/HSEARCH-5111) - Upgrade to Hibernate ORM 6.5.0.CR1
+* [HSEARCH-5109](https://hibernate.atlassian.net/browse/HSEARCH-5109) - Introduce `ValueConvert.PARSE` to provide built-in converters for string values
+* [HSEARCH-5106](https://hibernate.atlassian.net/browse/HSEARCH-5106) - Upgrade Jackson to 2.17.0
+* [HSEARCH-5104](https://hibernate.atlassian.net/browse/HSEARCH-5104) - Upgrade Jackson to 2.15.4
+* [HSEARCH-5100](https://hibernate.atlassian.net/browse/HSEARCH-5100) - Upgrade to GSON 2.10.1
+* [HSEARCH-5098](https://hibernate.atlassian.net/browse/HSEARCH-5098) - Upgrade to AWS SDK 2.25.2
+* [HSEARCH-5096](https://hibernate.atlassian.net/browse/HSEARCH-5096) - Reproducible builds
+* [HSEARCH-5092](https://hibernate.atlassian.net/browse/HSEARCH-5092) - Make `HibernateOrmSearchQueryAdapter` compatible with a future ORM 6.5 release
+* [HSEARCH-5091](https://hibernate.atlassian.net/browse/HSEARCH-5091) - Upgrade to Elasticsearch client 8.12.2 and test against Elasticsearch 8.12.2
+* [HSEARCH-5088](https://hibernate.atlassian.net/browse/HSEARCH-5088) - Limit OpenSearch vector search capabilities to 2.9+ versions
+* [HSEARCH-5087](https://hibernate.atlassian.net/browse/HSEARCH-5087) - Add compatibility with OpenSearch 2.12.0
+* [HSEARCH-5086](https://hibernate.atlassian.net/browse/HSEARCH-5086) - Upgrade to Lucene 9.10
+* [HSEARCH-5084](https://hibernate.atlassian.net/browse/HSEARCH-5084) - Switch to IndexSearcher#search(Query, CollectorManager) for the Lucene backend
+* [HSEARCH-5083](https://hibernate.atlassian.net/browse/HSEARCH-5083) - Upgrade to AWS SDK 2.24.1
+* [HSEARCH-5062](https://hibernate.atlassian.net/browse/HSEARCH-5062) - Target types as precise as possible for entity loading
+* [HSEARCH-5048](https://hibernate.atlassian.net/browse/HSEARCH-5048) - Check that index/search vectors meet the requirements of a configured similarity function
+* [HSEARCH-5018](https://hibernate.atlassian.net/browse/HSEARCH-5018) - Better guidance for applications where classpath scanning does not work
+* [HSEARCH-5016](https://hibernate.atlassian.net/browse/HSEARCH-5016) - Allow binding a @HighlightProjection to a single-valued String (instead of List<String>) when using numberOfFragments(1)
+* [HSEARCH-5006](https://hibernate.atlassian.net/browse/HSEARCH-5006) - Non-string tenant identifiers
+* [HSEARCH-4572](https://hibernate.atlassian.net/browse/HSEARCH-4572) - Using SearchPredicate/SearchProjection/SearchSort with broader scope than the search query
+
+### New Feature
+* [HSEARCH-4964](https://hibernate.atlassian.net/browse/HSEARCH-4964) - Projection on the document tree for the Lucene backend
+* [HSEARCH-4963](https://hibernate.atlassian.net/browse/HSEARCH-4963) - API to run analysis on a given String
+* [HSEARCH-4961](https://hibernate.atlassian.net/browse/HSEARCH-4961) - API to list all analyzer names
+* [HSEARCH-4929](https://hibernate.atlassian.net/browse/HSEARCH-4929) - Support dropAndCreateSchemaOnStart in JSR-352 integration
+* [HSEARCH-4807](https://hibernate.atlassian.net/browse/HSEARCH-4807) - @DistanceProjection to map a constructor parameter to a distance projection
+* [HSEARCH-4806](https://hibernate.atlassian.net/browse/HSEARCH-4806) - Basic support for parameters at the query level
+* [HSEARCH-4558](https://hibernate.atlassian.net/browse/HSEARCH-4558) - simpleQueryString for numeric/date fields
+* [HSEARCH-3200](https://hibernate.atlassian.net/browse/HSEARCH-3200) - Allow setting the minimum number of should clauses required to match for full-text predicates in the query DSL
+
+### Task
+* [HSEARCH-5147](https://hibernate.atlassian.net/browse/HSEARCH-5147) - Test Elasticsearch 8.13.4 compatibility
+* [HSEARCH-5143](https://hibernate.atlassian.net/browse/HSEARCH-5143) - Test against latest Elasticsearch 7.17.21
+* [HSEARCH-5141](https://hibernate.atlassian.net/browse/HSEARCH-5141) - Test Elasticsearch 8.13.3 compatibility
+* [HSEARCH-5135](https://hibernate.atlassian.net/browse/HSEARCH-5135) - Improve test execution time for some of the orm-based tests
+* [HSEARCH-5129](https://hibernate.atlassian.net/browse/HSEARCH-5129) - Test against latest Elasticsearch 7.17.20
+* [HSEARCH-5128](https://hibernate.atlassian.net/browse/HSEARCH-5128) - Update the supported versions of Java in the documentation
+* [HSEARCH-5126](https://hibernate.atlassian.net/browse/HSEARCH-5126) - Test Elasticsearch 8.13.2 compatibility
+* [HSEARCH-5116](https://hibernate.atlassian.net/browse/HSEARCH-5116) - Test against latest Elasticsearch 7.17.19
+* [HSEARCH-5113](https://hibernate.atlassian.net/browse/HSEARCH-5113) - Fix flaky knn test : KnnPredicateSpecificsIT$ExampleKnnSearchIT.multipleKnn_shouldClauses
+* [HSEARCH-5101](https://hibernate.atlassian.net/browse/HSEARCH-5101) - Test against latest Elasticsearch 7.17.18
+* [HSEARCH-5099](https://hibernate.atlassian.net/browse/HSEARCH-5099) - Test against latest OpenSearch 1.3.15
+* [HSEARCH-5094](https://hibernate.atlassian.net/browse/HSEARCH-5094) - Integrate with Develocity build scans/build cache
+* [HSEARCH-5093](https://hibernate.atlassian.net/browse/HSEARCH-5093) - Fix flaky test TransactionTimeoutJtaAndSpringOutboxIT
+* [HSEARCH-5081](https://hibernate.atlassian.net/browse/HSEARCH-5081) - Fix very slow unit tests
+* [HSEARCH-5075](https://hibernate.atlassian.net/browse/HSEARCH-5075) - Refactor parameter handling during binding
+* [HSEARCH-5009](https://hibernate.atlassian.net/browse/HSEARCH-5009) - Re-enable some tests when HHH-17408 gets fixed
+* [HSEARCH-4981](https://hibernate.atlassian.net/browse/HSEARCH-4981) - Fix flaky test with CockroachDB: OutboxPollingAutomaticIndexingLifecycleIT.stopWhileOutboxEventsIsBeingProcessed
+* [HSEARCH-4965](https://hibernate.atlassian.net/browse/HSEARCH-4965) - Fix outbox-polling integration tests on Windows
+* [HSEARCH-4927](https://hibernate.atlassian.net/browse/HSEARCH-4927) - Take into account all integration tests in Sonar reports
+
+## 7.1.0.CR1 (2024-02-12)
+
+### Improvement
+* [HSEARCH-5078](https://hibernate.atlassian.net/browse/HSEARCH-5078) - Upgrade to Hibernate ORM 6.4.4.Final
+* [HSEARCH-5077](https://hibernate.atlassian.net/browse/HSEARCH-5077) - Upgrade to Elasticsearch client 8.12.1 and test against Elasticsearch 8.12.1
+* [HSEARCH-5074](https://hibernate.atlassian.net/browse/HSEARCH-5074) - Upgrade JBeret to 2.2.1.Final
+* [HSEARCH-5073](https://hibernate.atlassian.net/browse/HSEARCH-5073) - Add minimum_should_match to simple query string predicate 
+* [HSEARCH-5071](https://hibernate.atlassian.net/browse/HSEARCH-5071) - Upgrade to Hibernate ORM 6.4.3.Final
+* [HSEARCH-5070](https://hibernate.atlassian.net/browse/HSEARCH-5070) - Update latexmath formulas in the documentation to correctly render in a PDF 
+* [HSEARCH-5069](https://hibernate.atlassian.net/browse/HSEARCH-5069) - Upgrade to Lucene 9.9.2
+* [HSEARCH-5068](https://hibernate.atlassian.net/browse/HSEARCH-5068) - Simplify entity registration in the Standalone POJO mapper
+* [HSEARCH-5067](https://hibernate.atlassian.net/browse/HSEARCH-5067) - Allow targeting entities by name in the Standalone POJO Mapper
+* [HSEARCH-5064](https://hibernate.atlassian.net/browse/HSEARCH-5064) - Integrate Elasticsearch's knn query introduced in 8.12
+* [HSEARCH-5020](https://hibernate.atlassian.net/browse/HSEARCH-5020) - Increase the max allowed dimension for a Lucene backend
+
+### New Feature
+* [HSEARCH-5079](https://hibernate.atlassian.net/browse/HSEARCH-5079) - Support `@IndexedEmbedded` on Hibernate ORM column mapped with `@JdbcTypeCode(SqlTypes.JSON)`
+* [HSEARCH-4563](https://hibernate.atlassian.net/browse/HSEARCH-4563) - queryString predicate for advanced, Lucene-syntax query strings
+
+### Task
+* [HSEARCH-5050](https://hibernate.atlassian.net/browse/HSEARCH-5050) - Update link to documentation for batch_fetch_size in Hibernate ORM 6.4+
+* [HSEARCH-5033](https://hibernate.atlassian.net/browse/HSEARCH-5033) - Better tests and documentation of limitations around nested fields for highlighting
+
+## 7.1.0.Alpha2 (2024-01-24)
+
+### Bug
+* [HSEARCH-5031](https://hibernate.atlassian.net/browse/HSEARCH-5031) - Mass indexing ID loading queries with discriminator multi-tenancy may cross tenant boundaries in some cases
+
+### Improvement
+* [HSEARCH-5065](https://hibernate.atlassian.net/browse/HSEARCH-5065) - Two-phase boot for the standalone POJO mapper
+* [HSEARCH-5060](https://hibernate.atlassian.net/browse/HSEARCH-5060) - Upgrade to Hibernate ORM 6.4.2.Final
+* [HSEARCH-5059](https://hibernate.atlassian.net/browse/HSEARCH-5059) - Add compatiblity with Elasticsearch 8.12.0 and upgrade to Elasticsearch client 8.12.0
+* [HSEARCH-5057](https://hibernate.atlassian.net/browse/HSEARCH-5057) - Upgrade to AWS SDK 2.23.3
+* [HSEARCH-5056](https://hibernate.atlassian.net/browse/HSEARCH-5056) - Rename VectorField#beamWidth / VectorField#maxConnections to align with Elasticsearch/OpenSearch naming
+* [HSEARCH-5055](https://hibernate.atlassian.net/browse/HSEARCH-5055) - Upgrade to Elasticsearch client 8.11.4 and test against Elasticsearch 8.11.4
+* [HSEARCH-5052](https://hibernate.atlassian.net/browse/HSEARCH-5052) - knn predicate: filter out results based on similarity
+* [HSEARCH-5047](https://hibernate.atlassian.net/browse/HSEARCH-5047) - Upgrade JBeret to 2.2.0.Final
+* [HSEARCH-5046](https://hibernate.atlassian.net/browse/HSEARCH-5046) - Upgrade to AWS SDK 2.22.1
+* [HSEARCH-5043](https://hibernate.atlassian.net/browse/HSEARCH-5043) - Upgrade to Lucene 9.9.1
+* [HSEARCH-5042](https://hibernate.atlassian.net/browse/HSEARCH-5042) - Upgrade to Hibernate ORM 6.4.1.Final
+* [HSEARCH-5038](https://hibernate.atlassian.net/browse/HSEARCH-5038) - Align vector similarity naming between backends
+* [HSEARCH-5036](https://hibernate.atlassian.net/browse/HSEARCH-5036) - Upgrade to Elasticsearch client 8.11.3 and test against Elasticsearch 8.11.3
+* [HSEARCH-5034](https://hibernate.atlassian.net/browse/HSEARCH-5034) - Allow passing BeanReference<? extends T> when registering beans to BeanConfigurationContext
+* [HSEARCH-5032](https://hibernate.atlassian.net/browse/HSEARCH-5032) - Upgrade to Elasticsearch client 8.11.2 and test against Elasticsearch 8.11.2
+* [HSEARCH-5025](https://hibernate.atlassian.net/browse/HSEARCH-5025) - Add container extraction support to @VectorField
+* [HSEARCH-5021](https://hibernate.atlassian.net/browse/HSEARCH-5021) - Improve support for custom value bridges for vector fields
+* [HSEARCH-5010](https://hibernate.atlassian.net/browse/HSEARCH-5010) - Upgrade to Lucene 9.9
+* [HSEARCH-5004](https://hibernate.atlassian.net/browse/HSEARCH-5004) - Default to SqlTypes.UUID instead of CHAR for the OutboxEvent/Agent ID in databases supporting it
+
+### New Feature
+* [HSEARCH-4950](https://hibernate.atlassian.net/browse/HSEARCH-4950) - Vector search using Elasticsearch/OpenSearch
+* [HSEARCH-3909](https://hibernate.atlassian.net/browse/HSEARCH-3909) - Allow looking up the capabilities of each field in the metamodel
+
+### Task
+* [HSEARCH-5041](https://hibernate.atlassian.net/browse/HSEARCH-5041) - Test against latest OpenSearch 1.3.14
+* [HSEARCH-5040](https://hibernate.atlassian.net/browse/HSEARCH-5040) - Use Maven 3.9.6 in CI builds and as a required minimum version for the build
+* [HSEARCH-5037](https://hibernate.atlassian.net/browse/HSEARCH-5037) - Test against latest Elasticsearch 7.17.16
+* [HSEARCH-5029](https://hibernate.atlassian.net/browse/HSEARCH-5029) - Simplify entity cleanup in ORM-related tests
+* [HSEARCH-5026](https://hibernate.atlassian.net/browse/HSEARCH-5026) - Test against latest OpenSearch 2.11.1
+* [HSEARCH-5023](https://hibernate.atlassian.net/browse/HSEARCH-5023) - Simplify the format for indexNullAs on float[]/byte[] bridges
+
+## 7.1.0.Alpha1 (2023-11-30)
+
+### Improvement
+* [HSEARCH-5024](https://hibernate.atlassian.net/browse/HSEARCH-5024) - Adjust Jandex index reading and building for nested JARs
+
+### New Feature
+* [HSEARCH-4948](https://hibernate.atlassian.net/browse/HSEARCH-4948) - Vector search using the Lucene backend
+
+## 7.0.0.CR2 (2023-11-24)
+
+### Improvement
+* [HSEARCH-5015](https://hibernate.atlassian.net/browse/HSEARCH-5015) - Make OutboxEvent non-final
+* [HSEARCH-5012](https://hibernate.atlassian.net/browse/HSEARCH-5012) - Add compatiblity with Elasticsearch 8.11.1 and upgrade to Elasticsearch client 8.11.1
+* [HSEARCH-5008](https://hibernate.atlassian.net/browse/HSEARCH-5008) - Upgrade to Hibernate ORM 6.4
+* [HSEARCH-5005](https://hibernate.atlassian.net/browse/HSEARCH-5005) - Add compatiblity with Elasticsearch 8.11.0 and upgrade to Elasticsearch client 8.11.0
+* [HSEARCH-4999](https://hibernate.atlassian.net/browse/HSEARCH-4999) - Use geo_shape instead of geo_polygon in Elasticsearch spatial predicates
+* [HSEARCH-4997](https://hibernate.atlassian.net/browse/HSEARCH-4997) - Compatibility with Hibernate ORM 6.4
+* [HSEARCH-4996](https://hibernate.atlassian.net/browse/HSEARCH-4996) - Upgrade JBeret to 2.1.3.Final
+* [HSEARCH-4995](https://hibernate.atlassian.net/browse/HSEARCH-4995) - Avoid logging exceptions when using SchemaManager explicitly
+
+### Task
+* [HSEARCH-5013](https://hibernate.atlassian.net/browse/HSEARCH-5013) - Test against latest Elasticsearch 7.17.15
+* [HSEARCH-5011](https://hibernate.atlassian.net/browse/HSEARCH-5011) - Fix some tests no longer being executed as part of the build
+* [HSEARCH-5002](https://hibernate.atlassian.net/browse/HSEARCH-5002) - Document dropped compatibility with older Elasticsearch/OpenSearch versions and Hibernate ORM 6.3 upgrade in migration guide
+* [HSEARCH-5000](https://hibernate.atlassian.net/browse/HSEARCH-5000) - Address test failure with ORM 6.4 in PolymorphicAssociationContainedInTargetTest
+* [HSEARCH-4998](https://hibernate.atlassian.net/browse/HSEARCH-4998) - Make the build compatible with podman
+* [HSEARCH-4674](https://hibernate.atlassian.net/browse/HSEARCH-4674) - Move to Testcontainers to start Elasticsearch/OpenSearch/databases/etc.
+
+## 7.0.0.CR1 (2023-10-20)
+
+### Bug
+* [HSEARCH-4988](https://hibernate.atlassian.net/browse/HSEARCH-4988) - Container extractor resolution leads to StackOverflowError on properties of type Path
+* [HSEARCH-4986](https://hibernate.atlassian.net/browse/HSEARCH-4986) - Mapping partitions fails in Jakarta Batch mass indexing job for some JDBC drivers (DB2, MSSQL, ...)
+* [HSEARCH-4983](https://hibernate.atlassian.net/browse/HSEARCH-4983) - Concurrency issues in Lucene IndexAccessor/IndexWriterProvider may lead to LockObtainFailedException: Lock held by this virtual machine
+* [HSEARCH-4980](https://hibernate.atlassian.net/browse/HSEARCH-4980) - Jakarta Batch job fails for entities with embedded ids
+* [HSEARCH-4969](https://hibernate.atlassian.net/browse/HSEARCH-4969) - IndexOutOfBoundsException in TextMultiValues
+* [HSEARCH-4947](https://hibernate.atlassian.net/browse/HSEARCH-4947) - CodeSource does not work in windows using jar files
+* [HSEARCH-4487](https://hibernate.atlassian.net/browse/HSEARCH-4487) - Jakarta Batch Mass Indexing job fails with @IndexedEmbedded entity and MySQL
+
+### Improvement
+* [HSEARCH-4994](https://hibernate.atlassian.net/browse/HSEARCH-4994) - Upgrade to Elasticsearch client 8.10.4 and test against Elasticsearch 8.10.4
+* [HSEARCH-4993](https://hibernate.atlassian.net/browse/HSEARCH-4993) - Add compatibility with OpenSearch 2.11.0
+* [HSEARCH-4992](https://hibernate.atlassian.net/browse/HSEARCH-4992) - Upgrade to AWS SDK 2.21.1
+* [HSEARCH-4990](https://hibernate.atlassian.net/browse/HSEARCH-4990) - Upgrade to Elasticsearch client 8.10.3 and test against Elasticsearch 8.10.3
+* [HSEARCH-4984](https://hibernate.atlassian.net/browse/HSEARCH-4984) - Upgrade to Avro 1.11.3
+* [HSEARCH-4982](https://hibernate.atlassian.net/browse/HSEARCH-4982) - Upgrade to Lucene 9.8
+* [HSEARCH-4978](https://hibernate.atlassian.net/browse/HSEARCH-4978) - Add compatibility with OpenSearch 2.10.0
+* [HSEARCH-4967](https://hibernate.atlassian.net/browse/HSEARCH-4967) - Upgrade to Elasticsearch client 8.10.2 and test against Elasticsearch 8.10.2
+* [HSEARCH-4959](https://hibernate.atlassian.net/browse/HSEARCH-4959) - Upgrade to Hibernate ORM 6.3.1.Final
+* [HSEARCH-4958](https://hibernate.atlassian.net/browse/HSEARCH-4958) - Upgrade to Elasticsearch client 8.10.1 and test against Elasticsearch 8.10.1
+* [HSEARCH-4957](https://hibernate.atlassian.net/browse/HSEARCH-4957) - Upgrade to Jackson 2.15.2
+* [HSEARCH-4946](https://hibernate.atlassian.net/browse/HSEARCH-4946) - Upgrade to Elasticsearch client 8.10.0 and test against Elasticsearch 8.10.0
+* [HSEARCH-4941](https://hibernate.atlassian.net/browse/HSEARCH-4941) - Upgrade to Elasticsearch client 8.9.2 and test against Elasticsearch 8.9.2
+* [HSEARCH-4940](https://hibernate.atlassian.net/browse/HSEARCH-4940) - Use "Jakarta Batch" instead of "JSR-352"/"Batch for Java" in POM and documentation of JSR-352 artifacts
+* [HSEARCH-4928](https://hibernate.atlassian.net/browse/HSEARCH-4928) - Rename hibernate-search-mapper-orm-coordination-outbox-polling to something shorter
+
+### New Feature
+* [HSEARCH-4403](https://hibernate.atlassian.net/browse/HSEARCH-4403) - Support ORM's discriminator-based multi-tenancy (esp. in the outbox-polling module)
+
+### Remove Feature
+* [HSEARCH-4938](https://hibernate.atlassian.net/browse/HSEARCH-4938) - Remove support for the complement operator (~) in regexp queries
+* [HSEARCH-4934](https://hibernate.atlassian.net/browse/HSEARCH-4934) - Drop compatibility with Elasticsearch 7.0-7.9, OpenSearch 1.0-1.2
+
+### Task
+* [HSEARCH-4991](https://hibernate.atlassian.net/browse/HSEARCH-4991) - Test against latest Elasticsearch 7.17.14
+* [HSEARCH-4989](https://hibernate.atlassian.net/browse/HSEARCH-4989) - Update JQAssistant rules for JUnit 5 upgrade
+* [HSEARCH-4985](https://hibernate.atlassian.net/browse/HSEARCH-4985) - Fix heading level of documentation section "Explicitly altering a whole index"
+* [HSEARCH-4968](https://hibernate.atlassian.net/browse/HSEARCH-4968) - Test against latest OpenSearch 1.3.13
+* [HSEARCH-4944](https://hibernate.atlassian.net/browse/HSEARCH-4944) - Adjust tests to address ORM changes introduced in a recent ORM 6.3 snapshot
+* [HSEARCH-4943](https://hibernate.atlassian.net/browse/HSEARCH-4943) - Document the differences in outbox polling tables when upgrading to Hiberate Search 6.2  with ORM 5 vs ORM 6
+* [HSEARCH-4942](https://hibernate.atlassian.net/browse/HSEARCH-4942) - Test against latest Elasticsearch 7.17.13
+* [HSEARCH-4939](https://hibernate.atlassian.net/browse/HSEARCH-4939) - Avoid uses of Lucene's NO_MORE_ORDS constant
+* [HSEARCH-4935](https://hibernate.atlassian.net/browse/HSEARCH-4935) - Re-enable Spring integration tests after next 6.3 ORM upgrade
+* [HSEARCH-4923](https://hibernate.atlassian.net/browse/HSEARCH-4923) - Tidy up documentation of listener-triggered indexing vs indexing plans
+* [HSEARCH-4920](https://hibernate.atlassian.net/browse/HSEARCH-4920) - Add CI jobs to test against the latest version of Lucene/Elasticsearch
+* [HSEARCH-3654](https://hibernate.atlassian.net/browse/HSEARCH-3654) - Upgrade to JUnit 5
+
+## 7.0.0.Beta1 (2023-09-05)
+
+### Bug
+* [HSEARCH-4915](https://hibernate.atlassian.net/browse/HSEARCH-4915) - Errors returned by OpenSearch/ElasticSearch not forwarded to caller
+
+### Improvement
+* [HSEARCH-4931](https://hibernate.atlassian.net/browse/HSEARCH-4931) - Upgrade to Hibernate ORM 6.3.0.Final
+* [HSEARCH-4921](https://hibernate.atlassian.net/browse/HSEARCH-4921) - Upgrade to Elasticsearch client 8.9.1 and test against Elasticsearch 8.9.1
+* [HSEARCH-4914](https://hibernate.atlassian.net/browse/HSEARCH-4914) - Handle transaction deadlocks more gracefully when retrieving outbox events (especially on CockroachDB)
+* [HSEARCH-4913](https://hibernate.atlassian.net/browse/HSEARCH-4913) - Generate module-info for `hibernate-search-mapper-orm-batch-jsr352-jberet`
+* [HSEARCH-4909](https://hibernate.atlassian.net/browse/HSEARCH-4909) - Improve documentation of outbox polling coordination configuration 
+* [HSEARCH-4908](https://hibernate.atlassian.net/browse/HSEARCH-4908) - Upgrade to Hibernate ORM 6.3.0.CR1
+* [HSEARCH-4905](https://hibernate.atlassian.net/browse/HSEARCH-4905) - Add compatibility with OpenSearch 2.9.0
+* [HSEARCH-4904](https://hibernate.atlassian.net/browse/HSEARCH-4904) - Upgrade to Elasticsearch client 8.9.0 and test against Elasticsearch 8.9.0
+* [HSEARCH-4903](https://hibernate.atlassian.net/browse/HSEARCH-4903) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.7.Final
+* [HSEARCH-4902](https://hibernate.atlassian.net/browse/HSEARCH-4902) - Flatten all public POMs
+* [HSEARCH-4899](https://hibernate.atlassian.net/browse/HSEARCH-4899) - Use the links to Appendix instead of Javadocs where possible in reference documentation
+* [HSEARCH-4898](https://hibernate.atlassian.net/browse/HSEARCH-4898) - Give more context in the Hibernate Search getting started guides
+* [HSEARCH-4896](https://hibernate.atlassian.net/browse/HSEARCH-4896) - Upgrade Jackson to 2.15.0
+* [HSEARCH-4892](https://hibernate.atlassian.net/browse/HSEARCH-4892) - Upgrade to Avro 1.11.2
+* [HSEARCH-4891](https://hibernate.atlassian.net/browse/HSEARCH-4891) - Upgrade JBeret to 2.1.2.Final
+* [HSEARCH-4888](https://hibernate.atlassian.net/browse/HSEARCH-4888) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.6.Final
+* [HSEARCH-4886](https://hibernate.atlassian.net/browse/HSEARCH-4886) - Upgrade to Elasticsearch client 8.8.2 and test against Elasticsearch 8.8.2
+* [HSEARCH-4859](https://hibernate.atlassian.net/browse/HSEARCH-4859) - Add a "type" parameter to APIs that retrieve a parameter of arbitrary type
+* [HSEARCH-4744](https://hibernate.atlassian.net/browse/HSEARCH-4744) - Support Jandex index reading and building for nested JARs
+* [HSEARCH-4742](https://hibernate.atlassian.net/browse/HSEARCH-4742) - Expose a way for `SearchMappingBuilder` to get properties from a file
+* [HSEARCH-4688](https://hibernate.atlassian.net/browse/HSEARCH-4688) - Upgrade to Jandex 3.0
+* [HSEARCH-4602](https://hibernate.atlassian.net/browse/HSEARCH-4602) - Upgrade to CDI 4
+* [HSEARCH-4556](https://hibernate.atlassian.net/browse/HSEARCH-4556) - Upgrade to JDK 11 as the baseline and drop JDK 8 compatibility
+* [HSEARCH-4555](https://hibernate.atlassian.net/browse/HSEARCH-4555) - Upgrade to JBoss logging 3.5.3.Final
+* [HSEARCH-4532](https://hibernate.atlassian.net/browse/HSEARCH-4532) - Switch to Hibernate ORM 6's LONG32VARBINARY type for payloads of outbox-polling entities
+* [HSEARCH-4395](https://hibernate.atlassian.net/browse/HSEARCH-4395) - Switch to ORM 6 as the default ORM version and drop support for ORM 5
+* [HSEARCH-4394](https://hibernate.atlassian.net/browse/HSEARCH-4394) - Switch to Jakarta EE as the default standard instead of Java EE
+* [HSEARCH-4393](https://hibernate.atlassian.net/browse/HSEARCH-4393) - Upgrade to Lucene 9.x
+
+### New Feature
+* [HSEARCH-4867](https://hibernate.atlassian.net/browse/HSEARCH-4867) - Experimental compatibility with Amazon OpenSearch Serverless
+* [HSEARCH-4861](https://hibernate.atlassian.net/browse/HSEARCH-4861) - Publish a Hibernate Search BOM
+* [HSEARCH-4845](https://hibernate.atlassian.net/browse/HSEARCH-4845) - Have a dedicated docvalue field for the root document id in the Lucene backend's document
+
+### Remove Feature
+* [HSEARCH-4868](https://hibernate.atlassian.net/browse/HSEARCH-4868) - Drop compatibility with Elasticsearch 5.x/6.x
+
+### Task
+* [HSEARCH-4926](https://hibernate.atlassian.net/browse/HSEARCH-4926) - Improve casts in HashTable
+* [HSEARCH-4925](https://hibernate.atlassian.net/browse/HSEARCH-4925) - Improve documentation of Elasticsearch/OpenSearch compatibility
+* [HSEARCH-4924](https://hibernate.atlassian.net/browse/HSEARCH-4924) - Use gitflow incremental builder for pull request builds
+* [HSEARCH-4917](https://hibernate.atlassian.net/browse/HSEARCH-4917) - Split dependabot configuration for build (plugins, ...)/test dependencies and runtime (public) dependencies
+* [HSEARCH-4916](https://hibernate.atlassian.net/browse/HSEARCH-4916) - Test against latest OpenSearch 1.3.12
+* [HSEARCH-4912](https://hibernate.atlassian.net/browse/HSEARCH-4912) - Use Maven 3.9.4 in CI builds and as a required minimum version for the build
+* [HSEARCH-4910](https://hibernate.atlassian.net/browse/HSEARCH-4910) - Investigate slow startup of Elasticsearch container in integration tests
+* [HSEARCH-4907](https://hibernate.atlassian.net/browse/HSEARCH-4907) - Fix links and formatting in the migration guide
+* [HSEARCH-4906](https://hibernate.atlassian.net/browse/HSEARCH-4906) - Test against latest Elasticsearch 7.17.12
+* [HSEARCH-4901](https://hibernate.atlassian.net/browse/HSEARCH-4901) - Use `element-list` along side `package-list` for javadoc links
+* [HSEARCH-4900](https://hibernate.atlassian.net/browse/HSEARCH-4900) - Create a custom enforcer rule to check that all dependencies of published modules are listed in a BOM
+* [HSEARCH-4897](https://hibernate.atlassian.net/browse/HSEARCH-4897) - Allow providing configuration defaults for every backend through SPI
+* [HSEARCH-4894](https://hibernate.atlassian.net/browse/HSEARCH-4894) - Fix timeouts on CockroachDB test runs
+* [HSEARCH-4890](https://hibernate.atlassian.net/browse/HSEARCH-4890) - Adapt calls to RootGraph#appliesTo() to Hibernate ORM 6.3
+* [HSEARCH-4889](https://hibernate.atlassian.net/browse/HSEARCH-4889) - Forbid usage of internal/incubating Hibernate ORM code (API/SPI/...)
+* [HSEARCH-4887](https://hibernate.atlassian.net/browse/HSEARCH-4887) - Test against latest Elasticsearch 7.17.11
+* [HSEARCH-4885](https://hibernate.atlassian.net/browse/HSEARCH-4885) - Test against latest OpenSearch 1.3.11
+* [HSEARCH-4816](https://hibernate.atlassian.net/browse/HSEARCH-4816) - Document @IndexedEmbedded#includeEmbeddedObjectId
+* [HSEARCH-4805](https://hibernate.atlassian.net/browse/HSEARCH-4805) - Remove workarounds related to HHH-15604/HHH-16209 from tests
+* [HSEARCH-4787](https://hibernate.atlassian.net/browse/HSEARCH-4787) - Upgrade to Mockito 5
+* [HSEARCH-4755](https://hibernate.atlassian.net/browse/HSEARCH-4755) - Upgrade to Spring Boot 3 for -orm6 artifacts
+* [HSEARCH-4699](https://hibernate.atlassian.net/browse/HSEARCH-4699) - Rely on Hibernate ORM's BOM (hibernate-platform) to align on ORM's version of dependencies
+
+## 6.2.0.CR1 (2023-06-26)
+
+### Bug
+* [HSEARCH-4877](https://hibernate.atlassian.net/browse/HSEARCH-4877) - [Infinispan] Provided identifier bridge not applied in Search DSL and `id` projection
+* [HSEARCH-4876](https://hibernate.atlassian.net/browse/HSEARCH-4876) - StackOverflow error when processing cyclic indexed embedded with excludePaths
+
+### Deprecation
+* [HSEARCH-4866](https://hibernate.atlassian.net/browse/HSEARCH-4866) - Deprecate hibernate.search.automatic_indexing.enable_dirty_checks for removal
+
+### Epic
+* [HSEARCH-1800](https://hibernate.atlassian.net/browse/HSEARCH-1800) - Offer API to index and query third party datasources easily
+
+### Improvement
+* [HSEARCH-4880](https://hibernate.atlassian.net/browse/HSEARCH-4880) - Upgrade to Hibernate ORM 5.6.15.Final
+* [HSEARCH-4875](https://hibernate.atlassian.net/browse/HSEARCH-4875) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.5.Final
+* [HSEARCH-4871](https://hibernate.atlassian.net/browse/HSEARCH-4871) - Upgrade to Elasticsearch client 8.8.1 and test against Elasticsearch 8.8.1
+* [HSEARCH-4870](https://hibernate.atlassian.net/browse/HSEARCH-4870) - Add compatibility with OpenSearch 2.8.0
+* [HSEARCH-4863](https://hibernate.atlassian.net/browse/HSEARCH-4863) - Minor improvements to the documentation of highlighting
+* [HSEARCH-4725](https://hibernate.atlassian.net/browse/HSEARCH-4725) - @ObjectProjection filtering (includeDepth, includePaths, excludePaths) to apply projection constructors down to a certain depth
+* [HSEARCH-4616](https://hibernate.atlassian.net/browse/HSEARCH-4616) - Rename automatic indexing to something more explicit
+
+### New Feature
+* [HSEARCH-1182](https://hibernate.atlassian.net/browse/HSEARCH-1182) - excludePaths on indexedEmbedded
+
+### Remove Feature
+* [HSEARCH-4869](https://hibernate.atlassian.net/browse/HSEARCH-4869) - Drop compatibility with Hibernate ORM 6.1 and 6.0 in -orm6 artifacts, get rid of deprecated/internal class references
+
+### Task
+* [HSEARCH-4882](https://hibernate.atlassian.net/browse/HSEARCH-4882) - Avoid compilation failures when calling AnnotationMappingConfigurationContext#add without Jandex in the classpath
+* [HSEARCH-4881](https://hibernate.atlassian.net/browse/HSEARCH-4881) - Avoid non-static loggers
+* [HSEARCH-4879](https://hibernate.atlassian.net/browse/HSEARCH-4879) - Extract Jandex-dependent code to dedicated classes
+* [HSEARCH-4878](https://hibernate.atlassian.net/browse/HSEARCH-4878) - Reduce verbosity of "HSEARCH000616: Ignoring ServiceConfigurationError" logs
+* [HSEARCH-4873](https://hibernate.atlassian.net/browse/HSEARCH-4873) - Test Hibernate Search against JDK 22 EA
+* [HSEARCH-4872](https://hibernate.atlassian.net/browse/HSEARCH-4872) - Limit what's tested during a Lucene 9 upgrade job
+* [HSEARCH-4865](https://hibernate.atlassian.net/browse/HSEARCH-4865) - Upgrade build dependencies to the latest version in Search 6.2.0.CR1
+* [HSEARCH-4847](https://hibernate.atlassian.net/browse/HSEARCH-4847) - Move getting started guides to separate documents
+* [HSEARCH-4811](https://hibernate.atlassian.net/browse/HSEARCH-4811) - Automated code formatting
+
+## 6.2.0.Beta1 (2023-06-02)
+
+### Bug
+* [HSEARCH-4853](https://hibernate.atlassian.net/browse/HSEARCH-4853) - On JDK 21-ea+21, projection constructors relying on canonical record constructor result in all-null records
+* [HSEARCH-4828](https://hibernate.atlassian.net/browse/HSEARCH-4828) - Lucene's unified highlighter should produce multiple highlighted snippets for multi-valued fields
+* [HSEARCH-4825](https://hibernate.atlassian.net/browse/HSEARCH-4825) - Hibernate Search's dynamic templates are lost when using a custom mapping through schema_management.mapping_file
+* [HSEARCH-4803](https://hibernate.atlassian.net/browse/HSEARCH-4803) - ServiceConfigurationError thrown by non aggregated classloader when loading services should be ignored
+
+### Improvement
+* [HSEARCH-4860](https://hibernate.atlassian.net/browse/HSEARCH-4860) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.4.Final
+* [HSEARCH-4858](https://hibernate.atlassian.net/browse/HSEARCH-4858) - Upgrade to Hibernate ORM 6.2.3.Final
+* [HSEARCH-4857](https://hibernate.atlassian.net/browse/HSEARCH-4857) - Upgrade to Elasticsearch client 8.8.0 and test against Elasticsearch 8.8.0
+* [HSEARCH-4850](https://hibernate.atlassian.net/browse/HSEARCH-4850) - Add compatibility with OpenSearch 2.7.0
+* [HSEARCH-4849](https://hibernate.atlassian.net/browse/HSEARCH-4849) - Upgrade to Elasticsearch client 8.7.1 and test against Elasticsearch 8.7.1
+* [HSEARCH-4846](https://hibernate.atlassian.net/browse/HSEARCH-4846) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.2.Final
+* [HSEARCH-4843](https://hibernate.atlassian.net/browse/HSEARCH-4843) - Introduce a common EntityReference interface and deprecate mapper-specific ones
+* [HSEARCH-4842](https://hibernate.atlassian.net/browse/HSEARCH-4842) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.1.Final
+* [HSEARCH-4833](https://hibernate.atlassian.net/browse/HSEARCH-4833) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.0.Final
+* [HSEARCH-4832](https://hibernate.atlassian.net/browse/HSEARCH-4832) - Upgrade to Elasticsearch client 8.7.0 and add compatibility with Elasticsearch 8.7.0
+* [HSEARCH-4829](https://hibernate.atlassian.net/browse/HSEARCH-4829) - Upgrade -orm6 artifacts to Hibernate ORM 6.2.0.CR4
+* [HSEARCH-4822](https://hibernate.atlassian.net/browse/HSEARCH-4822) - Extend @FullTextField with `highlightable` configuration
+* [HSEARCH-4814](https://hibernate.atlassian.net/browse/HSEARCH-4814) - Propagate failures to submit operations through OperationSubmitter.offloading()
+* [HSEARCH-4812](https://hibernate.atlassian.net/browse/HSEARCH-4812) - Add compatibility with OpenSearch 2.6.0
+* [HSEARCH-4809](https://hibernate.atlassian.net/browse/HSEARCH-4809) - Upgrade to Hibernate ORM 6.2.0.CR3
+* [HSEARCH-4802](https://hibernate.atlassian.net/browse/HSEARCH-4802) - Upgrade to Elasticsearch client 8.6.2 and test against Elasticsearch 8.6.2
+* [HSEARCH-4772](https://hibernate.atlassian.net/browse/HSEARCH-4772) - Add failsafe to prevent log flooding for mass indexing with lots of non-critical failures
+* [HSEARCH-4767](https://hibernate.atlassian.net/browse/HSEARCH-4767) - Handle multiple tenant IDs in a single PojoWorkspace/IndexWorkspace
+
+### New Feature
+* [HSEARCH-4808](https://hibernate.atlassian.net/browse/HSEARCH-4808) - Add configuration option for Elasticsearch connection keep-alive
+* [HSEARCH-4574](https://hibernate.atlassian.net/browse/HSEARCH-4574) - Explicit binding of constructor parameters for @ProjectionConstructor
+* [HSEARCH-4149](https://hibernate.atlassian.net/browse/HSEARCH-4149) - Support more missing() sort options
+* [HSEARCH-2366](https://hibernate.atlassian.net/browse/HSEARCH-2366) - Add an Elasticsearch mapping export tool
+* [HSEARCH-2192](https://hibernate.atlassian.net/browse/HSEARCH-2192) - Highlighting in the Search API
+* [HSEARCH-1383](https://hibernate.atlassian.net/browse/HSEARCH-1383) - Ability to disable automatic indexing programmatically at the session level
+* [HSEARCH-168](https://hibernate.atlassian.net/browse/HSEARCH-168) - Ability to disable automatic indexing programmatically, ideally per-index, at the application level (all sessions)
+
+### Task
+* [HSEARCH-4856](https://hibernate.atlassian.net/browse/HSEARCH-4856) - Test against latest OpenSearch 1.3.10
+* [HSEARCH-4855](https://hibernate.atlassian.net/browse/HSEARCH-4855) - Run tests against Elasticsearch 7.17.10
+* [HSEARCH-4848](https://hibernate.atlassian.net/browse/HSEARCH-4848) - Fix unpredictable order of some associations in automatic reindexing tests
+* [HSEARCH-4844](https://hibernate.atlassian.net/browse/HSEARCH-4844) - Add an explicit dependency on HPPC
+* [HSEARCH-4840](https://hibernate.atlassian.net/browse/HSEARCH-4840) - Test against AWS OpenSearch Service 2.5
+* [HSEARCH-4839](https://hibernate.atlassian.net/browse/HSEARCH-4839) - Test Hibernate Search regularly against the latest version of Lucene
+* [HSEARCH-4836](https://hibernate.atlassian.net/browse/HSEARCH-4836) - Turn hibernate.search.backend.client.instance into an SPI property
+* [HSEARCH-4831](https://hibernate.atlassian.net/browse/HSEARCH-4831) - Fix Hibernate Search tests against latest ORM 6.2/6.3
+* [HSEARCH-4830](https://hibernate.atlassian.net/browse/HSEARCH-4830) - Test Hibernate Search regularly against Hibernate ORM 6.3.0-SNAPSHOT
+* [HSEARCH-4827](https://hibernate.atlassian.net/browse/HSEARCH-4827) - Only allow nesting-aware projections within `object` projections
+* [HSEARCH-4826](https://hibernate.atlassian.net/browse/HSEARCH-4826) - Remove unused Maven plugins from the POM
+* [HSEARCH-4823](https://hibernate.atlassian.net/browse/HSEARCH-4823) - Clarify the documentation of the configuration property about the Elasticsearch version 
+* [HSEARCH-4821](https://hibernate.atlassian.net/browse/HSEARCH-4821) - Test against latest OpenSearch 1.3.9
+* [HSEARCH-4819](https://hibernate.atlassian.net/browse/HSEARCH-4819) - Remove uses of outdated dialects in Hibernate ORM integration tests
+* [HSEARCH-4818](https://hibernate.atlassian.net/browse/HSEARCH-4818) - Fix failures in tests caused by concurrent use of OutboxEventFilter#allowedIds
+* [HSEARCH-4815](https://hibernate.atlassian.net/browse/HSEARCH-4815) - Provide a user with a meaningful error when Fast Vector Highlighter is used on a field without term vectors
+* [HSEARCH-4813](https://hibernate.atlassian.net/browse/HSEARCH-4813) - Test against latest OpenSearch 1.3.8
+* [HSEARCH-4810](https://hibernate.atlassian.net/browse/HSEARCH-4810) - Fix flaky test with MSSQL
+* [HSEARCH-4804](https://hibernate.atlassian.net/browse/HSEARCH-4804) - Fix flaky test OutboxPollingAutomaticIndexingLifecycleIT with postgresql 
+* [HSEARCH-4801](https://hibernate.atlassian.net/browse/HSEARCH-4801) - Upgrade build dependencies to the latest version in Search 6.2.0.Beta1
+* [HSEARCH-4800](https://hibernate.atlassian.net/browse/HSEARCH-4800) - The list of configuration properties is empty on releases
+* [HSEARCH-4799](https://hibernate.atlassian.net/browse/HSEARCH-4799) - Fix deprecation warnings in tests with JDK 21
+* [HSEARCH-4788](https://hibernate.atlassian.net/browse/HSEARCH-4788) - Fix some out-of-date javadoc for configuration properties
+* [HSEARCH-4766](https://hibernate.atlassian.net/browse/HSEARCH-4766) - Change how executors are created in OutboxPollingMassIndexerAgent
+* [HSEARCH-4721](https://hibernate.atlassian.net/browse/HSEARCH-4721) - Re-enable tests disabled because of HHH-15606/HHH-15967
+* [HSEARCH-4675](https://hibernate.atlassian.net/browse/HSEARCH-4675) - Use .and()/.or() rather than .bool() where possible in documentation and tests
+
+## 6.2.0.Alpha2 (2023-02-13)
+
+### Bug
+* [HSEARCH-4749](https://hibernate.atlassian.net/browse/HSEARCH-4749) - MSSQL cannot acquire locks properly on outbox event table
+* [HSEARCH-4727](https://hibernate.atlassian.net/browse/HSEARCH-4727) - OutboxEvent "payload" column created as blob(255) with DB2
+* [HSEARCH-4724](https://hibernate.atlassian.net/browse/HSEARCH-4724) - Classpath scanning ignores classes within Spring Boot's "repackaged" JARs
+* [HSEARCH-4708](https://hibernate.atlassian.net/browse/HSEARCH-4708) - No automatic reindexing when changing a property annotated with @OneToOne(mappedBy = ...) @IndexedEmbedded
+* [HSEARCH-4703](https://hibernate.atlassian.net/browse/HSEARCH-4703) - HSearch Outbox table module -> inaccesible private field error using Java 9 modules
+* [HSEARCH-4701](https://hibernate.atlassian.net/browse/HSEARCH-4701) - org.jboss.logging module needs to access org.hibernate.search.backend.elasticsearch module
+* [HSEARCH-4654](https://hibernate.atlassian.net/browse/HSEARCH-4654) - Deadlock in RootFailureCollector when exceeding the failure limit (100) with concurrent failures from different threads
+* [HSEARCH-4652](https://hibernate.atlassian.net/browse/HSEARCH-4652) - Schema validation fails if search analyzer is set explicitly to the same value as the analyzer
+* [HSEARCH-4647](https://hibernate.atlassian.net/browse/HSEARCH-4647) - High transaction contention in outbox-polling processes
+* [HSEARCH-4634](https://hibernate.atlassian.net/browse/HSEARCH-4634) - Executing task 'Outbox event processor' fail with CockroachDB v22.1.1 SKIP LOCKED lock wait policy is not supported
+* [HSEARCH-4305](https://hibernate.atlassian.net/browse/HSEARCH-4305) - No automatic reindexing when setting a property annotated with @OneToOne(mappedBy = ...) @IndexedEmbedded to null
+* [HSEARCH-939](https://hibernate.atlassian.net/browse/HSEARCH-939) - Can not manually update index for IndexedEmbedded changes
+
+### Improvement
+* [HSEARCH-4793](https://hibernate.atlassian.net/browse/HSEARCH-4793) - Upgrade to Elasticsearch client 8.6.1
+* [HSEARCH-4791](https://hibernate.atlassian.net/browse/HSEARCH-4791) - Upgrade to Hibernate ORM 6.2.0.CR2 for -orm6 artifacts
+* [HSEARCH-4782](https://hibernate.atlassian.net/browse/HSEARCH-4782) - Retrieve decimal scale automatically from entity identifiers
+* [HSEARCH-4781](https://hibernate.atlassian.net/browse/HSEARCH-4781) - Mention @ScaledNumberField in error messages when the decimal scale cannot be found
+* [HSEARCH-4778](https://hibernate.atlassian.net/browse/HSEARCH-4778) - Upgrade to Elasticsearch client 8.6.0
+* [HSEARCH-4777](https://hibernate.atlassian.net/browse/HSEARCH-4777) - Add compatibility with Elasticsearch 8.6
+* [HSEARCH-4764](https://hibernate.atlassian.net/browse/HSEARCH-4764) - Upgrade to AWS SDK 2.19.8
+* [HSEARCH-4758](https://hibernate.atlassian.net/browse/HSEARCH-4758) - Upgrade -orm6 artifacts to Hibernate ORM 6.1.6.Final
+* [HSEARCH-4748](https://hibernate.atlassian.net/browse/HSEARCH-4748) - Use UUID for outbox-polling agent IDs 
+* [HSEARCH-4747](https://hibernate.atlassian.net/browse/HSEARCH-4747) - Upgrade to Hibernate ORM 5.6.14.Final
+* [HSEARCH-4743](https://hibernate.atlassian.net/browse/HSEARCH-4743) - Skip Jandex index building for Hibernate JARs
+* [HSEARCH-4740](https://hibernate.atlassian.net/browse/HSEARCH-4740) - Run tests against Elasticsearch 7.17.8
+* [HSEARCH-4739](https://hibernate.atlassian.net/browse/HSEARCH-4739) - Upgrade to jackson-databind 2.13.4.2
+* [HSEARCH-4738](https://hibernate.atlassian.net/browse/HSEARCH-4738) - Add compatibility with Elasticsearch 8.5
+* [HSEARCH-4737](https://hibernate.atlassian.net/browse/HSEARCH-4737) - Upgrade to Elasticsearch client 8.5.0
+* [HSEARCH-4736](https://hibernate.atlassian.net/browse/HSEARCH-4736) - OperationSubmitter to "retry from another thread"
+* [HSEARCH-4734](https://hibernate.atlassian.net/browse/HSEARCH-4734) - Upgrade -orm6 artifacts to Hibernate ORM 6.1.5.Final
+* [HSEARCH-4731](https://hibernate.atlassian.net/browse/HSEARCH-4731) - Run tests against OpenSearch 1.3.6
+* [HSEARCH-4729](https://hibernate.atlassian.net/browse/HSEARCH-4729) - Add compatibility with OpenSearch 2.1, 2.2, 2.3
+* [HSEARCH-4726](https://hibernate.atlassian.net/browse/HSEARCH-4726) - Upgrade to AWS SDK 2.18
+* [HSEARCH-4714](https://hibernate.atlassian.net/browse/HSEARCH-4714) - Early sanity checks for property names
+* [HSEARCH-4713](https://hibernate.atlassian.net/browse/HSEARCH-4713) - Upgrade to Elasticsearch client 8.4.3 and test against Elasticsearch 8.4.3
+* [HSEARCH-4712](https://hibernate.atlassian.net/browse/HSEARCH-4712) - Convert synchronized blocks to java.util.concurrent.Locks for better Loom compatibility
+* [HSEARCH-4711](https://hibernate.atlassian.net/browse/HSEARCH-4711) - Upgrade -orm6 artifacts to Hibernate ORM 6.1.4.Final
+* [HSEARCH-4710](https://hibernate.atlassian.net/browse/HSEARCH-4710) - Test and document how to apply @IndexedEmbedded to "filtered" associations
+* [HSEARCH-4707](https://hibernate.atlassian.net/browse/HSEARCH-4707) - Upgrade to Hibernate ORM 5.6.12.Final
+* [HSEARCH-4704](https://hibernate.atlassian.net/browse/HSEARCH-4704) - Upgrade to Elasticsearch client 8.4.2 and test against Elasticsearch 8.4.2
+* [HSEARCH-4700](https://hibernate.atlassian.net/browse/HSEARCH-4700) - Configurable behavior on full queues for indexing operations
+* [HSEARCH-4698](https://hibernate.atlassian.net/browse/HSEARCH-4698) - Upgrade to Hibernate ORM 6.1.3.Final for -orm6 artifacts
+* [HSEARCH-4697](https://hibernate.atlassian.net/browse/HSEARCH-4697) - Upgrade to Jackson 2.13.4
+* [HSEARCH-4694](https://hibernate.atlassian.net/browse/HSEARCH-4694) - Compatibility with Jandex 3.0
+* [HSEARCH-4693](https://hibernate.atlassian.net/browse/HSEARCH-4693) - Upgrade to Elasticsearch client 8.4.1 and test against Elasticsearch 8.4.1
+* [HSEARCH-4692](https://hibernate.atlassian.net/browse/HSEARCH-4692) - Upgrade to Hibernate ORM 5.6.11.Final
+* [HSEARCH-4689](https://hibernate.atlassian.net/browse/HSEARCH-4689) - Upgrade to HCANN 6.0.4.Final for -orm6 artifacts
+* [HSEARCH-4681](https://hibernate.atlassian.net/browse/HSEARCH-4681) - Add compatibility with Elasticsearch 8.4
+* [HSEARCH-4680](https://hibernate.atlassian.net/browse/HSEARCH-4680) - Upgrade to Elasticsearch client 8.4
+* [HSEARCH-4679](https://hibernate.atlassian.net/browse/HSEARCH-4679) - Automatically simplify and/or predicates with a single clause
+* [HSEARCH-4678](https://hibernate.atlassian.net/browse/HSEARCH-4678) - select  nextval ('hsearch_outbox_event_generator ') performs very slowly on CockroachDB，why not use UUID
+* [HSEARCH-4676](https://hibernate.atlassian.net/browse/HSEARCH-4676) - Use .and() syntax by default with .where(BiFunction) and .nested() predicate
+* [HSEARCH-4673](https://hibernate.atlassian.net/browse/HSEARCH-4673) - Remove the need for the `-parameters` compiler flag when using the default constructor of records as projection constructor
+* [HSEARCH-4672](https://hibernate.atlassian.net/browse/HSEARCH-4672) - Upgrade -orm6 artifacts to hibernate-commons-annotations 6.0.3.Final
+* [HSEARCH-4669](https://hibernate.atlassian.net/browse/HSEARCH-4669) - Provide contextual information about the projection definition when it cannot be applied to an index
+* [HSEARCH-4664](https://hibernate.atlassian.net/browse/HSEARCH-4664) - Upgrade to Hibernate ORM 6.1.2.Final for -orm6 artifacts
+* [HSEARCH-4661](https://hibernate.atlassian.net/browse/HSEARCH-4661) - Upgrade to JBeret 1.4.8.Final
+* [HSEARCH-4660](https://hibernate.atlassian.net/browse/HSEARCH-4660) - Upgrade to GSON 2.9.1
+* [HSEARCH-4659](https://hibernate.atlassian.net/browse/HSEARCH-4659) - Upgrade to Avro 1.11.1
+* [HSEARCH-4657](https://hibernate.atlassian.net/browse/HSEARCH-4657) - Upgrade to Elasticsearch client 8.3.3 and test against Elasticsearch 8.3.3
+* [HSEARCH-4656](https://hibernate.atlassian.net/browse/HSEARCH-4656) - Provide more guidance in error messages when calling "retrieve-by-name" methods
+* [HSEARCH-4620](https://hibernate.atlassian.net/browse/HSEARCH-4620) - Simplify the configuration of indexing plan synchronization with the Standalone POJO Mapper
+* [HSEARCH-4618](https://hibernate.atlassian.net/browse/HSEARCH-4618) - Add an hasClause() accessor in BooleanPredicateOptionsCollector/SimpleBooleanPredicateClausesCollector
+* [HSEARCH-4617](https://hibernate.atlassian.net/browse/HSEARCH-4617) - Mention @DocumentId in the error message when no default bridge can be found
+* [HSEARCH-4615](https://hibernate.atlassian.net/browse/HSEARCH-4615) - Move more configuration of the Standalone POJO mapper to configuration properties
+* [HSEARCH-4612](https://hibernate.atlassian.net/browse/HSEARCH-4612) - Disable purgeAllOnStart by default in MassIndexer when dropAndCreateSchemaOnStart is enabled
+* [HSEARCH-4591](https://hibernate.atlassian.net/browse/HSEARCH-4591) - Allow object projections on single-valued, flattened object fields with the Lucene backend
+* [HSEARCH-4579](https://hibernate.atlassian.net/browse/HSEARCH-4579) - Default to constructor projection when possible if .select() is not called during query definition and loading is not configured
+* [HSEARCH-4541](https://hibernate.atlassian.net/browse/HSEARCH-4541) - Manage Hibernate ORM exceptions thrown during mass indexing. Treat them in a global Failure Handler.
+* [HSEARCH-4503](https://hibernate.atlassian.net/browse/HSEARCH-4503) - Disable version logging through system properties
+* [HSEARCH-4500](https://hibernate.atlassian.net/browse/HSEARCH-4500) - Provide more context in error messages about fields with invalid type (value vs. object)
+* [HSEARCH-4050](https://hibernate.atlassian.net/browse/HSEARCH-4050) - Allow "exists" predicate on object field that has different children when targeting multiple Lucene indexes
+* [HSEARCH-1809](https://hibernate.atlassian.net/browse/HSEARCH-1809) - Extension Point for setting thread locals on mass indexer threads
+
+### New Feature
+* [HSEARCH-4683](https://hibernate.atlassian.net/browse/HSEARCH-4683) - Configuration property to provide an external RestClient to Hibernate Search
+* [HSEARCH-4645](https://hibernate.atlassian.net/browse/HSEARCH-4645) - Syntactic sugar for negating predicates (NOT)
+* [HSEARCH-4601](https://hibernate.atlassian.net/browse/HSEARCH-4601) - Syntactic sugar for OR/AND predicates
+* [HSEARCH-4321](https://hibernate.atlassian.net/browse/HSEARCH-4321) - Mass indexing for multiple tenants at once
+* [HSEARCH-4294](https://hibernate.atlassian.net/browse/HSEARCH-4294) - Targeting of "implicit" fields in the Search DSL
+* [HSEARCH-3910](https://hibernate.atlassian.net/browse/HSEARCH-3910) - SPI for integrators to provide their own thread pools
+
+### Task
+* [HSEARCH-4798](https://hibernate.atlassian.net/browse/HSEARCH-4798) - Upgrade to AWS SDK 2.20.2
+* [HSEARCH-4797](https://hibernate.atlassian.net/browse/HSEARCH-4797) - Run tests against Elasticsearch 7.17.9
+* [HSEARCH-4795](https://hibernate.atlassian.net/browse/HSEARCH-4795) - build/configuration-properties-collector should not use the public parent POM because this will get this module published on release
+* [HSEARCH-4794](https://hibernate.atlassian.net/browse/HSEARCH-4794) - Fix ci/dependency-update/perform-update.sh ignoring snapshot versions when currently using an alpha/beta/CR
+* [HSEARCH-4792](https://hibernate.atlassian.net/browse/HSEARCH-4792) - Run tests against Elasticsearch 8.6.1
+* [HSEARCH-4790](https://hibernate.atlassian.net/browse/HSEARCH-4790) - Add compatibility with OpenSearch 2.5.0
+* [HSEARCH-4783](https://hibernate.atlassian.net/browse/HSEARCH-4783) - Run more tests for orm6/jakarta artifacts
+* [HSEARCH-4780](https://hibernate.atlassian.net/browse/HSEARCH-4780) - Test Hibernate Search against JDK 21
+* [HSEARCH-4779](https://hibernate.atlassian.net/browse/HSEARCH-4779) - Reference the Hibernate Search 6.0 migration guide from the reference documentation
+* [HSEARCH-4775](https://hibernate.atlassian.net/browse/HSEARCH-4775) - Improve source code compatibility of Hibernate Search with Hibernate ORM 6.2
+* [HSEARCH-4773](https://hibernate.atlassian.net/browse/HSEARCH-4773) - Change how agents are stopped in massindexer
+* [HSEARCH-4771](https://hibernate.atlassian.net/browse/HSEARCH-4771) - Deprecate the concept of "DetachedBackendSessionContext"
+* [HSEARCH-4770](https://hibernate.atlassian.net/browse/HSEARCH-4770) - Only update dependencies for test modules in dependency-update builds
+* [HSEARCH-4768](https://hibernate.atlassian.net/browse/HSEARCH-4768) - Fix JavaModulePathTest with ORM 6.2
+* [HSEARCH-4763](https://hibernate.atlassian.net/browse/HSEARCH-4763) - Replace usage of URL constructors with URI where possible
+* [HSEARCH-4762](https://hibernate.atlassian.net/browse/HSEARCH-4762) - Test against latest OpenSearch 1.3.7/2.4.1 versions
+* [HSEARCH-4761](https://hibernate.atlassian.net/browse/HSEARCH-4761) - Update Elasticsearch client to the latest version 8.5.3
+* [HSEARCH-4760](https://hibernate.atlassian.net/browse/HSEARCH-4760) - Update Elasticsearch backend compatibility section (17.1) to reference the versions we test against
+* [HSEARCH-4759](https://hibernate.atlassian.net/browse/HSEARCH-4759) - Add test to check that entites are getting enhanced for tests with `BytecodeEnhancerRunner`
+* [HSEARCH-4757](https://hibernate.atlassian.net/browse/HSEARCH-4757) - Adjust tests to address ORM changes introduced in HHH-15767
+* [HSEARCH-4756](https://hibernate.atlassian.net/browse/HSEARCH-4756) - Add TCK tests against more timezones
+* [HSEARCH-4754](https://hibernate.atlassian.net/browse/HSEARCH-4754) - Update Elasticsearch client to the latest version 8.5.2
+
+## 6.2.0.Alpha1 (2022-07-12)
+
+### Bug
+* [HSEARCH-4619](https://hibernate.atlassian.net/browse/HSEARCH-4619) - Inconsistent behavior of boolean predicate when not adding any clause
+* [HSEARCH-4604](https://hibernate.atlassian.net/browse/HSEARCH-4604) - AWS Request signing ignores the target port of service endpoint
+* [HSEARCH-4584](https://hibernate.atlassian.net/browse/HSEARCH-4584) - Projection and sort on the same nested field fails with the Lucene Backend
+* [HSEARCH-4580](https://hibernate.atlassian.net/browse/HSEARCH-4580) - "_routing" in custom Elasticsearch schema leads to "JsonIOException: JSON document was not fully consumed."
+* [HSEARCH-4565](https://hibernate.atlassian.net/browse/HSEARCH-4565) - Cyclic dependency detection for IndexingDependency(derivedFrom = ...) does not detect "buried" cycles
+* [HSEARCH-4544](https://hibernate.atlassian.net/browse/HSEARCH-4544) - OutOfMemoryError when defining aggregation on text field with .maxTermCount(<very large value>)
+* [HSEARCH-4538](https://hibernate.atlassian.net/browse/HSEARCH-4538) - Provided routes with null "currentRoute" may lead to a null previousRoutes, exposing the mapper to NPE
+* [HSEARCH-4537](https://hibernate.atlassian.net/browse/HSEARCH-4537) - NPE with outbox-polling coordination strategy when routing prevents indexing
+* [HSEARCH-4536](https://hibernate.atlassian.net/browse/HSEARCH-4536) - .flags(Collections.emptySet()) doesn't disable all flags as expected for simpleQueryString predicate
+* [HSEARCH-4531](https://hibernate.atlassian.net/browse/HSEARCH-4531) - Sort on dynamic field fails on Elasticsearch if field has never been indexed yet 
+* [HSEARCH-4513](https://hibernate.atlassian.net/browse/HSEARCH-4513) - Using a SearchSort instance in multiple queries with the Lucene backend has side effects and leads to unexpected results
+
+### Improvement
+* [HSEARCH-4635](https://hibernate.atlassian.net/browse/HSEARCH-4635) - Prepare -orm6 artifacts for changes coming in Hibernate ORM 6.1.2.Final
+* [HSEARCH-4631](https://hibernate.atlassian.net/browse/HSEARCH-4631) - Upgrade to Elasticsearch client 8.3.2 and test against Elasticsearch 8.3.2
+* [HSEARCH-4628](https://hibernate.atlassian.net/browse/HSEARCH-4628) - Upgrade to Hibernate ORM 5.6.10.Final
+* [HSEARCH-4627](https://hibernate.atlassian.net/browse/HSEARCH-4627) - Upgrade to Hibernate ORM 6.1.1.Final for -orm6 artifacts
+* [HSEARCH-4626](https://hibernate.atlassian.net/browse/HSEARCH-4626) - Run tests against OpenSearch 2.0.1
+* [HSEARCH-4625](https://hibernate.atlassian.net/browse/HSEARCH-4625) - Upgrade to Elasticsearch client 8.3.1 and test against Elasticsearch 8.3.1
+* [HSEARCH-4623](https://hibernate.atlassian.net/browse/HSEARCH-4623) - Upgrade to Elasticsearch client 8.3.0
+* [HSEARCH-4622](https://hibernate.atlassian.net/browse/HSEARCH-4622) - Add compatibility with Elasticsearch 8.3.0
+* [HSEARCH-4611](https://hibernate.atlassian.net/browse/HSEARCH-4611) - Improve exception and log messages involving multi-valued elements
+* [HSEARCH-4610](https://hibernate.atlassian.net/browse/HSEARCH-4610) - Upgrade to Elasticsearch client 8.2.3 and test against Elasticsearch 8.2.3
+* [HSEARCH-4609](https://hibernate.atlassian.net/browse/HSEARCH-4609) - Upgrade to Lucene 8.11.2
+* [HSEARCH-4608](https://hibernate.atlassian.net/browse/HSEARCH-4608) - Upgrade to the latest version of Jakarta dependencies in -orm6/-jakarta artifacts
+* [HSEARCH-4606](https://hibernate.atlassian.net/browse/HSEARCH-4606) - Upgrade to Hibernate ORM 6.1.0.Final for -orm6 artifacts
+* [HSEARCH-4599](https://hibernate.atlassian.net/browse/HSEARCH-4599) - Upgrade to Elasticsearch client 8.2.2 and test against Elasticsearch 8.2.2
+* [HSEARCH-4598](https://hibernate.atlassian.net/browse/HSEARCH-4598) - Upgrade to Reactive Streams 1.0.4
+* [HSEARCH-4596](https://hibernate.atlassian.net/browse/HSEARCH-4596) - Upgrade to Hibernate ORM 6.0.2.Final for -orm6 artifacts
+* [HSEARCH-4594](https://hibernate.atlassian.net/browse/HSEARCH-4594) - Allow multi-valued bean references for configurers defined in configuration properties
+* [HSEARCH-4593](https://hibernate.atlassian.net/browse/HSEARCH-4593) - Upgrade to Elasticsearch client 8.2.1 and test against Elasticsearch 8.2.1
+* [HSEARCH-4590](https://hibernate.atlassian.net/browse/HSEARCH-4590) - Upgrade to HCANN 6.0.2 for -orm6 artifacts
+* [HSEARCH-4585](https://hibernate.atlassian.net/browse/HSEARCH-4585) - Upgrade to Hibernate ORM 5.6.9.Final
+* [HSEARCH-4581](https://hibernate.atlassian.net/browse/HSEARCH-4581) - Upgrade to Jackson 2.13.3
+* [HSEARCH-4575](https://hibernate.atlassian.net/browse/HSEARCH-4575) - Allow projections on fields by default with the Elasticsearch backend
+* [HSEARCH-4570](https://hibernate.atlassian.net/browse/HSEARCH-4570) - Upgrade -orm6 artifacts to HCANN 6.0.1.Final
+* [HSEARCH-4569](https://hibernate.atlassian.net/browse/HSEARCH-4569) - Upgrade -orm6 artifacts to Hibernate ORM 6.0.1.Final
+* [HSEARCH-4562](https://hibernate.atlassian.net/browse/HSEARCH-4562) - Add compatibility with OpenSearch 2.0
+* [HSEARCH-4561](https://hibernate.atlassian.net/browse/HSEARCH-4561) - Add compatibility with OpenSearch 1.3
+* [HSEARCH-4560](https://hibernate.atlassian.net/browse/HSEARCH-4560) - Upgrade to Elasticsearch client 8.2.0
+* [HSEARCH-4559](https://hibernate.atlassian.net/browse/HSEARCH-4559) - Add compatibility with Elasticsearch 8.2.0
+* [HSEARCH-4547](https://hibernate.atlassian.net/browse/HSEARCH-4547) - Upgrade Elasticsearch client to 8.1.3 and test against Elasticsearch 8.1.3
+* [HSEARCH-4543](https://hibernate.atlassian.net/browse/HSEARCH-4543) - Upgrade to Hibernate ORM 5.6.8.Final
+* [HSEARCH-4540](https://hibernate.atlassian.net/browse/HSEARCH-4540) - Upgrade to the latest version of Jakarta dependencies in -orm6/-jakarta artifacts
+* [HSEARCH-4539](https://hibernate.atlassian.net/browse/HSEARCH-4539) - Upgrade to JBeret 1.4.7.Final
+* [HSEARCH-4533](https://hibernate.atlassian.net/browse/HSEARCH-4533) - Setting to customize Hibernate Search's outbox-polling table names, schema, catalog
+* [HSEARCH-4529](https://hibernate.atlassian.net/browse/HSEARCH-4529) - Upgrade to Hibernate Commons Annotations 6.0.0.Final for -orm6 artifacts
+* [HSEARCH-4528](https://hibernate.atlassian.net/browse/HSEARCH-4528) - Upgrade to latest version of Jakarta dependencies for -orm6/-jakarta artifacts
+* [HSEARCH-4524](https://hibernate.atlassian.net/browse/HSEARCH-4524) - Upgrade Elasticsearch client to 8.1.2 and test against Elasticsearch 8.1.2
+* [HSEARCH-4523](https://hibernate.atlassian.net/browse/HSEARCH-4523) - Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.Final
+* [HSEARCH-4520](https://hibernate.atlassian.net/browse/HSEARCH-4520) - Improved support of lambdas in boolean predicates
+* [HSEARCH-4516](https://hibernate.atlassian.net/browse/HSEARCH-4516) - Upgrade to Elasticsearch client 8.1.1
+* [HSEARCH-4512](https://hibernate.atlassian.net/browse/HSEARCH-4512) - Upgrade to Hibernate ORM 5.6.7.Final
+* [HSEARCH-4506](https://hibernate.atlassian.net/browse/HSEARCH-4506) - Upgrade to Elasticsearch client 8.1.0
+* [HSEARCH-4505](https://hibernate.atlassian.net/browse/HSEARCH-4505) - Add compatibility with Elasticsearch 8.1.0
+* [HSEARCH-4504](https://hibernate.atlassian.net/browse/HSEARCH-4504) - Upgrade to JBeret 1.4.6.Final
+* [HSEARCH-4502](https://hibernate.atlassian.net/browse/HSEARCH-4502) - Upgrade to Jackson 2.13.2
+* [HSEARCH-4496](https://hibernate.atlassian.net/browse/HSEARCH-4496) - Upgrade to Elasticsearch client 8.0.1
+* [HSEARCH-4486](https://hibernate.atlassian.net/browse/HSEARCH-4486) - Upgrade to slf4j 1.7.36
+* [HSEARCH-4485](https://hibernate.atlassian.net/browse/HSEARCH-4485) - Upgrade to GSON 2.9.0
+* [HSEARCH-4483](https://hibernate.atlassian.net/browse/HSEARCH-4483) - Display "instant speed" on top of overall speed in the mass indexer
+* [HSEARCH-4481](https://hibernate.atlassian.net/browse/HSEARCH-4481) - Upgrade to elasticsearch-rest-client 8.0.0
+* [HSEARCH-4475](https://hibernate.atlassian.net/browse/HSEARCH-4475) - Add compatibility with Elasticsearch 8.0.0
+* [HSEARCH-4474](https://hibernate.atlassian.net/browse/HSEARCH-4474) - Upgrade to Elasticsearch client 7.17.0
+* [HSEARCH-4318](https://hibernate.atlassian.net/browse/HSEARCH-4318) - Review mapper-pojo-standalone API, mark as @Incubating if necessary, remove loose ends
+
+### New Feature
+* [HSEARCH-4621](https://hibernate.atlassian.net/browse/HSEARCH-4621) - Add support for SearchWorkspace to the Standalone POJO Mapper
+* [HSEARCH-4567](https://hibernate.atlassian.net/browse/HSEARCH-4567) - "Constant" projection, returning a given constant
+* [HSEARCH-4553](https://hibernate.atlassian.net/browse/HSEARCH-4553) - Option to return composite/object projections as an object array
+* [HSEARCH-4499](https://hibernate.atlassian.net/browse/HSEARCH-4499) - Fluent definition of nested predicates
+* [HSEARCH-4498](https://hibernate.atlassian.net/browse/HSEARCH-4498) - Fluent definition of composite projections
+* [HSEARCH-4489](https://hibernate.atlassian.net/browse/HSEARCH-4489) - matchNone() predicate
+* [HSEARCH-3943](https://hibernate.atlassian.net/browse/HSEARCH-3943) - Projection on object fields: preserving the document structure in projections
+* [HSEARCH-3927](https://hibernate.atlassian.net/browse/HSEARCH-3927) - Projection to a DTO/JavaBean/record/etc.
+
+### Task
+* [HSEARCH-4632](https://hibernate.atlassian.net/browse/HSEARCH-4632) - Test against JDK 20 (early access)
+* [HSEARCH-4614](https://hibernate.atlassian.net/browse/HSEARCH-4614) - Test the standalone POJO mapper with real backends
+* [HSEARCH-4613](https://hibernate.atlassian.net/browse/HSEARCH-4613) - Revert to a version of Derby that works on JDK 8
+* [HSEARCH-4603](https://hibernate.atlassian.net/browse/HSEARCH-4603) - Upgrade to Surefire 3.0.0-M7
+* [HSEARCH-4600](https://hibernate.atlassian.net/browse/HSEARCH-4600) - Fix flaky assertion in OutboxPollingAutomaticIndexingEventSendingIT
+* [HSEARCH-4597](https://hibernate.atlassian.net/browse/HSEARCH-4597) - Fix unfinished sentences in the documentation
+* [HSEARCH-4592](https://hibernate.atlassian.net/browse/HSEARCH-4592) - Simplify passing the SearchIntegration to mappings
+* [HSEARCH-4587](https://hibernate.atlassian.net/browse/HSEARCH-4587) - Initialize migration guide with 6.2 changes so far
+* [HSEARCH-4586](https://hibernate.atlassian.net/browse/HSEARCH-4586) - Use clean, consistent utils for all in-session code execution in ORM sessions
+* [HSEARCH-4583](https://hibernate.atlassian.net/browse/HSEARCH-4583) - Use equivalent of @Nested instead of the Enclosed runner in JUnit 4 tests
+* [HSEARCH-4582](https://hibernate.atlassian.net/browse/HSEARCH-4582) - More extensive testing of from()/as()/multi() on object projections
+* [HSEARCH-4578](https://hibernate.atlassian.net/browse/HSEARCH-4578) - Improve error messages in tests when failure report assertions fail
+* [HSEARCH-4571](https://hibernate.atlassian.net/browse/HSEARCH-4571) - Move a few tests from integrationtest/showcase/library to integrationtest/mapper/orm-realbackend
+* [HSEARCH-4568](https://hibernate.atlassian.net/browse/HSEARCH-4568) - Simplify search projection SPI
+* [HSEARCH-4566](https://hibernate.atlassian.net/browse/HSEARCH-4566) - SPI for "hot" restart that allows compatible schema changes with Lucene without losing data in local-heap indexes
+* [HSEARCH-4564](https://hibernate.atlassian.net/browse/HSEARCH-4564) - Run tests against AWS OpenSearch Service 1.2 instead of 1.1
+* [HSEARCH-4534](https://hibernate.atlassian.net/browse/HSEARCH-4534) - Fix random failures for tests involving dynamic BigDecimal/BigInteger fields with Elasticsearch
+* [HSEARCH-4530](https://hibernate.atlassian.net/browse/HSEARCH-4530) - Remove LGTM integration from the Hibernate Search GitHub repository
+* [HSEARCH-4527](https://hibernate.atlassian.net/browse/HSEARCH-4527) - Upgrade to jackson-databind 2.13.2.2 (this is a test dependency only)
+* [HSEARCH-4526](https://hibernate.atlassian.net/browse/HSEARCH-4526) - Test mapping of Java Records
+* [HSEARCH-4525](https://hibernate.atlassian.net/browse/HSEARCH-4525) - Fix generation of Avro sources with Intellij IDEA
+* [HSEARCH-4522](https://hibernate.atlassian.net/browse/HSEARCH-4522) - Use JDK17 by default when building Hibernate Search
+* [HSEARCH-4521](https://hibernate.atlassian.net/browse/HSEARCH-4521) - Upgrade to forbidden-apis 3.3+
+* [HSEARCH-4519](https://hibernate.atlassian.net/browse/HSEARCH-4519) - Update links markup in Getting Started Guide 
+* [HSEARCH-4518](https://hibernate.atlassian.net/browse/HSEARCH-4518) - Upgrade to Jackson-databind 2.13.2.1 (this is a test dependency only)
+* [HSEARCH-4517](https://hibernate.atlassian.net/browse/HSEARCH-4517) - Run tests against Elasticsearch 8.1.1
+* [HSEARCH-4515](https://hibernate.atlassian.net/browse/HSEARCH-4515) - Simplify NestedDocsProvider and a few projections
+* [HSEARCH-4511](https://hibernate.atlassian.net/browse/HSEARCH-4511) - Use hppc collections where possible in low-level Lucene-related code
+* [HSEARCH-4509](https://hibernate.atlassian.net/browse/HSEARCH-4509) - Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.CR2
+
+## 6.1.1.Final (2022-02-07)
+
+### Improvement
+* [HSEARCH-4465](https://hibernate.atlassian.net/browse/HSEARCH-4465) - Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.CR1
+* [HSEARCH-4462](https://hibernate.atlassian.net/browse/HSEARCH-4462) - Upgrade to Hibernate ORM 5.6.5.Final
+
+### Task
+* [HSEARCH-4479](https://hibernate.atlassian.net/browse/HSEARCH-4479) - Clean up rendundant "public" modifiers
+* [HSEARCH-4478](https://hibernate.atlassian.net/browse/HSEARCH-4478) - Run tests against AWS OpenSearch service
+* [HSEARCH-4472](https://hibernate.atlassian.net/browse/HSEARCH-4472) - Move the release job to a separate Jenkinsfile
+* [HSEARCH-4470](https://hibernate.atlassian.net/browse/HSEARCH-4470) - Add mapping code examples to the documentation of @IndexedEmbedded.structure
+* [HSEARCH-4469](https://hibernate.atlassian.net/browse/HSEARCH-4469) - Test Hibernate Search against OpenJDK 19
+* [HSEARCH-4468](https://hibernate.atlassian.net/browse/HSEARCH-4468) - Upgrade to slf4j 1.7.35
+* [HSEARCH-4467](https://hibernate.atlassian.net/browse/HSEARCH-4467) - Upgrade build dependencies to the latest version
+* [HSEARCH-4464](https://hibernate.atlassian.net/browse/HSEARCH-4464) - Document that custom bridges or projection converters are not applied to fields for source()/document() projections
+* [HSEARCH-4463](https://hibernate.atlassian.net/browse/HSEARCH-4463) - Upgrade to H2 2.1.210 in tests
+* [HSEARCH-4461](https://hibernate.atlassian.net/browse/HSEARCH-4461) - Fix typos and grammar in documentation
+* [HSEARCH-4222](https://hibernate.atlassian.net/browse/HSEARCH-4222) - Re-enable forbiddenapis on JDK16/JDK17+
+* [HSEARCH-3244](https://hibernate.atlassian.net/browse/HSEARCH-3244) - Simplify configuration of AWS Elasticsearch endpoints in the Jenkins CI
+
+## 6.1.0.Final (2022-01-25)
+
+### Epic
+* [HSEARCH-3280](https://hibernate.atlassian.net/browse/HSEARCH-3280) - Simple, asynchronous, distributed reindexing relying on the database only (without any extra infrastructure)
+
+### Improvement
+* [HSEARCH-4458](https://hibernate.atlassian.net/browse/HSEARCH-4458) - Accept both Java EE and Jakarta EE flavours of all query hints
+* [HSEARCH-4457](https://hibernate.atlassian.net/browse/HSEARCH-4457) - Upgrade to Hibernate ORM 5.6.4.Final
+* [HSEARCH-4445](https://hibernate.atlassian.net/browse/HSEARCH-4445) - Test against Elasticsearch 7.16.3
+
+### Task
+* [HSEARCH-4456](https://hibernate.atlassian.net/browse/HSEARCH-4456) - Update CONTRIBUTING.md to list new modules
+* [HSEARCH-4452](https://hibernate.atlassian.net/browse/HSEARCH-4452) - Fix formatting of documentation about regexp predicate's optional operators
+* [HSEARCH-4415](https://hibernate.atlassian.net/browse/HSEARCH-4415) - Sign published artifacts
+
+## 6.1.0.CR1 (2022-01-18)
+
+### Bug
+* [HSEARCH-4443](https://hibernate.atlassian.net/browse/HSEARCH-4443) - Enum properties in outbox-polling entities (agent, outboxevent) have a weird type in database
+* [HSEARCH-4435](https://hibernate.atlassian.net/browse/HSEARCH-4435) - Custom Elasticsearch settings/mapping require the backend to be started
+
+### Improvement
+* [HSEARCH-4451](https://hibernate.atlassian.net/browse/HSEARCH-4451) - Allow null tenant IDs in HibernateOrmMapperOutboxPollingSettings#coordinationKey
+* [HSEARCH-4450](https://hibernate.atlassian.net/browse/HSEARCH-4450) - Expose list of outbox-polling classes requiring reflection through an SPI
+* [HSEARCH-4449](https://hibernate.atlassian.net/browse/HSEARCH-4449) - Upgrade to slf4j 1.7.33
+* [HSEARCH-4448](https://hibernate.atlassian.net/browse/HSEARCH-4448) - Upgrade to JBoss logging 3.4.3.Final
+* [HSEARCH-4446](https://hibernate.atlassian.net/browse/HSEARCH-4446) - Upgrade to Elasticsearch client 7.16.3
+* [HSEARCH-4438](https://hibernate.atlassian.net/browse/HSEARCH-4438) - More detailed error message for syntax errors in custom mapping/settings file
+* [HSEARCH-4436](https://hibernate.atlassian.net/browse/HSEARCH-4436) - Upgrade to Hibernate ORM 5.6.3.Final
+* [HSEARCH-4425](https://hibernate.atlassian.net/browse/HSEARCH-4425) - Mark non-nullable properties as such in OutboxPollingOutboxEventAdditionalJaxbMappingProducer
+* [HSEARCH-4362](https://hibernate.atlassian.net/browse/HSEARCH-4362) - Customizable optional operators for the regexp query
+* [HSEARCH-3277](https://hibernate.atlassian.net/browse/HSEARCH-3277) - Separate artifacts for compatibility with Hibernate ORM 6 (Jakarta Persistence only, no Java EE)
+
+### New Feature
+* [HSEARCH-4330](https://hibernate.atlassian.net/browse/HSEARCH-4330) - Configurable mapping for entities added by the database-polling coordination strategy
+
+### Task
+* [HSEARCH-4442](https://hibernate.atlassian.net/browse/HSEARCH-4442) - Fix errors and clarify documentation of outbox-polling configuration
+* [HSEARCH-4440](https://hibernate.atlassian.net/browse/HSEARCH-4440) - Fix OutOfMemoryError thrown by Elasticsearch in tests
+* [HSEARCH-4439](https://hibernate.atlassian.net/browse/HSEARCH-4439) - Fix tests involving overrides of outbox-polling entity mapping on MySQL
+* [HSEARCH-4437](https://hibernate.atlassian.net/browse/HSEARCH-4437) - Fix very long Maven download timeouts when building with GitHub Actions
+* [HSEARCH-4434](https://hibernate.atlassian.net/browse/HSEARCH-4434) - Avoid unnecessary synchronization in ExpectedLog4jLog
+* [HSEARCH-4430](https://hibernate.atlassian.net/browse/HSEARCH-4430) - Upgrade to latest version of build dependencies
+* [HSEARCH-4429](https://hibernate.atlassian.net/browse/HSEARCH-4429) - Change the limit of the RAM usage by ES containers
+* [HSEARCH-4428](https://hibernate.atlassian.net/browse/HSEARCH-4428) - Add missing classes to org.hibernate.search.backend.elasticsearch.gson.spi.GsonClasses
+* [HSEARCH-4427](https://hibernate.atlassian.net/browse/HSEARCH-4427) - Run tests against Elasticsearch 6.8.22
+* [HSEARCH-4426](https://hibernate.atlassian.net/browse/HSEARCH-4426) - Update compatible versions of OpenSearch in the reference documentation
+
+## 6.1.0.Beta2 (2022-01-05)
+
+### Bug
+* [HSEARCH-4423](https://hibernate.atlassian.net/browse/HSEARCH-4423) - False positive in detection of cycles in indexing dependency graph
+* [HSEARCH-4401](https://hibernate.atlassian.net/browse/HSEARCH-4401) - Lucene backend ignores limit when offset + limit is higher than Integer.MAX_VALUE instead of reporting that it cannot handle it
+
+### Improvement
+* [HSEARCH-4422](https://hibernate.atlassian.net/browse/HSEARCH-4422) - Upgrade to Jackson 2.13.1
+* [HSEARCH-4420](https://hibernate.atlassian.net/browse/HSEARCH-4420) - Upgrade to Lucene 8.11.1
+* [HSEARCH-4412](https://hibernate.atlassian.net/browse/HSEARCH-4412) - Compatibility with OpenSearch 1.2.1
+* [HSEARCH-4410](https://hibernate.atlassian.net/browse/HSEARCH-4410) - Upgrade to Elasticsearch client 7.16.2
+* [HSEARCH-4400](https://hibernate.atlassian.net/browse/HSEARCH-4400) - Upgrade to Hibernate ORM 5.6.2.Final
+* [HSEARCH-4396](https://hibernate.atlassian.net/browse/HSEARCH-4396) - Upgrade to Elasticsearch client 7.16.0
+* [HSEARCH-4283](https://hibernate.atlassian.net/browse/HSEARCH-4283) - Solutions for persistent indexing errors
+
+### New Feature
+* [HSEARCH-4404](https://hibernate.atlassian.net/browse/HSEARCH-4404) - Methods in Lucene analysis configurers to define analyzers/normalizers without referring to Lucene classes
+
+### Task
+* [HSEARCH-4421](https://hibernate.atlassian.net/browse/HSEARCH-4421) - Upgrade to Log4j 2.17.1
+* [HSEARCH-4416](https://hibernate.atlassian.net/browse/HSEARCH-4416) - Upgrade to log4j 2.16.0
+* [HSEARCH-4414](https://hibernate.atlassian.net/browse/HSEARCH-4414) - Raise timeout when publishing to oss.sonatype.org
+* [HSEARCH-4413](https://hibernate.atlassian.net/browse/HSEARCH-4413) - Run tests against Elasticsearch 7.16.2
+* [HSEARCH-4411](https://hibernate.atlassian.net/browse/HSEARCH-4411) - Run tests against Elasticsearch 7.16 by default instead of 7.10
+* [HSEARCH-4409](https://hibernate.atlassian.net/browse/HSEARCH-4409) - Upgrade build dependencies to the latest version
+* [HSEARCH-4408](https://hibernate.atlassian.net/browse/HSEARCH-4408) - Fix syntax highlighting for code example not working anymore in 6.0/6.1 documentation
+* [HSEARCH-4407](https://hibernate.atlassian.net/browse/HSEARCH-4407) - Fix flaky tests involving rebalancing
+* [HSEARCH-4406](https://hibernate.atlassian.net/browse/HSEARCH-4406) - Upgrade to jruby-complete 9.3.2.0
+* [HSEARCH-4405](https://hibernate.atlassian.net/browse/HSEARCH-4405) - Upgrade to log4j 2.15
+* [HSEARCH-4402](https://hibernate.atlassian.net/browse/HSEARCH-4402) - Upgrade to ECJ 3.28.0
+* [HSEARCH-4398](https://hibernate.atlassian.net/browse/HSEARCH-4398) - Remove the unnecessary transitive dependency to lucene-sandbox
+* [HSEARCH-4397](https://hibernate.atlassian.net/browse/HSEARCH-4397) - Switch to elastic/elasticsearch:* rather than the root elasticsearch:* for container images used in testing
+* [HSEARCH-4391](https://hibernate.atlassian.net/browse/HSEARCH-4391) - Fix images not being displayed in the documentation
+* [HSEARCH-4390](https://hibernate.atlassian.net/browse/HSEARCH-4390) - Fix flaky tests involving Spring and JTA timeout
+* [HSEARCH-4389](https://hibernate.atlassian.net/browse/HSEARCH-4389) - Remove mentions of hibernate.search.coordination.event_processor.shards.static from the documentation
+* [HSEARCH-4340](https://hibernate.atlassian.net/browse/HSEARCH-4340) - Run tests against Elasticsearch 7.16
+
+## 6.1.0.Beta1 (2021-12-03)
+
+### Bug
+* [HSEARCH-4370](https://hibernate.atlassian.net/browse/HSEARCH-4370) - Event processing triggers deadlock with Oracle database
+* [HSEARCH-4369](https://hibernate.atlassian.net/browse/HSEARCH-4369) - The outbox event processors apply the polling interval even when there are still events to process
+* [HSEARCH-4365](https://hibernate.atlassian.net/browse/HSEARCH-4365) - remove of entity with IndexedEmbedded collections cause LazyInitializationException during indexing
+* [HSEARCH-4363](https://hibernate.atlassian.net/browse/HSEARCH-4363) - NPE on SingletonTask
+* [HSEARCH-4352](https://hibernate.atlassian.net/browse/HSEARCH-4352) - MappingException: property [xxx] not found on entity [yyy]
+* [HSEARCH-4348](https://hibernate.atlassian.net/browse/HSEARCH-4348) - Mapping does not work when the properties are defined inside Groovy Traits
+* [HSEARCH-4307](https://hibernate.atlassian.net/browse/HSEARCH-4307) - Hibernate Search version detection doesn't work on native images
+* [HSEARCH-4273](https://hibernate.atlassian.net/browse/HSEARCH-4273) - MassIndexer.cacheMode is not honored
+* [HSEARCH-4266](https://hibernate.atlassian.net/browse/HSEARCH-4266) - Conditional indexing with condition including an OR may lead to unnecessary entity loading
+
+### Improvement
+* [HSEARCH-4384](https://hibernate.atlassian.net/browse/HSEARCH-4384) - Upgrade to Elasticsearch client 7.15.2
+* [HSEARCH-4383](https://hibernate.atlassian.net/browse/HSEARCH-4383) - Upgrade to GSON 2.8.9
+* [HSEARCH-4382](https://hibernate.atlassian.net/browse/HSEARCH-4382) - Upgrade to AWS SDK 2.17.94 
+* [HSEARCH-4381](https://hibernate.atlassian.net/browse/HSEARCH-4381) - Upgrade to Avro 1.11
+* [HSEARCH-4379](https://hibernate.atlassian.net/browse/HSEARCH-4379) - Upgrade to Hibernate ORM 5.6.1.Final
+* [HSEARCH-4372](https://hibernate.atlassian.net/browse/HSEARCH-4372) - Simplify sharding configuration and move it to hibernate.search.coordination.event_processor.* properties
+* [HSEARCH-4368](https://hibernate.atlassian.net/browse/HSEARCH-4368) - Rename the database-polling coordination strategy to outbox-polling
+* [HSEARCH-4367](https://hibernate.atlassian.net/browse/HSEARCH-4367) - Upgrade to Lucene 8.11
+* [HSEARCH-4366](https://hibernate.atlassian.net/browse/HSEARCH-4366) - Add context to exceptions thrown during processing of POJOs (for indexing or reindexing resolution)
+* [HSEARCH-4360](https://hibernate.atlassian.net/browse/HSEARCH-4360) - Use conflict-free entity names for entities added by the database-polling coordination strategy
+* [HSEARCH-4354](https://hibernate.atlassian.net/browse/HSEARCH-4354) - Avoid retrieving additional metadata for properties that are not used by Hibernate Search
+* [HSEARCH-4345](https://hibernate.atlassian.net/browse/HSEARCH-4345) - Upgrade to Hibernate ORM 5.6.0.Final
+* [HSEARCH-4339](https://hibernate.atlassian.net/browse/HSEARCH-4339) - Upgrade to Elasticsearch client 7.15
+* [HSEARCH-4332](https://hibernate.atlassian.net/browse/HSEARCH-4332) - Upgrade to Hibernate ORM 5.6.0.CR1
+* [HSEARCH-4331](https://hibernate.atlassian.net/browse/HSEARCH-4331) - Default identifier bridges for some types supported in Search 5
+* [HSEARCH-4329](https://hibernate.atlassian.net/browse/HSEARCH-4329) - Upgrade to Lucene 8.10
+* [HSEARCH-4316](https://hibernate.atlassian.net/browse/HSEARCH-4316) - Multi-tenancy for asynchronous indexing
+* [HSEARCH-4311](https://hibernate.atlassian.net/browse/HSEARCH-4311) - Upgrade to Lucene 8.9
+* [HSEARCH-4306](https://hibernate.atlassian.net/browse/HSEARCH-4306) - Avoid ORM warnings on locking outbox events
+* [HSEARCH-4297](https://hibernate.atlassian.net/browse/HSEARCH-4297) - Run background processor indexing and event deletes in separate transactions
+* [HSEARCH-4295](https://hibernate.atlassian.net/browse/HSEARCH-4295) - Refine the column types for synthetic tables added by the database-polling strategy
+* [HSEARCH-4282](https://hibernate.atlassian.net/browse/HSEARCH-4282) - Configurable transaction timeout for the outbox event processor in JTA environments
+* [HSEARCH-4209](https://hibernate.atlassian.net/browse/HSEARCH-4209) - Reasonable, future-proof serialization strategy for outbox events
+* [HSEARCH-4182](https://hibernate.atlassian.net/browse/HSEARCH-4182) - Improve detection of whether an OutboxEvent entity mapping is required
+* [HSEARCH-4033](https://hibernate.atlassian.net/browse/HSEARCH-4033) - Support mass-indexing entities with @IdClass if they have an explicit @DocumentId
+* [HSEARCH-3875](https://hibernate.atlassian.net/browse/HSEARCH-3875) - Validate configuration property values more precisely
+
+### New Feature
+* [HSEARCH-4358](https://hibernate.atlassian.net/browse/HSEARCH-4358) - Prevent concurrent execution of outbox event processing and mass indexing
+* [HSEARCH-4342](https://hibernate.atlassian.net/browse/HSEARCH-4342) - Add SchemaManager in the Javabean mapper
+* [HSEARCH-4253](https://hibernate.atlassian.net/browse/HSEARCH-4253) - JSON-format Elasticsearch mapping templates on the application side
+* [HSEARCH-4240](https://hibernate.atlassian.net/browse/HSEARCH-4240) - Compatibility with Jakarta EE 9.1 (Jakarta Persistence 3)
+* [HSEARCH-4234](https://hibernate.atlassian.net/browse/HSEARCH-4234) - Disable _source
+* [HSEARCH-4194](https://hibernate.atlassian.net/browse/HSEARCH-4194) - Guarantee a minimum delay on processing retries of outbox events
+* [HSEARCH-4140](https://hibernate.atlassian.net/browse/HSEARCH-4140) - Dynamic sharding of the event queue for asynchronous automatic indexing
+* [HSEARCH-3274](https://hibernate.atlassian.net/browse/HSEARCH-3274) - Expose fully defined (non-automatic) Java modules for consumption by users
+
+### Task
+* [HSEARCH-4388](https://hibernate.atlassian.net/browse/HSEARCH-4388) - Stop all containers before starting builds
+* [HSEARCH-4387](https://hibernate.atlassian.net/browse/HSEARCH-4387) - Address compilation warnings, in particular unchecked type conversions
+* [HSEARCH-4385](https://hibernate.atlassian.net/browse/HSEARCH-4385) - Test that annotations on interfaces are correctly detected even when no implementation is known by HSearch
+* [HSEARCH-4378](https://hibernate.atlassian.net/browse/HSEARCH-4378) - Upgrade build dependencies to the latest version
+* [HSEARCH-4377](https://hibernate.atlassian.net/browse/HSEARCH-4377) - Enable GitHub's Dependabot
+* [HSEARCH-4376](https://hibernate.atlassian.net/browse/HSEARCH-4376) - Document Elasticsearch normalizing regexps as a bug
+* [HSEARCH-4375](https://hibernate.atlassian.net/browse/HSEARCH-4375) - Mark the outbox-polling coordination strategy as incubating in the documentation
+* [HSEARCH-4374](https://hibernate.atlassian.net/browse/HSEARCH-4374) - Make outbox-polling ITs shorter, in particular automatic indexing ITs
+* [HSEARCH-4373](https://hibernate.atlassian.net/browse/HSEARCH-4373) - Verify that all the test instances run from OutboxPollingAutomaticIndexingBaseIT always use the outbox polling as automatic indexing strategy.
+* [HSEARCH-4364](https://hibernate.atlassian.net/browse/HSEARCH-4364) - Upgrade to the latest version of Eclipse ECJ
+* [HSEARCH-4357](https://hibernate.atlassian.net/browse/HSEARCH-4357) - Fix some integration tests not being executed in jakarta artifacts
+* [HSEARCH-4351](https://hibernate.atlassian.net/browse/HSEARCH-4351) - Avoid unnecessary Thread.sleep in database polling coordination tests
+* [HSEARCH-4347](https://hibernate.atlassian.net/browse/HSEARCH-4347) - Rename OutboxEvent table and clean up related code
+* [HSEARCH-4343](https://hibernate.atlassian.net/browse/HSEARCH-4343) - Move away from repository.jboss.org for releases and (where possible) dependencies
+* [HSEARCH-4341](https://hibernate.atlassian.net/browse/HSEARCH-4341) - Fix GitHub action build taking 6+ hours to complete
+* [HSEARCH-4335](https://hibernate.atlassian.net/browse/HSEARCH-4335) - Clean up dead code and deprecated usage in ORM mapper
+* [HSEARCH-4334](https://hibernate.atlassian.net/browse/HSEARCH-4334) - Refactor default bridge implementations
+* [HSEARCH-4328](https://hibernate.atlassian.net/browse/HSEARCH-4328) - Refactor JSR-352 ITs for safer startup/shutdown
+* [HSEARCH-4326](https://hibernate.atlassian.net/browse/HSEARCH-4326) - Avoid null values for DirtinessDescriptor.dirtyPath()
+* [HSEARCH-4325](https://hibernate.atlassian.net/browse/HSEARCH-4325) - Try a different phase to generate Avro DTOs
+* [HSEARCH-4315](https://hibernate.atlassian.net/browse/HSEARCH-4315) - Fix example captions in documentation
+* [HSEARCH-4313](https://hibernate.atlassian.net/browse/HSEARCH-4313) - Missing anchors in the documentation
+* [HSEARCH-4308](https://hibernate.atlassian.net/browse/HSEARCH-4308) - Make tests more resilient to duplicate indexing works
+* [HSEARCH-4304](https://hibernate.atlassian.net/browse/HSEARCH-4304) - Upgrade CDI support to Jakarta CDI3
+* [HSEARCH-4290](https://hibernate.atlassian.net/browse/HSEARCH-4290) - Add an example to the documentation using ".bridgedElement().name()" in a property binder
+
+## 6.1.0.Alpha1 (2021-09-09)
+
+### Bug
+* [HSEARCH-4303](https://hibernate.atlassian.net/browse/HSEARCH-4303) - No automatic reindexing on insert/delete of contained entity without corresponding update in the containing entity
+* [HSEARCH-4254](https://hibernate.atlassian.net/browse/HSEARCH-4254) - AWS request signing producing an incorrect signature in very specific cases involving non-ascii characters
+* [HSEARCH-4239](https://hibernate.atlassian.net/browse/HSEARCH-4239) - Credentials error while mass indexing on AWS ES with static credentials: "The request signature we calculated does not match the signature you provided."
+* [HSEARCH-4236](https://hibernate.atlassian.net/browse/HSEARCH-4236) - No cleanup of threads, if an connection exception during mass indexation happens
+* [HSEARCH-4185](https://hibernate.atlassian.net/browse/HSEARCH-4185) - Return type of session.search() in mapper-javabean does not expose the entity type
+* [HSEARCH-4184](https://hibernate.atlassian.net/browse/HSEARCH-4184) - A contained entity with only irrelevant changes may mistakenly trigger reindexing
+* [HSEARCH-4183](https://hibernate.atlassian.net/browse/HSEARCH-4183) - SearchResult.took() returns incorrect, very large value with the Lucene backend
+* [HSEARCH-4173](https://hibernate.atlassian.net/browse/HSEARCH-4173) - Multi-index Elasticsearch query fails (sometimes silently) when field is present in only one index
+* [HSEARCH-4161](https://hibernate.atlassian.net/browse/HSEARCH-4161) - LuceneIndexManager.computeSizeInBytes() may fail if a file is deleted while computing size
+* [HSEARCH-4159](https://hibernate.atlassian.net/browse/HSEARCH-4159) - Hibernate Search doesn't properly execute the backend's preStop() operation on shutdown
+* [HSEARCH-4156](https://hibernate.atlassian.net/browse/HSEARCH-4156) - Hibernate Search incorrectly adds synthetic Hibernate ORM properties to the metamodel, ultimately leading to a bootstrap failure
+* [HSEARCH-4155](https://hibernate.atlassian.net/browse/HSEARCH-4155) - Deleting then re-inserting the same entity in a transaction does not result in an update
+* [HSEARCH-4152](https://hibernate.atlassian.net/browse/HSEARCH-4152) - "hibernate.search.backend.dynamic_mapping" is ignored
+* [HSEARCH-4150](https://hibernate.atlassian.net/browse/HSEARCH-4150) - Entity loading fails when using FetchMode.SUBSELECT
+* [HSEARCH-4137](https://hibernate.atlassian.net/browse/HSEARCH-4137) - Reindexing is skipped when a contained entity change follows a change that is irrelevant to indexing
+* [HSEARCH-4123](https://hibernate.atlassian.net/browse/HSEARCH-4123) - Default analyzer not applied by default on programmatic-defined full text fields
+* [HSEARCH-4117](https://hibernate.atlassian.net/browse/HSEARCH-4117) - "AssertionFailure: Unexpected duplicate key" when an entity has two getters for the same property
+
+### Improvement
+* [HSEARCH-4289](https://hibernate.atlassian.net/browse/HSEARCH-4289) - Ignore database-locked events in outbox automatic indexing processors
+* [HSEARCH-4287](https://hibernate.atlassian.net/browse/HSEARCH-4287) - Make processing of outbox events indifferent to processing order
+* [HSEARCH-4279](https://hibernate.atlassian.net/browse/HSEARCH-4279) - Upgrade to Hibernate ORM 5.5.6.Final
+* [HSEARCH-4275](https://hibernate.atlassian.net/browse/HSEARCH-4275) - Upgrade to Elasticsearch Client 7.13.4
+* [HSEARCH-4268](https://hibernate.atlassian.net/browse/HSEARCH-4268) - Configure coordination through a separate, orthogonal set of configuration properties
+* [HSEARCH-4243](https://hibernate.atlassian.net/browse/HSEARCH-4243) - Upgrade to Hibernate ORM 5.5.2.Final
+* [HSEARCH-4233](https://hibernate.atlassian.net/browse/HSEARCH-4233) - Upgrade to Hibernate ORM 5.5.0.Final
+* [HSEARCH-4230](https://hibernate.atlassian.net/browse/HSEARCH-4230) - Preserve the relative order of events for a given entity even in the case of retries
+* [HSEARCH-4229](https://hibernate.atlassian.net/browse/HSEARCH-4229) - Use a Long for OutboxEvent identifiers instead of Integer
+* [HSEARCH-4228](https://hibernate.atlassian.net/browse/HSEARCH-4228) - Ensure correct processing of events even if their IDs are out of order
+* [HSEARCH-4223](https://hibernate.atlassian.net/browse/HSEARCH-4223) - Outbox event background executor should stop as soon as Hibernate Search stops
+* [HSEARCH-4218](https://hibernate.atlassian.net/browse/HSEARCH-4218) - When mass indexing, wait for ID producing threads to finish
+* [HSEARCH-4214](https://hibernate.atlassian.net/browse/HSEARCH-4214) - hibernate.search.backend.version_check.enabled should be evaluated on backend startup
+* [HSEARCH-4213](https://hibernate.atlassian.net/browse/HSEARCH-4213) - Upgrade to Jackson 2.12.x
+* [HSEARCH-4208](https://hibernate.atlassian.net/browse/HSEARCH-4208) - Implement the id predicate using a TermInSetQuery instead of a BooleanQuery
+* [HSEARCH-4204](https://hibernate.atlassian.net/browse/HSEARCH-4204) - Expose the Elasticsearch index names in the metamodel API
+* [HSEARCH-4198](https://hibernate.atlassian.net/browse/HSEARCH-4198) - Transactional outbox event creation with Spring and JTA
+* [HSEARCH-4188](https://hibernate.atlassian.net/browse/HSEARCH-4188) - Preserve generic type arguments when casting type models during the mapping phase
+* [HSEARCH-4186](https://hibernate.atlassian.net/browse/HSEARCH-4186) - PojoIndexingQueueEventProcessingPlan should only deal with "previous" routes
+* [HSEARCH-4169](https://hibernate.atlassian.net/browse/HSEARCH-4169) - Upgrade to Lucene 8.8.1
+* [HSEARCH-4163](https://hibernate.atlassian.net/browse/HSEARCH-4163) - Improve behavior when using multi-tenancy in ORM but not in the backend
+* [HSEARCH-4151](https://hibernate.atlassian.net/browse/HSEARCH-4151) - Reuse the same Query instance when executing multiple queries during entity loading
+* [HSEARCH-4148](https://hibernate.atlassian.net/browse/HSEARCH-4148) - Polymorphic "derivedFrom" definition for derived properties
+* [HSEARCH-4142](https://hibernate.atlassian.net/browse/HSEARCH-4142) - Identifier projection
+* [HSEARCH-4141](https://hibernate.atlassian.net/browse/HSEARCH-4141) - Move the resolution of containing entities to reindex to background processes
+* [HSEARCH-4139](https://hibernate.atlassian.net/browse/HSEARCH-4139) - Rely on BitSet rather than Set<String> to track updated properties
+* [HSEARCH-4138](https://hibernate.atlassian.net/browse/HSEARCH-4138) - Avoid unnecessary memory allocations on entity updates
+* [HSEARCH-3880](https://hibernate.atlassian.net/browse/HSEARCH-3880) - Configurable QueryCache and QueryCachingPolicy in the Lucene backend
+* [HSEARCH-3878](https://hibernate.atlassian.net/browse/HSEARCH-3878) - Maximize utilization of database connections during mass indexing
+* [HSEARCH-3863](https://hibernate.atlassian.net/browse/HSEARCH-3863) - Specify a replacement for missing values in distance sorts
+* [HSEARCH-3771](https://hibernate.atlassian.net/browse/HSEARCH-3771) - Mass indexing for ORM's dynamic-map entity types
+* [HSEARCH-2599](https://hibernate.atlassian.net/browse/HSEARCH-2599) - Allow finer-grained configuration of the HTTP client for Elasticsearch
+* [HSEARCH-2589](https://hibernate.atlassian.net/browse/HSEARCH-2589) - Add syntactic sugar to the QueryDSL for simple multiple-term keyword matches
+
+### New Feature
+* [HSEARCH-4245](https://hibernate.atlassian.net/browse/HSEARCH-4245) - Explicit creation of DSL factories (SearchPredicateFactory, etc.) that accept relative paths
+* [HSEARCH-4231](https://hibernate.atlassian.net/browse/HSEARCH-4231) - Static sharding of automatic indexing outbox event queues
+* [HSEARCH-4215](https://hibernate.atlassian.net/browse/HSEARCH-4215) - SearchSession#isOpen() in the javabean mapper
+* [HSEARCH-4212](https://hibernate.atlassian.net/browse/HSEARCH-4212) - Official, documented compatibility with OpenSearch
+* [HSEARCH-4180](https://hibernate.atlassian.net/browse/HSEARCH-4180) - Mass indexing in mapper-javabean
+* [HSEARCH-4134](https://hibernate.atlassian.net/browse/HSEARCH-4134) - Implement background polling service that retrieves entity change events from an outbox table and reindexes (initial impl, assume 1 app instance)
+* [HSEARCH-4065](https://hibernate.atlassian.net/browse/HSEARCH-4065) - Expose Lucene's low-level IndexReader through API
+* [HSEARCH-3934](https://hibernate.atlassian.net/browse/HSEARCH-3934) - Custom index settings for Elasticsearch indexes created by Hibernate Search
+* [HSEARCH-3884](https://hibernate.atlassian.net/browse/HSEARCH-3884) - Regexp predicates
+* [HSEARCH-3556](https://hibernate.atlassian.net/browse/HSEARCH-3556) - Configuration of the max window size in Elasticsearch
+* [HSEARCH-3325](https://hibernate.atlassian.net/browse/HSEARCH-3325) - NamedPredicates, similar to Hibernate Search 5's full-text filters
+* [HSEARCH-499](https://hibernate.atlassian.net/browse/HSEARCH-499) - Allow to filter elements to be indexed when mass-indexing
+
+### Task
+* [HSEARCH-4312](https://hibernate.atlassian.net/browse/HSEARCH-4312) - Fix a few typos in the documentation
+* [HSEARCH-4310](https://hibernate.atlassian.net/browse/HSEARCH-4310) - Disable tests for dynamic BigDecimal fields on Elasticsearch 5.6
+* [HSEARCH-4309](https://hibernate.atlassian.net/browse/HSEARCH-4309) - Document deprecated/changed API/SPI/configuration in 6.1.0.Alpha1
+* [HSEARCH-4300](https://hibernate.atlassian.net/browse/HSEARCH-4300) - Fix build timeout after 1 hour when testing against DB2
+* [HSEARCH-4298](https://hibernate.atlassian.net/browse/HSEARCH-4298) - Fix unfinished sentence in schema management documentation
+* [HSEARCH-4296](https://hibernate.atlassian.net/browse/HSEARCH-4296) - Make sure assertion errors in background threads caused by unexpected works will fail a test
+* [HSEARCH-4292](https://hibernate.atlassian.net/browse/HSEARCH-4292) - Stop testing against Open Distro for Elasticsearch in local mode
+* [HSEARCH-4291](https://hibernate.atlassian.net/browse/HSEARCH-4291) - Remove invalid dependencies from hibernate-search-util-common
+* [HSEARCH-4288](https://hibernate.atlassian.net/browse/HSEARCH-4288) - Resume testing against MS SQL Server in CI
+* [HSEARCH-4284](https://hibernate.atlassian.net/browse/HSEARCH-4284) - Use a different JDK for running Maven than for compiling tests in JDK CI jobs
+* [HSEARCH-4281](https://hibernate.atlassian.net/browse/HSEARCH-4281) - Fix tests for outbox event processing using different databases
+* [HSEARCH-4278](https://hibernate.atlassian.net/browse/HSEARCH-4278) - Test against OpenSearch 1.0.0
+* [HSEARCH-4277](https://hibernate.atlassian.net/browse/HSEARCH-4277) - Upgrade to Awaitily 4.1.0
+* [HSEARCH-4276](https://hibernate.atlassian.net/browse/HSEARCH-4276) - Upgrade to the latest version of the Elasticsearch servers for tests
+* [HSEARCH-4274](https://hibernate.atlassian.net/browse/HSEARCH-4274) - Set up SSH config as part of the Jenkinsfile
+* [HSEARCH-4272](https://hibernate.atlassian.net/browse/HSEARCH-4272) - Restore the previous default of CacheMode.IGNORE in the mass indexer
+* [HSEARCH-4269](https://hibernate.atlassian.net/browse/HSEARCH-4269) - Fix assertion error on rollback being reported before the assertion error that triggered the rollback
+* [HSEARCH-4267](https://hibernate.atlassian.net/browse/HSEARCH-4267) - Fix variable interpolation in Jenkinsfile
+* [HSEARCH-4265](https://hibernate.atlassian.net/browse/HSEARCH-4265) - Fix flaky tests with MS-SQL and Oracle
+* [HSEARCH-4264](https://hibernate.atlassian.net/browse/HSEARCH-4264) - Disable extra database builds (postgres, oracle) by default for builds of topic branches in forks
+* [HSEARCH-4263](https://hibernate.atlassian.net/browse/HSEARCH-4263) - Switch to dockerhub to retrieve Elasticsearch container images
+* [HSEARCH-4260](https://hibernate.atlassian.net/browse/HSEARCH-4260) - Display Java version during builds
+* [HSEARCH-4257](https://hibernate.atlassian.net/browse/HSEARCH-4257) - Upgrade to JUnit 4.13.2
+* [HSEARCH-4255](https://hibernate.atlassian.net/browse/HSEARCH-4255) - Test Hibernate Search against JDK 18
+* [HSEARCH-4251](https://hibernate.atlassian.net/browse/HSEARCH-4251) - Clarify in the docs that Spring Boot requires that you prefix Hibernate Search properties with "spring.jpa.properties."
+* [HSEARCH-4250](https://hibernate.atlassian.net/browse/HSEARCH-4250) - Deprecate ElasticsearcAwsCredentialsProvider and make it extend a new ElasticsearchAwsCredentialsProvider
+* [HSEARCH-4249](https://hibernate.atlassian.net/browse/HSEARCH-4249) - Test AWS Elasticsearch Service 7.10
+* [HSEARCH-4248](https://hibernate.atlassian.net/browse/HSEARCH-4248) - Remove locks from ProgressiveCharBufferWriter 
+* [HSEARCH-4246](https://hibernate.atlassian.net/browse/HSEARCH-4246) - Upgrade jboss-logging 3.4.2.Final
+* [HSEARCH-4244](https://hibernate.atlassian.net/browse/HSEARCH-4244) - Migration guide from 6.0 to 6.1
+* [HSEARCH-4242](https://hibernate.atlassian.net/browse/HSEARCH-4242) - Test more databases
+* [HSEARCH-4237](https://hibernate.atlassian.net/browse/HSEARCH-4237) - Work around Surefire clearing the interrupt status when forwarding stdout/stderr
+
+** 
+    *  
+
+### Task
+* [HSEARCH-4235](https://hibernate.atlassian.net/browse/HSEARCH-4235) - Add support for Elasticsearch 7.13
+* [HSEARCH-4227](https://hibernate.atlassian.net/browse/HSEARCH-4227) - Safer work expectations in backend mock
+* [HSEARCH-4226](https://hibernate.atlassian.net/browse/HSEARCH-4226) - Stop testing against JDK15
+* [HSEARCH-4220](https://hibernate.atlassian.net/browse/HSEARCH-4220) - Remove horizontal scrolling from the reference documentation
+* [HSEARCH-4219](https://hibernate.atlassian.net/browse/HSEARCH-4219) - Upgrade to Hibernate ORM 5.4.31.Final
+* [HSEARCH-4217](https://hibernate.atlassian.net/browse/HSEARCH-4217) - Move code related to index schema representation to the engine from the Elasticsearch and Lucene backends
+
+## 6.0.0.Final (10-12-2020)
+
+### Improvement
+* [HSEARCH-4120](https://hibernate.atlassian.net/browse/HSEARCH-4120) - Upgrade to Hibernate ORM 5.4.25.Final
+
+### Task
+* [HSEARCH-4118](https://hibernate.atlassian.net/browse/HSEARCH-4118) - Fix formatting in Elasticsearch layout strategy documentation
+* [HSEARCH-3527](https://hibernate.atlassian.net/browse/HSEARCH-3527) - Add proper SPIs for the Quarkus integration
+
+## 6.0.0.CR2 (23-11-2020)
+
+### Bug
+* [HSEARCH-4114](https://hibernate.atlassian.net/browse/HSEARCH-4114) - java.lang.reflect.InaccessibleObjectException when declaring dependencies to private fields from non-open modules in a bridge
+* [HSEARCH-4112](https://hibernate.atlassian.net/browse/HSEARCH-4112) - Hibernate Search + Spring-JTA fails because of closed entity manager
+* [HSEARCH-4108](https://hibernate.atlassian.net/browse/HSEARCH-4108) - Search.session() does not work with session proxies 
+* [HSEARCH-4107](https://hibernate.atlassian.net/browse/HSEARCH-4107) - Session cast fails when creating a FullTextSession with Spring 2.4.0
+* [HSEARCH-4100](https://hibernate.atlassian.net/browse/HSEARCH-4100) - Query/request logs should use the TRACE level
+* [HSEARCH-4096](https://hibernate.atlassian.net/browse/HSEARCH-4096) - Spring Boot hangs while trying to retrieve (built-in) beans for Hibernate Search
+
+### Improvement
+* [HSEARCH-4116](https://hibernate.atlassian.net/browse/HSEARCH-4116) - Ignore empty, blank or null configuration properties when detecting unused properties
+* [HSEARCH-4104](https://hibernate.atlassian.net/browse/HSEARCH-4104) - Upgrade to Elasticsearch 7.10.0
+* [HSEARCH-4102](https://hibernate.atlassian.net/browse/HSEARCH-4102) - Alias-free IndexLayoutStrategy
+* [HSEARCH-4101](https://hibernate.atlassian.net/browse/HSEARCH-4101) - Change default required status for Elasticsearch indexes to "yellow"
+* [HSEARCH-4098](https://hibernate.atlassian.net/browse/HSEARCH-4098) - Upgrade to Lucene 8.7.0
+* [HSEARCH-4074](https://hibernate.atlassian.net/browse/HSEARCH-4074) - Clarify how to pick a bridge type in the documentation
+* [HSEARCH-4069](https://hibernate.atlassian.net/browse/HSEARCH-4069) - Measure time more precisely when computing execution time of Lucene queries
+
+### New Feature
+* [HSEARCH-4099](https://hibernate.atlassian.net/browse/HSEARCH-4099) - Allow option for setting Elasticsearch connection information via full URIs.
+
+### Task
+* [HSEARCH-4115](https://hibernate.atlassian.net/browse/HSEARCH-4115) - Fix transient failure in ElasticsearchClientFactoryImplIT
+* [HSEARCH-4113](https://hibernate.atlassian.net/browse/HSEARCH-4113) - Document that serializing the indexing plan is not supported
+* [HSEARCH-4111](https://hibernate.atlassian.net/browse/HSEARCH-4111) - Upgrade to Hibernate ORM 5.4.24.Final
+* [HSEARCH-4106](https://hibernate.atlassian.net/browse/HSEARCH-4106) - Force tests to execute with JUnit 4
+* [HSEARCH-4097](https://hibernate.atlassian.net/browse/HSEARCH-4097) - Disable maven-surefire-plugin's trimStackTrace by default
+* [HSEARCH-4095](https://hibernate.atlassian.net/browse/HSEARCH-4095) - Fix some legacy package names in Batch JSR 352
+* [HSEARCH-4094](https://hibernate.atlassian.net/browse/HSEARCH-4094) - JSR-352 documentation should mention that an additional dependency is necessary
+* [HSEARCH-4093](https://hibernate.atlassian.net/browse/HSEARCH-4093) - Fix incorrect assertions in tests detected by Sonar
+* [HSEARCH-4089](https://hibernate.atlassian.net/browse/HSEARCH-4089) - Fix warnings related to templates in Elasticsearch integration tests
+* [HSEARCH-4088](https://hibernate.atlassian.net/browse/HSEARCH-4088) - Type safe PropertyBridge/TypeBridge
+* [HSEARCH-4072](https://hibernate.atlassian.net/browse/HSEARCH-4072) - Move from Travis to GitHub actions
+* [HSEARCH-4067](https://hibernate.atlassian.net/browse/HSEARCH-4067) - Remove "(default)"/"(no default)" from configuration examples in the documentation
+* [HSEARCH-4043](https://hibernate.atlassian.net/browse/HSEARCH-4043) - Remove Byteman from RestartChunkIT
+* [HSEARCH-3821](https://hibernate.atlassian.net/browse/HSEARCH-3821) - Improve test coverage for Elasticsearch schema validation
+* [HSEARCH-3479](https://hibernate.atlassian.net/browse/HSEARCH-3479) - Migrate Search 5 CDI and Spring integration tests to Search 6
+
+## 6.0.0.CR1 (03-11-2020)
+
+### Bug
+* [HSEARCH-4080](https://hibernate.atlassian.net/browse/HSEARCH-4080) - Lucene total hit count is wrongly considered exact on timeout
+* [HSEARCH-4079](https://hibernate.atlassian.net/browse/HSEARCH-4079) - Search query always times out when timeout is lower than 1ms
+* [HSEARCH-4070](https://hibernate.atlassian.net/browse/HSEARCH-4070) - Lucene scroll ignores totalHitCountThreshold
+* [HSEARCH-4048](https://hibernate.atlassian.net/browse/HSEARCH-4048) - Relative precedence of object field templates vs. value field templates is not always taken into account
+* [HSEARCH-3905](https://hibernate.atlassian.net/browse/HSEARCH-3905) - exists() predicate ignores dynamic fields among children of the targeted object field with the Lucene backend
+* [HSEARCH-2836](https://hibernate.atlassian.net/browse/HSEARCH-2836) - Timeouts start when the request is submitted to the client, leading to systematic timeout when client is under heavy load
+
+### Improvement
+* [HSEARCH-4068](https://hibernate.atlassian.net/browse/HSEARCH-4068) - Skip non-competitive hits when running a MatchAllDocsQuery with descending score sort with Lucene
+* [HSEARCH-4047](https://hibernate.atlassian.net/browse/HSEARCH-4047) - More explicit error messages when attempting to use features specific to value fields on an object field
+* [HSEARCH-4040](https://hibernate.atlassian.net/browse/HSEARCH-4040) - Upgrade to Elasticsearch 7.9.2
+* [HSEARCH-4023](https://hibernate.atlassian.net/browse/HSEARCH-4023) - Expose the total hit count in scroll results
+* [HSEARCH-4006](https://hibernate.atlassian.net/browse/HSEARCH-4006) - More explicit failure message when two types target the same index
+* [HSEARCH-4000](https://hibernate.atlassian.net/browse/HSEARCH-4000) - @IndexingDependency, @AssociationInverseSide should be repeatable
+* [HSEARCH-3990](https://hibernate.atlassian.net/browse/HSEARCH-3990) - Optimize the retrieval of topDocs in very long Lucene scrolls
+
+### New Feature
+* [HSEARCH-4056](https://hibernate.atlassian.net/browse/HSEARCH-4056) - Expose the index size from LuceneIndexManager
+* [HSEARCH-4046](https://hibernate.atlassian.net/browse/HSEARCH-4046) - Expose a map of static children by name in the metamodel of object fields
+* [HSEARCH-2584](https://hibernate.atlassian.net/browse/HSEARCH-2584) - Introduce some commonly used Analyzer definitions by default
+
+### Remove Feature
+* [HSEARCH-4041](https://hibernate.atlassian.net/browse/HSEARCH-4041) - Remove deprecated interfaces/methods introduced during the Alphas/Betas of 6.0.0
+
+### Task
+* [HSEARCH-4092](https://hibernate.atlassian.net/browse/HSEARCH-4092) - Remove incorrect documentation related to sharding
+* [HSEARCH-4091](https://hibernate.atlassian.net/browse/HSEARCH-4091) - Remove the "preview" status from Hibernate Search 6
+* [HSEARCH-4090](https://hibernate.atlassian.net/browse/HSEARCH-4090) - Mention in the migration guide that the migration helper is only for Lucene-based applications
+* [HSEARCH-4087](https://hibernate.atlassian.net/browse/HSEARCH-4087) - Upgrade to Hibernate ORM 5.4.23.Final
+* [HSEARCH-4086](https://hibernate.atlassian.net/browse/HSEARCH-4086) - Test Hibernate Search against Elasticsearch 7.8 on AWS
+* [HSEARCH-4085](https://hibernate.atlassian.net/browse/HSEARCH-4085) - Upgrade to HCANN 5.1.2.Final
+* [HSEARCH-4084](https://hibernate.atlassian.net/browse/HSEARCH-4084) - Add a mvnw executable to the repository
+* [HSEARCH-4083](https://hibernate.atlassian.net/browse/HSEARCH-4083) - JQassistant does not collect any information from modules
+* [HSEARCH-4082](https://hibernate.atlassian.net/browse/HSEARCH-4082) - Suppress warnings from Forbiddenapis about classes not found in the classpath
+* [HSEARCH-4081](https://hibernate.atlassian.net/browse/HSEARCH-4081) - Update copyright.txt
+* [HSEARCH-4078](https://hibernate.atlassian.net/browse/HSEARCH-4078) - Fix transient failure in LibraryShowcaseMassIndexingIT
+* [HSEARCH-4077](https://hibernate.atlassian.net/browse/HSEARCH-4077) - Avoid extra logging when using ExpectedLog4jLog
+* [HSEARCH-4076](https://hibernate.atlassian.net/browse/HSEARCH-4076) - Document loggers
+* [HSEARCH-4075](https://hibernate.atlassian.net/browse/HSEARCH-4075) - Upgrade to Hibernate Annotations 5.1.1.Final
+* [HSEARCH-4073](https://hibernate.atlassian.net/browse/HSEARCH-4073) - Fix code smells detected by Sonar - 2020-10
+* [HSEARCH-4071](https://hibernate.atlassian.net/browse/HSEARCH-4071) - Remove deprecated configuration properties
+* [HSEARCH-4064](https://hibernate.atlassian.net/browse/HSEARCH-4064) - Add warnings in the documentation about concurrent updates to the same entity in a clustered application
+* [HSEARCH-4063](https://hibernate.atlassian.net/browse/HSEARCH-4063) - Upgrade all publicly exposed dependencies to their latest available version
+* [HSEARCH-4061](https://hibernate.atlassian.net/browse/HSEARCH-4061) - Clean up a few obsolete entries in the POM
+* [HSEARCH-4060](https://hibernate.atlassian.net/browse/HSEARCH-4060) - Investigate unusually long execution of integration tests with AWS Elasticsearch Service 7.7
+* [HSEARCH-4058](https://hibernate.atlassian.net/browse/HSEARCH-4058) - Remove any anchor link from legacy documentation referencing Batch JSR-351 documentation
+* [HSEARCH-4055](https://hibernate.atlassian.net/browse/HSEARCH-4055) - Add the mapper-pojo-base module to the javadoc
+* [HSEARCH-4054](https://hibernate.atlassian.net/browse/HSEARCH-4054) - Upgrade to JUnit 4.13.1
+* [HSEARCH-4053](https://hibernate.atlassian.net/browse/HSEARCH-4053) - Remove the "legacy" directory from the codebase
+* [HSEARCH-4052](https://hibernate.atlassian.net/browse/HSEARCH-4052) - Add missing properties such as "directory_provider" to HibernateSearch5Properties
+* [HSEARCH-4051](https://hibernate.atlassian.net/browse/HSEARCH-4051) - Restore support for configuring a path prefix for Elasticsearch backend
+* [HSEARCH-4049](https://hibernate.atlassian.net/browse/HSEARCH-4049) - Test the JSR-352 module with JBeret
+* [HSEARCH-4045](https://hibernate.atlassian.net/browse/HSEARCH-4045) - Infer tools.jar location (for Byteman) correctly even when a different JVM is used for Maven and Surefire/Failsafe
+* [HSEARCH-4044](https://hibernate.atlassian.net/browse/HSEARCH-4044) - Rename JSR-352 artifacts and move them to reflect their ties to the ORM mapper
+* [HSEARCH-4024](https://hibernate.atlassian.net/browse/HSEARCH-4024) - Upgrade integration tests to the latest version of Spring Boot
+* [HSEARCH-4021](https://hibernate.atlassian.net/browse/HSEARCH-4021) - Move the tests to log4j2
+* [HSEARCH-3996](https://hibernate.atlassian.net/browse/HSEARCH-3996) - Double check all Log file offsets
+* [HSEARCH-3402](https://hibernate.atlassian.net/browse/HSEARCH-3402) - Apply recommendations from Async/reactive development experts for our async APIs
+
+## 6.0.0.Beta11 (08-10-2020)
+
+### Bug
+* [HSEARCH-4028](https://hibernate.atlassian.net/browse/HSEARCH-4028) - Elasticsearch's SearchResultTotal incorrectly reports an exact count after a timeout
+* [HSEARCH-4027](https://hibernate.atlassian.net/browse/HSEARCH-4027) - ScrollResult.timedOut() sometimes returns false even though a timeout occurred with Lucene
+* [HSEARCH-4011](https://hibernate.atlassian.net/browse/HSEARCH-4011) - Hibernate Search ScrollableResults should throw a JPA QueryTimeoutException instead of SearchTimeoutException
+* [HSEARCH-4009](https://hibernate.atlassian.net/browse/HSEARCH-4009) - PropertyBridge on property marked with @IndexingDependency(derivedFrom = ...) leads to bootstrap failure
+* [HSEARCH-4008](https://hibernate.atlassian.net/browse/HSEARCH-4008) - Hibernate Search ScrollableResults.getRowNumber() returns Integer.MAX_VALUE instead of -1 when after the last element
+* [HSEARCH-3999](https://hibernate.atlassian.net/browse/HSEARCH-3999) - Deletion of contained entity whose elementCollection is indexed-embedded in the containing entity leads to LazyInitializationException
+* [HSEARCH-3998](https://hibernate.atlassian.net/browse/HSEARCH-3998) - Mass indexing a (non-abstract) parent class in a type hierarchy with a subclass annotated with @Indexed(enabled = false) still indexes that subclass
+* [HSEARCH-3997](https://hibernate.atlassian.net/browse/HSEARCH-3997) - Mapping arrays of primitive types (int[]/float[]/etc.) leads to ClassCastException upon indexing
+* [HSEARCH-3864](https://hibernate.atlassian.net/browse/HSEARCH-3864) - java.lang.Error thrown during mass indexing are swallowed and not reported to the user
+* [HSEARCH-3655](https://hibernate.atlassian.net/browse/HSEARCH-3655) - AWS signing fails when using multiple routing keys
+
+### Improvement
+* [HSEARCH-4030](https://hibernate.atlassian.net/browse/HSEARCH-4030) - Upgrade to Hibernate ORM 5.4.22.Final
+* [HSEARCH-4020](https://hibernate.atlassian.net/browse/HSEARCH-4020) - Add the entity reference to the message of exceptions occurring during automatic indexing
+* [HSEARCH-4019](https://hibernate.atlassian.net/browse/HSEARCH-4019) - Avoid adding a TotalHitCountCollector to Lucene queries unless absolutely necessary
+* [HSEARCH-4018](https://hibernate.atlassian.net/browse/HSEARCH-4018) - Avoid filtering out nested documents in Lucene queries when we know there are none
+* [HSEARCH-4016](https://hibernate.atlassian.net/browse/HSEARCH-4016) - Avoid call to loader.loadBlocking(<empty list>) when there are no entities to load
+* [HSEARCH-4007](https://hibernate.atlassian.net/browse/HSEARCH-4007) - Throw an exception when the document ID turns out to be non-unique when loading entities during a search query
+* [HSEARCH-4005](https://hibernate.atlassian.net/browse/HSEARCH-4005) - Test Hibernate Search against Elasticsearch 7.7 on AWS
+* [HSEARCH-4004](https://hibernate.atlassian.net/browse/HSEARCH-4004) - Expose an eventContext from MappingAnnotationProcessorContext
+* [HSEARCH-4003](https://hibernate.atlassian.net/browse/HSEARCH-4003) - Automatically expand repeatable annotations in MappingAnnotatedElement
+* [HSEARCH-3947](https://hibernate.atlassian.net/browse/HSEARCH-3947) - Avoid creating huge arrays for collectors when a query does not have an upper bound limit
+* [HSEARCH-3917](https://hibernate.atlassian.net/browse/HSEARCH-3917) - Use TopScoreDocCollector when a descending score sort is requested explicitly
+
+### New Feature
+* [HSEARCH-4002](https://hibernate.atlassian.net/browse/HSEARCH-4002) - Expose the type of a property for a given ContainerExtractorPath in MappingAnnotatedProperty
+* [HSEARCH-4001](https://hibernate.atlassian.net/browse/HSEARCH-4001) - Trigger reindexing when a property is modified, but not when the targeted entity is modified
+* [HSEARCH-3994](https://hibernate.atlassian.net/browse/HSEARCH-3994) - Expose metadata about the targeted types from SearchScope
+* [HSEARCH-3992](https://hibernate.atlassian.net/browse/HSEARCH-3992) - Add support for a default analyzer configured at the analysis configurer level
+* [HSEARCH-3560](https://hibernate.atlassian.net/browse/HSEARCH-3560) - Elasticsearch AWS should support AWS Credential Providers for authentication
+
+### Task
+* [HSEARCH-4042](https://hibernate.atlassian.net/browse/HSEARCH-4042) - Restore the retry() steps in the Jenkinsfile
+* [HSEARCH-4039](https://hibernate.atlassian.net/browse/HSEARCH-4039) - Upgrade to maven-surefire-plugin/maven-failsafe-plugin 3.0.0-M5
+* [HSEARCH-4038](https://hibernate.atlassian.net/browse/HSEARCH-4038) - Assign more memory to the JVM used to run Elasticsearch locally in tests
+* [HSEARCH-4037](https://hibernate.atlassian.net/browse/HSEARCH-4037) - Stop adding -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true to JVM system properties when testing
+* [HSEARCH-4036](https://hibernate.atlassian.net/browse/HSEARCH-4036) - Upgrade to ForbiddenApis 3.1
+* [HSEARCH-4035](https://hibernate.atlassian.net/browse/HSEARCH-4035) - Use static imports for all assertions
+* [HSEARCH-4034](https://hibernate.atlassian.net/browse/HSEARCH-4034) - Add a multi-tenancy test to mapper ORM integration tests
+* [HSEARCH-4032](https://hibernate.atlassian.net/browse/HSEARCH-4032) - Use "surefire.rerunFailingTestsCount"/"failsafe.rerunFailingTestsCount" to re-run failing tests when testing on AWS Elasticsearch
+* [HSEARCH-4031](https://hibernate.atlassian.net/browse/HSEARCH-4031) - Move from Easymock to Mockito
+* [HSEARCH-4026](https://hibernate.atlassian.net/browse/HSEARCH-4026) - Raise timeout for reaching yellow status when testing on AWS Elasticsearch Service
+* [HSEARCH-4025](https://hibernate.atlassian.net/browse/HSEARCH-4025) - Support indexing entities with @IdClass if they have an explicit @DocumentId
+* [HSEARCH-4017](https://hibernate.atlassian.net/browse/HSEARCH-4017) - Don't scan index leaves that don't contain topdocs when applying projections
+* [HSEARCH-4015](https://hibernate.atlassian.net/browse/HSEARCH-4015) - Remove some legacy dependencies from the parent pom
+* [HSEARCH-4014](https://hibernate.atlassian.net/browse/HSEARCH-4014) - Document support for Character, Byte, Boolean, Float, Double as document identifiers
+* [HSEARCH-4013](https://hibernate.atlassian.net/browse/HSEARCH-4013) - Add framework-specific bits to the getting started guide
+* [HSEARCH-4012](https://hibernate.atlassian.net/browse/HSEARCH-4012) - Run tests in more environments for pull requests
+* [HSEARCH-3995](https://hibernate.atlassian.net/browse/HSEARCH-3995) - Add Lucene/Elasticsearch versions to the "Compatibility" section of the documentation
+* [HSEARCH-3991](https://hibernate.atlassian.net/browse/HSEARCH-3991) - Upgrade to Lucene 8.6.2
+* [HSEARCH-3986](https://hibernate.atlassian.net/browse/HSEARCH-3986) - Test that Hibernate Search releases all file handles on close
+* [HSEARCH-3985](https://hibernate.atlassian.net/browse/HSEARCH-3985) - Test Hibernate Search 6 indexing when hibernate.use_identifier_rollback=true
+* [HSEARCH-3785](https://hibernate.atlassian.net/browse/HSEARCH-3785) - Test soft timeout ( limiting fetching ) on Elasticsearch
+* [HSEARCH-3419](https://hibernate.atlassian.net/browse/HSEARCH-3419) - Remove --add-opens java.base/java.lang=ALL-UNNAMED from the JVM arguments used in our JDK11 integration tests
+* [HSEARCH-3282](https://hibernate.atlassian.net/browse/HSEARCH-3282) - Provide a "compatibility layer" module to help users migrate from Search 5 to Search 6
+* [HSEARCH-3243](https://hibernate.atlassian.net/browse/HSEARCH-3243) - Search 6 groundwork - Implement safer type checking for bridge type parameters
+
+## 6.0.0.Beta10 (04-09-2020)
+
+### Bug
+* [HSEARCH-3988](https://hibernate.atlassian.net/browse/HSEARCH-3988) - Using search(...).select(...) drops the type of loading options and prevents their definition
+
+### Improvement
+* [HSEARCH-3787](https://hibernate.atlassian.net/browse/HSEARCH-3787) - Support hard timeout on Hibernate ORM entity loading
+* [HSEARCH-3774](https://hibernate.atlassian.net/browse/HSEARCH-3774) - Improve the timeout implementation for Elasticsearch
+* [HSEARCH-3517](https://hibernate.atlassian.net/browse/HSEARCH-3517) - Optimize the computation of total hit count
+* [HSEARCH-3309](https://hibernate.atlassian.net/browse/HSEARCH-3309) - Allow per-index analyzer definitions in Elasticsearch
+
+### New Feature
+* [HSEARCH-3993](https://hibernate.atlassian.net/browse/HSEARCH-3993) - Add default identifier bridges for types character, boolean, byte, float, double
+* [HSEARCH-3974](https://hibernate.atlassian.net/browse/HSEARCH-3974) - Backend-specific extensions for scroll
+* [HSEARCH-3613](https://hibernate.atlassian.net/browse/HSEARCH-3613) - Allow field access to property with the JavaBean mapper
+
+### Task
+* [HSEARCH-3989](https://hibernate.atlassian.net/browse/HSEARCH-3989) - Upgrade to Hibernate ORM 5.4.21.Final
+* [HSEARCH-3987](https://hibernate.atlassian.net/browse/HSEARCH-3987) - Remove dead code related to "*Expectations" classes in the backend TCK
+* [HSEARCH-3984](https://hibernate.atlassian.net/browse/HSEARCH-3984) - Upgrade to Elasticsearch 7.9.0
+* [HSEARCH-3983](https://hibernate.atlassian.net/browse/HSEARCH-3983) - Upgrade to Lucene 8.6.1
+* [HSEARCH-3981](https://hibernate.atlassian.net/browse/HSEARCH-3981) - Upgrade to Hibernate ORM 5.4.20.Final
+* [HSEARCH-3980](https://hibernate.atlassian.net/browse/HSEARCH-3980) - Expose multiValuedInRoot in the metamodel
+* [HSEARCH-3979](https://hibernate.atlassian.net/browse/HSEARCH-3979) - Rename @IndexedEmbedded.maxDepth to includeDepth
+* [HSEARCH-3975](https://hibernate.atlassian.net/browse/HSEARCH-3975) - Expose scrolling operations through JPA/ORM queries
+* [HSEARCH-3973](https://hibernate.atlassian.net/browse/HSEARCH-3973) - Re-enable SearchQueryEntityLoadingGraphIT.lazy_fetch
+* [HSEARCH-3108](https://hibernate.atlassian.net/browse/HSEARCH-3108) - Search 6 groundwork - Restore support for indexing event interceptors
+* [HSEARCH-2505](https://hibernate.atlassian.net/browse/HSEARCH-2505) - Lower the default read timeout with Elasticsearch
+
+## 6.0.0.Beta9 (31-07-2020)
+
+### Bug
+* [HSEARCH-3977](https://hibernate.atlassian.net/browse/HSEARCH-3977) - Scroll always targets all indexes
+* [HSEARCH-3941](https://hibernate.atlassian.net/browse/HSEARCH-3941) - ClassCastException: org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory cannot be cast to org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory
+* [HSEARCH-3938](https://hibernate.atlassian.net/browse/HSEARCH-3938) - HibernateOrmIntegrationBooterImpl confuses the startup event for a shutdown event, and vice-versa
+* [HSEARCH-3937](https://hibernate.atlassian.net/browse/HSEARCH-3937) - Error messages on boot/shutdown are hidden or unclear when using an EnvironmentSynchronizer
+* [HSEARCH-1895](https://hibernate.atlassian.net/browse/HSEARCH-1895) - Projection over embedded collection returns only the first element
+
+### Improvement
+* [HSEARCH-3972](https://hibernate.atlassian.net/browse/HSEARCH-3972) - Upgrade to ORM 5.4.19.Final
+* [HSEARCH-3967](https://hibernate.atlassian.net/browse/HSEARCH-3967) - Specify defaults for index-level configuration properties at the backend level
+* [HSEARCH-3965](https://hibernate.atlassian.net/browse/HSEARCH-3965) - Upgrade to Lucene 8.6.0
+* [HSEARCH-3960](https://hibernate.atlassian.net/browse/HSEARCH-3960) - Validation failure messages should mention that they are related to Elasticsearch schema validation
+* [HSEARCH-3957](https://hibernate.atlassian.net/browse/HSEARCH-3957) - Upgrade to Hibernate ORM 5.4.18.Final
+* [HSEARCH-3956](https://hibernate.atlassian.net/browse/HSEARCH-3956) - Upgrade to Elasticsearch 7.8
+* [HSEARCH-3950](https://hibernate.atlassian.net/browse/HSEARCH-3950) - Simpler configuration syntax for single-backend applications
+* [HSEARCH-3936](https://hibernate.atlassian.net/browse/HSEARCH-3936) - Projectable fields in the Elasticsearch schema should have "store = false"
+* [HSEARCH-3506](https://hibernate.atlassian.net/browse/HSEARCH-3506) - Implement and test boosts on matchAll, matchId, boolean, nested predicates
+* [HSEARCH-3476](https://hibernate.atlassian.net/browse/HSEARCH-3476) - Make re-use of predicate/sort/fieldtype easier and safer
+* [HSEARCH-3307](https://hibernate.atlassian.net/browse/HSEARCH-3307) - Take into account how the field is being used when determining cross-index field compatibility
+* [HSEARCH-3102](https://hibernate.atlassian.net/browse/HSEARCH-3102) - Simpler configuration when only one backend type is available
+
+### New Feature
+* [HSEARCH-3944](https://hibernate.atlassian.net/browse/HSEARCH-3944) - Distance projection on multi-valued fields
+* [HSEARCH-3391](https://hibernate.atlassian.net/browse/HSEARCH-3391) - Projection on multi-valued field values
+
+### Remove Feature
+* [HSEARCH-3055](https://hibernate.atlassian.net/browse/HSEARCH-3055) - Remove support for the @Factory annotation and document the migration path
+
+### Sub-task
+* [HSEARCH-3962](https://hibernate.atlassian.net/browse/HSEARCH-3962) - Document possible architectures
+* [HSEARCH-3710](https://hibernate.atlassian.net/browse/HSEARCH-3710) - Document declaration of dependencies in bridges
+* [HSEARCH-3709](https://hibernate.atlassian.net/browse/HSEARCH-3709) - Document routing key bridges
+* [HSEARCH-3680](https://hibernate.atlassian.net/browse/HSEARCH-3680) - Document the programmatic mapping
+* [HSEARCH-3668](https://hibernate.atlassian.net/browse/HSEARCH-3668) - Document the aggregation DSL in details
+* [HSEARCH-3600](https://hibernate.atlassian.net/browse/HSEARCH-3600) - Document the projection DSL in details
+* [HSEARCH-3599](https://hibernate.atlassian.net/browse/HSEARCH-3599) - Document the sort DSL in details
+* [HSEARCH-3598](https://hibernate.atlassian.net/browse/HSEARCH-3598) - Document the predicate DSL in details
+
+### Task
+* [HSEARCH-3976](https://hibernate.atlassian.net/browse/HSEARCH-3976) - Document scrolling
+* [HSEARCH-3970](https://hibernate.atlassian.net/browse/HSEARCH-3970) - Clean up timing-related code
+* [HSEARCH-3964](https://hibernate.atlassian.net/browse/HSEARCH-3964) - Build and run tests against JDK16
+* [HSEARCH-3961](https://hibernate.atlassian.net/browse/HSEARCH-3961) - Test the default sort
+* [HSEARCH-3958](https://hibernate.atlassian.net/browse/HSEARCH-3958) - Factorize tests applied to various predicates
+* [HSEARCH-3954](https://hibernate.atlassian.net/browse/HSEARCH-3954) - Move the technical documentation to a separate document
+* [HSEARCH-3953](https://hibernate.atlassian.net/browse/HSEARCH-3953) - Document that zero-downtime reindexing is only doable if the schema did not change (for now)
+* [HSEARCH-3951](https://hibernate.atlassian.net/browse/HSEARCH-3951) - Upgrade to Elasticsearch 6.8 for AWS tests
+* [HSEARCH-3949](https://hibernate.atlassian.net/browse/HSEARCH-3949) - Remove OSGi and Wildfly support and integration tests from legacy code
+* [HSEARCH-3948](https://hibernate.atlassian.net/browse/HSEARCH-3948) - Rename ObjectFieldStorage to ObjectStructure and move it to a more appropriate package
+* [HSEARCH-3946](https://hibernate.atlassian.net/browse/HSEARCH-3946) - Remove the reference to SearchContext in reusable builders
+* [HSEARCH-3945](https://hibernate.atlassian.net/browse/HSEARCH-3945) - Refactor ElasticsearchScopedIndexFieldComponent / LuceneScopedIndexFieldComponent
+* [HSEARCH-3942](https://hibernate.atlassian.net/browse/HSEARCH-3942) - Stop testing Elasticsearch 6.2 in periodic CI builds
+* [HSEARCH-3940](https://hibernate.atlassian.net/browse/HSEARCH-3940) - Restore sort by distance on (nested) field in the Library showcase
+* [HSEARCH-3939](https://hibernate.atlassian.net/browse/HSEARCH-3939) - Use a single field for GeoPoint storage in Lucene
+* [HSEARCH-3935](https://hibernate.atlassian.net/browse/HSEARCH-3935) - Upgrade to Elasticsearch 6.8.9
+* [HSEARCH-3929](https://hibernate.atlassian.net/browse/HSEARCH-3929) - Use JDK11 by default when building Hibernate Search
+* [HSEARCH-3899](https://hibernate.atlassian.net/browse/HSEARCH-3899) - Change the explain API so that the entity id is used, instead of document id
+* [HSEARCH-3891](https://hibernate.atlassian.net/browse/HSEARCH-3891) - Allow POJO mapper implementations to pass explicit routing keys when indexing
+* [HSEARCH-3882](https://hibernate.atlassian.net/browse/HSEARCH-3882) - Test explicit and implicit nesting for all relevant predicates
+* [HSEARCH-3677](https://hibernate.atlassian.net/browse/HSEARCH-3677) - Complete all missing sections of the documentation
+* [HSEARCH-3636](https://hibernate.atlassian.net/browse/HSEARCH-3636) - Restore the ability to configure Lucene directories on a per-index or per-shard basis
+
+## 6.0.0.Beta8 (02-06-2020)
+
+### Bug
+* [HSEARCH-3913](https://hibernate.atlassian.net/browse/HSEARCH-3913) - @FullTextField.aggregable doesn't do anything
+* [HSEARCH-962](https://hibernate.atlassian.net/browse/HSEARCH-962) - HibernateOrmCriteriaEntityLoader needs to execute multiple queries in cases where the underlying database has a limit on the total amount of query parameters
+* [HSEARCH-551](https://hibernate.atlassian.net/browse/HSEARCH-551) - Using Programmatic API, getters are not inherited
+* [HSEARCH-550](https://hibernate.atlassian.net/browse/HSEARCH-550) - Using Programmatic API, the document ID is not inherited
+
+### Improvement
+* [HSEARCH-3932](https://hibernate.atlassian.net/browse/HSEARCH-3932) - Upgrade to Hibernate ORM 5.4.17.Final
+* [HSEARCH-3930](https://hibernate.atlassian.net/browse/HSEARCH-3930) - Upgrade to Lucene Lucene 8.5.2
+* [HSEARCH-3772](https://hibernate.atlassian.net/browse/HSEARCH-3772) - Allow mapping the document id to non-entity-id properties for ORM's dynamic-map entity types
+* [HSEARCH-3584](https://hibernate.atlassian.net/browse/HSEARCH-3584) - Support ORM bytecode enhancement when embeddables, mapped superclasses or entity hierarchies are involved
+* [HSEARCH-1344](https://hibernate.atlassian.net/browse/HSEARCH-1344) - Offer compiler or runtime error if range types are incompatible in range faceting
+* [HSEARCH-1301](https://hibernate.atlassian.net/browse/HSEARCH-1301) - Trigger/Set analyzer in classbridge
+* [HSEARCH-1086](https://hibernate.atlassian.net/browse/HSEARCH-1086) - Have more user friendly messages upon incorrect types in query DSLs
+* [HSEARCH-661](https://hibernate.atlassian.net/browse/HSEARCH-661) - Improve documentation around query dsl options like ignoreAnalyzer and ignoreFieldBridge
+
+### New Feature
+* [HSEARCH-3628](https://hibernate.atlassian.net/browse/HSEARCH-3628) - Finer loading options in search queries (fetch graph, ...)
+* [HSEARCH-1865](https://hibernate.atlassian.net/browse/HSEARCH-1865) - Extend public meta-data API to provide information on embedded properties/fields
+
+### Task
+* [HSEARCH-3933](https://hibernate.atlassian.net/browse/HSEARCH-3933) - Fix reset expectations and verify expectations met for the stub backend
+* [HSEARCH-3931](https://hibernate.atlassian.net/browse/HSEARCH-3931) - Fix the dataset used in performance tests
+* [HSEARCH-3928](https://hibernate.atlassian.net/browse/HSEARCH-3928) - Rename PropertyMappingIndexedEmbeddedStep#extractors() (no parameters) to "noExtractors"
+* [HSEARCH-3925](https://hibernate.atlassian.net/browse/HSEARCH-3925) - Move away from session.byId for entity loading
+* [HSEARCH-3924](https://hibernate.atlassian.net/browse/HSEARCH-3924) - Hide obvious getters and setters from the documentation examples
+* [HSEARCH-3923](https://hibernate.atlassian.net/browse/HSEARCH-3923) - Upgrade to Hibernate ORM 5.4.16.Final
+* [HSEARCH-3922](https://hibernate.atlassian.net/browse/HSEARCH-3922) - Remove "get"/"set" prefixes from API methods
+* [HSEARCH-3921](https://hibernate.atlassian.net/browse/HSEARCH-3921) - Fix a typo in the index layout documentation
+* [HSEARCH-3920](https://hibernate.atlassian.net/browse/HSEARCH-3920) - Update tests to take advantage of the latest changes to test utils
+* [HSEARCH-3919](https://hibernate.atlassian.net/browse/HSEARCH-3919) - Add test configuration to test AWS Elasticsearch Service 7.4
+* [HSEARCH-3918](https://hibernate.atlassian.net/browse/HSEARCH-3918) - Upgrade to Elasticsearch 7.7.0
+* [HSEARCH-3916](https://hibernate.atlassian.net/browse/HSEARCH-3916) - DynamicTemplateJsonAdapterFactory should be public
+* [HSEARCH-3915](https://hibernate.atlassian.net/browse/HSEARCH-3915) - Upgrade to the Ubuntu Bionic environment in .travis.yml
+* [HSEARCH-3912](https://hibernate.atlassian.net/browse/HSEARCH-3912) - Increase the amount of RAM assigned to Elasticsearch in integration tests
+* [HSEARCH-3902](https://hibernate.atlassian.net/browse/HSEARCH-3902) - Expose addOrUpdate/delete/purge on IndexIndexer/PojoIndexer
+* [HSEARCH-3855](https://hibernate.atlassian.net/browse/HSEARCH-3855) - Improve formatting of logged indexing processors and reindexing resolvers
+* [HSEARCH-3842](https://hibernate.atlassian.net/browse/HSEARCH-3842) - Expose a global option to use ReindexOnUpdate.NO as a default
+* [HSEARCH-3275](https://hibernate.atlassian.net/browse/HSEARCH-3275) - Search 6 groundwork - Move to a stable implementation of Lucene spatial support
+* [HSEARCH-3097](https://hibernate.atlassian.net/browse/HSEARCH-3097) - Search 6 groundwork - Deprecate the IndexedEmbedded "prefix" feature
+* [HSEARCH-3072](https://hibernate.atlassian.net/browse/HSEARCH-3072) - Search 6 groundwork - Restore support for @IndexedEmbedded.targetElement (now targetType)
+* [HSEARCH-1853](https://hibernate.atlassian.net/browse/HSEARCH-1853) - Expose facet metadata in public metadata API
+* [HSEARCH-1807](https://hibernate.atlassian.net/browse/HSEARCH-1807) - Provide SPIs required by ISPN query
+* [HSEARCH-1231](https://hibernate.atlassian.net/browse/HSEARCH-1231) - Inherit @Indexed annotations by default
+
+## 6.0.0.Beta7 (07-05-2020)
+
+### Bug
+* [HSEARCH-3897](https://hibernate.atlassian.net/browse/HSEARCH-3897) - explain() fails for indexes with a custom name
+* [HSEARCH-3894](https://hibernate.atlassian.net/browse/HSEARCH-3894) - Lucene text aggregations count nested documents twice when they include the same term multiple times
+* [HSEARCH-3893](https://hibernate.atlassian.net/browse/HSEARCH-3893) - Elasticsearch aggregations return the count of nested (leaf) documents
+* [HSEARCH-3883](https://hibernate.atlassian.net/browse/HSEARCH-3883) - NullPointerException when building a SimpleQueryString predicate
+* [HSEARCH-1929](https://hibernate.atlassian.net/browse/HSEARCH-1929) - @Facet on multi value field breaks indexing (be it for discrete or range faceting)
+* [HSEARCH-1927](https://hibernate.atlassian.net/browse/HSEARCH-1927) - Range faceting on multiple numeric values does not work
+
+### Improvement
+* [HSEARCH-3911](https://hibernate.atlassian.net/browse/HSEARCH-3911) - Allow to extract native Lucene ScoreDoc data
+* [HSEARCH-3901](https://hibernate.atlassian.net/browse/HSEARCH-3901) - Expose metadata about the annotated type in the context passed to PropertyMappingAnnotationProcessor/TypeMappingAnnotationProcessor
+* [HSEARCH-3886](https://hibernate.atlassian.net/browse/HSEARCH-3886) - Missing values should be last by default in field sorts
+* [HSEARCH-3885](https://hibernate.atlassian.net/browse/HSEARCH-3885) - Throw exceptions when attempting to use predicate with incompatible nested path hierarchy in a nested predicate
+* [HSEARCH-3879](https://hibernate.atlassian.net/browse/HSEARCH-3879) - Clarify documentation of thread pool and indexing settings
+* [HSEARCH-2461](https://hibernate.atlassian.net/browse/HSEARCH-2461) - API/SPI overhaul in HS 6.0
+
+### New Feature
+* [HSEARCH-3914](https://hibernate.atlassian.net/browse/HSEARCH-3914) - Expose the Lucene Sort in LuceneSearchQuery
+* [HSEARCH-3892](https://hibernate.atlassian.net/browse/HSEARCH-3892) - Aggregations on fields in nested documents
+* [HSEARCH-3881](https://hibernate.atlassian.net/browse/HSEARCH-3881) - Filtering for aggregations on multi-valued fields in nested documents
+* [HSEARCH-3846](https://hibernate.atlassian.net/browse/HSEARCH-3846) - Filtering for sorts on multi-valued fields in nested documents
+* [HSEARCH-3273](https://hibernate.atlassian.net/browse/HSEARCH-3273) - Dynamic fields
+
+### Task
+* [HSEARCH-3907](https://hibernate.atlassian.net/browse/HSEARCH-3907) - Upgrade to Hibernate ORM 5.4.15.Final
+* [HSEARCH-3898](https://hibernate.atlassian.net/browse/HSEARCH-3898) - Change the explain API so that the type name is used, instead of index name
+* [HSEARCH-3896](https://hibernate.atlassian.net/browse/HSEARCH-3896) - Verify multiple loading with the DefaultProjectionHitMapper on the same query instance
+* [HSEARCH-3890](https://hibernate.atlassian.net/browse/HSEARCH-3890) - Upgrade to Hibernate ORM 5.4.14.Final
+* [HSEARCH-3887](https://hibernate.atlassian.net/browse/HSEARCH-3887) - Update documentation about routing in the Search DSL
+* [HSEARCH-3877](https://hibernate.atlassian.net/browse/HSEARCH-3877) - Upgrade test dependencies to the latest available version
+* [HSEARCH-3777](https://hibernate.atlassian.net/browse/HSEARCH-3777) - Restore configuration of the Similarity in the Lucene backend
+* [HSEARCH-3776](https://hibernate.atlassian.net/browse/HSEARCH-3776) - Restore advanced configuration options of the Lucene Writer
+* [HSEARCH-3589](https://hibernate.atlassian.net/browse/HSEARCH-3589) - Search 6 groundwork - Restore support for index metadata lookup
+
+## 6.0.0.Beta6 (31-03-2020)
+
+### Bug
+* [HSEARCH-3874](https://hibernate.atlassian.net/browse/HSEARCH-3874) - @IdClass, even not @Indexed, leads to NPE on bootstrap
+* [HSEARCH-3869](https://hibernate.atlassian.net/browse/HSEARCH-3869) - java.lang.IndexOutOfBoundsException when an Elasticsearch bulk work fails
+* [HSEARCH-3861](https://hibernate.atlassian.net/browse/HSEARCH-3861) - Elasticsearch search queries fetch the whole document source by default
+* [HSEARCH-3859](https://hibernate.atlassian.net/browse/HSEARCH-3859) - .desc().missing().last() / .asc().missing().first() places documents around 0 instead of last/first
+* [HSEARCH-3857](https://hibernate.atlassian.net/browse/HSEARCH-3857) - ConcurrentModificationException in very specific scenarios when indexing multiple entities with addOrUpdate which contains @IndexEmbedded dependencies
+* [HSEARCH-3852](https://hibernate.atlassian.net/browse/HSEARCH-3852) - Failure to index reports the wrong document ID with Elasticsearch discriminator multi-tenancy
+* [HSEARCH-3851](https://hibernate.atlassian.net/browse/HSEARCH-3851) - Entities whose indexing failed are not reported when even just one document ID cannot be converted
+* [HSEARCH-3848](https://hibernate.atlassian.net/browse/HSEARCH-3848) - Dynamic entities are ignored when creating a scope targeting Object.class
+* [HSEARCH-3845](https://hibernate.atlassian.net/browse/HSEARCH-3845) - Prefix query in SimpleQueryString predicate is case sensitive
+* [HSEARCH-3844](https://hibernate.atlassian.net/browse/HSEARCH-3844) - NullPointerException when using simpleQueryString() on non-analyzed, non-normalized fields
+* [HSEARCH-2859](https://hibernate.atlassian.net/browse/HSEARCH-2859) - Current implementation of SpatialBridge prevents multi-valued locations
+
+### Improvement
+* [HSEARCH-3873](https://hibernate.atlassian.net/browse/HSEARCH-3873) - Upgrade to Hibernate ORM 5.4.13.Final
+* [HSEARCH-3872](https://hibernate.atlassian.net/browse/HSEARCH-3872) - Simplify and improve ordering and parallelism of Elasticsearch indexing
+* [HSEARCH-3871](https://hibernate.atlassian.net/browse/HSEARCH-3871) - Always enable delayed commits in the Lucene backend
+* [HSEARCH-3870](https://hibernate.atlassian.net/browse/HSEARCH-3870) - Upgrade to Elasticsearch 7.6.1
+* [HSEARCH-3867](https://hibernate.atlassian.net/browse/HSEARCH-3867) - Upgrade to Lucene 8.5.0
+* [HSEARCH-3850](https://hibernate.atlassian.net/browse/HSEARCH-3850) - Expose a tool to build property keys
+* [HSEARCH-3849](https://hibernate.atlassian.net/browse/HSEARCH-3849) - Create-or-validate schema management by default
+* [HSEARCH-3796](https://hibernate.atlassian.net/browse/HSEARCH-3796) - @IndexedEmbedded should be repeatable
+* [HSEARCH-3752](https://hibernate.atlassian.net/browse/HSEARCH-3752) - Implicit nested predicates
+* [HSEARCH-3719](https://hibernate.atlassian.net/browse/HSEARCH-3719) - Support a "degraded mode" where failure to contact Elasticsearch or index documents does not affect the whole application
+* [HSEARCH-3575](https://hibernate.atlassian.net/browse/HSEARCH-3575) - Add configuration options for the size and number of indexing queues, and the max size of Elasticsearch bulks
+
+### New Feature
+* [HSEARCH-3847](https://hibernate.atlassian.net/browse/HSEARCH-3847) - Customize enabled syntax elements in simple query strings
+* [HSEARCH-3841](https://hibernate.atlassian.net/browse/HSEARCH-3841) - Offline startup of the Elasticsearch backend
+* [HSEARCH-3759](https://hibernate.atlassian.net/browse/HSEARCH-3759) - Initialization options and APIs
+* [HSEARCH-3751](https://hibernate.atlassian.net/browse/HSEARCH-3751) - dropAndCreateSchema() as an alternative to purge() in the MassIndexer
+* [HSEARCH-3103](https://hibernate.atlassian.net/browse/HSEARCH-3103) - Sorts on multi-valued fields
+
+### Task
+* [HSEARCH-3876](https://hibernate.atlassian.net/browse/HSEARCH-3876) - Fix random failures in ElasticsearchClientFactoryImplIT
+* [HSEARCH-3868](https://hibernate.atlassian.net/browse/HSEARCH-3868) - Fix SearchQueryResultLoadingOrTransformingIT failures caused by incorrectly expecting ordered hits
+* [HSEARCH-3866](https://hibernate.atlassian.net/browse/HSEARCH-3866) - Stop testing against JDK13 in the CI build
+* [HSEARCH-3865](https://hibernate.atlassian.net/browse/HSEARCH-3865) - Clean up any change to the permission of index files during tests
+* [HSEARCH-3860](https://hibernate.atlassian.net/browse/HSEARCH-3860) - Refactor FieldSearchSortIT to enable testing more complex cases
+* [HSEARCH-3858](https://hibernate.atlassian.net/browse/HSEARCH-3858) - upgrade maven-checkstyle-plugin to 3.1.1
+* [HSEARCH-3854](https://hibernate.atlassian.net/browse/HSEARCH-3854) - Remove the unnecessary generic type parameter for DocumentElement
+* [HSEARCH-3843](https://hibernate.atlassian.net/browse/HSEARCH-3843) - Test Hibernate Search with JDK15 regularly
+* [HSEARCH-3822](https://hibernate.atlassian.net/browse/HSEARCH-3822) - Restore support for concurrent Lucene work execution - at least during mass indexing
+* [HSEARCH-3814](https://hibernate.atlassian.net/browse/HSEARCH-3814) - Mark experimental APIs/SPIs with an @Incubating annotation
+
+## 6.0.0.Beta5 (21-02-2020)
+
+### Bug
+* [HSEARCH-3834](https://hibernate.atlassian.net/browse/HSEARCH-3834) - Nested documents are never deleted
+* [HSEARCH-3833](https://hibernate.atlassian.net/browse/HSEARCH-3833) - Writing on different local-heap indexes will provoke LockObtainFailedException 
+* [HSEARCH-3825](https://hibernate.atlassian.net/browse/HSEARCH-3825) - Purging a document from the POJO mapper will lead to NPE
+* [HSEARCH-3801](https://hibernate.atlassian.net/browse/HSEARCH-3801) - Hibernate Search blocks loading of non hibernate batch jobs
+
+### Improvement
+* [HSEARCH-3835](https://hibernate.atlassian.net/browse/HSEARCH-3835) - Remove the unused "__HSEARCH_root_index_name" and "__HSEARCH_root_id" fields from nested documents
+* [HSEARCH-3831](https://hibernate.atlassian.net/browse/HSEARCH-3831) - Allow setting the automatic indexing sync strategy to a custom bean in configuration
+* [HSEARCH-3824](https://hibernate.atlassian.net/browse/HSEARCH-3824) - Automatically filter search results based on provided routing keys
+* [HSEARCH-3808](https://hibernate.atlassian.net/browse/HSEARCH-3808) - Rename and clarify automatic indexing synchronization strategies
+* [HSEARCH-3807](https://hibernate.atlassian.net/browse/HSEARCH-3807) - Use more generic wording in the query DSL
+* [HSEARCH-3460](https://hibernate.atlassian.net/browse/HSEARCH-3460) - Remove the confusion between flush and refresh
+
+### New Feature
+* [HSEARCH-3836](https://hibernate.atlassian.net/browse/HSEARCH-3836) - Allow explicit routing for purges
+* [HSEARCH-3791](https://hibernate.atlassian.net/browse/HSEARCH-3791) - Configurable alias-based reads/writes for Elasticsearch indexes
+
+### Remove Feature
+* [HSEARCH-3826](https://hibernate.atlassian.net/browse/HSEARCH-3826) - Drop support for non-exclusive index use
+* [HSEARCH-3779](https://hibernate.atlassian.net/browse/HSEARCH-3779) - Remove automatic index optimization
+* [HSEARCH-3778](https://hibernate.atlassian.net/browse/HSEARCH-3778) - Remove "index_metadata_complete" configuration property
+
+### Task
+* [HSEARCH-3837](https://hibernate.atlassian.net/browse/HSEARCH-3837) - Fix dependency convergence error caused by the ES client dependency
+* [HSEARCH-3830](https://hibernate.atlassian.net/browse/HSEARCH-3830) - Upgrade to Hibernate ORM 5.4.12.Final
+* [HSEARCH-3829](https://hibernate.atlassian.net/browse/HSEARCH-3829) - Upgrade to Elasticsearch 7.6
+* [HSEARCH-3828](https://hibernate.atlassian.net/browse/HSEARCH-3828) - Change the format of the version logged on boot
+* [HSEARCH-3827](https://hibernate.atlassian.net/browse/HSEARCH-3827) - Restore simple backend performance tests
+* [HSEARCH-3823](https://hibernate.atlassian.net/browse/HSEARCH-3823) - Make the build independent from linked javadoc websites
+* [HSEARCH-3820](https://hibernate.atlassian.net/browse/HSEARCH-3820) - Refactor ElasticsearchSchemaValidator to ease maintenance
+* [HSEARCH-3819](https://hibernate.atlassian.net/browse/HSEARCH-3819) - JsonSyntaxException when validating or migrating an Elasticsearch schema with a geo_point field with null_value
+* [HSEARCH-3818](https://hibernate.atlassian.net/browse/HSEARCH-3818) - Upgrade to checkstyle 8.29
+* [HSEARCH-3817](https://hibernate.atlassian.net/browse/HSEARCH-3817) - Upgrade to Elasticsearch 7.5.2
+* [HSEARCH-3815](https://hibernate.atlassian.net/browse/HSEARCH-3815) - Stop publishing the mapper-javabean module
+* [HSEARCH-3799](https://hibernate.atlassian.net/browse/HSEARCH-3799) - Upgrade to Lucene 8.4.1
+* [HSEARCH-3775](https://hibernate.atlassian.net/browse/HSEARCH-3775) - Restore advanced Reader/Writer handling in the Lucene backend
+* [HSEARCH-3838](https://hibernate.atlassian.net/browse/HSEARCH-3838) - Use an explicit format for docvalue projections on ES 6.6
+
+## 6.0.0.Beta4 (22-01-2020)
+
+### Bug
+* [HSEARCH-3802](https://hibernate.atlassian.net/browse/HSEARCH-3802) - query.fetchTotalHitCounts always fails when setting a timeout with Elasticsearch
+
+### Improvement
+* [HSEARCH-3812](https://hibernate.atlassian.net/browse/HSEARCH-3812) - Be more consistent with timeout messages in search queries across backends (Lucene/ES)
+* [HSEARCH-3810](https://hibernate.atlassian.net/browse/HSEARCH-3810) - Rework JBoss logging formatters: execute computationally intensive operations in toString rather than the constructor
+* [HSEARCH-3803](https://hibernate.atlassian.net/browse/HSEARCH-3803) - Support IdentifierBridge with provided IDs
+* [HSEARCH-3797](https://hibernate.atlassian.net/browse/HSEARCH-3797) - Two-phase projections in the Lucene backend
+* [HSEARCH-3793](https://hibernate.atlassian.net/browse/HSEARCH-3793) - Document usage of the "exists" predicate on object fields
+* [HSEARCH-3786](https://hibernate.atlassian.net/browse/HSEARCH-3786) - Lucene projections on fields in nested documents should limit children collection to the top docs
+* [HSEARCH-3729](https://hibernate.atlassian.net/browse/HSEARCH-3729) - Give more information about failures to MassIndexer users
+* [HSEARCH-3629](https://hibernate.atlassian.net/browse/HSEARCH-3629) - Move search query loading options to a better place in the search query DSL
+* [HSEARCH-3461](https://hibernate.atlassian.net/browse/HSEARCH-3461) - Do not optimize the indexes by default after mass indexing and document the drawbacks
+* [HSEARCH-3418](https://hibernate.atlassian.net/browse/HSEARCH-3418) - Document that Instants are truncated to the millisecond when indexed
+* [HSEARCH-1828](https://hibernate.atlassian.net/browse/HSEARCH-1828) - Clarify documentation about ways to disable Hibernate Search
+
+### Task
+* [HSEARCH-3813](https://hibernate.atlassian.net/browse/HSEARCH-3813) - Automatically skip Elasticsearch instance creation when skipping tests
+* [HSEARCH-3811](https://hibernate.atlassian.net/browse/HSEARCH-3811) - Various attempts at improving bootstrap performance
+* [HSEARCH-3805](https://hibernate.atlassian.net/browse/HSEARCH-3805) - Override repositories in Karaf/Paxexam config
+* [HSEARCH-3804](https://hibernate.atlassian.net/browse/HSEARCH-3804) - Upgrade to Arquillian 1.5/Shrinkwrap 3.1.3
+* [HSEARCH-3800](https://hibernate.atlassian.net/browse/HSEARCH-3800) - Add experimental tests with Hibernate Search with JDK15
+* [HSEARCH-3798](https://hibernate.atlassian.net/browse/HSEARCH-3798) - Test sorting on numeric fields without specifying missing value behavior
+* [HSEARCH-3795](https://hibernate.atlassian.net/browse/HSEARCH-3795) - Get rid of Version.logVersion()
+* [HSEARCH-3794](https://hibernate.atlassian.net/browse/HSEARCH-3794) - Break down large files in the documentation source into multiple, smaller files
+* [HSEARCH-3792](https://hibernate.atlassian.net/browse/HSEARCH-3792) - Fix warnings issued when starting Elasticsearch in integration tests
+* [HSEARCH-3790](https://hibernate.atlassian.net/browse/HSEARCH-3790) - Upgrade to Elasticsearch 5.6.16
+* [HSEARCH-3773](https://hibernate.atlassian.net/browse/HSEARCH-3773) - Simplify how HibernateOrmMappingContext/HibernateOrmSessionContext are implemented
+* [HSEARCH-3746](https://hibernate.atlassian.net/browse/HSEARCH-3746) - IndexWorkspacePurgeIT fails on windows
+* [HSEARCH-3171](https://hibernate.atlassian.net/browse/HSEARCH-3171) - Test using CDI beans referenced by their name
+
+## 6.0.0.Beta3 (13-12-2019)
+
+### Bug
+* [HSEARCH-3783](https://hibernate.atlassian.net/browse/HSEARCH-3783) - query.explain() with the Elasticsearch backend fails when using projections or multi-tenancy
+* [HSEARCH-3755](https://hibernate.atlassian.net/browse/HSEARCH-3755) - Configuration property checking displays the wrong name for the property controlling its behavior
+* [HSEARCH-1799](https://hibernate.atlassian.net/browse/HSEARCH-1799) - FullTextQueryImpl raises java.sql.QueryTimeoutException
+
+### Improvement
+* [HSEARCH-3788](https://hibernate.atlassian.net/browse/HSEARCH-3788) - Use a simpler prefix for metadata fields in Elasticsearch
+* [HSEARCH-3784](https://hibernate.atlassian.net/browse/HSEARCH-3784) - Avoid storing the index name in the index for each document
+* [HSEARCH-3766](https://hibernate.atlassian.net/browse/HSEARCH-3766) - Provide simple annotations for applying binders to types/properties
+* [HSEARCH-3764](https://hibernate.atlassian.net/browse/HSEARCH-3764) - Allow disabling conversion in the ID predicate
+* [HSEARCH-3761](https://hibernate.atlassian.net/browse/HSEARCH-3761) - Use GSON rather than strings to pass JSON objects around in Elasticsearch APIs
+* [HSEARCH-3758](https://hibernate.atlassian.net/browse/HSEARCH-3758) - Upgrade to Lucene 8.3.0
+* [HSEARCH-3757](https://hibernate.atlassian.net/browse/HSEARCH-3757) - Configure the protocol used to contact Elasticsearch separately
+* [HSEARCH-3756](https://hibernate.atlassian.net/browse/HSEARCH-3756) - Use commas instead of blanks as separators for multi-valued properties
+* [HSEARCH-3712](https://hibernate.atlassian.net/browse/HSEARCH-3712) - Simplify the definition of DSL converters and projection converters
+* [HSEARCH-3657](https://hibernate.atlassian.net/browse/HSEARCH-3657) - Switch to docvalues instead of stored fields for Hibernate Search metadata in Lucene/ES documents
+* [HSEARCH-3634](https://hibernate.atlassian.net/browse/HSEARCH-3634) - Clarify the error message when a @Transient property is missing a @IndexingDependency annotation
+* [HSEARCH-3456](https://hibernate.atlassian.net/browse/HSEARCH-3456) - Expose meta-information about the query execution (execution time, timeout, ...)
+* [HSEARCH-2389](https://hibernate.atlassian.net/browse/HSEARCH-2389) - Support "exists" predicate for @IndexedEmbedded
+
+### New Feature
+* [HSEARCH-3765](https://hibernate.atlassian.net/browse/HSEARCH-3765) - Add minimal support for Index Aliases
+* [HSEARCH-3662](https://hibernate.atlassian.net/browse/HSEARCH-3662) - Define aggregations from JSON with Elasticsearch
+* [HSEARCH-3496](https://hibernate.atlassian.net/browse/HSEARCH-3496) - Customization of Elasticsearch search requests
+* [HSEARCH-3135](https://hibernate.atlassian.net/browse/HSEARCH-3135) - Allow the definition of domain specific annotations for ValueBridges
+* [HSEARCH-2399](https://hibernate.atlassian.net/browse/HSEARCH-2399) - Implement timeouts for the Elasticsearch backend
+* [HSEARCH-1401](https://hibernate.atlassian.net/browse/HSEARCH-1401) - Allow integrators to declare entities whose structure is defined programmatically ("free-form")
+
+### Sub-task
+* [HSEARCH-3711](https://hibernate.atlassian.net/browse/HSEARCH-3711) - Document index field type DSL extension
+
+### Task
+* [HSEARCH-3782](https://hibernate.atlassian.net/browse/HSEARCH-3782) - Upgrade to Elasticsearch 7.5.0
+* [HSEARCH-3781](https://hibernate.atlassian.net/browse/HSEARCH-3781) - Upgrade to Hibernate ORM 5.4.10.Final
+* [HSEARCH-3780](https://hibernate.atlassian.net/browse/HSEARCH-3780) - Fix random failures in ElasticsearchClientFactoryImplIT
+* [HSEARCH-3770](https://hibernate.atlassian.net/browse/HSEARCH-3770) - Upgrade to elasticsearch-maven-plugin 6.15
+* [HSEARCH-3763](https://hibernate.atlassian.net/browse/HSEARCH-3763) - Upgrade to Hibernate ORM 5.4.9.Final
+* [HSEARCH-3754](https://hibernate.atlassian.net/browse/HSEARCH-3754) - Upgrade to Hibernate ORM 5.4.8.Final
+* [HSEARCH-3753](https://hibernate.atlassian.net/browse/HSEARCH-3753) - Mark the ContainerExtractor API as experimental
+* [HSEARCH-3750](https://hibernate.atlassian.net/browse/HSEARCH-3750) - Use auto-expanding entries in the documentation TOC
+* [HSEARCH-3748](https://hibernate.atlassian.net/browse/HSEARCH-3748) - Remove the bridge-based programmatic mapping APIs for TypeBridge, PropertyBridge and RoutingKeyBridge
+* [HSEARCH-3737](https://hibernate.atlassian.net/browse/HSEARCH-3737) - Test against AWS-hosted ES 7.1
+* [HSEARCH-3732](https://hibernate.atlassian.net/browse/HSEARCH-3732) - Add a timeout to the Jenkins build configuration
+* [HSEARCH-3717](https://hibernate.atlassian.net/browse/HSEARCH-3717) - Allow the use of native field types in ValueBridge
+* [HSEARCH-3716](https://hibernate.atlassian.net/browse/HSEARCH-3716) - Mitigate test failures caused by automatic snapshots of AWS-managed Elasticsearch service
+* [HSEARCH-3693](https://hibernate.atlassian.net/browse/HSEARCH-3693) - Search 6 groundwork Restore missing log messages from Search 5 in Search 6
+* [HSEARCH-3352](https://hibernate.atlassian.net/browse/HSEARCH-3352) - Search 6 groundwork - Restore support for search query timeouts
+
+## 6.0.0.Beta2 (25-10-2019)
+
+### Bug
+* [HSEARCH-3736](https://hibernate.atlassian.net/browse/HSEARCH-3736) - Lucene startup creates an unnecessary IndexWriter
+* [HSEARCH-3734](https://hibernate.atlassian.net/browse/HSEARCH-3734) - Configuration property hibernate.search.reflection.strategy is ignored
+* [HSEARCH-3733](https://hibernate.atlassian.net/browse/HSEARCH-3733) - BatchExecutor sometimes forgets to schedule the processor since HSEARCH-3084
+* [HSEARCH-3727](https://hibernate.atlassian.net/browse/HSEARCH-3727) - Elasticsearch orchestrators do not wait for single-work worksets to finish with ElasticsearchParallelWorkProcessor
+* [HSEARCH-3726](https://hibernate.atlassian.net/browse/HSEARCH-3726) - Exceptions are not propagated from the Elasticsearch backend to the mapper when using IndexingPlan or automatic indexing
+* [HSEARCH-3725](https://hibernate.atlassian.net/browse/HSEARCH-3725) - IllegalStateException thrown by Gson while encoding Elasticsearch requests
+* [HSEARCH-3684](https://hibernate.atlassian.net/browse/HSEARCH-3684) - @IndexedEmbedded.includePaths includes fields one level too deep in some cases
+* [HSEARCH-1108](https://hibernate.atlassian.net/browse/HSEARCH-1108) - programmatic API doesn't work correctly for entities with @MappedSuperclass parent
+* [HSEARCH-3740](https://hibernate.atlassian.net/browse/HSEARCH-3740) - ValueReadHandle fails to report exceptions if the call to entity.toString() fails
+
+### Improvement
+* [HSEARCH-3741](https://hibernate.atlassian.net/browse/HSEARCH-3741) - Expose the index name in IndexFailureContext
+* [HSEARCH-3735](https://hibernate.atlassian.net/browse/HSEARCH-3735) - Report failures in work executions only once, at the mapper level
+* [HSEARCH-3730](https://hibernate.atlassian.net/browse/HSEARCH-3730) - Upgrade to Hibernate ORM 5.4.6
+* [HSEARCH-3728](https://hibernate.atlassian.net/browse/HSEARCH-3728) - All background operations should propagate exceptions from the mapper to the user thread
+* [HSEARCH-3724](https://hibernate.atlassian.net/browse/HSEARCH-3724) - Upgrade to Jackson 2.9.10
+* [HSEARCH-3723](https://hibernate.atlassian.net/browse/HSEARCH-3723) - Upgrade to Elasticsearch 7.4.0
+* [HSEARCH-3720](https://hibernate.atlassian.net/browse/HSEARCH-3720) - Rename the mapper-pojo artifact to make it clearer that it's just an abstract base
+* [HSEARCH-3694](https://hibernate.atlassian.net/browse/HSEARCH-3694) - Support distance sorts on single-valued fields in nested documents
+* [HSEARCH-3640](https://hibernate.atlassian.net/browse/HSEARCH-3640) - Expose backends/indexes through the ORM mapper APIs
+* [HSEARCH-3193](https://hibernate.atlassian.net/browse/HSEARCH-3193) - Search 6 groundwork - Contribute descending sort support for Lucene's LatLonPointSortField
+
+### New Feature
+* [HSEARCH-3042](https://hibernate.atlassian.net/browse/HSEARCH-3042) - Allow the definition of one "search" analyzer per field as part of the mapping
+
+### Sub-task
+* [HSEARCH-1375](https://hibernate.atlassian.net/browse/HSEARCH-1375) - Improve design of ErrorHandler
+* [HSEARCH-1353](https://hibernate.atlassian.net/browse/HSEARCH-1353) - Document the expected behaviour of ErrorHandler
+
+### Task
+* [HSEARCH-3745](https://hibernate.atlassian.net/browse/HSEARCH-3745) - Fix test failures on AWS related to PUT /_cluster/settings
+* [HSEARCH-3744](https://hibernate.atlassian.net/browse/HSEARCH-3744) - Upgrade integration tests to Spring 2.2.0
+* [HSEARCH-3743](https://hibernate.atlassian.net/browse/HSEARCH-3743) - Generate Java 13/14 bytecode for tests when building with JDK13/14
+* [HSEARCH-3742](https://hibernate.atlassian.net/browse/HSEARCH-3742) - Upgrade to Hibernate ORM 5.4.7.Final
+* [HSEARCH-3739](https://hibernate.atlassian.net/browse/HSEARCH-3739) - Test MassIndexer interruption/cancellation and fix it if necessary
+* [HSEARCH-3722](https://hibernate.atlassian.net/browse/HSEARCH-3722) - Fix the artifact ID of the ORM mapper integration tests module 
+* [HSEARCH-3721](https://hibernate.atlassian.net/browse/HSEARCH-3721) - Remove deprecated methods that were already present in 6.0.0.Beta1
+* [HSEARCH-3653](https://hibernate.atlassian.net/browse/HSEARCH-3653) - Run Elasticsearch in JDK11 by default in the Jenkinsfile
+* [HSEARCH-3486](https://hibernate.atlassian.net/browse/HSEARCH-3486) - Upgrade to forbiddenApis 2.7 and configure JDK12/13 signatures
+* [HSEARCH-3110](https://hibernate.atlassian.net/browse/HSEARCH-3110) - Search 6 groundwork - Restore support for ErrorHandler
+* [HSEARCH-3084](https://hibernate.atlassian.net/browse/HSEARCH-3084) - Initialize and close index managers / backends in parallel
+
+## 6.0.0.Beta1 (23-09-2019)
+
+### Bug
+* [HSEARCH-3670](https://hibernate.atlassian.net/browse/HSEARCH-3670) - Cannot index java.util.Date property when the value is a java.sql.Date 
+* [HSEARCH-2224](https://hibernate.atlassian.net/browse/HSEARCH-2224) - Indexing of collection of basic types not documented
+
+### Improvement
+* [HSEARCH-3708](https://hibernate.atlassian.net/browse/HSEARCH-3708) - Simplify the syntax of the range predicate DSL by leveraging the Range class
+* [HSEARCH-3707](https://hibernate.atlassian.net/browse/HSEARCH-3707) - Swap the limit and offset parameters in SearchQuery.fetch(Integer, Integer)
+* [HSEARCH-3706](https://hibernate.atlassian.net/browse/HSEARCH-3706) - Upgrade to Hibernate ORM 5.4.5.Final
+* [HSEARCH-3705](https://hibernate.atlassian.net/browse/HSEARCH-3705) - Use the entity name instead of the class name as default index name
+* [HSEARCH-3671](https://hibernate.atlassian.net/browse/HSEARCH-3671) - Make SearchScope session-independent
+* [HSEARCH-3669](https://hibernate.atlassian.net/browse/HSEARCH-3669) - Rename fetch()/fetchHits() methods in Query APIs to fetchAll/fetchAllHits
+* [HSEARCH-3667](https://hibernate.atlassian.net/browse/HSEARCH-3667) - Make Hibernate Search be compatible with Envers
+* [HSEARCH-3659](https://hibernate.atlassian.net/browse/HSEARCH-3659) - Manage the version of Jackson to the latest available version
+* [HSEARCH-3623](https://hibernate.atlassian.net/browse/HSEARCH-3623) - Harmonize the syntax of analysis definition DSLs
+* [HSEARCH-3606](https://hibernate.atlassian.net/browse/HSEARCH-3606) - Revisit the names of "SearchWriter" and "SearchSessionWritePlan"
+* [HSEARCH-3564](https://hibernate.atlassian.net/browse/HSEARCH-3564) - Refactoring to update code to make use of Java 8 features (and other..)
+* [HSEARCH-2254](https://hibernate.atlassian.net/browse/HSEARCH-2254) - Support (single-valued) sorts on fields within nested fields
+* [HSEARCH-1347](https://hibernate.atlassian.net/browse/HSEARCH-1347) - Apply package naming rules consistently 
+
+### Remove Feature
+* [HSEARCH-3691](https://hibernate.atlassian.net/browse/HSEARCH-3691) - Remove the ability to use @GeoPointBinding on properties of type GeoPoint
+
+### Sub-task
+* [HSEARCH-3692](https://hibernate.atlassian.net/browse/HSEARCH-3692) - Document custom bridges
+* [HSEARCH-3681](https://hibernate.atlassian.net/browse/HSEARCH-3681) - Document the MassIndexer
+* [HSEARCH-3679](https://hibernate.atlassian.net/browse/HSEARCH-3679) - Document container value extractors
+* [HSEARCH-3676](https://hibernate.atlassian.net/browse/HSEARCH-3676) - Document mapping in details
+* [HSEARCH-3675](https://hibernate.atlassian.net/browse/HSEARCH-3675) - Document core concepts
+* [HSEARCH-3674](https://hibernate.atlassian.net/browse/HSEARCH-3674) - Document analysis
+* [HSEARCH-3673](https://hibernate.atlassian.net/browse/HSEARCH-3673) - Document @IndexedEmbedded
+* [HSEARCH-3649](https://hibernate.atlassian.net/browse/HSEARCH-3649) - Add initial support for simple aggregations (count by value, count by range)
+* [HSEARCH-3615](https://hibernate.atlassian.net/browse/HSEARCH-3615) - Document the query DSL in details
+* [HSEARCH-2954](https://hibernate.atlassian.net/browse/HSEARCH-2954) - Faceting for the Java 8 date/time types
+* [HSEARCH-2472](https://hibernate.atlassian.net/browse/HSEARCH-2472) - Change facet mapping to allow for broader encoding selection
+* [HSEARCH-2446](https://hibernate.atlassian.net/browse/HSEARCH-2446) - Allow Numeric Faceting from FieldBridge
+* [HSEARCH-2111](https://hibernate.atlassian.net/browse/HSEARCH-2111) - FacetRange and RangeFacet need some love
+* [HSEARCH-1748](https://hibernate.atlassian.net/browse/HSEARCH-1748) - Validate preconditions of a field to allow a FacetingRequest
+* [HSEARCH-1372](https://hibernate.atlassian.net/browse/HSEARCH-1372) - Normalize names in faceting API
+
+### Task
+* [HSEARCH-3715](https://hibernate.atlassian.net/browse/HSEARCH-3715) - Restore support for custom mass indexing monitors
+* [HSEARCH-3714](https://hibernate.atlassian.net/browse/HSEARCH-3714) - Restore temporary, SPI-only support for error handlers
+* [HSEARCH-3713](https://hibernate.atlassian.net/browse/HSEARCH-3713) - Upgrade maven-checkstyle-plugin to 3.1.0
+* [HSEARCH-3704](https://hibernate.atlassian.net/browse/HSEARCH-3704) - Use less alarming wording in warnings about 6 being work in progress
+* [HSEARCH-3702](https://hibernate.atlassian.net/browse/HSEARCH-3702) - Upgrade to JBoss logging 3.4.0.Final
+* [HSEARCH-3697](https://hibernate.atlassian.net/browse/HSEARCH-3697) - Test Hibernate Search on JDK13 regularly on the CI
+* [HSEARCH-3690](https://hibernate.atlassian.net/browse/HSEARCH-3690) - Add a default identifier bridge for type String
+* [HSEARCH-3687](https://hibernate.atlassian.net/browse/HSEARCH-3687) - Add self types to DSL interfaces to make overrides by backends easier
+* [HSEARCH-3686](https://hibernate.atlassian.net/browse/HSEARCH-3686) - Upgrade to a staging version of ECJ 3.19.0 to work around Eclipse compiler bugs in 3.18.0
+* [HSEARCH-3685](https://hibernate.atlassian.net/browse/HSEARCH-3685) - Always include -Infinity/+Infinity in Range.of
+* [HSEARCH-3665](https://hibernate.atlassian.net/browse/HSEARCH-3665) - Use the method AutoFlushEvent#isFlushRequired to filter auto flush events
+* [HSEARCH-3441](https://hibernate.atlassian.net/browse/HSEARCH-3441) - Search 6 groundwork - Improve naming consistency of DSL/builder methods
+* [HSEARCH-3271](https://hibernate.atlassian.net/browse/HSEARCH-3271) - Search 6 groundwork - Restore support for faceting
+* [HSEARCH-3270](https://hibernate.atlassian.net/browse/HSEARCH-3270) - Search 6 groundwork - Document the main features of Hibernate Search 6
+* [HSEARCH-859](https://hibernate.atlassian.net/browse/HSEARCH-859) - Review names and composition of configuration properties
+
+## 6.0.0.Alpha9 (23-08-2019)
+
+### Bug
+* [HSEARCH-3644](https://hibernate.atlassian.net/browse/HSEARCH-3644) - ORM warning on bootstrap: HHH000450: Encountered request for Service by non-primary service role 
+* [HSEARCH-3643](https://hibernate.atlassian.net/browse/HSEARCH-3643) - Entities should be unproxied before getting field values when indexing
+* [HSEARCH-3551](https://hibernate.atlassian.net/browse/HSEARCH-3551) - Hibernate Search doesn't boot when declared as a dependency in a module-info.java
+* [HSEARCH-1350](https://hibernate.atlassian.net/browse/HSEARCH-1350) - Sequence of flush(); clear(); commit(); can lead to LazyInitializationException
+
+### Improvement
+* [HSEARCH-3660](https://hibernate.atlassian.net/browse/HSEARCH-3660) - Upgrade to Elasticsearch 7.3.0
+* [HSEARCH-3651](https://hibernate.atlassian.net/browse/HSEARCH-3651) - Do not specify a type in Elasticsearch _explain requests
+* [HSEARCH-3648](https://hibernate.atlassian.net/browse/HSEARCH-3648) - Upgrade to Hibernate ORM 5.4.4
+* [HSEARCH-3646](https://hibernate.atlassian.net/browse/HSEARCH-3646) - Upgrade to Lucene 8.2
+* [HSEARCH-3642](https://hibernate.atlassian.net/browse/HSEARCH-3642) - Merge the DslConverter and ProjectionConverter enums into one
+* [HSEARCH-3612](https://hibernate.atlassian.net/browse/HSEARCH-3612) - Normalize the terms to match in wildcard/prefix predicates
+* [HSEARCH-3447](https://hibernate.atlassian.net/browse/HSEARCH-3447) - Replace uses of deprecated Hibernate criteria with JPA criteria
+* [HSEARCH-3360](https://hibernate.atlassian.net/browse/HSEARCH-3360) - Correctly handle the flush() and clear() events in the ORM integration
+* [HSEARCH-1270](https://hibernate.atlassian.net/browse/HSEARCH-1270) - Clear the pending indexing tasks at Session.clear()
+* [HSEARCH-899](https://hibernate.atlassian.net/browse/HSEARCH-899) - Check for illegal usage of @IndexedEmbedded
+
+### Task
+* [HSEARCH-3658](https://hibernate.atlassian.net/browse/HSEARCH-3658) - Upgrade to AWS Elasticsearch Service 6.7 in the Jenkinsfile
+* [HSEARCH-3656](https://hibernate.atlassian.net/browse/HSEARCH-3656) - Update mapper ORM documentation chapter: writeplan API process is no longer necessary
+* [HSEARCH-3652](https://hibernate.atlassian.net/browse/HSEARCH-3652) - Refresh Jenkinsfiles to match the new CI environment
+* [HSEARCH-3314](https://hibernate.atlassian.net/browse/HSEARCH-3314) - Search 6 groundwork - Restore support for (static) sharding
+* [HSEARCH-3075](https://hibernate.atlassian.net/browse/HSEARCH-3075) - Search 6 groundwork - Release WorkPlan resources when a transaction is rolled back
+* [HSEARCH-3068](https://hibernate.atlassian.net/browse/HSEARCH-3068) - Search 6 groundwork - Restore support for "simulated" transaction using a Flush listener
+* [HSEARCH-3062](https://hibernate.atlassian.net/browse/HSEARCH-3062) - Search 6 groundwork - Support (single-valued) projections on fields within nested object fields
+
+## 6.0.0.Alpha8 (19-07-2019)
+
+### Bug
+* [HSEARCH-3641](https://hibernate.atlassian.net/browse/HSEARCH-3641) - Some attributes for native Elasticsearch fields are restricted to values known by Hibernate Search
+
+### Improvement
+* [HSEARCH-3637](https://hibernate.atlassian.net/browse/HSEARCH-3637) - Upgrade to Lucene 8.1.1
+* [HSEARCH-3627](https://hibernate.atlassian.net/browse/HSEARCH-3627) - Upgrade to Elasticsearch 6.8.1
+* [HSEARCH-3625](https://hibernate.atlassian.net/browse/HSEARCH-3625) - Upgrade to Elasticsearch 7.2.0
+* [HSEARCH-3607](https://hibernate.atlassian.net/browse/HSEARCH-3607) - Allow using @GenericField on GeoPoint properties instead of @GeoPointBinding (previously @Spatial)
+* [HSEARCH-3602](https://hibernate.atlassian.net/browse/HSEARCH-3602) - Use the "Step" suffix instead of the "Context" suffix in DSLs
+
+### Task
+* [HSEARCH-3638](https://hibernate.atlassian.net/browse/HSEARCH-3638) - Improve test utils (SearchSetupHelper, OrmSetupHelper, ...) to allow sharding tests
+* [HSEARCH-3626](https://hibernate.atlassian.net/browse/HSEARCH-3626) - Fix order requirements in various backend integration tests
+* [HSEARCH-3624](https://hibernate.atlassian.net/browse/HSEARCH-3624) - Move ConfigurationPropertySource to SPI
+* [HSEARCH-3621](https://hibernate.atlassian.net/browse/HSEARCH-3621) - Clarify the error message when the Elasticsearch cluster cannot be reached upon startup
+* [HSEARCH-3609](https://hibernate.atlassian.net/browse/HSEARCH-3609) - Search 6 groundwork - Replace bridge builders with *binders*
+* [HSEARCH-3440](https://hibernate.atlassian.net/browse/HSEARCH-3440) - Search 6 groundwork - Finalize the lucene DirectoryProvider SPI
+* [HSEARCH-3349](https://hibernate.atlassian.net/browse/HSEARCH-3349) - Search 6 groundwork - Restore ORM object loading with the same feature coverage as Search 5
+
+## 6.0.0.Alpha7 (21-06-2019)
+
+### Bug
+* [HSEARCH-3618](https://hibernate.atlassian.net/browse/HSEARCH-3618) - Distance projection may lead to missing hits in the Lucene and Elasticsearch backends
+* [HSEARCH-1467](https://hibernate.atlassian.net/browse/HSEARCH-1467) - indexEmbedded depth parameter shared across class
+
+### Improvement
+* [HSEARCH-3616](https://hibernate.atlassian.net/browse/HSEARCH-3616) - Accept Collection<?> instead of Collection<Object>  in the ID predicate
+* [HSEARCH-3614](https://hibernate.atlassian.net/browse/HSEARCH-3614) - Allow integrators to opt out of using MethodHandles completely
+* [HSEARCH-3611](https://hibernate.atlassian.net/browse/HSEARCH-3611) - Add support for Elasticsearch 6.8
+* [HSEARCH-3605](https://hibernate.atlassian.net/browse/HSEARCH-3605) - Use a consistent strategy to decide on the package hosting each annotation
+* [HSEARCH-3604](https://hibernate.atlassian.net/browse/HSEARCH-3604) - Replace PojoReference with mapper-specific types
+* [HSEARCH-3595](https://hibernate.atlassian.net/browse/HSEARCH-3595) - Upgrade to Hibernate ORM 5.4.3.Final
+* [HSEARCH-3591](https://hibernate.atlassian.net/browse/HSEARCH-3591) - Expect a function as parameter for SearchQueryContext#sort
+* [HSEARCH-3255](https://hibernate.atlassian.net/browse/HSEARCH-3255) - Handle .onMissingValue().use() properly for date fields in Elasticsearch
+* [HSEARCH-3254](https://hibernate.atlassian.net/browse/HSEARCH-3254) - Handle .onMissingValue().use() properly for string fields in Lucene
+* [HSEARCH-2539](https://hibernate.atlassian.net/browse/HSEARCH-2539) - Return a CompletableFuture instead of a Future from MassIndexer.start()
+
+### New Feature
+* [HSEARCH-3592](https://hibernate.atlassian.net/browse/HSEARCH-3592) - Upgrade to Elasticsearch 7.1
+
+### Sub-task
+* [HSEARCH-3601](https://hibernate.atlassian.net/browse/HSEARCH-3601) - Fix a few typos and quirks in the documentation
+* [HSEARCH-3597](https://hibernate.atlassian.net/browse/HSEARCH-3597) - Document all available predicates/sorts/projections and query DSL basics
+* [HSEARCH-3373](https://hibernate.atlassian.net/browse/HSEARCH-3373) - Search 6 groundwork - Add javadoc to backend-specific APIs
+* [HSEARCH-3372](https://hibernate.atlassian.net/browse/HSEARCH-3372) - Search 6 groundwork - Add javadoc to remaining POJO mapper APIs
+* [HSEARCH-3371](https://hibernate.atlassian.net/browse/HSEARCH-3371) - Search 6 groundwork - Add javadoc to the ORM mapper APIs
+* [HSEARCH-3370](https://hibernate.atlassian.net/browse/HSEARCH-3370) - Search 6 groundwork - Add javadoc to the remaining engine APIs
+* [HSEARCH-3369](https://hibernate.atlassian.net/browse/HSEARCH-3369) - Search 6 groundwork - Add javadoc to the POJO bridge APIs
+
+### Task
+* [HSEARCH-3620](https://hibernate.atlassian.net/browse/HSEARCH-3620) - Add experimental build environments for JDK14
+* [HSEARCH-3619](https://hibernate.atlassian.net/browse/HSEARCH-3619) - Clean up the code in org.hibernate.search.mapper.pojo.mapping.impl
+* [HSEARCH-3617](https://hibernate.atlassian.net/browse/HSEARCH-3617) - Search 6 groundwork - Remove the by(SearchSort) method from the sort DSL
+* [HSEARCH-3610](https://hibernate.atlassian.net/browse/HSEARCH-3610) - Search 6 groundwork - Rename Search.getSearchSession(Session) to Search.session(Session)
+* [HSEARCH-3603](https://hibernate.atlassian.net/browse/HSEARCH-3603) - Swap the names of BeanResolver and BeanProvider
+* [HSEARCH-3588](https://hibernate.atlassian.net/browse/HSEARCH-3588) - Clean up TODOs in the code
+* [HSEARCH-3587](https://hibernate.atlassian.net/browse/HSEARCH-3587) - Rename MarkerMapping#builder to MarkerMapping#marker
+* [HSEARCH-3586](https://hibernate.atlassian.net/browse/HSEARCH-3586) - Document the BigInteger and BigDecimal field types in the documentation of the Lucene and Elasticsearch backends
+* [HSEARCH-3367](https://hibernate.atlassian.net/browse/HSEARCH-3367) - Search 6 groundwork - Restore the javadoc on all APIs
+* [HSEARCH-3230](https://hibernate.atlassian.net/browse/HSEARCH-3230) - Search 6 groundwork - Clarify the behavior of Lucene GeoPoint field codecs with respect to searchable/sortable/projectable
+* [HSEARCH-3203](https://hibernate.atlassian.net/browse/HSEARCH-3203) - Search 6 groundwork - Restore support for non-@Id document IDs in the ORM integration
+* [HSEARCH-3192](https://hibernate.atlassian.net/browse/HSEARCH-3192) - Allow "caching" predicates/sorts/projections for re-use
+* [HSEARCH-3077](https://hibernate.atlassian.net/browse/HSEARCH-3077) - Search 6 groundwork - Check that Marker/Bridge builders instances are suitable for the annotation before initializing them
+* [HSEARCH-3076](https://hibernate.atlassian.net/browse/HSEARCH-3076) - Search 6 groundwork - Check that IdentifierBridges are suitable for the property type before applying them
+* [HSEARCH-3074](https://hibernate.atlassian.net/browse/HSEARCH-3074) - Search 6 groundwork - Avoid depending on internal Hibernate ORM types
+* [HSEARCH-3067](https://hibernate.atlassian.net/browse/HSEARCH-3067) - Search 6 groundwork - Remove the notion of  explicit initialization of lazy collection/map/array initialization
+* [HSEARCH-3049](https://hibernate.atlassian.net/browse/HSEARCH-3049) - Search 6 groundwork - Implement the missing work types compared to Search 5 (except DeleteByQuery)
+* [HSEARCH-3048](https://hibernate.atlassian.net/browse/HSEARCH-3048) - Search 6 groundwork - Add the missing common field type options compared to Search 5
+* [HSEARCH-3046](https://hibernate.atlassian.net/browse/HSEARCH-3046) - Search 6 groundwork - Avoid the use of java.beans.Introspector in the mapper-javabean module
+* [HSEARCH-2473](https://hibernate.atlassian.net/browse/HSEARCH-2473) - Get test naming practices straight
+
+## 6.0.0.Alpha6 (24-05-2019)
+
+### Bug
+* [HSEARCH-3581](https://hibernate.atlassian.net/browse/HSEARCH-3581) - Indexing entities whose bytecode was enhanced by Hibernate ORM fails to load lazy properties
+* [HSEARCH-3579](https://hibernate.atlassian.net/browse/HSEARCH-3579) - Failing to boot the ORM integration no longer throws an exception
+* [HSEARCH-3571](https://hibernate.atlassian.net/browse/HSEARCH-3571) - Extra type name parameters trigger warnings in ES6.7+
+* [HSEARCH-3539](https://hibernate.atlassian.net/browse/HSEARCH-3539) - LuceneDistanceToFieldProjection is not thread safe
+* [HSEARCH-3213](https://hibernate.atlassian.net/browse/HSEARCH-3213) - @Spatial bridge set at type level are applied regardless of @IndexedEmbedded.includePaths
+* [HSEARCH-2663](https://hibernate.atlassian.net/browse/HSEARCH-2663) - Null handling for elements in container bridges isn't consistent with non-container bridges
+
+### Improvement
+* [HSEARCH-3578](https://hibernate.atlassian.net/browse/HSEARCH-3578) - Make the call to asXXX() (asEntity, asReference) optional in the Search DSL
+* [HSEARCH-3574](https://hibernate.atlassian.net/browse/HSEARCH-3574) - Rename ElasticsearchJsonStringIndexFieldTypeContext to ElasticsearchNativeIndexFieldTypeContext
+* [HSEARCH-3573](https://hibernate.atlassian.net/browse/HSEARCH-3573) - Use consistent naming for hits and projections
+* [HSEARCH-3572](https://hibernate.atlassian.net/browse/HSEARCH-3572) - Add fetch methods to terminal steps of the query DSL
+* [HSEARCH-3536](https://hibernate.atlassian.net/browse/HSEARCH-3536) - Use Analyzer.normalize instead of our own code for normalization
+* [HSEARCH-3475](https://hibernate.atlassian.net/browse/HSEARCH-3475) - Make automatic indexing configuration properties clearer
+* [HSEARCH-3463](https://hibernate.atlassian.net/browse/HSEARCH-3463) - Make APIs clearer about the fact automatic extractor resolution is an "all or nothing"
+* [HSEARCH-1857](https://hibernate.atlassian.net/browse/HSEARCH-1857) - Throw exceptions on usage of a FullTextSession whose underlying Session is closed
+* [HSEARCH-1667](https://hibernate.atlassian.net/browse/HSEARCH-1667) - Create an optimised IndexManager meant for asynchronous processing of remote index updates
+* [HSEARCH-1214](https://hibernate.atlassian.net/browse/HSEARCH-1214) - Review SearchFactory initialization
+
+### New Feature
+* [HSEARCH-3487](https://hibernate.atlassian.net/browse/HSEARCH-3487) - Support java.math.BigDecimal and java.math.BigInteger as field types
+* [HSEARCH-3316](https://hibernate.atlassian.net/browse/HSEARCH-3316) - Allow to configure whether indexing in the ORM mapper should be synchronous or asynchronous
+
+### Remove Feature
+* [HSEARCH-3577](https://hibernate.atlassian.net/browse/HSEARCH-3577) - Remove support for longs when specifying the limit/offset of a Search query
+* [HSEARCH-1645](https://hibernate.atlassian.net/browse/HSEARCH-1645) - Drop @ProvidedId annotation
+
+### Task
+* [HSEARCH-3585](https://hibernate.atlassian.net/browse/HSEARCH-3585) - Upgrade AWS-Elasticsearch tests to ES 6.5
+* [HSEARCH-3582](https://hibernate.atlassian.net/browse/HSEARCH-3582) - Ensure the code is compatible with the Eclipse compiler as part of integration tests
+* [HSEARCH-3570](https://hibernate.atlassian.net/browse/HSEARCH-3570) - Switch to XML format for JaCoCo reports
+* [HSEARCH-3569](https://hibernate.atlassian.net/browse/HSEARCH-3569) - Adapt the build to JDK11.0.3
+* [HSEARCH-3544](https://hibernate.atlassian.net/browse/HSEARCH-3544) - Allow extensions at the top level of the query DSL
+* [HSEARCH-3353](https://hibernate.atlassian.net/browse/HSEARCH-3353) - Search 6 groundwork - Restore support for search hit explanation
+* [HSEARCH-3324](https://hibernate.atlassian.net/browse/HSEARCH-3324) - Keep track of which field may be multi-valued and force bridges to declare fields as such
+* [HSEARCH-3118](https://hibernate.atlassian.net/browse/HSEARCH-3118) - Search 6 groundwork - Restore the full orchestration (queues, threadpools) from Search 5 and remove the explicit commits in LuceneIndexWorker
+* [HSEARCH-1777](https://hibernate.atlassian.net/browse/HSEARCH-1777) - Clarify the documentation on automatic indexing
+
+## 6.0.0.Alpha5 (30-04-2019)
+
+### Bug
+* [HSEARCH-3566](https://hibernate.atlassian.net/browse/HSEARCH-3566) - Reindexing is not triggered when an association mentioned in an IndexingDependency.derivedFrom is updated
+* [HSEARCH-3561](https://hibernate.atlassian.net/browse/HSEARCH-3561) - "transpositions" setting is ignored for FuzzyQuery in the Elasticsearch integration
+* [HSEARCH-3559](https://hibernate.atlassian.net/browse/HSEARCH-3559) - Obsolete hibernate.search.indexes.<index name> syntax for property keys in the documentation
+* [HSEARCH-3552](https://hibernate.atlassian.net/browse/HSEARCH-3552) - Field type compatibility checks ignore the analyzer
+* [HSEARCH-3535](https://hibernate.atlassian.net/browse/HSEARCH-3535) - Parameters are inverted in minimumShouldMatch error message
+* [HSEARCH-3534](https://hibernate.atlassian.net/browse/HSEARCH-3534) - Default value for "minimumShouldMatch" is different between Elasticsearch and Lucene
+
+### Improvement
+* [HSEARCH-3563](https://hibernate.atlassian.net/browse/HSEARCH-3563) - Simpler dialect configuration
+* [HSEARCH-3541](https://hibernate.atlassian.net/browse/HSEARCH-3541) - Upgrade to Elasticsearch 7.0.0 (release)
+* [HSEARCH-3518](https://hibernate.atlassian.net/browse/HSEARCH-3518) - Add support for Elasticsearch 6.7
+* [HSEARCH-2941](https://hibernate.atlassian.net/browse/HSEARCH-2941) - MassIndexerProgressMonitor should consitently use long types
+
+### New Feature
+* [HSEARCH-3297](https://hibernate.atlassian.net/browse/HSEARCH-3297) - Add an API to declare reindexing conditions in bridges
+* [HSEARCH-1656](https://hibernate.atlassian.net/browse/HSEARCH-1656) - Recognize annotations from implemented interfaces
+
+### Remove Feature
+* [HSEARCH-3553](https://hibernate.atlassian.net/browse/HSEARCH-3553) - Remove support for "default" null tokens
+* [HSEARCH-2465](https://hibernate.atlassian.net/browse/HSEARCH-2465) - Drop support for @IndexedEmbedded.indexNullAs
+
+### Task
+* [HSEARCH-3568](https://hibernate.atlassian.net/browse/HSEARCH-3568) - Upgrade to Elasticsearch 6.7.1
+* [HSEARCH-3547](https://hibernate.atlassian.net/browse/HSEARCH-3547) - Use different times for LocalDateTime and OffsetDateTime values used in backend TCK
+* [HSEARCH-3467](https://hibernate.atlassian.net/browse/HSEARCH-3467) - Add tests for all the attributes validated by the Elasticsearch schema validator
+* [HSEARCH-3298](https://hibernate.atlassian.net/browse/HSEARCH-3298) - Search 6 groundwork - Mark the accessor-based entity access API and explicit reindexing declaration API in bridges as experimental
+* [HSEARCH-3099](https://hibernate.atlassian.net/browse/HSEARCH-3099) - Search 6 groundwork - Restore support for "indexNullAs" in @Field
+* [HSEARCH-3058](https://hibernate.atlassian.net/browse/HSEARCH-3058) - Search 6 groundwork - Add generic type parameters to PropertyHandle
+
+## 6.0.0.Alpha4 (04-04-2019)
+
+### Bug
+* [HSEARCH-3557](https://hibernate.atlassian.net/browse/HSEARCH-3557) - ZonedDateTime at later offset during DST change gets parsed incorrectly
+* [HSEARCH-3554](https://hibernate.atlassian.net/browse/HSEARCH-3554) - The Elasticsearch backend defaults to a 10 element hit limit
+* [HSEARCH-3549](https://hibernate.atlassian.net/browse/HSEARCH-3549) - Indexing MonthDay.of( 2, 29 ) fails on Elasticsearch
+* [HSEARCH-3548](https://hibernate.atlassian.net/browse/HSEARCH-3548) - ZonedDateTime with zone = ZoneOffset.UTC fails when indexing in Elasticsearch 5.6
+* [HSEARCH-3546](https://hibernate.atlassian.net/browse/HSEARCH-3546) - SearchException is missing from the javadoc
+* [HSEARCH-3540](https://hibernate.atlassian.net/browse/HSEARCH-3540) - The NONE Elasticsearch index lifecycle strategy throws an AssertionFailure
+* [HSEARCH-3538](https://hibernate.atlassian.net/browse/HSEARCH-3538) - Disabling projection converters in projections is ignored when checking compatibility
+* [HSEARCH-2423](https://hibernate.atlassian.net/browse/HSEARCH-2423) - Projecting an unstored field should raise an exception with Elasticsearch
+* [HSEARCH-2185](https://hibernate.atlassian.net/browse/HSEARCH-2185) - Phrase query with the DSL does not consider the `ignoreAnalyzer()` options
+
+### Improvement
+* [HSEARCH-3555](https://hibernate.atlassian.net/browse/HSEARCH-3555) - Document the range of years supported by each backend for date/time types
+* [HSEARCH-3543](https://hibernate.atlassian.net/browse/HSEARCH-3543) - Allow to set GeoPointBridges as sortable to enable distance sorts
+* [HSEARCH-3521](https://hibernate.atlassian.net/browse/HSEARCH-3521) - Move index-specific configuration properties below the hibernate.search.backends.<backend name>.indexes property
+* [HSEARCH-3510](https://hibernate.atlassian.net/browse/HSEARCH-3510) - Change the syntax of predicates/sorts on raw fields from onRawField(...).matching() to onField(...).matchingRaw()?
+* [HSEARCH-3507](https://hibernate.atlassian.net/browse/HSEARCH-3507) - Improve consistency of naming for methods related to native Elasticsearch/Lucene features (fromJsonString, etc.)
+* [HSEARCH-2757](https://hibernate.atlassian.net/browse/HSEARCH-2757) - Allow usage of FieldSelectors when using Spatial indexing
+
+### New Feature
+* [HSEARCH-3312](https://hibernate.atlassian.net/browse/HSEARCH-3312) - Allow analyzer/normalizer overrides on a per-predicate basis
+* [HSEARCH-2534](https://hibernate.atlassian.net/browse/HSEARCH-2534) - Allow using query-only analyzer definitions with Elasticsearch
+* [HSEARCH-2518](https://hibernate.atlassian.net/browse/HSEARCH-2518) - Allow to assign a name to an analyzer class/instance
+* [HSEARCH-2464](https://hibernate.atlassian.net/browse/HSEARCH-2464) - Add support for "missing"/"exists" predicates
+
+### Task
+* [HSEARCH-3550](https://hibernate.atlassian.net/browse/HSEARCH-3550) - Fix the many problems of java module integration tests
+* [HSEARCH-3542](https://hibernate.atlassian.net/browse/HSEARCH-3542) - Fix transient failures in OrmLibraryShowcaseIT#searchAroundMe_spatial
+* [HSEARCH-3533](https://hibernate.atlassian.net/browse/HSEARCH-3533) - Upgrade to Hibernate ORM 5.4.2
+* [HSEARCH-3532](https://hibernate.atlassian.net/browse/HSEARCH-3532) - Fix the java module name for hibernate-search-util-common
+* [HSEARCH-3531](https://hibernate.atlassian.net/browse/HSEARCH-3531) - Upgrade to Lucene 8.0.0
+* [HSEARCH-3530](https://hibernate.atlassian.net/browse/HSEARCH-3530) - Update the date formats in the reference documentation
+* [HSEARCH-3375](https://hibernate.atlassian.net/browse/HSEARCH-3375) - Fail the build on javadoc warnings
+* [HSEARCH-3070](https://hibernate.atlassian.net/browse/HSEARCH-3070) - Remove the concept of ServiceManager
+* [HSEARCH-3051](https://hibernate.atlassian.net/browse/HSEARCH-3051) - Search 6 groundwork - Restore the Elasticsearch AWS integration
+
+## 6.0.0.Alpha3 (21-03-2019)
+
+### Bug
+* [HSEARCH-3529](https://hibernate.atlassian.net/browse/HSEARCH-3529) - MassIndexer fails for entities with primitive ID type
+* [HSEARCH-3477](https://hibernate.atlassian.net/browse/HSEARCH-3477) - Wrong incompatible types error when query a full text field across different indexes on Lucene backend
+* [HSEARCH-2908](https://hibernate.atlassian.net/browse/HSEARCH-2908) - Incorrect mapping for 'java.lang.Short and java.lang.Byte' fields with Elasticsearch.
+* [HSEARCH-1640](https://hibernate.atlassian.net/browse/HSEARCH-1640) - boolean field should never be analyzed
+
+### Improvement
+* [HSEARCH-3511](https://hibernate.atlassian.net/browse/HSEARCH-3511) - Make the entry points to the Search API more intuitive
+* [HSEARCH-3509](https://hibernate.atlassian.net/browse/HSEARCH-3509) - Document the limitations of the date/time conversion in the Pojo mapper for java.util.Calendar and java.util.Date
+* [HSEARCH-3503](https://hibernate.atlassian.net/browse/HSEARCH-3503) - Add dedicated default value bridges for java.sql.Timestamp, java.sql.Date and java.sql.Time
+* [HSEARCH-3498](https://hibernate.atlassian.net/browse/HSEARCH-3498) - Move optional predicate DSL parameters to the terminal contexts
+* [HSEARCH-3444](https://hibernate.atlassian.net/browse/HSEARCH-3444) - Reduce the verbosity of the predicate/projection/sort DSLs and index schema DSL
+* [HSEARCH-3251](https://hibernate.atlassian.net/browse/HSEARCH-3251) - Avoid "fuzzy" query in Elasticsearch and prefer "match" query with "fuzziness" parameter
+* [HSEARCH-2658](https://hibernate.atlassian.net/browse/HSEARCH-2658) - Support @Inject in most (if not all?) non-service customizable classes
+* [HSEARCH-2088](https://hibernate.atlassian.net/browse/HSEARCH-2088) - Take advantage of ORM's capability of MultiLoading by list of IDs
+
+### New Feature
+* [HSEARCH-3526](https://hibernate.atlassian.net/browse/HSEARCH-3526) - Allow to specify the Elasticsearch dialect to use explicitly
+* [HSEARCH-3523](https://hibernate.atlassian.net/browse/HSEARCH-3523) - Allow integrators to pre-build Hibernate Search from Metadata + service registry, without a SessionFactory
+* [HSEARCH-3257](https://hibernate.atlassian.net/browse/HSEARCH-3257) - Allow to bypass bridges in projections
+
+### Remove Feature
+* [HSEARCH-3403](https://hibernate.atlassian.net/browse/HSEARCH-3403) - Remove the inheritance from FullTextQuery/FullTextSession to the corresponding Hibernate ORM types
+* [HSEARCH-2248](https://hibernate.atlassian.net/browse/HSEARCH-2248) - Remove deprecated threshold method for fuzzy queries from the DSL
+
+### Task
+* [HSEARCH-3525](https://hibernate.atlassian.net/browse/HSEARCH-3525) - Allow Quarkus to switch our ProperyHandles to using java.lang.reflect instead of MethodHandles
+* [HSEARCH-3524](https://hibernate.atlassian.net/browse/HSEARCH-3524) - Avoid the use of Hibernate ORM's Metamodel object during boot (use Metadata instead)
+* [HSEARCH-3520](https://hibernate.atlassian.net/browse/HSEARCH-3520) - Upgrade to Elasticseearch 6.6.2
+* [HSEARCH-3515](https://hibernate.atlassian.net/browse/HSEARCH-3515) - Upgrade to checkstyle 8.18 and maven-checkstyle-plugin 3.0.0
+* [HSEARCH-3514](https://hibernate.atlassian.net/browse/HSEARCH-3514) - Search 6 groundwork - add automatic Java module names and test them
+* [HSEARCH-3494](https://hibernate.atlassian.net/browse/HSEARCH-3494) - Allow to build the javadoc with JDK12
+* [HSEARCH-3493](https://hibernate.atlassian.net/browse/HSEARCH-3493) - Test compatibility with JDK13
+* [HSEARCH-3490](https://hibernate.atlassian.net/browse/HSEARCH-3490) - Add experimental support for Elasticsearch 7.0.0.beta1
+* [HSEARCH-3489](https://hibernate.atlassian.net/browse/HSEARCH-3489) - Improve the error message when the inverse side of an association cannot be found by Hibernate Search
+* [HSEARCH-3485](https://hibernate.atlassian.net/browse/HSEARCH-3485) - Test compatibility with JDK12
+* [HSEARCH-3484](https://hibernate.atlassian.net/browse/HSEARCH-3484) - Use Maven 3.6.0 in the Jenkinsfile
+* [HSEARCH-3483](https://hibernate.atlassian.net/browse/HSEARCH-3483) - Upgrade to Lucene 7.7.0
+* [HSEARCH-3482](https://hibernate.atlassian.net/browse/HSEARCH-3482) - Adjust some configuration property names in the Elasticsearch backend
+* [HSEARCH-3481](https://hibernate.atlassian.net/browse/HSEARCH-3481) - Change max_connections_per_route default value to 10
+* [HSEARCH-3480](https://hibernate.atlassian.net/browse/HSEARCH-3480) - Rename fromExternalRepresentation() to of() for enums used in the configuration
+* [HSEARCH-3478](https://hibernate.atlassian.net/browse/HSEARCH-3478) - Fix bugs, vulnerabilities and code smells detected by Sonar - 20190206
+* [HSEARCH-3474](https://hibernate.atlassian.net/browse/HSEARCH-3474) - Do not deploy the distribution module to Maven
+* [HSEARCH-3473](https://hibernate.atlassian.net/browse/HSEARCH-3473) - Search 6 groundwork - Document the configuration options in Search 6
+* [HSEARCH-3468](https://hibernate.atlassian.net/browse/HSEARCH-3468) - Restore the ability for the Elasticsearch schema validation to report errors across multiple indexes
+* [HSEARCH-3445](https://hibernate.atlassian.net/browse/HSEARCH-3445) - Search 6 groundwork - Restore support for query result caching
+* [HSEARCH-3425](https://hibernate.atlassian.net/browse/HSEARCH-3425) - Clean up Java compiler warnings inherited from the Search 6 prototype
+* [HSEARCH-3424](https://hibernate.atlassian.net/browse/HSEARCH-3424) - Clean up the showcases to turn it into a full-stack ORM integration test suite
+* [HSEARCH-3315](https://hibernate.atlassian.net/browse/HSEARCH-3315) - Search 6 groundwork - Move publicly exposed util types to a dedicated module
+* [HSEARCH-3295](https://hibernate.atlassian.net/browse/HSEARCH-3295) - Search 6 groundwork - Invert the syntax of accessors
+* [HSEARCH-3256](https://hibernate.atlassian.net/browse/HSEARCH-3256) - Search 6 groundwork - Restore support for bypassing bridges in the predicate/sort DSL
+* [HSEARCH-3091](https://hibernate.atlassian.net/browse/HSEARCH-3091) - Search 6 groundwork - Add to the predicate DSL the missing per-predicate options compared to Search 5
+* [HSEARCH-3089](https://hibernate.atlassian.net/browse/HSEARCH-3089) - Search 6 groundwork - Add to the DSL the missing query predicates (excluding spatial, faceting, moreLikeThis) compared to Search 5
+* [HSEARCH-3080](https://hibernate.atlassian.net/browse/HSEARCH-3080) - Search 6 groundwork - Find out how to use type names in the Elasticsearch mapping
+* [HSEARCH-3054](https://hibernate.atlassian.net/browse/HSEARCH-3054) - Search 6 groundwork - Restore the Elasticsearch dialect support
+* [HSEARCH-3047](https://hibernate.atlassian.net/browse/HSEARCH-3047) - Search 6 groundwork - Implement the missing field types and default bridges compared to Search 5
+
+## 6.0.0.Alpha2 (31-01-2019)
+
+### Bug
+* [HSEARCH-3462](https://hibernate.atlassian.net/browse/HSEARCH-3462) - SimpleIndexingProgressMonitor stops logging as soon as the number of indexed document stops being a multiple of the logging period
+
+### Improvement
+* [HSEARCH-3466](https://hibernate.atlassian.net/browse/HSEARCH-3466) - Add the number of objects in the payload in the Elasticsearch request log
+* [HSEARCH-3464](https://hibernate.atlassian.net/browse/HSEARCH-3464) - Use consistent naming for *Settings class with respect to Maven modules
+* [HSEARCH-3454](https://hibernate.atlassian.net/browse/HSEARCH-3454) - Upgrade to Lucene 7.6.0
+* [HSEARCH-3453](https://hibernate.atlassian.net/browse/HSEARCH-3453) - Execute blocking search result processing in another thread than the one used for HTTP requests
+* [HSEARCH-3451](https://hibernate.atlassian.net/browse/HSEARCH-3451) - Make the index defaults backend-scoped
+* [HSEARCH-3429](https://hibernate.atlassian.net/browse/HSEARCH-3429) - Add a lambda-based syntax to the projection DSL
+* [HSEARCH-3421](https://hibernate.atlassian.net/browse/HSEARCH-3421) - Support for ID predicates when multi-tenancy is enabled
+* [HSEARCH-3416](https://hibernate.atlassian.net/browse/HSEARCH-3416) - Use ID bridges from the mapper when building ID predicates
+* [HSEARCH-3174](https://hibernate.atlassian.net/browse/HSEARCH-3174) - Allow non-String values in environment configuration
+
+### Task
+* [HSEARCH-3472](https://hibernate.atlassian.net/browse/HSEARCH-3472) - Upgrade to Elasticsearch 6.6.0
+* [HSEARCH-3470](https://hibernate.atlassian.net/browse/HSEARCH-3470) - Upgrade Hibernate ORM to 5.4.1.Final
+* [HSEARCH-3455](https://hibernate.atlassian.net/browse/HSEARCH-3455) - Add a way to test the JSON sent to the Elasticsearch cluster
+* [HSEARCH-3450](https://hibernate.atlassian.net/browse/HSEARCH-3450) - Search 6 groundwork - Use a consistent naming scheme for the configuration properties added in Search 6 so far
+* [HSEARCH-3449](https://hibernate.atlassian.net/browse/HSEARCH-3449) - Fix random test failures caused by improper mocking of ObjectLoader
+* [HSEARCH-3448](https://hibernate.atlassian.net/browse/HSEARCH-3448) - Move all classes related to test configuration/utils/etc to "testsupport" packages
+* [HSEARCH-3446](https://hibernate.atlassian.net/browse/HSEARCH-3446) - Search 6 groundwork - Clean up and factorize code around converters and type-specific features in backends
+* [HSEARCH-3442](https://hibernate.atlassian.net/browse/HSEARCH-3442) - Search 6 groundwork - Properly handle missing backend / backend type in configuration properties
+* [HSEARCH-3438](https://hibernate.atlassian.net/browse/HSEARCH-3438) - Make references to value bridges and container value extractors in the mapping cleaner and simpler
+* [HSEARCH-3433](https://hibernate.atlassian.net/browse/HSEARCH-3433) - Upgrade to Hibernate ORM 5.4.0.Final
+* [HSEARCH-3410](https://hibernate.atlassian.net/browse/HSEARCH-3410) - Upgrade to ORM 5.4.0.CR2 + HCANN 5.1.0.Final
+* [HSEARCH-3386](https://hibernate.atlassian.net/browse/HSEARCH-3386) - Search 6 groundwork - Make bean references easier to use in configuration properties
+* [HSEARCH-3376](https://hibernate.atlassian.net/browse/HSEARCH-3376) - Remove the explicit dependency to JAXB/javax.xml.bind from the ORM modules when building with JDK9+
+* [HSEARCH-3374](https://hibernate.atlassian.net/browse/HSEARCH-3374) - Search 6 groundwork - Restore the Search 5 syntax for including/excluding bounds in range predicates
+* [HSEARCH-3351](https://hibernate.atlassian.net/browse/HSEARCH-3351) - Search 6 groundwork - Restore support for FullTextQuery.getResultSize()
+* [HSEARCH-3291](https://hibernate.atlassian.net/browse/HSEARCH-3291) - Search 6 groundwork - Split the field definition API in two: encoding definition and field definition
+* [HSEARCH-3268](https://hibernate.atlassian.net/browse/HSEARCH-3268) - Search 6 groundwork - Restore support for the massindexer
+* [HSEARCH-3170](https://hibernate.atlassian.net/browse/HSEARCH-3170) - Implement CDI/Spring bean releasing more cleanly
+* [HSEARCH-3101](https://hibernate.atlassian.net/browse/HSEARCH-3101) - Search 6 groundwork - Support aliases for backend factories
+* [HSEARCH-3086](https://hibernate.atlassian.net/browse/HSEARCH-3086) - Search 6 groundwork - Add the missing non-field projections compared to Search 5
+* [HSEARCH-3053](https://hibernate.atlassian.net/browse/HSEARCH-3053) - Search 6 groundwork - Restore the full Elasticsearch work factory/orchestrators from Search 5
+* [HSEARCH-3052](https://hibernate.atlassian.net/browse/HSEARCH-3052) - Search 6 groundwork - Restore the Elasticsearch index schema management strategies (validation, ...)
+
+## 6.0.0.Alpha1 (28-11-2018)
+
+### Bug
+* [HSEARCH-3389](https://hibernate.atlassian.net/browse/HSEARCH-3389) - Fix bugs in the Lucene backend when maxResults is set to 0
+* [HSEARCH-3267](https://hibernate.atlassian.net/browse/HSEARCH-3267) - Restore option to run WildFly integration tests against manually prepared distribution
+* [HSEARCH-3216](https://hibernate.atlassian.net/browse/HSEARCH-3216) - Deprecated API usage in example Implementing a class bridge
+* [HSEARCH-3215](https://hibernate.atlassian.net/browse/HSEARCH-3215) - Reference guide typos
+* [HSEARCH-3212](https://hibernate.atlassian.net/browse/HSEARCH-3212) - Class bridges are applied regardless of @IndexedEmbedded.includePaths
+* [HSEARCH-3167](https://hibernate.atlassian.net/browse/HSEARCH-3167) - Exceptions may not be reported in the right order when internals use Closer.split
+* [HSEARCH-3163](https://hibernate.atlassian.net/browse/HSEARCH-3163) - On bootstrap failure the SessionFactory is closed without propagating the root cause
+* [HSEARCH-3148](https://hibernate.atlassian.net/browse/HSEARCH-3148) - Search 6 groundwork - Lucene - Support bool() predicate with only mustNot() predicates
+* [HSEARCH-2554](https://hibernate.atlassian.net/browse/HSEARCH-2554) - Using array/iterable/map field bridges requires the @IndexedEmbedded annotation (second attempt)
+* [HSEARCH-2552](https://hibernate.atlassian.net/browse/HSEARCH-2552) - @IndexedEmbedded.includePaths should not allow to pick paths that were excluded from the embedded entity
+* [HSEARCH-2490](https://hibernate.atlassian.net/browse/HSEARCH-2490) - SortedMap is not supported for MapFieldBridge and IndexedEmbeddeds
+* [HSEARCH-2328](https://hibernate.atlassian.net/browse/HSEARCH-2328) - Code examples in the documentations are not automatically checked for correctness
+* [HSEARCH-2194](https://hibernate.atlassian.net/browse/HSEARCH-2194) - Handling of @IndexedEmbedded not working correctly for multi-level hierarchies
+* [HSEARCH-1710](https://hibernate.atlassian.net/browse/HSEARCH-1710) - Child collection being unnecessarily initialized through @ContainedIn
+* [HSEARCH-1394](https://hibernate.atlassian.net/browse/HSEARCH-1394) - SPI shouldn't expose impl types
+* [HSEARCH-1357](https://hibernate.atlassian.net/browse/HSEARCH-1357) - Remove LuceneOptions from the FieldBridge#set(String, Object, Document, LuceneOptions ) signature
+* [HSEARCH-383](https://hibernate.atlassian.net/browse/HSEARCH-383) - Hibernate Search does not respect the @AccessType annotation in respect to @Id fields.
+
+### Improvement
+* [HSEARCH-3401](https://hibernate.atlassian.net/browse/HSEARCH-3401) - Merge the two "Search" classes into one
+* [HSEARCH-3395](https://hibernate.atlassian.net/browse/HSEARCH-3395) - Make the .reference() and .object() projections type-safe in the Projection DSL
+* [HSEARCH-3310](https://hibernate.atlassian.net/browse/HSEARCH-3310) - Split the @Field annotation into multiple, type-specific annotations
+* [HSEARCH-3287](https://hibernate.atlassian.net/browse/HSEARCH-3287) - Change the syntax of index configuration properties from h.s.index.myIndex.someProperty to h.s.indexes.myIndex.someProperty
+* [HSEARCH-3234](https://hibernate.atlassian.net/browse/HSEARCH-3234) - Upgrade to ORM 5.3.3
+* [HSEARCH-3233](https://hibernate.atlassian.net/browse/HSEARCH-3233) - Overriding an analyzer in the queryBuilder with an unknown analyzer should lead to a proper SearchException
+* [HSEARCH-3227](https://hibernate.atlassian.net/browse/HSEARCH-3227) - Upgrade to Elasticsearch 6
+* [HSEARCH-3211](https://hibernate.atlassian.net/browse/HSEARCH-3211) - Upgrade to ORM 5.3.2
+* [HSEARCH-3210](https://hibernate.atlassian.net/browse/HSEARCH-3210) - Upgrade to HCANN 5.0.4.Final
+* [HSEARCH-3208](https://hibernate.atlassian.net/browse/HSEARCH-3208) - Add advanced, conditional syntax to set the minimum number of should clauses required to match for boolean predicates in the DSL
+* [HSEARCH-3197](https://hibernate.atlassian.net/browse/HSEARCH-3197) - Allow to set the minimum number of should clauses required to match for boolean predicates in the DSL
+* [HSEARCH-3182](https://hibernate.atlassian.net/browse/HSEARCH-3182) - Sort Hibernate ORM metadata before processing it
+* [HSEARCH-3168](https://hibernate.atlassian.net/browse/HSEARCH-3168) - JBoss Modules should not use the deprecated module of Hibernate ORM
+* [HSEARCH-3164](https://hibernate.atlassian.net/browse/HSEARCH-3164) - Search 6 groundwork - Do not create unnecessary identifier/routingKey bridges for @IndexedEmbeddeds
+* [HSEARCH-3145](https://hibernate.atlassian.net/browse/HSEARCH-3145) - Rename the all() predicate to matchAll()
+* [HSEARCH-3139](https://hibernate.atlassian.net/browse/HSEARCH-3139) - Avoid SPIs leaking into APIs
+* [HSEARCH-2847](https://hibernate.atlassian.net/browse/HSEARCH-2847) - Comply with Hibernate ORM's access mode in @Spatial bridges
+* [HSEARCH-2765](https://hibernate.atlassian.net/browse/HSEARCH-2765) - Rename the SearchFactory API
+* [HSEARCH-2759](https://hibernate.atlassian.net/browse/HSEARCH-2759) - Handle private/protected field access for @Spatial fields
+* [HSEARCH-2756](https://hibernate.atlassian.net/browse/HSEARCH-2756) - Improve naming schemes of Elasticsearch configuration properties
+* [HSEARCH-2641](https://hibernate.atlassian.net/browse/HSEARCH-2641) - Allow for Elasticsearch analyzer definitions to be applied in class bridges/custom field bridges
+* [HSEARCH-2546](https://hibernate.atlassian.net/browse/HSEARCH-2546) - Give more context when there are errors while generating metadata
+* [HSEARCH-2498](https://hibernate.atlassian.net/browse/HSEARCH-2498) - Use a generic representation of queries in the DSL
+* [HSEARCH-2496](https://hibernate.atlassian.net/browse/HSEARCH-2496) - Smarter dirty checking when using @ContainedIn with custom field bridges
+* [HSEARCH-2462](https://hibernate.atlassian.net/browse/HSEARCH-2462) - Split internal metadata into two: agnostic metadata and indexing service specific metadata
+* [HSEARCH-2331](https://hibernate.atlassian.net/browse/HSEARCH-2331) - Enable creating a QueryBuilder with a multi-entity scope
+* [HSEARCH-2329](https://hibernate.atlassian.net/browse/HSEARCH-2329) - Provide support for more distance units
+* [HSEARCH-2294](https://hibernate.atlassian.net/browse/HSEARCH-2294) - Decide of the type of a range query based on the field instead of the value
+* [HSEARCH-2225](https://hibernate.atlassian.net/browse/HSEARCH-2225) - Consider adding typed version of query on FullTextEntityManager
+* [HSEARCH-2186](https://hibernate.atlassian.net/browse/HSEARCH-2186) - Abstract from direct usage of Lucene's Document as the internal data container
+* [HSEARCH-2181](https://hibernate.atlassian.net/browse/HSEARCH-2181) - Remove StringHelper from public API
+* [HSEARCH-2055](https://hibernate.atlassian.net/browse/HSEARCH-2055) - FieldBridge 2.0: generalize FieldBridge contract to deal with other backends
+* [HSEARCH-1869](https://hibernate.atlassian.net/browse/HSEARCH-1869) - Validate for each hibernate.search prefixed configuration property to be consumed
+
+## 5.10.0.Final (16-05-2018)
+
+### Bug
+* [HSEARCH-3156](https://hibernate.atlassian.net/browse/HSEARCH-3156) - @ContainedIn fails at runtime when targeting a class for which only some subclasses are configured in Search
+
+### Task
+* [HSEARCH-3161](https://hibernate.atlassian.net/browse/HSEARCH-3161) - Clarify which LGPL version exactly in the POM file
+* [HSEARCH-3159](https://hibernate.atlassian.net/browse/HSEARCH-3159) - Upgrade to Hibernate ORM 5.3.0.Final
+
+## 5.10.0.CR1 (04-05-2018)
+
+### Bug
+* [HSEARCH-3134](https://hibernate.atlassian.net/browse/HSEARCH-3134) - Error message in MassIndexerImpl#toRootEntities mentions "a subclass of an indexed entity" but should mention "supertype" instead
+* [HSEARCH-3132](https://hibernate.atlassian.net/browse/HSEARCH-3132) - Normalizers are not closed on shutdown
+
+### Improvement
+* [HSEARCH-3149](https://hibernate.atlassian.net/browse/HSEARCH-3149) - Export the Analyzer SPI in OSGI manifests
+* [HSEARCH-3142](https://hibernate.atlassian.net/browse/HSEARCH-3142) - Allow usage of ByteBuddy in the OSGi feature definition
+* [HSEARCH-3138](https://hibernate.atlassian.net/browse/HSEARCH-3138) - Restore binary compatibility with applications compiled against Hibernate Search 5.5
+* [HSEARCH-3133](https://hibernate.atlassian.net/browse/HSEARCH-3133) - Make ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER consistent with other constants
+* [HSEARCH-3000](https://hibernate.atlassian.net/browse/HSEARCH-3000) - Pick Jigsaw Automatic Module names for all published modules
+* [HSEARCH-1085](https://hibernate.atlassian.net/browse/HSEARCH-1085) - MappingModelMetadataProvider should pass the chosen ClassLoader rather than overriding the context
+
+### New Feature
+* [HSEARCH-3125](https://hibernate.atlassian.net/browse/HSEARCH-3125) - Allow native access to the Elasticsearch RestClient
+
+### Task
+* [HSEARCH-3155](https://hibernate.atlassian.net/browse/HSEARCH-3155) - Review documentation in preparation for 5.10 release
+* [HSEARCH-3154](https://hibernate.atlassian.net/browse/HSEARCH-3154) - Update to ForbiddenAPI 2.5
+* [HSEARCH-3153](https://hibernate.atlassian.net/browse/HSEARCH-3153) - Externalize ForbiddenAPI restrictions and make rules stricter
+* [HSEARCH-3150](https://hibernate.atlassian.net/browse/HSEARCH-3150) - Upgrade to Maven Surefire 2.21.0
+* [HSEARCH-3146](https://hibernate.atlassian.net/browse/HSEARCH-3146) - Use the feature packs produced by Hibernate ORM
+* [HSEARCH-3144](https://hibernate.atlassian.net/browse/HSEARCH-3144) - Update to Byte Buddy 1.8.0 to align with Hibernate ORM 5.3.0.CR2
+* [HSEARCH-3143](https://hibernate.atlassian.net/browse/HSEARCH-3143) - Update to Hibernate ORM 5.3.0.CR2
+* [HSEARCH-2614](https://hibernate.atlassian.net/browse/HSEARCH-2614) - JSR-352: Test starting/stopping the job using WildFly tooling (e.g. CLI) 
+
+## 5.10.0.Beta2 (12-04-2018)
+
+### Bug
+* [HSEARCH-3039](https://hibernate.atlassian.net/browse/HSEARCH-3039) - Register a pass through analyzer for the @DocumentId field
+* [HSEARCH-3033](https://hibernate.atlassian.net/browse/HSEARCH-3033) - Internal links to "section-custom-similarity" in the documentation are dead
+* [HSEARCH-3027](https://hibernate.atlassian.net/browse/HSEARCH-3027) - Avoid a possible initialization hang on bootstrap failure
+
+### Improvement
+* [HSEARCH-3036](https://hibernate.atlassian.net/browse/HSEARCH-3036) - Upgrade to Hibernate Commons Annotations 5.0.3.Final
+* [HSEARCH-3035](https://hibernate.atlassian.net/browse/HSEARCH-3035) - Use source and target properties for JBoss logging processor source and target
+* [HSEARCH-3026](https://hibernate.atlassian.net/browse/HSEARCH-3026) - Support the ability to define a pathPrefix for the Elasticsearch REST client
+* [HSEARCH-3024](https://hibernate.atlassian.net/browse/HSEARCH-3024) - Make our pom files more consistent with WildFly and JBoss parent pom files
+* [HSEARCH-3015](https://hibernate.atlassian.net/browse/HSEARCH-3015) - Update JGroups to 3.6.13.Final
+* [HSEARCH-3013](https://hibernate.atlassian.net/browse/HSEARCH-3013) - Update Classmate to 1.3.4
+
+### Remove Feature
+* [HSEARCH-3030](https://hibernate.atlassian.net/browse/HSEARCH-3030) - Separate the JGroups integration component into a dedicated WildFly feature pack
+
+### Task
+* [HSEARCH-3043](https://hibernate.atlassian.net/browse/HSEARCH-3043) - Upgrade to Byteman version 4.0.2
+* [HSEARCH-3041](https://hibernate.atlassian.net/browse/HSEARCH-3041) - Upgrade to Elasticsearch 5.6.8
+* [HSEARCH-3037](https://hibernate.atlassian.net/browse/HSEARCH-3037) - Fix incorrect dependency in the IDEA profile leading to JBoss logging annotation processor errors
+* [HSEARCH-3034](https://hibernate.atlassian.net/browse/HSEARCH-3034) - Replace Fest-assert with AssertJ
+* [HSEARCH-3032](https://hibernate.atlassian.net/browse/HSEARCH-3032) - Add test coverage analysis in an optional build profile
+* [HSEARCH-3029](https://hibernate.atlassian.net/browse/HSEARCH-3029) - Use Wildfly JPA 2.2 patch 1.0.0.Beta2 to support WildFly 12
+* [HSEARCH-3028](https://hibernate.atlassian.net/browse/HSEARCH-3028) - Upgrade to wildfly-build-tools 1.2.9.Final
+* [HSEARCH-3025](https://hibernate.atlassian.net/browse/HSEARCH-3025) - Upgrade recommended SLF4J version to 1.7.25
+* [HSEARCH-3022](https://hibernate.atlassian.net/browse/HSEARCH-3022) - Upgrade integration tests to WildFly 12
+* [HSEARCH-3021](https://hibernate.atlassian.net/browse/HSEARCH-3021) - Document the integration to DI frameworks
+* [HSEARCH-3020](https://hibernate.atlassian.net/browse/HSEARCH-3020) - Fix build warnings in version 5.10
+* [HSEARCH-2598](https://hibernate.atlassian.net/browse/HSEARCH-2598) - Upgrade to JGroups 4.0.11.Final
+
+## 5.10.0.Beta1 (22-02-2018)
+
+### Improvement
+* [HSEARCH-3019](https://hibernate.atlassian.net/browse/HSEARCH-3019) - Provide ability to customize parser in TikaBridge
+* [HSEARCH-3010](https://hibernate.atlassian.net/browse/HSEARCH-3010) - Update JBoss Logging to version 3.3.2.Final
+* [HSEARCH-3009](https://hibernate.atlassian.net/browse/HSEARCH-3009) - Remove out of date requirement of avoiding Logger invocations with primitives
+* [HSEARCH-3008](https://hibernate.atlassian.net/browse/HSEARCH-3008) - Update to forbiddenapis to 2.4.1 to get JDK10 compatibility
+* [HSEARCH-3007](https://hibernate.atlassian.net/browse/HSEARCH-3007) - Upgrade to Byte Buddy 1.7.9 to support JDK10
+* [HSEARCH-2979](https://hibernate.atlassian.net/browse/HSEARCH-2979) - Use Hibernate ORM 5.3 ManagedBeanRegistry SPI to implement Field Bridge injection
+* [HSEARCH-2978](https://hibernate.atlassian.net/browse/HSEARCH-2978) - Upgrade to Hibernate ORM 5.3.0.Beta1
+* [HSEARCH-2430](https://hibernate.atlassian.net/browse/HSEARCH-2430) - Update checkstyle ParenPad rule to include RESOURCE_SPECIFICATION
+
+### Task
+* [HSEARCH-3018](https://hibernate.atlassian.net/browse/HSEARCH-3018) - Update to Byteman 4.0.1: allows building on JDK10
+* [HSEARCH-3017](https://hibernate.atlassian.net/browse/HSEARCH-3017) - Upgrade to Hibernate ORM 5.3.0.CR1
+* [HSEARCH-3012](https://hibernate.atlassian.net/browse/HSEARCH-3012) - Update to Hibernate Asciidoctor Theme 1.0.2.Final
+* [HSEARCH-3011](https://hibernate.atlassian.net/browse/HSEARCH-3011) - Re-enable building the documentation on all JDKs
+* [HSEARCH-3006](https://hibernate.atlassian.net/browse/HSEARCH-3006) - Allow to override version of the Surefire and Failsafe Maven plugins to test on JDK10
+* [HSEARCH-3005](https://hibernate.atlassian.net/browse/HSEARCH-3005) - Upgrade to Hibernate Commons Annotations 5.0.2.Final
+* [HSEARCH-3004](https://hibernate.atlassian.net/browse/HSEARCH-3004) - Update address of Free Software Foundation
+* [HSEARCH-3002](https://hibernate.atlassian.net/browse/HSEARCH-3002) - Upgrade to Checkstyle 8.8 and re-enable checks on method call spaces
+* [HSEARCH-3001](https://hibernate.atlassian.net/browse/HSEARCH-3001) - Checkstyle checks were not enabled automatically for the new jsr352 modules
+
+## 5.9.0.Final (06-02-2018)
+
+### Task
+* [HSEARCH-2999](https://hibernate.atlassian.net/browse/HSEARCH-2999) - Upgrade to Elasticsearch 5.6.7
+* [HSEARCH-2998](https://hibernate.atlassian.net/browse/HSEARCH-2998) - Make sure the integration tests work without any specific Maven configuration from the developper
+* [HSEARCH-2997](https://hibernate.atlassian.net/browse/HSEARCH-2997) - Ensure hibernate-search-jbossmodules-testing will not be released anymore
+* [HSEARCH-2992](https://hibernate.atlassian.net/browse/HSEARCH-2992) - Remove settings-example.xml and any reference to it
+
+## 5.9.0.CR1 (23-01-2018)
+
+### Bug
+* [HSEARCH-2983](https://hibernate.atlassian.net/browse/HSEARCH-2983) - Take boost into account when building numeric or null encoding queries with the DSL
+* [HSEARCH-2972](https://hibernate.atlassian.net/browse/HSEARCH-2972) - Missing provided dependencies in the distribution ZIP
+* [HSEARCH-2955](https://hibernate.atlassian.net/browse/HSEARCH-2955) - Faceting query fails when the facet field is not populated for any document
+* [HSEARCH-1885](https://hibernate.atlassian.net/browse/HSEARCH-1885) - BridgeFactory unable to create instances of custom bridges in a modular environment
+
+### Improvement
+* [HSEARCH-2985](https://hibernate.atlassian.net/browse/HSEARCH-2985) - Split JBoss module distribution zip to make external dependencies optional
+* [HSEARCH-2981](https://hibernate.atlassian.net/browse/HSEARCH-2981) - Improve toString() of RemoteMatchQuery
+* [HSEARCH-2977](https://hibernate.atlassian.net/browse/HSEARCH-2977) - Revisit the documentation about using modules on WildFly
+* [HSEARCH-2964](https://hibernate.atlassian.net/browse/HSEARCH-2964) - Include the JSR 352 module in the distribution
+* [HSEARCH-2880](https://hibernate.atlassian.net/browse/HSEARCH-2880) - Improve documentation regarding field bridges on IDs
+* [HSEARCH-2191](https://hibernate.atlassian.net/browse/HSEARCH-2191) - Make Hibernate Search Modules a valid Wildfly Feature pack file.
+
+### Task
+* [HSEARCH-2996](https://hibernate.atlassian.net/browse/HSEARCH-2996) - Upgrade Elasticsearch dependencies to 5.6.6
+* [HSEARCH-2995](https://hibernate.atlassian.net/browse/HSEARCH-2995) - Upgrade to JMH 1.20
+* [HSEARCH-2994](https://hibernate.atlassian.net/browse/HSEARCH-2994) - Upgrade to Hibernate ORM 5.2.12.Final
+* [HSEARCH-2993](https://hibernate.atlassian.net/browse/HSEARCH-2993) - Upgrade to Byteman 4.0.0
+* [HSEARCH-2991](https://hibernate.atlassian.net/browse/HSEARCH-2991) - Avoid needing jsr250-api during project build
+* [HSEARCH-2990](https://hibernate.atlassian.net/browse/HSEARCH-2990) - Skip javadoc generation in JBoss modules artifacts
+* [HSEARCH-2989](https://hibernate.atlassian.net/browse/HSEARCH-2989) - Split JBoss module distribution zip to make ORM dependencies optional
+* [HSEARCH-2988](https://hibernate.atlassian.net/browse/HSEARCH-2988) - Make sure Hibernate Search can be used without relying on JBoss's Nexus repo
+* [HSEARCH-2987](https://hibernate.atlassian.net/browse/HSEARCH-2987) - Use Server Provisioning plugin to setup WildFly based integration tests
+* [HSEARCH-2986](https://hibernate.atlassian.net/browse/HSEARCH-2986) - Put the distribution files to upload into distribution/target/dir so that release scripts find them
+* [HSEARCH-2984](https://hibernate.atlassian.net/browse/HSEARCH-2984) - Remove an unnecessary jberet dependency in the distribution module
+* [HSEARCH-2976](https://hibernate.atlassian.net/browse/HSEARCH-2976) - Upgrade to Elasticsearch 5.6.5
+* [HSEARCH-2975](https://hibernate.atlassian.net/browse/HSEARCH-2975) - Skip exploding the built WildFly modules by default
+* [HSEARCH-2974](https://hibernate.atlassian.net/browse/HSEARCH-2974) - JGroups backend not needing to import OSGi module org.hibernate.annotations.common
+* [HSEARCH-2971](https://hibernate.atlassian.net/browse/HSEARCH-2971) - Update the copyright in the Javadoc footer
+* [HSEARCH-2969](https://hibernate.atlassian.net/browse/HSEARCH-2969) - Use the default style for JavaDoc
+* [HSEARCH-2968](https://hibernate.atlassian.net/browse/HSEARCH-2968) - Align the JBeret dependency on WildFly
+* [HSEARCH-2967](https://hibernate.atlassian.net/browse/HSEARCH-2967) - Remove internal classes from the Javadoc
+* [HSEARCH-2965](https://hibernate.atlassian.net/browse/HSEARCH-2965) - Do not generate the PDF documentation by default
+* [HSEARCH-2963](https://hibernate.atlassian.net/browse/HSEARCH-2963) - Remove duplicate dependency declarations in integration tests
+* [HSEARCH-2961](https://hibernate.atlassian.net/browse/HSEARCH-2961) - Downgrade the version of the MariaDB plugin
+* [HSEARCH-2960](https://hibernate.atlassian.net/browse/HSEARCH-2960) - Avoid duplicate build step executions in the Travis build
+* [HSEARCH-2959](https://hibernate.atlassian.net/browse/HSEARCH-2959) - Reduce the verbosity of the build when testing against Elasticsearch 2
+* [HSEARCH-2958](https://hibernate.atlassian.net/browse/HSEARCH-2958) - Move the few tests using Mockito to Easymock
+* [HSEARCH-2957](https://hibernate.atlassian.net/browse/HSEARCH-2957) - Remove the warning "this feature is work in progress" in the JSR-352 integration documentation
+* [HSEARCH-2951](https://hibernate.atlassian.net/browse/HSEARCH-2951) - Validate tests running on JDK9 with the illegal-access=deny flag enabled
+* [HSEARCH-2942](https://hibernate.atlassian.net/browse/HSEARCH-2942) - Move Wildfly module packaging of dependencies to external repositories
+* [HSEARCH-2778](https://hibernate.atlassian.net/browse/HSEARCH-2778) - The non-release builds with -Pdist should validate all javadocs by default
+
+## 5.9.0.Beta1 (27-11-2017)
+
+### Bug
+* [HSEARCH-2934](https://hibernate.atlassian.net/browse/HSEARCH-2934) - Pending Elasticsearch streamed works may fail when stopping Hibernate Search and using the drop-and-create-and-drop strategy
+* [HSEARCH-2909](https://hibernate.atlassian.net/browse/HSEARCH-2909) - NPE using a custom annotation on a non-indexed class
+* [HSEARCH-2906](https://hibernate.atlassian.net/browse/HSEARCH-2906) - Unable to extend NumericFieldBridge
+* [HSEARCH-2886](https://hibernate.atlassian.net/browse/HSEARCH-2886) - Use of BufferedWriter in GsonEntity may lead to MalformedInputException when input contains 4-byte unicode characters
+* [HSEARCH-2883](https://hibernate.atlassian.net/browse/HSEARCH-2883) - Getting health status fails for non system users
+* [HSEARCH-2832](https://hibernate.atlassian.net/browse/HSEARCH-2832) - Hibernate Search produces huge stack traces when Elasticsearch request processing threads are interrupted
+
+### Improvement
+* [HSEARCH-2944](https://hibernate.atlassian.net/browse/HSEARCH-2944) - Clarify that all methods of MassIndexerProgressMonitor are incremental
+* [HSEARCH-2935](https://hibernate.atlassian.net/browse/HSEARCH-2935) - Avoid high initialization cost of static logger instances
+* [HSEARCH-2887](https://hibernate.atlassian.net/browse/HSEARCH-2887) - Avoid generating redundant logging code across modules
+
+### New Feature
+* [HSEARCH-2901](https://hibernate.atlassian.net/browse/HSEARCH-2901) - Introduce an SPI to get a SearchIntegrator from a SessionFactory
+* [HSEARCH-2594](https://hibernate.atlassian.net/browse/HSEARCH-2594) - JSR-352 (Batch) integration
+
+### Task
+* [HSEARCH-2953](https://hibernate.atlassian.net/browse/HSEARCH-2953) - Update to EasyMock 3.5.1 and matching Unitils 3.4.6
+* [HSEARCH-2952](https://hibernate.atlassian.net/browse/HSEARCH-2952) - Switch to using ByteBuddy for Hibernate ORM bytecode  instrumentation during test execution
+* [HSEARCH-2949](https://hibernate.atlassian.net/browse/HSEARCH-2949) - Upgrade Elasticsearch dependencies to 5.6.4
+* [HSEARCH-2948](https://hibernate.atlassian.net/browse/HSEARCH-2948) - Match JBoss Logging versions of WildFly 11.0.0.Final
+* [HSEARCH-2947](https://hibernate.atlassian.net/browse/HSEARCH-2947) - JSR-352: Improve for-loop usage in tests
+* [HSEARCH-2946](https://hibernate.atlassian.net/browse/HSEARCH-2946) - JSR-352: Simplify EntityManager closing in tests
+* [HSEARCH-2940](https://hibernate.atlassian.net/browse/HSEARCH-2940) - Cleanup some trivial dead code warnings
+* [HSEARCH-2939](https://hibernate.atlassian.net/browse/HSEARCH-2939) - Avoid overriding managed version with the same version
+* [HSEARCH-2938](https://hibernate.atlassian.net/browse/HSEARCH-2938) - Duplicate definition of version for javax.inject:javax.inject
+* [HSEARCH-2937](https://hibernate.atlassian.net/browse/HSEARCH-2937) - Avoid using no longer defined Annotation Processor option  'translationFilesPath'
+* [HSEARCH-2936](https://hibernate.atlassian.net/browse/HSEARCH-2936) - Avoid preparing a full WildFly server when skipping integration tests
+* [HSEARCH-2932](https://hibernate.atlassian.net/browse/HSEARCH-2932) - Fix JSR-352 integration tests on Windows
+* [HSEARCH-2931](https://hibernate.atlassian.net/browse/HSEARCH-2931) - Add specific configuration for JSR-352 integration tests on Mariadb
+* [HSEARCH-2930](https://hibernate.atlassian.net/browse/HSEARCH-2930) - Make JSR-352 integration tests compatible with an AWS setup
+* [HSEARCH-2928](https://hibernate.atlassian.net/browse/HSEARCH-2928) - Update to WildFly 11.0.0.Final
+* [HSEARCH-2927](https://hibernate.atlassian.net/browse/HSEARCH-2927) - Update to Apache Lucene 5.5.5
+* [HSEARCH-2926](https://hibernate.atlassian.net/browse/HSEARCH-2926) - Upgrade surefire/failsafe to 2.20.1
+* [HSEARCH-2923](https://hibernate.atlassian.net/browse/HSEARCH-2923) - Prepare for Checkstyle 8.4 (issue 4456)
+* [HSEARCH-2922](https://hibernate.atlassian.net/browse/HSEARCH-2922) - Upgrade Elasticsearch dependencies to 5.6.3
+* [HSEARCH-2921](https://hibernate.atlassian.net/browse/HSEARCH-2921) - Update the readme in ORM performance tests
+* [HSEARCH-2916](https://hibernate.atlassian.net/browse/HSEARCH-2916) - Avoid random failures in TestRunnerStandalone.runPerformanceTest
+* [HSEARCH-2915](https://hibernate.atlassian.net/browse/HSEARCH-2915) - Update to Narayana 5.5.30.Final
+* [HSEARCH-2913](https://hibernate.atlassian.net/browse/HSEARCH-2913) - Avoid custom interfaces to implement Elasticsearch requests digest generation
+* [HSEARCH-2912](https://hibernate.atlassian.net/browse/HSEARCH-2912) - Reenable all integration tests on all JDK profiles
+* [HSEARCH-2905](https://hibernate.atlassian.net/browse/HSEARCH-2905) - Take database profile into account for in-container tests (Spring, Wildfly)
+* [HSEARCH-2904](https://hibernate.atlassian.net/browse/HSEARCH-2904) - Get the Karaf integration tests running on JDK9
+* [HSEARCH-2903](https://hibernate.atlassian.net/browse/HSEARCH-2903) - Incorrect word @FieldBrige in documentation
+* [HSEARCH-2896](https://hibernate.atlassian.net/browse/HSEARCH-2896) - Upgrade GSON dependency to version 2.8.2
+* [HSEARCH-2895](https://hibernate.atlassian.net/browse/HSEARCH-2895) - Prepare ORM performance tests for the introduction of completely different scenarios
+* [HSEARCH-2894](https://hibernate.atlassian.net/browse/HSEARCH-2894) - Fix off-by-one error in initial index size of ORM performance tests
+* [HSEARCH-2893](https://hibernate.atlassian.net/browse/HSEARCH-2893) - Fix ORM performance tests on Wildfly (they fail silently)
+* [HSEARCH-2892](https://hibernate.atlassian.net/browse/HSEARCH-2892) - Upgrade Elasticsearch dependencies to 5.6.2
+* [HSEARCH-2890](https://hibernate.atlassian.net/browse/HSEARCH-2890) - WildFly Performance tests use multiple copies of Hibernate Search
+* [HSEARCH-2889](https://hibernate.atlassian.net/browse/HSEARCH-2889) - WildFly integration tests no longer need WF10 related workarounds
+* [HSEARCH-2881](https://hibernate.atlassian.net/browse/HSEARCH-2881) - Re-enable Wildfly integration tests with JDK9
+* [HSEARCH-2879](https://hibernate.atlassian.net/browse/HSEARCH-2879) - Fix BridgeTest.testCalendarBridgeStringEncoding on PostgreSQL
+* [HSEARCH-2878](https://hibernate.atlassian.net/browse/HSEARCH-2878) - Fix AnalyzerInheritanceTest on MariaDB
+* [HSEARCH-2874](https://hibernate.atlassian.net/browse/HSEARCH-2874) - Update to Checkstyle 8.3
+* [HSEARCH-2249](https://hibernate.atlassian.net/browse/HSEARCH-2249) - We should not start elasticsearch during build when test are skipped
+
+## 5.8.0.Final (13-09-2017)
+
+### Bug
+* [HSEARCH-2868](https://hibernate.atlassian.net/browse/HSEARCH-2868) - Collection updates may not trigger reindexing despite @ContainedIn in some circumstances
+* [HSEARCH-2867](https://hibernate.atlassian.net/browse/HSEARCH-2867) - Duplicate package names in orm/engine, causes problem with jdk9 modules
+* [HSEARCH-2865](https://hibernate.atlassian.net/browse/HSEARCH-2865) - CollectionUpdateEventTest.testWithClassBridge test fails with ORM 5.2.11-SNAPSHOT
+* [HSEARCH-2863](https://hibernate.atlassian.net/browse/HSEARCH-2863) - CalendarBridgeProvider creates StringEncodingDateBridge
+* [HSEARCH-2858](https://hibernate.atlassian.net/browse/HSEARCH-2858) - Using @ContainedIn in a @Spatial-annotated entity triggers a NullPointerException on startup
+* [HSEARCH-2854](https://hibernate.atlassian.net/browse/HSEARCH-2854) - IllegalStateException when sending an Elasticsearch request with a content-length
+* [HSEARCH-2404](https://hibernate.atlassian.net/browse/HSEARCH-2404) - Enable CollectionUpdateEventTest for Elasticsearch
+
+### Improvement
+* [HSEARCH-2872](https://hibernate.atlassian.net/browse/HSEARCH-2872) - Update the IndexedTypeSets and IndexedTypeMap based on Infinispan update needs
+* [HSEARCH-2870](https://hibernate.atlassian.net/browse/HSEARCH-2870) - Test compatibility, upgrade to Elasticsearch 5.6.0
+* [HSEARCH-2864](https://hibernate.atlassian.net/browse/HSEARCH-2864) - Use anchors correctly in the documentation
+* [HSEARCH-2862](https://hibernate.atlassian.net/browse/HSEARCH-2862) - More extensive Elasticsearch request/response logging
+* [HSEARCH-2853](https://hibernate.atlassian.net/browse/HSEARCH-2853) - Get rid of standalone-full-testqueues.xml file in integration tests
+* [HSEARCH-2850](https://hibernate.atlassian.net/browse/HSEARCH-2850) - Option to run WildFly integration tests against manually prepared distribution and to run against built-in Search modules
+
+### Task
+* [HSEARCH-2876](https://hibernate.atlassian.net/browse/HSEARCH-2876) - Upgrade WildFly tests to target WF11
+* [HSEARCH-2875](https://hibernate.atlassian.net/browse/HSEARCH-2875) - Upgrade to Hibernate ORM 5.2.11.Final
+* [HSEARCH-2869](https://hibernate.atlassian.net/browse/HSEARCH-2869) - Some tickets are missing in the release notes
+* [HSEARCH-2856](https://hibernate.atlassian.net/browse/HSEARCH-2856) - Upgrade Elasticsearch dependencies to 5.5.2
+* [HSEARCH-2849](https://hibernate.atlassian.net/browse/HSEARCH-2849) - Improve or remove the currently useless content-length hinting when computing Elasticsearch request hash
+
+## 5.8.0.CR1 (15-08-2017)
+
+### Bug
+* [HSEARCH-2843](https://hibernate.atlassian.net/browse/HSEARCH-2843) - Changing the limit/offset of a query does not clear the cached results
+* [HSEARCH-2839](https://hibernate.atlassian.net/browse/HSEARCH-2839) - Projecting on a default field whose type was overridden in the bridge fails with Elasticsearch
+* [HSEARCH-2823](https://hibernate.atlassian.net/browse/HSEARCH-2823) - The elasticsearch-aws JAR and its dependencies are missing from the .tar.gz/zip distributions
+* [HSEARCH-2196](https://hibernate.atlassian.net/browse/HSEARCH-2196) - Amazon AWS Elasticsearch Integration Test failures
+
+### Improvement
+* [HSEARCH-2840](https://hibernate.atlassian.net/browse/HSEARCH-2840) - Allow Elasticsearch projection on field bridges making use of dynamic object fields
+* [HSEARCH-2837](https://hibernate.atlassian.net/browse/HSEARCH-2837) - Clarify errors when interrupted during submission of work to the ES client
+* [HSEARCH-2833](https://hibernate.atlassian.net/browse/HSEARCH-2833) - Avoid confusing variable uses (bad naming, no declaration) in the documentation
+* [HSEARCH-2818](https://hibernate.atlassian.net/browse/HSEARCH-2818) - Optimise encoding of GSON elements into HTTP client buffers
+* [HSEARCH-2764](https://hibernate.atlassian.net/browse/HSEARCH-2764) - Improve orchestration of Elasticsearch works
+* [HSEARCH-2640](https://hibernate.atlassian.net/browse/HSEARCH-2640) - Improve resilience of cleanup methods (close, etc.)
+
+### Task
+* [HSEARCH-2846](https://hibernate.atlassian.net/browse/HSEARCH-2846) - Update build to be able to test with Java 9 preview build 9+181
+* [HSEARCH-2845](https://hibernate.atlassian.net/browse/HSEARCH-2845) - Add dependency management entries for the dependencypath plugin and jsonassert
+* [HSEARCH-2844](https://hibernate.atlassian.net/browse/HSEARCH-2844) - Remove requirement for CLA
+* [HSEARCH-2842](https://hibernate.atlassian.net/browse/HSEARCH-2842) - Verify and document interaction of full-text queries with an ORM filter
+* [HSEARCH-2841](https://hibernate.atlassian.net/browse/HSEARCH-2841) - Clean up the ElasticsearchHSQueryImpl code
+* [HSEARCH-2838](https://hibernate.atlassian.net/browse/HSEARCH-2838) - Add a maxConnection parameter to Elasticsearch performance tests
+* [HSEARCH-2834](https://hibernate.atlassian.net/browse/HSEARCH-2834) - Upgrade Elasticsearch versions to 5.5.1 and 2.4.6
+* [HSEARCH-2831](https://hibernate.atlassian.net/browse/HSEARCH-2831) - Clarify how to disable Elasticsearch/AWS digest signature
+* [HSEARCH-2830](https://hibernate.atlassian.net/browse/HSEARCH-2830) - Extend Elasticsearch performance tests for better orchestration testing
+* [HSEARCH-2828](https://hibernate.atlassian.net/browse/HSEARCH-2828) - Make WorkerTestCase wait for async works to finish
+* [HSEARCH-2827](https://hibernate.atlassian.net/browse/HSEARCH-2827) - Make WorkerTestCase fail if a background error occurs
+* [HSEARCH-2822](https://hibernate.atlassian.net/browse/HSEARCH-2822) - Automatically activate the JBoss Logging AP when importing project in IDEA
+* [HSEARCH-2821](https://hibernate.atlassian.net/browse/HSEARCH-2821) - Improve JSON rendering: better StringBuilder usage and logging
+* [HSEARCH-2816](https://hibernate.atlassian.net/browse/HSEARCH-2816) - Make sure Elasticsearch performance tests apply update/delete works to existing documents and add works to non-existing documents
+* [HSEARCH-2806](https://hibernate.atlassian.net/browse/HSEARCH-2806) - Remove method org.hibernate.search.engine.spi.EntityIndexBinding.getIndexManagers
+* [HSEARCH-2801](https://hibernate.atlassian.net/browse/HSEARCH-2801) - QueryDescriptor requires a List<CustomTypeParameter> where a Set or Map would make more sense
+
+## 5.8.0.Beta4 (12-07-2017)
+
+### Bug
+* [HSEARCH-2785](https://hibernate.atlassian.net/browse/HSEARCH-2785) - Phrase/match queries on normalized fields built using the DSL fail on Elasticsearch
+* [HSEARCH-2777](https://hibernate.atlassian.net/browse/HSEARCH-2777) - javax.persistence is no longer an optional dependency of hibernate-search-orm in OSGi environments
+* [HSEARCH-2776](https://hibernate.atlassian.net/browse/HSEARCH-2776) - javax.transaction is not an optional dependency of hibernate-search-engine in OSGi environments
+
+### Improvement
+* [HSEARCH-2783](https://hibernate.atlassian.net/browse/HSEARCH-2783) - Deprecate no longer useful buffer_size_on_copy configuration property
+* [HSEARCH-2774](https://hibernate.atlassian.net/browse/HSEARCH-2774) - The default build should include documentation
+* [HSEARCH-2700](https://hibernate.atlassian.net/browse/HSEARCH-2700) - Decide how simpleQueryString() should behave with null or empty input
+* [HSEARCH-2682](https://hibernate.atlassian.net/browse/HSEARCH-2682) - Unit test DefaultElasticsearchClientFactoryTest.multipleHosts_failover_fault fails randomly because the timeout is too low
+
+### New Feature
+* [HSEARCH-2772](https://hibernate.atlassian.net/browse/HSEARCH-2772) - Add an elasticsearch-aws module
+
+### Patch
+* [HSEARCH-2810](https://hibernate.atlassian.net/browse/HSEARCH-2810) - Micro formatting issues in the documentation
+
+### Task
+* [HSEARCH-2813](https://hibernate.atlassian.net/browse/HSEARCH-2813) - Add Elasticsearch performance tests
+* [HSEARCH-2812](https://hibernate.atlassian.net/browse/HSEARCH-2812) - IdUniquenessResolver SPI needs to migrate to new type system
+* [HSEARCH-2811](https://hibernate.atlassian.net/browse/HSEARCH-2811) - Avoid using Lucene deprecated methods when not essential for 5.8 API
+* [HSEARCH-2809](https://hibernate.atlassian.net/browse/HSEARCH-2809) - Upgrade to Elasticsearch 5.5.0
+* [HSEARCH-2808](https://hibernate.atlassian.net/browse/HSEARCH-2808) - Avoid using deprecated methods from Hibernate ORM 5.2
+* [HSEARCH-2807](https://hibernate.atlassian.net/browse/HSEARCH-2807) - DSLTest numeric tests use order-sensitive assertions on queries without a sort
+* [HSEARCH-2805](https://hibernate.atlassian.net/browse/HSEARCH-2805) - Upgrade to Checkstyle 8.0
+* [HSEARCH-2804](https://hibernate.atlassian.net/browse/HSEARCH-2804) - Prepare for Checkstyle 8 updates
+* [HSEARCH-2802](https://hibernate.atlassian.net/browse/HSEARCH-2802) - Make sure the default elasticsearch profile will only be enabled if the ES version is not provided
+* [HSEARCH-2794](https://hibernate.atlassian.net/browse/HSEARCH-2794) - Reorganize/rename performance testing modules
+* [HSEARCH-2793](https://hibernate.atlassian.net/browse/HSEARCH-2793) - Upgrade Elasticsearch version used for 2.x tests to 2.4.5
+* [HSEARCH-2792](https://hibernate.atlassian.net/browse/HSEARCH-2792) - Rename DslCrossHierarchyTest to ObjectLoadingCrossHierarchyTest
+* [HSEARCH-2791](https://hibernate.atlassian.net/browse/HSEARCH-2791) - Fix integration tests failing on non-H2 databases due to mapping specifics
+* [HSEARCH-2790](https://hibernate.atlassian.net/browse/HSEARCH-2790) - Upgrade to Elasticsearch 5.4.2
+* [HSEARCH-2789](https://hibernate.atlassian.net/browse/HSEARCH-2789) - Test that the CREATE strategy actually doesn't create mappings when the index already exists
+* [HSEARCH-2788](https://hibernate.atlassian.net/browse/HSEARCH-2788) - Remove unnecessary calls to Thread.sleep in CDI/Wildfly tests
+* [HSEARCH-2787](https://hibernate.atlassian.net/browse/HSEARCH-2787) - Replace INFO blocks in the documentation with valid styles
+* [HSEARCH-2781](https://hibernate.atlassian.net/browse/HSEARCH-2781) - Rework internals of sharding to make it possible for backends not to rely on Class<?>
+* [HSEARCH-2775](https://hibernate.atlassian.net/browse/HSEARCH-2775) - Migrate internal file helpers and SPIs from File to NIO APIs
+* [HSEARCH-2770](https://hibernate.atlassian.net/browse/HSEARCH-2770) - Remove (deprecated) methods using Class<?> as indexed type identifier in the engine SPIs
+* [HSEARCH-2528](https://hibernate.atlassian.net/browse/HSEARCH-2528) - Document the dynamic mapping feature
+* [HSEARCH-2369](https://hibernate.atlassian.net/browse/HSEARCH-2369) - HSQuery.targetedEntities(List<Class<?>>) won't always work when using multiple backends 
+
+## 5.8.0.Beta3 (13-06-2017)
+
+### Bug
+* [HSEARCH-2761](https://hibernate.atlassian.net/browse/HSEARCH-2761) - Elasticsearch purges may fail due to concurrent (or non-refreshed) writes
+* [HSEARCH-2742](https://hibernate.atlassian.net/browse/HSEARCH-2742) - NPE when clearing the index in Elasticsearch
+* [HSEARCH-2736](https://hibernate.atlassian.net/browse/HSEARCH-2736) - Discovery_scheme not taken in account
+* [HSEARCH-2683](https://hibernate.atlassian.net/browse/HSEARCH-2683) - Avoid explicit usage of hibernate.search. prefix for new Elasticsearch configuration properties
+* [HSEARCH-2481](https://hibernate.atlassian.net/browse/HSEARCH-2481) - Byteman-based tests executed in the Elasticsearch module won't work
+* [HSEARCH-2477](https://hibernate.atlassian.net/browse/HSEARCH-2477) - Shard filtering doesn't work with Elasticsearch queries
+
+### Deprecation
+* [HSEARCH-2735](https://hibernate.atlassian.net/browse/HSEARCH-2735) - Deprecate index-time boosting capabilities
+
+### Improvement
+* [HSEARCH-2763](https://hibernate.atlassian.net/browse/HSEARCH-2763) - Use improved statistic collector utilities from JDK8
+* [HSEARCH-2754](https://hibernate.atlassian.net/browse/HSEARCH-2754) - SpatialFieldBridge uses inefficient Reflection access
+* [HSEARCH-2752](https://hibernate.atlassian.net/browse/HSEARCH-2752) - Improve overhead of checking for Timeout during Query execution
+* [HSEARCH-2748](https://hibernate.atlassian.net/browse/HSEARCH-2748) - Just log a warning instead of throwing an exception when connecting to an ES server with a higher version than supported
+* [HSEARCH-2746](https://hibernate.atlassian.net/browse/HSEARCH-2746) - Translate parameters of WordDelimiterFilterFactory from 0/1 to booleans on Elasticsearch
+* [HSEARCH-2715](https://hibernate.atlassian.net/browse/HSEARCH-2715) - Mention in the documentation *when* a full reindex may be necessary
+* [HSEARCH-2714](https://hibernate.atlassian.net/browse/HSEARCH-2714) - Allow finer-grained configuration of Elasticsearch authentication
+* [HSEARCH-2711](https://hibernate.atlassian.net/browse/HSEARCH-2711) - Upgrade to Elasticsearch 5.4.1
+* [HSEARCH-2659](https://hibernate.atlassian.net/browse/HSEARCH-2659) - Support "normalizers" in Elasticsearch 5.2+
+* [HSEARCH-2652](https://hibernate.atlassian.net/browse/HSEARCH-2652) - Create one error context per set of works, instead of one per work, when processing Elasticsearch works
+
+### New Feature
+* [HSEARCH-2726](https://hibernate.atlassian.net/browse/HSEARCH-2726) - Add a concept of "normalizer" (analyzer without tokenizer)
+* [HSEARCH-2583](https://hibernate.atlassian.net/browse/HSEARCH-2583) - Document the Analyzer definition extension points
+* [HSEARCH-1316](https://hibernate.atlassian.net/browse/HSEARCH-1316) - Support @Inject in ClassBridges and FieldBridge instances
+
+### Sub-task
+* [HSEARCH-2666](https://hibernate.atlassian.net/browse/HSEARCH-2666) - IndexControlMBean should no longer be flagged experimental
+* [HSEARCH-2665](https://hibernate.atlassian.net/browse/HSEARCH-2665) - Promote IndexingInterceptor to be no longer experimental
+
+### Task
+* [HSEARCH-2767](https://hibernate.atlassian.net/browse/HSEARCH-2767) - Make ElasticsearchWorkProcessor use one execution context per runnable once again
+* [HSEARCH-2762](https://hibernate.atlassian.net/browse/HSEARCH-2762) - Reduce the memory footprint of the Elasticsearch instances in builds
+* [HSEARCH-2751](https://hibernate.atlassian.net/browse/HSEARCH-2751) - SimpleQueryStringDSLTest fails on Elasticsearch 5.1
+* [HSEARCH-2749](https://hibernate.atlassian.net/browse/HSEARCH-2749) - Make sure every SearchIntegrator built in test is closed properly
+* [HSEARCH-2747](https://hibernate.atlassian.net/browse/HSEARCH-2747) - Fix a few typos in the backend section of the documentation
+* [HSEARCH-2745](https://hibernate.atlassian.net/browse/HSEARCH-2745) - Make the Elasticsearch option more prominent in the documentation
+* [HSEARCH-2744](https://hibernate.atlassian.net/browse/HSEARCH-2744) - Improve Simple Query String documentation
+* [HSEARCH-2743](https://hibernate.atlassian.net/browse/HSEARCH-2743) - JGroupsDynamicMasterElectionTest fails on Windows
+* [HSEARCH-2741](https://hibernate.atlassian.net/browse/HSEARCH-2741) - Fix dependency convergence issue between MariaDB and integration tests
+* [HSEARCH-2740](https://hibernate.atlassian.net/browse/HSEARCH-2740) - Remove dead dependencies from sandbox performance tests
+* [HSEARCH-2739](https://hibernate.atlassian.net/browse/HSEARCH-2739) - Some error message use the indexed type and field path inconsistently
+* [HSEARCH-2737](https://hibernate.atlassian.net/browse/HSEARCH-2737) - Agents usage during builds requires a new JVM flag on JDK 9
+* [HSEARCH-2734](https://hibernate.atlassian.net/browse/HSEARCH-2734) - Re-brand the "ram" DirectoryProvider as "local-heap"
+* [HSEARCH-2733](https://hibernate.atlassian.net/browse/HSEARCH-2733) - FullTextIndexEventListener doesn't need to be Serializable
+* [HSEARCH-2732](https://hibernate.atlassian.net/browse/HSEARCH-2732) - New Spring integration tests are failing the JDK9 integration tests
+* [HSEARCH-2727](https://hibernate.atlassian.net/browse/HSEARCH-2727) - No longer needed to explicitly disable INDEX_UNINVERTING_ALLOWED in tests
+* [HSEARCH-2724](https://hibernate.atlassian.net/browse/HSEARCH-2724) - Clarify that "directory-based" indexes are actually just "local Lucene" indexes
+* [HSEARCH-2723](https://hibernate.atlassian.net/browse/HSEARCH-2723) - Clarify the documentation about built-in bridges
+* [HSEARCH-2722](https://hibernate.atlassian.net/browse/HSEARCH-2722) - Remove conditions around Java 8 specific code
+* [HSEARCH-2721](https://hibernate.atlassian.net/browse/HSEARCH-2721) - Fix transient failures in DefaultElasticsearchClientFactoryTest.discovery
+* [HSEARCH-2719](https://hibernate.atlassian.net/browse/HSEARCH-2719) - Fix links to hibernate.onjira.com
+* [HSEARCH-2718](https://hibernate.atlassian.net/browse/HSEARCH-2718) - Make the analyzer definition provider interfaces API instead of SPI
+* [HSEARCH-2717](https://hibernate.atlassian.net/browse/HSEARCH-2717) - Performance tests in sandbox running out of JDBC connections
+* [HSEARCH-2716](https://hibernate.atlassian.net/browse/HSEARCH-2716) - Investigate test failures on the MariaDB job in the CI
+* [HSEARCH-2696](https://hibernate.atlassian.net/browse/HSEARCH-2696) - Move integration test environment resources to a more fitting location
+* [HSEARCH-2603](https://hibernate.atlassian.net/browse/HSEARCH-2603) - Switch to the Painless language for Elasticsearch inline scripts
+* [HSEARCH-1844](https://hibernate.atlassian.net/browse/HSEARCH-1844) - Review which components should no longer be tagged as experimental in 5.8
+* [HSEARCH-1404](https://hibernate.atlassian.net/browse/HSEARCH-1404) - More flexibility than just Class to identify indexing metadata
+
+## 5.8.0.Beta2 (11-05-2017)
+
+### Bug
+* [HSEARCH-2699](https://hibernate.atlassian.net/browse/HSEARCH-2699) - Javassist not being included in the distribution tarballs
+* [HSEARCH-2697](https://hibernate.atlassian.net/browse/HSEARCH-2697) - Mapping with @Field @IndexedEmbedded Integer[] field throws InaccessibleObjectException
+* [HSEARCH-2691](https://hibernate.atlassian.net/browse/HSEARCH-2691) - Custom filter implementations must provide proper implementations of the #equals() and #hashCode() methods.
+* [HSEARCH-2690](https://hibernate.atlassian.net/browse/HSEARCH-2690) - FileHelper based index replication attempts to delete locked files on Windows
+* [HSEARCH-2688](https://hibernate.atlassian.net/browse/HSEARCH-2688) - Clearing scroll IDs (when closing ScrollableResults) fails systematically with Elasticsearch
+* [HSEARCH-2675](https://hibernate.atlassian.net/browse/HSEARCH-2675) - JGroupsBackendQueueProcessor doesn't switch from slave to master dynamically
+* [HSEARCH-2670](https://hibernate.atlassian.net/browse/HSEARCH-2670) - Facet drill-down will never return any result when the source field has a different name
+* [HSEARCH-2642](https://hibernate.atlassian.net/browse/HSEARCH-2642) - Automatic translation of TypeTokenFilterFactory to Elasticsearch turns blacklists to whitelists
+* [HSEARCH-2319](https://hibernate.atlassian.net/browse/HSEARCH-2319) - NPE on metadata reading when the user entity is not using a package
+* [HSEARCH-1886](https://hibernate.atlassian.net/browse/HSEARCH-1886) - Master indexing nodes fail to lookup lazily initialized IndexManager instances
+
+### Improvement
+* [HSEARCH-2709](https://hibernate.atlassian.net/browse/HSEARCH-2709) - Add support for converting MatchNoDocsQuery to Elasticsearch
+* [HSEARCH-2704](https://hibernate.atlassian.net/browse/HSEARCH-2704) - Avoid frequent URL encoding operations at runtime
+* [HSEARCH-2703](https://hibernate.atlassian.net/browse/HSEARCH-2703) - Improve boost handling when translating Lucene queries to Elasticsearch
+* [HSEARCH-2695](https://hibernate.atlassian.net/browse/HSEARCH-2695) - Speedup initialization of Elasticsearch client by skipping SSL engine initialization when not required
+* [HSEARCH-2679](https://hibernate.atlassian.net/browse/HSEARCH-2679) - Improve error handling/reporting around Elasticsearch request sending
+* [HSEARCH-2636](https://hibernate.atlassian.net/browse/HSEARCH-2636) - Be more resilient to the absence of id in the _source
+* [HSEARCH-2606](https://hibernate.atlassian.net/browse/HSEARCH-2606) - Disallow conflicting usage of @Parameter
+* [HSEARCH-2502](https://hibernate.atlassian.net/browse/HSEARCH-2502) - Support the *.worker.execution configuration option on Elasticsearch
+* [HSEARCH-2458](https://hibernate.atlassian.net/browse/HSEARCH-2458) - Report incomplete metadata issues during Elasticsearch mapping generation
+
+### New Feature
+* [HSEARCH-2014](https://hibernate.atlassian.net/browse/HSEARCH-2014) - Expose size of the indexes among statistics
+
+### Sub-task
+* [HSEARCH-2667](https://hibernate.atlassian.net/browse/HSEARCH-2667) - Fulltext Query timeout methods should no longer be flagged as experimental
+* [HSEARCH-2208](https://hibernate.atlassian.net/browse/HSEARCH-2208) - Avoid the org.apache.lucene.search.Filter API
+
+### Task
+* [HSEARCH-2710](https://hibernate.atlassian.net/browse/HSEARCH-2710) - Restore master checking code in JGroupsMasterMessageListener
+* [HSEARCH-2701](https://hibernate.atlassian.net/browse/HSEARCH-2701) - Allow reflection to all-unnamed modules for JDK9 integration testing
+* [HSEARCH-2698](https://hibernate.atlassian.net/browse/HSEARCH-2698) - Investigate and try to solve warnings in build logs
+* [HSEARCH-2694](https://hibernate.atlassian.net/browse/HSEARCH-2694) - Reduce verbosity and warnings from the Elasticsearch integration tests
+* [HSEARCH-2687](https://hibernate.atlassian.net/browse/HSEARCH-2687) - Upgrade Hibernate ORM to 5.2.10.Final
+* [HSEARCH-2684](https://hibernate.atlassian.net/browse/HSEARCH-2684) - Improve timeout handling in tests
+* [HSEARCH-2680](https://hibernate.atlassian.net/browse/HSEARCH-2680) - Investigate alerts from lgtm
+* [HSEARCH-2677](https://hibernate.atlassian.net/browse/HSEARCH-2677) - Upgrade to Byteman 4.0.0-BETA4 to restore Java 9 compatibility
+* [HSEARCH-2158](https://hibernate.atlassian.net/browse/HSEARCH-2158) - Create a Maven profile to allow testing with an externally managed Elasticsearch node
+
+## 5.8.0.Beta1 (13-04-2017)
+
+### Bug
+* [HSEARCH-2681](https://hibernate.atlassian.net/browse/HSEARCH-2681) - Lease request timeouts on the Elasticsearch async client lead to cascading failures
+* [HSEARCH-2664](https://hibernate.atlassian.net/browse/HSEARCH-2664) - Broken links in doc: delete-by-query plugin
+* [HSEARCH-2662](https://hibernate.atlassian.net/browse/HSEARCH-2662) - Querying an empty, dynamically sharded index won't work (Lucene + Elasticsearch)
+* [HSEARCH-2656](https://hibernate.atlassian.net/browse/HSEARCH-2656) - Range queries on fields with a custom MetadataProvidingFieldBridge may not detect numeric-ness correctly
+* [HSEARCH-2651](https://hibernate.atlassian.net/browse/HSEARCH-2651) - Calls to numericField in the programmatic API create duplicate fields
+* [HSEARCH-2631](https://hibernate.atlassian.net/browse/HSEARCH-2631) - Iterating on results of query on single class with criteria generates wrong statistics
+* [HSEARCH-2630](https://hibernate.atlassian.net/browse/HSEARCH-2630) - Queries on multiple classes returning a single result generates wrong statistics
+* [HSEARCH-2602](https://hibernate.atlassian.net/browse/HSEARCH-2602) - The documentation recommends using the deprecated byField(String, SortField.Type) method in the sort DSL
+* [HSEARCH-2541](https://hibernate.atlassian.net/browse/HSEARCH-2541) - FullTextQuery with single result does not populate fields or ID in entity results
+* [HSEARCH-2353](https://hibernate.atlassian.net/browse/HSEARCH-2353) - Add support for norms with Elasticsearch 5
+* [HSEARCH-2277](https://hibernate.atlassian.net/browse/HSEARCH-2277) - Some resources may not be cleaned on bootstrap failure
+* [HSEARCH-1862](https://hibernate.atlassian.net/browse/HSEARCH-1862) - Allow configuration of facets via programmatic configuration API
+
+### Improvement
+* [HSEARCH-2661](https://hibernate.atlassian.net/browse/HSEARCH-2661) - Avoid the recurring calls to serviceManager.requestReference in ElasticsearchHSQueryImpl
+* [HSEARCH-2648](https://hibernate.atlassian.net/browse/HSEARCH-2648) - Add debug/trace logs showing execution time of Elasticsearch requests
+* [HSEARCH-2646](https://hibernate.atlassian.net/browse/HSEARCH-2646) - Mark the private JBoss Modules as private.api
+* [HSEARCH-2645](https://hibernate.atlassian.net/browse/HSEARCH-2645) - Separate the JBoss Module for the Elasticsearch client
+* [HSEARCH-2644](https://hibernate.atlassian.net/browse/HSEARCH-2644) - Mention what needs to be done to switch Elasticsearch version in docs
+* [HSEARCH-2600](https://hibernate.atlassian.net/browse/HSEARCH-2600) - Update javadoc configuration
+* [HSEARCH-2565](https://hibernate.atlassian.net/browse/HSEARCH-2565) - Boolean QueryBuilder clauses should accept a 'null' clause
+* [HSEARCH-2521](https://hibernate.atlassian.net/browse/HSEARCH-2521) - Clarify if error HSEARCH000278 could be caused by the entity not being a managed entity
+* [HSEARCH-2361](https://hibernate.atlassian.net/browse/HSEARCH-2361) - Make sure Elasticsearch related configuration properties are parsed and validated at boot time
+* [HSEARCH-2009](https://hibernate.atlassian.net/browse/HSEARCH-2009) - Document supported types for @FieldBridge#impl()
+* [HSEARCH-2001](https://hibernate.atlassian.net/browse/HSEARCH-2001) - By default enable a "strict mode" validation for sorting
+
+### New Feature
+* [HSEARCH-2678](https://hibernate.atlassian.net/browse/HSEARCH-2678) - Add a simple query string entry point to the DSL
+* [HSEARCH-2469](https://hibernate.atlassian.net/browse/HSEARCH-2469) - Ability to fail over to the next host when a request to an Elasticsearch host fails
+
+### Task
+* [HSEARCH-2686](https://hibernate.atlassian.net/browse/HSEARCH-2686) - No longer require the ByteBuddy dependency to run OSGi tests
+* [HSEARCH-2685](https://hibernate.atlassian.net/browse/HSEARCH-2685) - Update to Hibernate ORM 5.2.9.Final
+* [HSEARCH-2669](https://hibernate.atlassian.net/browse/HSEARCH-2669) - Remove mentions of HSEARCH-2605 in the Elasticsearch documentation
+* [HSEARCH-2660](https://hibernate.atlassian.net/browse/HSEARCH-2660) - Make index schema management strategy options more consistent with JPA
+* [HSEARCH-2654](https://hibernate.atlassian.net/browse/HSEARCH-2654) - Upgrade Elasticsearch RestClient + Sniffer to 5.3
+* [HSEARCH-2653](https://hibernate.atlassian.net/browse/HSEARCH-2653) - Rework credits section in the documentation
+* [HSEARCH-2635](https://hibernate.atlassian.net/browse/HSEARCH-2635) - Some clarifications in the Elasticsearch related documentation
+* [HSEARCH-2628](https://hibernate.atlassian.net/browse/HSEARCH-2628) - JNDI support should reuse the JNDIService from Hibernate ORM
+* [HSEARCH-2607](https://hibernate.atlassian.net/browse/HSEARCH-2607) - Improve OSGi test diagnostics when running tests on misconfigured networks
+* [HSEARCH-2581](https://hibernate.atlassian.net/browse/HSEARCH-2581) - Add the ability to support multiple incompatible Elasticsearch versions (dialects?)
+* [HSEARCH-2434](https://hibernate.atlassian.net/browse/HSEARCH-2434) - Add support for Elasticsearch 5
+* [HSEARCH-2382](https://hibernate.atlassian.net/browse/HSEARCH-2382) - Merge the JPA and Hibernate native components like ORM did
+
+## 5.7.0.Final (21-02-2017)
+
+### Bug
+* [HSEARCH-2593](https://hibernate.atlassian.net/browse/HSEARCH-2593) - Node discovery uses the HTTP (not HTTPS) scheme by default and isn't configurable
+* [HSEARCH-2590](https://hibernate.atlassian.net/browse/HSEARCH-2590) - ElasticsearchHSQueryImpl allocates too much memory for query results
+* [HSEARCH-2587](https://hibernate.atlassian.net/browse/HSEARCH-2587) - Sort DSL on embedded fields throws NPE
+* [HSEARCH-2569](https://hibernate.atlassian.net/browse/HSEARCH-2569) - The "delete-by-query" plugin requirement for Elasticsearch isn't clear
+
+### Improvement
+* [HSEARCH-2591](https://hibernate.atlassian.net/browse/HSEARCH-2591) - Upgrade to Apache Lucene 5.5.4
+* [HSEARCH-2588](https://hibernate.atlassian.net/browse/HSEARCH-2588) - Make byField(String) in the sort DSL automatically determine the sort type for metadata providing field bridges
+* [HSEARCH-2577](https://hibernate.atlassian.net/browse/HSEARCH-2577) - Separate the namespaces for Lucene and Elasticsearch analyzers
+* [HSEARCH-2576](https://hibernate.atlassian.net/browse/HSEARCH-2576) - FacetingManager should allocate maps lazily
+* [HSEARCH-2574](https://hibernate.atlassian.net/browse/HSEARCH-2574) - Java 8: Make the repeatable annotations actually Repeatable
+* [HSEARCH-2572](https://hibernate.atlassian.net/browse/HSEARCH-2572) - Missing labels for cross references in documentation
+* [HSEARCH-2568](https://hibernate.atlassian.net/browse/HSEARCH-2568) - IndexSchemaManagementStrategy#NONE throws an exception if index does not exist
+* [HSEARCH-2453](https://hibernate.atlassian.net/browse/HSEARCH-2453) - Add support for Elasticsearch authentication
+* [HSEARCH-2447](https://hibernate.atlassian.net/browse/HSEARCH-2447) - Make it easier to add sortable fields from custom field bridges
+
+### New Feature
+* [HSEARCH-2585](https://hibernate.atlassian.net/browse/HSEARCH-2585) - Allow injecting Analyzer definitions using a Service
+* [HSEARCH-2418](https://hibernate.atlassian.net/browse/HSEARCH-2418) - Allow registering Analyzer definitions at bootstrap via an extension point
+
+### Task
+* [HSEARCH-2597](https://hibernate.atlassian.net/browse/HSEARCH-2597) - Do not rely on automatic detection of JPA annotations from the classpath
+* [HSEARCH-2596](https://hibernate.atlassian.net/browse/HSEARCH-2596) - Point to the Hibernate ORM / WildFly modules documentation
+* [HSEARCH-2595](https://hibernate.atlassian.net/browse/HSEARCH-2595) - Upgrade to Hibernate ORM 5.2.8.Final
+* [HSEARCH-2580](https://hibernate.atlassian.net/browse/HSEARCH-2580) - Update of the "previous.stable" property following the 5.6.0.Final release
+* [HSEARCH-2578](https://hibernate.atlassian.net/browse/HSEARCH-2578) - Include the lucene-grouping artifact in the WildFly modules
+* [HSEARCH-2575](https://hibernate.atlassian.net/browse/HSEARCH-2575) - Update usage of deprecated options of Forbidden APIs code check
+* [HSEARCH-2573](https://hibernate.atlassian.net/browse/HSEARCH-2573) - Upgrade the Elasticsearch version used for tests to 2.4.4
+* [HSEARCH-2571](https://hibernate.atlassian.net/browse/HSEARCH-2571) - Upgrade the maven plugin dependencies
+* [HSEARCH-2570](https://hibernate.atlassian.net/browse/HSEARCH-2570) - Upgrade maven plugins to support Java 8 code
+* [HSEARCH-2564](https://hibernate.atlassian.net/browse/HSEARCH-2564) - Generic type signature of FullTextQuery should not be as flexible as the JPA Query
+* [HSEARCH-2563](https://hibernate.atlassian.net/browse/HSEARCH-2563) - Update some outdated information in the pom (CI and authors)
+* [HSEARCH-2562](https://hibernate.atlassian.net/browse/HSEARCH-2562) - Integrators can not use the AnalyzerDiscriminator to override analyzer mapping dynamically
+* [HSEARCH-2561](https://hibernate.atlassian.net/browse/HSEARCH-2561) - Allow sorting metadata to be overriden during query execution
+* [HSEARCH-2559](https://hibernate.atlassian.net/browse/HSEARCH-2559) - Switch to Asciidoctor output for the documentation
+* [HSEARCH-2558](https://hibernate.atlassian.net/browse/HSEARCH-2558) - Remove obsolete entries from the "limitations" section of the Elasticsearch integration documentation 
+* [HSEARCH-2381](https://hibernate.atlassian.net/browse/HSEARCH-2381) - Avoid logging warnings caused by internal usage of the legacy Criteria API
+* [HSEARCH-2141](https://hibernate.atlassian.net/browse/HSEARCH-2141) - Improve reliability of JGroups integration tests
+
+## 5.7.0.CR1 (22-01-2017)
+
+### Bug
+* [HSEARCH-2547](https://hibernate.atlassian.net/browse/HSEARCH-2547) - Nesting @IndexedEmbeddeds with "includePaths" results in invalid path restrictions
+* [HSEARCH-2545](https://hibernate.atlassian.net/browse/HSEARCH-2545) - Validation of IndexedEmbedded targeting a numeric document ID fails inside a non-indexed entity
+* [HSEARCH-2535](https://hibernate.atlassian.net/browse/HSEARCH-2535) - @Facet on container (Iterable, Array, ...) properties indexes the container's toString()
+* [HSEARCH-2531](https://hibernate.atlassian.net/browse/HSEARCH-2531) - Cannot override index names through configuration properties with Elasticsearch
+* [HSEARCH-2529](https://hibernate.atlassian.net/browse/HSEARCH-2529) - NullPointerException in LogErrorHandler
+* [HSEARCH-2522](https://hibernate.atlassian.net/browse/HSEARCH-2522) - Elasticsearch backend in the classpath causes eager initialization of non related IndexManagers
+* [HSEARCH-2510](https://hibernate.atlassian.net/browse/HSEARCH-2510) - ArrayBridge doesn't support arrays of primitive types
+* [HSEARCH-2501](https://hibernate.atlassian.net/browse/HSEARCH-2501) - Elasticsearch calendar resolution handling is not consistent with Lucene's
+
+### Improvement
+* [HSEARCH-2527](https://hibernate.atlassian.net/browse/HSEARCH-2527) - Avoid mixups of analyzers and analyzer references in analyzer-related code
+* [HSEARCH-2520](https://hibernate.atlassian.net/browse/HSEARCH-2520) - Support analyzer definitions with the Elasticsearch MERGE strategy
+* [HSEARCH-2519](https://hibernate.atlassian.net/browse/HSEARCH-2519) - Support anlyzer definitions with the Elasticsearch VALIDATE strategy
+* [HSEARCH-2548](https://hibernate.atlassian.net/browse/HSEARCH-2548) - Upgrade to Hibernate ORM 5.2.7.Final
+
+### Task
+* [HSEARCH-2555](https://hibernate.atlassian.net/browse/HSEARCH-2555) - Ensure the test suite fails if any service isn't properly released
+* [HSEARCH-2550](https://hibernate.atlassian.net/browse/HSEARCH-2550) - Improve injection of current version in Arquillian tests
+* [HSEARCH-2540](https://hibernate.atlassian.net/browse/HSEARCH-2540) - Array instantiation in WorkPlan.processContainedInAndPrepareExecution is misleading
+* [HSEARCH-2551](https://hibernate.atlassian.net/browse/HSEARCH-2551) - Avoid FullTextQuery API to directly depend on deprecated API methods
+* [HSEARCH-2549](https://hibernate.atlassian.net/browse/HSEARCH-2549) - MemberRegistrationIT should disable modules injection
+* [HSEARCH-2380](https://hibernate.atlassian.net/browse/HSEARCH-2380) - Upgrade to Hibernate ORM 5.2.6.Final
+
+## 5.7.0.Beta2 (19-12-2016)
+
+### Bug
+* [HSEARCH-2526](https://hibernate.atlassian.net/browse/HSEARCH-2526) - Javadoc errors failing the release process
+* [HSEARCH-2507](https://hibernate.atlassian.net/browse/HSEARCH-2507) - ElasticsearchIndexNameConflictIT is broken on file-insensitive filesystems
+* [HSEARCH-2500](https://hibernate.atlassian.net/browse/HSEARCH-2500) - TikaBridge not working for containers type
+* [HSEARCH-2499](https://hibernate.atlassian.net/browse/HSEARCH-2499) - Tests leaking transactions hang the build when running on MariaDB
+* [HSEARCH-2494](https://hibernate.atlassian.net/browse/HSEARCH-2494) - TikaBridgeProvider does not recognize byte arrays as a compatible type
+* [HSEARCH-2492](https://hibernate.atlassian.net/browse/HSEARCH-2492) - Stream operations behaviour not consistent across IndexManagers
+* [HSEARCH-2491](https://hibernate.atlassian.net/browse/HSEARCH-2491) - Flush per entity ignored for ElasticsearchIndexManager
+* [HSEARCH-2488](https://hibernate.atlassian.net/browse/HSEARCH-2488) - AssertionFailure thrown when field bridges bypass @IndexedEmbedded prefixes with Elasticsearch
+* [HSEARCH-2486](https://hibernate.atlassian.net/browse/HSEARCH-2486) - @ContainedIn in super class being ignored when child class has no Search-specific annotations
+* [HSEARCH-2484](https://hibernate.atlassian.net/browse/HSEARCH-2484) - Concurrent projections fails randomly with Elasticsearch due to service access issues
+* [HSEARCH-2479](https://hibernate.atlassian.net/browse/HSEARCH-2479) - ConnectedMultiFieldsPhraseQueryBuilder uses HashMap on sorted map
+* [HSEARCH-2467](https://hibernate.atlassian.net/browse/HSEARCH-2467) - Avoid scientific notation of date values (epoch millis format) in queries since Elasticsearch is unable to parse it
+* [HSEARCH-2456](https://hibernate.atlassian.net/browse/HSEARCH-2456) - Wait for index status does not raise an exception
+* [HSEARCH-2441](https://hibernate.atlassian.net/browse/HSEARCH-2441) - ElasticsearchQueries.fromJson expects top-level JSON but only the "query" parameter is supported
+* [HSEARCH-2415](https://hibernate.atlassian.net/browse/HSEARCH-2415) - indexNullAs doesn't work on Java 8 date/time types with ES
+* [HSEARCH-2363](https://hibernate.atlassian.net/browse/HSEARCH-2363) - ZonedDateTimeBridge stores time in an ambiguous representation
+
+### Improvement
+* [HSEARCH-2387](https://hibernate.atlassian.net/browse/HSEARCH-2387) - Configurable dynamic mapping settings
+* [HSEARCH-2348](https://hibernate.atlassian.net/browse/HSEARCH-2348) - Improve logging for elasticsearch integration
+* [HSEARCH-2219](https://hibernate.atlassian.net/browse/HSEARCH-2219) - Define analyzers via the REST API
+* [HSEARCH-2172](https://hibernate.atlassian.net/browse/HSEARCH-2172) - Non-null properties persisted as null in ES if value equals indexNullAs()
+* [HSEARCH-1589](https://hibernate.atlassian.net/browse/HSEARCH-1589) - ServiceManager closes services too aggressively
+
+### New Feature
+* [HSEARCH-2449](https://hibernate.atlassian.net/browse/HSEARCH-2449) - Allow configuration of the pool sizes, timeouts and autodiscovery for the Jest client connections
+
+### Task
+* [HSEARCH-2523](https://hibernate.atlassian.net/browse/HSEARCH-2523) - Clarify the Elasticsearch integration is not ready for usage within OSGi
+* [HSEARCH-2512](https://hibernate.atlassian.net/browse/HSEARCH-2512) - Force OSGi integration tests to use the loopback device for RMI
+* [HSEARCH-2509](https://hibernate.atlassian.net/browse/HSEARCH-2509) - Upgrade to Jest 2.0.4
+* [HSEARCH-2508](https://hibernate.atlassian.net/browse/HSEARCH-2508) - Restore the previous default for container bridges
+* [HSEARCH-2506](https://hibernate.atlassian.net/browse/HSEARCH-2506) - Mention Jest in the Elasticsearch documentation
+* [HSEARCH-2503](https://hibernate.atlassian.net/browse/HSEARCH-2503) - Fix ExpectedLog4jLog when expectations are defined during the test
+* [HSEARCH-2489](https://hibernate.atlassian.net/browse/HSEARCH-2489) - Update documentation opening to introduce the Lucene/Elasticsearch option
+* [HSEARCH-2391](https://hibernate.atlassian.net/browse/HSEARCH-2391) - Support -orm/-engine analyzer-related tests in -elasticsearch
+* [HSEARCH-2258](https://hibernate.atlassian.net/browse/HSEARCH-2258) - Index lowercasing required by Elasticsearch might introduce name conflicts
+* [HSEARCH-2223](https://hibernate.atlassian.net/browse/HSEARCH-2223) - Rename SolrAnalyzerBuilder as it's not Solr related anymore
+* [HSEARCH-2095](https://hibernate.atlassian.net/browse/HSEARCH-2095) - LuceneQueryTranslator is forcing to export the whole impl package to OSGi headers
+
+## 5.7.0.Beta1 (29-11-2016)
+
+### Bug
+* [HSEARCH-2495](https://hibernate.atlassian.net/browse/HSEARCH-2495) - The javadoc @see tag is illegal on URLs
+* [HSEARCH-2482](https://hibernate.atlassian.net/browse/HSEARCH-2482) - Sort DSL fails with ClassCastException when using missing values on numeric non-double fields
+* [HSEARCH-2480](https://hibernate.atlassian.net/browse/HSEARCH-2480) - Adding classes to the SearchIntegrator concurrently fails with Elasticsearch
+* [HSEARCH-2475](https://hibernate.atlassian.net/browse/HSEARCH-2475) - Elasticsearch score sorts are reversed
+* [HSEARCH-2474](https://hibernate.atlassian.net/browse/HSEARCH-2474) - Elasticsearch sorts ignore the "missing value" property
+* [HSEARCH-2468](https://hibernate.atlassian.net/browse/HSEARCH-2468) - method getShardIdentifiersForDeletion in ShardIdentifierProviderTemplate should not be final
+* [HSEARCH-2451](https://hibernate.atlassian.net/browse/HSEARCH-2451) - StringFacetingTest.testStringFacetingWithNameCollision() fails randomly with Elasticsearch
+* [HSEARCH-2442](https://hibernate.atlassian.net/browse/HSEARCH-2442) - AsyncExecutor blocks forever on shutdown
+* [HSEARCH-2439](https://hibernate.atlassian.net/browse/HSEARCH-2439) - NPE when generating mapping for unindexed class bridge fields with Elasticsearch
+* [HSEARCH-2438](https://hibernate.atlassian.net/browse/HSEARCH-2438) - Tests failing following daylight saving time change
+* [HSEARCH-2433](https://hibernate.atlassian.net/browse/HSEARCH-2433) - AssertionFailure with providedId in embeddeds
+* [HSEARCH-2432](https://hibernate.atlassian.net/browse/HSEARCH-2432) - Entity Ids containing underscore lost when querying 
+* [HSEARCH-2431](https://hibernate.atlassian.net/browse/HSEARCH-2431) - NPE with projections and Elasticsearch
+* [HSEARCH-2429](https://hibernate.atlassian.net/browse/HSEARCH-2429) - Analyzers on ClassBridge are being ignored with Elasticsearch
+* [HSEARCH-2426](https://hibernate.atlassian.net/browse/HSEARCH-2426) - Remote analyzer initialization fails when using dynamic sharding on Elasticsearch
+* [HSEARCH-2425](https://hibernate.atlassian.net/browse/HSEARCH-2425) - Projection on spatial coordinates returns a String instead of a number with Elasticsearch
+* [HSEARCH-2422](https://hibernate.atlassian.net/browse/HSEARCH-2422) - Error when projecting on the score while not sorting by relevance
+* [HSEARCH-2420](https://hibernate.atlassian.net/browse/HSEARCH-2420) - Tenant IDs containing underscores are not supported with ES
+* [HSEARCH-2419](https://hibernate.atlassian.net/browse/HSEARCH-2419) - Using array/iterable/map field bridges requires the @IndexedEmbedded annotation
+* [HSEARCH-2409](https://hibernate.atlassian.net/browse/HSEARCH-2409) - Parent prefix gets ignored on @IndexedEmbedded @ElementCollection
+* [HSEARCH-2408](https://hibernate.atlassian.net/browse/HSEARCH-2408) - @IndexedEmbedded.prefix, .depth, etc. don't work on @ElementCollection anymore
+* [HSEARCH-2403](https://hibernate.atlassian.net/browse/HSEARCH-2403) - TwoWayFieldBridge exceptions are not wrapped properly when retrieving ES projection values
+* [HSEARCH-2402](https://hibernate.atlassian.net/browse/HSEARCH-2402) - Elasticsearch backend mistakes @DateBridge for @CalendarBridge
+* [HSEARCH-2401](https://hibernate.atlassian.net/browse/HSEARCH-2401) - Boosts are (erroneously) not applied to IndexedEmbeddeds
+* [HSEARCH-2397](https://hibernate.atlassian.net/browse/HSEARCH-2397) - The Elasticsearch backend doesn't support embeddeds prefixes properly
+* [HSEARCH-2386](https://hibernate.atlassian.net/browse/HSEARCH-2386) - TikaMetadataProcessor cannot add sortable fields (or fields usable in Elasticsearch)
+* [HSEARCH-2330](https://hibernate.atlassian.net/browse/HSEARCH-2330) - MetadataProvidingFieldBridge cannot override metadata on annotation-generated field
+* [HSEARCH-2324](https://hibernate.atlassian.net/browse/HSEARCH-2324) - Distance computation is inconsistent between the Lucene and the ElasticSearch backend
+* [HSEARCH-2314](https://hibernate.atlassian.net/browse/HSEARCH-2314) - TokenStream contract violation during serialization of index on slave node in a JMS cluster
+* [HSEARCH-2119](https://hibernate.atlassian.net/browse/HSEARCH-2119) - ManualIndexingStrategyTest is unreliable when run on Elasticsearch
+
+### Improvement
+* [HSEARCH-2450](https://hibernate.atlassian.net/browse/HSEARCH-2450) - In internal metadata, provide access to BridgeDefinedFields through their source document field
+* [HSEARCH-2448](https://hibernate.atlassian.net/browse/HSEARCH-2448) - Throw exceptions with clear messages when there are field type conflicts with Elasticsearch
+* [HSEARCH-2445](https://hibernate.atlassian.net/browse/HSEARCH-2445) - Improve error handling
+* [HSEARCH-2435](https://hibernate.atlassian.net/browse/HSEARCH-2435) - Improve Elasticsearch documentation
+* [HSEARCH-2412](https://hibernate.atlassian.net/browse/HSEARCH-2412) - Add the target URL in Elasticsearch error messages
+* [HSEARCH-2375](https://hibernate.atlassian.net/browse/HSEARCH-2375) - Document the supported Elasticsearch versions in the reference documentation
+* [HSEARCH-2360](https://hibernate.atlassian.net/browse/HSEARCH-2360) - Elasticsearch queries should use source filtering
+* [HSEARCH-2313](https://hibernate.atlassian.net/browse/HSEARCH-2313) - Drop the experimental flag of More Like This queries
+
+### New Feature
+* [HSEARCH-2471](https://hibernate.atlassian.net/browse/HSEARCH-2471) - Add support for projection on unmapped fields with Elasticsearch
+* [HSEARCH-2400](https://hibernate.atlassian.net/browse/HSEARCH-2400) - Support IndexingMonitor for the Elasticsearch backend
+* [HSEARCH-2396](https://hibernate.atlassian.net/browse/HSEARCH-2396) - Support custom field bridges with the Elasticsearch backend (for EmbeddedIds for instance)
+* [HSEARCH-2235](https://hibernate.atlassian.net/browse/HSEARCH-2235) - Allow to configure several hosts of an Elasticsearch cluster
+* [HSEARCH-402](https://hibernate.atlassian.net/browse/HSEARCH-402) - Provide a ReaderProvider to cap the number of index reopenings to a fixed rate
+
+### Patch
+* [HSEARCH-2493](https://hibernate.atlassian.net/browse/HSEARCH-2493) - Generics usage needs to be stricter to make the Java9 compiler happy
+
+### Task
+* [HSEARCH-2483](https://hibernate.atlassian.net/browse/HSEARCH-2483) - Upgrade Elasticsearch used for testing to 2.4.2
+* [HSEARCH-2470](https://hibernate.atlassian.net/browse/HSEARCH-2470) - Drop support for projection on fields with a one-way bridge in Elasticsearch
+* [HSEARCH-2457](https://hibernate.atlassian.net/browse/HSEARCH-2457) - Clean up confusions between relative field name, absolute field name and property name
+* [HSEARCH-2437](https://hibernate.atlassian.net/browse/HSEARCH-2437) - Prepare the support for Elasticsearch 5
+* [HSEARCH-2436](https://hibernate.atlassian.net/browse/HSEARCH-2436) - Reference HSEARCH-2414 in the Elasticsearch doc
+* [HSEARCH-2427](https://hibernate.atlassian.net/browse/HSEARCH-2427) - Introduce JMH tests for query execution via the engine component only
+* [HSEARCH-2416](https://hibernate.atlassian.net/browse/HSEARCH-2416) - Add links to the JIRA tickets for missing features in the Elasticsearch doc
+
+## 5.7.0.Alpha1 (05-10-2016)
+
+### Task
+* [HSEARCH-2350](https://hibernate.atlassian.net/browse/HSEARCH-2350) - Require Java 8
+* [HSEARCH-2296](https://hibernate.atlassian.net/browse/HSEARCH-2296) - Upgrade to Hibernate ORM 5.2.1.Final
+
+## 5.6.0.Beta3 (05-10-2016)
+
+### Bug
+* [HSEARCH-2376](https://hibernate.atlassian.net/browse/HSEARCH-2376) - Unable to sort string with non case sensitive order
+* [HSEARCH-2373](https://hibernate.atlassian.net/browse/HSEARCH-2373) - Some ES-related services are not properly released
+* [HSEARCH-2372](https://hibernate.atlassian.net/browse/HSEARCH-2372) - QueryDescriptor creates an implementation leak
+* [HSEARCH-2371](https://hibernate.atlassian.net/browse/HSEARCH-2371) - Using a SearchIntegrator-provided QueryDescriptor will require passing the targeted entities twice
+* [HSEARCH-2367](https://hibernate.atlassian.net/browse/HSEARCH-2367) - QueryDescriptors ignore targetEntities
+* [HSEARCH-2355](https://hibernate.atlassian.net/browse/HSEARCH-2355) - Add some documentation about time (especially java.util.Date) handling in Elasticsearch integration
+* [HSEARCH-2352](https://hibernate.atlassian.net/browse/HSEARCH-2352) - Index.NO is being ignored for numeric fields (and also boolean or date fields for Elasticearch)
+* [HSEARCH-2351](https://hibernate.atlassian.net/browse/HSEARCH-2351) - Documents lost after concurrent initialization of DirectoryProvider
+* [HSEARCH-2343](https://hibernate.atlassian.net/browse/HSEARCH-2343) - Possible resource leak in IndexControl MBean
+* [HSEARCH-2189](https://hibernate.atlassian.net/browse/HSEARCH-2189) - Querying elastic search triggers exception "Result window is too large"
+
+### Improvement
+* [HSEARCH-2374](https://hibernate.atlassian.net/browse/HSEARCH-2374) - Make the default value of hibernate.search.default.elasticsearch.index_schema_management_strategy less confusing
+* [HSEARCH-2370](https://hibernate.atlassian.net/browse/HSEARCH-2370) - Document how to use QueryDescriptor
+* [HSEARCH-2359](https://hibernate.atlassian.net/browse/HSEARCH-2359) - Checkstyle: stricter ParenPad rule
+* [HSEARCH-2349](https://hibernate.atlassian.net/browse/HSEARCH-2349) - PrefixQuery Apache Lucene query type is not automatically translated to json  
+* [HSEARCH-2092](https://hibernate.atlassian.net/browse/HSEARCH-2092) - Map the optimize() operation to Elasticsearch 'force merge' requests
+
+### New Feature
+* [HSEARCH-2269](https://hibernate.atlassian.net/browse/HSEARCH-2269) - Provide support for new Java 8 time/date types (JSR 310) with Elasticsearch backend
+* [HSEARCH-1872](https://hibernate.atlassian.net/browse/HSEARCH-1872) - Create a proper API for sorting definitions
+
+### Task
+* [HSEARCH-2356](https://hibernate.atlassian.net/browse/HSEARCH-2356) - Latest Java 9 preview builds need --add-modules instead of -addmods as build option
+* [HSEARCH-2347](https://hibernate.atlassian.net/browse/HSEARCH-2347) - Upgrade JUnit to 4.12
+* [HSEARCH-2346](https://hibernate.atlassian.net/browse/HSEARCH-2346) - Upgrade Spring Framework used for integration tests to 4.3.2.RELEASE
+* [HSEARCH-2342](https://hibernate.atlassian.net/browse/HSEARCH-2342) - Upgrade to WildFly 10.1.0.Final
+* [HSEARCH-2262](https://hibernate.atlassian.net/browse/HSEARCH-2262) - In the Elasticsearch mapping, validate the type of the null_value/indexNullAs property
+
+Version 5.6.0.Beta2 (5-9-2016)
+
+### Sub-task
+* [HSEARCH-2207](https://hibernate.atlassian.net/browse/HSEARCH-2207) - Treat BooleanQuery as an immutable Query
+
+### Bug
+* [HSEARCH-2094](https://hibernate.atlassian.net/browse/HSEARCH-2094) - ConfigurationPropertiesProvider leaks the configuration Properties
+* [HSEARCH-2221](https://hibernate.atlassian.net/browse/HSEARCH-2221) - Document in the migration guide that sort by Long @Id doesn't work anymore
+* [HSEARCH-2287](https://hibernate.atlassian.net/browse/HSEARCH-2287) - Clear cached results of a query when sort is changed
+* [HSEARCH-2307](https://hibernate.atlassian.net/browse/HSEARCH-2307) - Documentation shouldn't suggest need for @Indexed of embedded association fields
+* [HSEARCH-2322](https://hibernate.atlassian.net/browse/HSEARCH-2322) - Spatial sort on optional field may fail in corner cases
+* [HSEARCH-2325](https://hibernate.atlassian.net/browse/HSEARCH-2325) - AbstractHSQuery.validateSortField validates SortFields even when lacking information
+* [HSEARCH-2326](https://hibernate.atlassian.net/browse/HSEARCH-2326) - The default unit for the spatial distance projection in ES is not documented (same for Lucene's)
+* [HSEARCH-2336](https://hibernate.atlassian.net/browse/HSEARCH-2336) - Upgrade Unitils to 3.4.3
+* [HSEARCH-2337](https://hibernate.atlassian.net/browse/HSEARCH-2337) - Async backend not properly flushed
+* [HSEARCH-2338](https://hibernate.atlassian.net/browse/HSEARCH-2338) - Regex in ElasticsearchIndexWorkVisitor.NAME_AND_INDEX doesn't deal with numbers with more than 1 digit
+
+### New Feature
+* [HSEARCH-2286](https://hibernate.atlassian.net/browse/HSEARCH-2286) - DistanceSortField should support reverse sorting
+
+### Task
+* [HSEARCH-1969](https://hibernate.atlassian.net/browse/HSEARCH-1969) - Setup a build job to test the project works with JDK7
+* [HSEARCH-2157](https://hibernate.atlassian.net/browse/HSEARCH-2157) - Options not exposed in SpatialFieldBridgeByHash
+* [HSEARCH-2170](https://hibernate.atlassian.net/browse/HSEARCH-2170) - Convert the GsonHolder to a Service to ensure cleanup
+* [HSEARCH-2256](https://hibernate.atlassian.net/browse/HSEARCH-2256) - Consider adding an option to include the tenant id field in the mapping or not
+* [HSEARCH-2257](https://hibernate.atlassian.net/browse/HSEARCH-2257) - Add more Elasticsearch specific projection constants
+* [HSEARCH-2272](https://hibernate.atlassian.net/browse/HSEARCH-2272) - Upgrade to Hibernate ORM 5.1
+* [HSEARCH-2276](https://hibernate.atlassian.net/browse/HSEARCH-2276) - Unclosed test utilities cause leaking of threads
+* [HSEARCH-2285](https://hibernate.atlassian.net/browse/HSEARCH-2285) - Explicit dependency on the javax.annotations to allow compiling on JDK9
+* [HSEARCH-2289](https://hibernate.atlassian.net/browse/HSEARCH-2289) - DurationBridgeTest assumes an overflow not happening on JDK9
+* [HSEARCH-2290](https://hibernate.atlassian.net/browse/HSEARCH-2290) - Get build to pass on JDK9 preview 9-ea+120
+* [HSEARCH-2293](https://hibernate.atlassian.net/browse/HSEARCH-2293) - Validate builds are backwards compatible with JBoss Logger 3.1
+* [HSEARCH-2302](https://hibernate.atlassian.net/browse/HSEARCH-2302) - Avoid depending on implementation details to get the JPA FlushMode for a Query
+* [HSEARCH-2303](https://hibernate.atlassian.net/browse/HSEARCH-2303) - Cleanup build: maven-injection-plugin is no longer used
+* [HSEARCH-2305](https://hibernate.atlassian.net/browse/HSEARCH-2305) - Upgrade to Apache Lucene 5.5.2
+* [HSEARCH-2308](https://hibernate.atlassian.net/browse/HSEARCH-2308) - Upgrade JGroups to version 3.6.10.Final
+* [HSEARCH-2309](https://hibernate.atlassian.net/browse/HSEARCH-2309) - Getting started documentation points to an old version of Luke
+* [HSEARCH-2316](https://hibernate.atlassian.net/browse/HSEARCH-2316) - Upgrade to Narayana 5.2.14.Final
+* [HSEARCH-2317](https://hibernate.atlassian.net/browse/HSEARCH-2317) - Upgrade to Apache ActiveMQ 5.13.3
+
+### Improvement
+* [HSEARCH-2098](https://hibernate.atlassian.net/browse/HSEARCH-2098) - Clarify documentation of @IndexedEmbedded#prefix()
+* [HSEARCH-2168](https://hibernate.atlassian.net/browse/HSEARCH-2168) - Raise exceptions via Log API in Elasticsearch backend
+* [HSEARCH-2171](https://hibernate.atlassian.net/browse/HSEARCH-2171) - Convert query values to correct type
+* [HSEARCH-2281](https://hibernate.atlassian.net/browse/HSEARCH-2281) - Omit the "boost" attribute on queries when not required
+* [HSEARCH-2299](https://hibernate.atlassian.net/browse/HSEARCH-2299) - Create CONTRIBUTING.md file
+* [HSEARCH-2300](https://hibernate.atlassian.net/browse/HSEARCH-2300) - Use Maven Central first and only contact JBoss Nexus if the artifact is not found in Central
+* [HSEARCH-2301](https://hibernate.atlassian.net/browse/HSEARCH-2301) - CriteriaObjectInitializer is suboptimal when we query only one subtype of a hierarchy
+* [HSEARCH-2304](https://hibernate.atlassian.net/browse/HSEARCH-2304) - Add missing @Override annotation
+* [HSEARCH-2312](https://hibernate.atlassian.net/browse/HSEARCH-2312) - Do not require the lucene-backward-codecs dependency
+* [HSEARCH-2318](https://hibernate.atlassian.net/browse/HSEARCH-2318) - Improve error messages on BytemanHelper
+* [HSEARCH-2321](https://hibernate.atlassian.net/browse/HSEARCH-2321) - Upgrade maven-jdocbook-plugin and pressgang to generate valid HTML5 documentation
+* [HSEARCH-2323](https://hibernate.atlassian.net/browse/HSEARCH-2323) - Properly ignore hibernate-noorm-release-scripts directory in the build
+* [HSEARCH-2333](https://hibernate.atlassian.net/browse/HSEARCH-2333) - There's no straightforward way to execute backend-independent queries from the engine module
+
+### Patch
+* [HSEARCH-2297](https://hibernate.atlassian.net/browse/HSEARCH-2297) - Avoid logging method tracef( String, int )
+
+### Deprecation
+* [HSEARCH-2310](https://hibernate.atlassian.net/browse/HSEARCH-2310) - Deprecate the ProvidedId annotation
+
+
+Version 5.6.0.Beta1 (22-5-2016)
+
+### Bug
+* [HSEARCH-2011](https://hibernate.atlassian.net/browse/HSEARCH-2011) - HSEARCH000268 : Field does not exist or not configured for faceting
+* [HSEARCH-2046](https://hibernate.atlassian.net/browse/HSEARCH-2046) - Three fields are added to the index for an indexed element collection with two elements
+* [HSEARCH-2120](https://hibernate.atlassian.net/browse/HSEARCH-2120) - EdgeCaseFacetTest is unreliable on Elasticsearch
+* [HSEARCH-2193](https://hibernate.atlassian.net/browse/HSEARCH-2193) - LuceneBackendQueueTask does not release the Directory lock on update failures
+* [HSEARCH-2200](https://hibernate.atlassian.net/browse/HSEARCH-2200) - Typo in log message
+* [HSEARCH-2210](https://hibernate.atlassian.net/browse/HSEARCH-2210) - Missing types in NumericFieldUtils#requiresNumericRangeQuery
+* [HSEARCH-2222](https://hibernate.atlassian.net/browse/HSEARCH-2222) - The new AnalyzerReference infrastructure is not used in the DSL
+* [HSEARCH-2226](https://hibernate.atlassian.net/browse/HSEARCH-2226) - FullTextQuery does not override some returned Query types to allow method chaining
+* [HSEARCH-2227](https://hibernate.atlassian.net/browse/HSEARCH-2227) - elasticsearch.ProjectionConstants exposes Lucene constructs
+* [HSEARCH-2233](https://hibernate.atlassian.net/browse/HSEARCH-2233) - Elasticsearch - Dates and numerics should never be analyzed
+* [HSEARCH-2237](https://hibernate.atlassian.net/browse/HSEARCH-2237) - ScopedAnalyzerReference shouldn't close the underlying analyzer references
+* [HSEARCH-2240](https://hibernate.atlassian.net/browse/HSEARCH-2240) - Parallel service lookup might fail to find the service
+* [HSEARCH-2251](https://hibernate.atlassian.net/browse/HSEARCH-2251) - In the DSL, don't analyze string encoded dates
+* [HSEARCH-2252](https://hibernate.atlassian.net/browse/HSEARCH-2252) - Document that it's not recommended to sort on the id field
+* [HSEARCH-2274](https://hibernate.atlassian.net/browse/HSEARCH-2274) - Property "elasticsearch.host" isn't accessed correctly
+* [HSEARCH-2275](https://hibernate.atlassian.net/browse/HSEARCH-2275) - Elasticsearch massindexer does not guarantee a proper shutdown
+* [HSEARCH-2280](https://hibernate.atlassian.net/browse/HSEARCH-2280) - The JGroups backend module should not depend on the Elasticsearch module
+
+### New Feature
+* [HSEARCH-2064](https://hibernate.atlassian.net/browse/HSEARCH-2064) - Implement filters in Elasticsearch backend
+* [HSEARCH-2110](https://hibernate.atlassian.net/browse/HSEARCH-2110) - Upgrade ES documentation before Beta1 release
+* [HSEARCH-2199](https://hibernate.atlassian.net/browse/HSEARCH-2199) - Allows the use of CharFilter in the programmatic API of SearchMapping
+* [HSEARCH-2234](https://hibernate.atlassian.net/browse/HSEARCH-2234) - Add dependency to "xml.bind" to ES JBoss Modules module.xml
+
+### Task
+* [HSEARCH-2061](https://hibernate.atlassian.net/browse/HSEARCH-2061) - Review package naming in the new ElasticSearch integration module
+* [HSEARCH-2063](https://hibernate.atlassian.net/browse/HSEARCH-2063) - Review the pending TODOs in the new Elasticsearch backend
+* [HSEARCH-2067](https://hibernate.atlassian.net/browse/HSEARCH-2067) - Rework ElasticSearchBridgeProvider integration to not affect non-ES indexing
+* [HSEARCH-2071](https://hibernate.atlassian.net/browse/HSEARCH-2071) - Support embedded ids with ES backend
+* [HSEARCH-2106](https://hibernate.atlassian.net/browse/HSEARCH-2106) - Discuss unique ProjectionConstants API
+* [HSEARCH-2138](https://hibernate.atlassian.net/browse/HSEARCH-2138) - Elasticsearch async: do not request reader refresh operations after each write
+* [HSEARCH-2156](https://hibernate.atlassian.net/browse/HSEARCH-2156) - Document requiring the bulk deletion Elasticsearch plugin
+* [HSEARCH-2164](https://hibernate.atlassian.net/browse/HSEARCH-2164) - Make Elasticsearch configuration properties index-scoped where feasible
+* [HSEARCH-2187](https://hibernate.atlassian.net/browse/HSEARCH-2187) - Documentation: Explain how to use the analyzers configured in ES
+* [HSEARCH-2198](https://hibernate.atlassian.net/browse/HSEARCH-2198) - Avoid using maven-injection-plugin to retrieve project Version
+* [HSEARCH-2205](https://hibernate.atlassian.net/browse/HSEARCH-2205) - Upgrade to Elasticsearch 2.3.1: Java9 compatibility and Lucene aligned to 5.5
+* [HSEARCH-2211](https://hibernate.atlassian.net/browse/HSEARCH-2211) - Upgrade Arquillian infrastructure
+* [HSEARCH-2217](https://hibernate.atlassian.net/browse/HSEARCH-2217) - Move Travis build to Trusty infrastructure and use Maven wrapper
+* [HSEARCH-2229](https://hibernate.atlassian.net/browse/HSEARCH-2229) - Improve error message in ElasticsearchIndexManager#analyzerName
+* [HSEARCH-2238](https://hibernate.atlassian.net/browse/HSEARCH-2238) - Upgrade to Byteman 3.0.5
+* [HSEARCH-2242](https://hibernate.atlassian.net/browse/HSEARCH-2242) - Convert FacetManager implementation to no longer use Filters
+* [HSEARCH-2245](https://hibernate.atlassian.net/browse/HSEARCH-2245) - Handle Calendar and resolution in the Elasticsearch specific BridgeProvider
+* [HSEARCH-2246](https://hibernate.atlassian.net/browse/HSEARCH-2246) - Using DSL with Elasticsearch and dates is broken
+* [HSEARCH-2264](https://hibernate.atlassian.net/browse/HSEARCH-2264) - Add additional comments on building metadata with/without IndexManager type
+
+### Sub-task
+* [HSEARCH-2209](https://hibernate.atlassian.net/browse/HSEARCH-2209) - Switch to ClassicSimilarity as default Similarity implementation
+
+### Improvement
+* [HSEARCH-1724](https://hibernate.atlassian.net/browse/HSEARCH-1724) - Simplify access to ClassLoaderService
+* [HSEARCH-1951](https://hibernate.atlassian.net/browse/HSEARCH-1951) - Improve resulting error message when applying the wrong Sort Type
+* [HSEARCH-1970](https://hibernate.atlassian.net/browse/HSEARCH-1970) - Untangle relationship of (DirectoryBased)IndexManager and BackendQueueProvider
+* [HSEARCH-2093](https://hibernate.atlassian.net/browse/HSEARCH-2093) - Clarify meaning of constant names on IndexSchemaManagementStrategy
+* [HSEARCH-2100](https://hibernate.atlassian.net/browse/HSEARCH-2100) - CPU hotspot in query.dsl.impl.Helper.getDocumentBuilder(QueryBuildingContext)
+* [HSEARCH-2125](https://hibernate.atlassian.net/browse/HSEARCH-2125) - Elasticsearch - support for MultiPhraseQuery
+* [HSEARCH-2167](https://hibernate.atlassian.net/browse/HSEARCH-2167) - Rename IndexManagementStrategy
+* [HSEARCH-2178](https://hibernate.atlassian.net/browse/HSEARCH-2178) - Send bulked index changes to ES when using the mass indexer
+* [HSEARCH-2197](https://hibernate.atlassian.net/browse/HSEARCH-2197) - Loading of search results produces useless garbage.
+* [HSEARCH-2201](https://hibernate.atlassian.net/browse/HSEARCH-2201) - Fix assorted typos in comments
+* [HSEARCH-2202](https://hibernate.atlassian.net/browse/HSEARCH-2202) - Fix SearchIntegrator camel casing throughout the codebase
+* [HSEARCH-2203](https://hibernate.atlassian.net/browse/HSEARCH-2203) - Reduce memory consumption of EntityInfoImpl objects.
+* [HSEARCH-2212](https://hibernate.atlassian.net/browse/HSEARCH-2212) - Improve Elasticsearch integration documentation
+* [HSEARCH-2213](https://hibernate.atlassian.net/browse/HSEARCH-2213) - Cryptic error when cluster is not green during index creation
+* [HSEARCH-2214](https://hibernate.atlassian.net/browse/HSEARCH-2214) - Provide an option to wait for Elasticsearch status yellow rather than green
+* [HSEARCH-2243](https://hibernate.atlassian.net/browse/HSEARCH-2243) - Allow provided services to implement Startable or Stoppable
+* [HSEARCH-2244](https://hibernate.atlassian.net/browse/HSEARCH-2244) - Unify the way TermQuery for numerics are handled
+* [HSEARCH-2247](https://hibernate.atlassian.net/browse/HSEARCH-2247) - Represent the kind of underlying technology with an explicit type
+* [HSEARCH-2250](https://hibernate.atlassian.net/browse/HSEARCH-2250) - Improve readability and efficiency of MultiWriteDrainableLinkedList
+* [HSEARCH-2270](https://hibernate.atlassian.net/browse/HSEARCH-2270) - Upgrade to Apache Lucene 5.5.1.Final
+
+### Deprecation
+* [HSEARCH-2241](https://hibernate.atlassian.net/browse/HSEARCH-2241) - Clarify deprecation of setFilter() method on FullTextQuery
+
+
+Version 5.6.0.Alpha3 (16-3-2016)
+
+### Bug
+* [HSEARCH-2126](https://hibernate.atlassian.net/browse/HSEARCH-2126) - Checkstyle fails when explicitly called via goal checkstyle:check
+* [HSEARCH-2127](https://hibernate.atlassian.net/browse/HSEARCH-2127) - SpatialFieldBridges implement MetadataProvidingFieldBridge but does not provide useful information about the added fields
+* [HSEARCH-2129](https://hibernate.atlassian.net/browse/HSEARCH-2129) - Spatial FieldBrige defined fields are not contributed correctly in the DocumentBuilderIndexedEntity
+* [HSEARCH-2160](https://hibernate.atlassian.net/browse/HSEARCH-2160) - JGroups Backend SyncJGroupsBackendTest doesn't work after 2150 on anymore.
+* [HSEARCH-2163](https://hibernate.atlassian.net/browse/HSEARCH-2163) - ElasticsearchIndexManager should close the underlying BackendQueueProcessor
+* [HSEARCH-2169](https://hibernate.atlassian.net/browse/HSEARCH-2169) - TermQuery should be translated to term query not match query
+* [HSEARCH-2179](https://hibernate.atlassian.net/browse/HSEARCH-2179) - Hanging during shutdown of SyncWorkProcessor
+
+### New Feature
+* [HSEARCH-2108](https://hibernate.atlassian.net/browse/HSEARCH-2108) - Allow to configure custom analyzers with ES backend
+
+### Task
+* [HSEARCH-2132](https://hibernate.atlassian.net/browse/HSEARCH-2132) - Upgrade Elasticsearch used for testing to 2.2.0
+* [HSEARCH-2134](https://hibernate.atlassian.net/browse/HSEARCH-2134) - Include Elasticsearch modules and dependencies in the release distribution
+* [HSEARCH-2136](https://hibernate.atlassian.net/browse/HSEARCH-2136) - Enable scripting support for Elasticsearch
+* [HSEARCH-2140](https://hibernate.atlassian.net/browse/HSEARCH-2140) - Checkstyle upgrade broke testing on JDK9
+* [HSEARCH-2143](https://hibernate.atlassian.net/browse/HSEARCH-2143) - On SearchException in JestClient we should describe which operation was attempted
+* [HSEARCH-2144](https://hibernate.atlassian.net/browse/HSEARCH-2144) - Explicitly define the Elasticsearch version and configuration file used for integration testing
+* [HSEARCH-2145](https://hibernate.atlassian.net/browse/HSEARCH-2145) - Make our IllegalImport checkstyle check consistent with the official ones
+* [HSEARCH-2146](https://hibernate.atlassian.net/browse/HSEARCH-2146) - Wait for index status green after index creation on Elasticsearch
+* [HSEARCH-2147](https://hibernate.atlassian.net/browse/HSEARCH-2147) - Elasticsearch - spatial: implement the HASH strategy
+* [HSEARCH-2148](https://hibernate.atlassian.net/browse/HSEARCH-2148) - Add Travis support
+* [HSEARCH-2149](https://hibernate.atlassian.net/browse/HSEARCH-2149) - Fix the HikariCP configuration of TestRunnerStandalone
+* [HSEARCH-2150](https://hibernate.atlassian.net/browse/HSEARCH-2150) - The JGroups messages timeout in SyncJGroupsBackendTest is too low
+* [HSEARCH-2151](https://hibernate.atlassian.net/browse/HSEARCH-2151) - Make sure failures in the Elasticsearch backend are handled by the Errorhandler
+* [HSEARCH-2155](https://hibernate.atlassian.net/browse/HSEARCH-2155) - Make sure Elasticsearch exceptions are logged in the build output
+* [HSEARCH-2161](https://hibernate.atlassian.net/browse/HSEARCH-2161) - Missing @SortableField in performance tests
+* [HSEARCH-2162](https://hibernate.atlassian.net/browse/HSEARCH-2162) - Make TestRunnerStandalone work in Maven *and* Eclipse with and without a database profile
+
+### Improvement
+* [HSEARCH-2091](https://hibernate.atlassian.net/browse/HSEARCH-2091) - ElasticSearchIndexWorkVisitor should not be allocated for each operation
+* [HSEARCH-2130](https://hibernate.atlassian.net/browse/HSEARCH-2130) - Elasticsearch - add spatial support
+* [HSEARCH-2133](https://hibernate.atlassian.net/browse/HSEARCH-2133) - Add various accessors and utilities to be able to exploit the spatial structures
+* [HSEARCH-2139](https://hibernate.atlassian.net/browse/HSEARCH-2139) - SpatialFieldBridge implementations should reuse target field name
+* [HSEARCH-2142](https://hibernate.atlassian.net/browse/HSEARCH-2142) - Upgrade JGroups to version 3.6.8.Final
+* [HSEARCH-2152](https://hibernate.atlassian.net/browse/HSEARCH-2152) - Create bulk request for one List<LuceneWork> where possible
+* [HSEARCH-2154](https://hibernate.atlassian.net/browse/HSEARCH-2154) - Enable some more tests around embeddables
+* [HSEARCH-2173](https://hibernate.atlassian.net/browse/HSEARCH-2173) - Support delete-by-query with ES backend
+* [HSEARCH-2174](https://hibernate.atlassian.net/browse/HSEARCH-2174) - Tenant id should not be analyzed
+* [HSEARCH-2175](https://hibernate.atlassian.net/browse/HSEARCH-2175) - Enable some more tests
+* [HSEARCH-2176](https://hibernate.atlassian.net/browse/HSEARCH-2176) - Avoid repeated service look-ups in ElasticsearchBackendQueueProcessor
+* [HSEARCH-2180](https://hibernate.atlassian.net/browse/HSEARCH-2180) - Rename IndexManager#closeIndexWriter() into flushAndReleaseResources()
+* [HSEARCH-2182](https://hibernate.atlassian.net/browse/HSEARCH-2182) - Configure plug-in for creating API/SPI change report
+
+### Patch
+* [HSEARCH-2166](https://hibernate.atlassian.net/browse/HSEARCH-2166) - Runtime exceptions during the performance tests should fail the benchmark
+
+
+Version 5.6.0.Alpha2 (29-2-2016)
+
+### Bug
+* [HSEARCH-1917](https://hibernate.atlassian.net/browse/HSEARCH-1917) - Cannot index null or empty values for faceted fields
+
+### New Feature
+* [HSEARCH-2065](https://hibernate.atlassian.net/browse/HSEARCH-2065) - Support the Faceting feature over Elasticsearch
+* [HSEARCH-2114](https://hibernate.atlassian.net/browse/HSEARCH-2114) - Allow to use "elasticsearch" as alias for index manager configuration
+* [HSEARCH-2117](https://hibernate.atlassian.net/browse/HSEARCH-2117) - Add FullTextEntityManager#createFullTextQuery(QueryDescriptor, Class<?>...)
+
+### Task
+* [HSEARCH-2131](https://hibernate.atlassian.net/browse/HSEARCH-2131) - Include basic Elasticsearch getting started elements in the documentation
+
+### Improvement
+* [HSEARCH-2099](https://hibernate.atlassian.net/browse/HSEARCH-2099) - Upgrade to Apache Lucene 5.5.0
+* [HSEARCH-2103](https://hibernate.atlassian.net/browse/HSEARCH-2103) - Fix Checkstyle for Java 8 syntax
+* [HSEARCH-2105](https://hibernate.atlassian.net/browse/HSEARCH-2105) - Don't use nested mapping by default with ES backend
+* [HSEARCH-2113](https://hibernate.atlassian.net/browse/HSEARCH-2113) - Elasticsearch - Better sort support
+* [HSEARCH-2118](https://hibernate.atlassian.net/browse/HSEARCH-2118) - Add infrastructure to be able to ignore tests when running the Elasticsearch backend
+* [HSEARCH-2121](https://hibernate.atlassian.net/browse/HSEARCH-2121) - Split DSLTest to facilitate Elasticsearch testing
+* [HSEARCH-2122](https://hibernate.atlassian.net/browse/HSEARCH-2122) - Elasticsearch - add support for FuzzyQuery
+* [HSEARCH-2123](https://hibernate.atlassian.net/browse/HSEARCH-2123) - Elasticsearch - add support for boost
+* [HSEARCH-2124](https://hibernate.atlassian.net/browse/HSEARCH-2124) - Elasticsearch - add support for phrase query
+
+
+Version 5.6.0.Alpha1 (16-2-2016)
+
+### Bug
+* [HSEARCH-1461](https://hibernate.atlassian.net/browse/HSEARCH-1461) - Query Statistics object is reset every time the SearchFactory is reconfigured via SearchFactoryIntegrator.addClasses(..) method.
+* [HSEARCH-2010](https://hibernate.atlassian.net/browse/HSEARCH-2010) - Error message incorrectly references @SortField instead of @SortableField
+* [HSEARCH-2021](https://hibernate.atlassian.net/browse/HSEARCH-2021) - No way to make fields Sortable inside of custom FieldBridge
+* [HSEARCH-2023](https://hibernate.atlassian.net/browse/HSEARCH-2023) - Race conditions between shutdown of ScheduledCommitPolicy and close of IndexWriter
+* [HSEARCH-2030](https://hibernate.atlassian.net/browse/HSEARCH-2030) - DSL range/below on a string field creates a TermRangeQuery with lower bound equal to the null token
+* [HSEARCH-2033](https://hibernate.atlassian.net/browse/HSEARCH-2033) - Testsuite fails on Windows
+* [HSEARCH-2037](https://hibernate.atlassian.net/browse/HSEARCH-2037) - Multiple "must not" query clauses produce zero results
+* [HSEARCH-2047](https://hibernate.atlassian.net/browse/HSEARCH-2047) - Remove tab character from null value token in ArrayBridgeTestEntity
+* [HSEARCH-2056](https://hibernate.atlassian.net/browse/HSEARCH-2056) - Allow default field name to be used for @Id property also if @DocumentId is given at another property
+* [HSEARCH-2069](https://hibernate.atlassian.net/browse/HSEARCH-2069) - SortableField on id field will make initialization crash if the entity is @IndexedEmbedded in another
+* [HSEARCH-2070](https://hibernate.atlassian.net/browse/HSEARCH-2070) - Range queries on embedded Date fields won't return the expected results
+* [HSEARCH-2073](https://hibernate.atlassian.net/browse/HSEARCH-2073) - LuceneHSQuery fails to deserialize
+* [HSEARCH-2074](https://hibernate.atlassian.net/browse/HSEARCH-2074) - @ContainedIn triggers too much works when there is not "depth" on the corresponding @IndexedEmbedded
+* [HSEARCH-2075](https://hibernate.atlassian.net/browse/HSEARCH-2075) - ShardIdentifierProvider should allow customization of shards for deletion
+* [HSEARCH-2082](https://hibernate.atlassian.net/browse/HSEARCH-2082) - Documentation refers to @SortField when it should be @SortableField
+* [HSEARCH-2085](https://hibernate.atlassian.net/browse/HSEARCH-2085) - Typo in hibernate-search-engine logger
+* [HSEARCH-2086](https://hibernate.atlassian.net/browse/HSEARCH-2086) - Long and Date range faceting doesn't honor hasZeroCountsIncluded
+
+### New Feature
+* [HSEARCH-1188](https://hibernate.atlassian.net/browse/HSEARCH-1188) - Prototype capability to delegate both indexing and search to an Elasticsearch service
+* [HSEARCH-1867](https://hibernate.atlassian.net/browse/HSEARCH-1867) - Change TypeMetadata#getEmbeddedTypeMetadata() to return a set instead of list
+* [HSEARCH-2012](https://hibernate.atlassian.net/browse/HSEARCH-2012) - Expose a method to close the IndexWriter (lock) of a specific IndexManager
+* [HSEARCH-2034](https://hibernate.atlassian.net/browse/HSEARCH-2034) - Allow the QueryBuilder DSL to disable scoring for must clauses
+* [HSEARCH-2043](https://hibernate.atlassian.net/browse/HSEARCH-2043) - Provide option to raise an exception in case uncovered sorts are detected
+* [HSEARCH-2048](https://hibernate.atlassian.net/browse/HSEARCH-2048) - Generalize MetadataProvidingFieldBridge contract to return types and names of created fields
+
+### Task
+* [HSEARCH-2013](https://hibernate.atlassian.net/browse/HSEARCH-2013) - Upgrade tests to WildFly 10.0.0.CR2
+* [HSEARCH-2015](https://hibernate.atlassian.net/browse/HSEARCH-2015) - Upgrade Narayana to 5.2.5.Final
+* [HSEARCH-2016](https://hibernate.atlassian.net/browse/HSEARCH-2016) - Upgrade JGroups to 3.6.6.Final
+* [HSEARCH-2017](https://hibernate.atlassian.net/browse/HSEARCH-2017) - Upgrade Hibernate ORM to 5.0.2.Final
+* [HSEARCH-2018](https://hibernate.atlassian.net/browse/HSEARCH-2018) - Upgrade Apache Lucene to 5.3.1
+* [HSEARCH-2026](https://hibernate.atlassian.net/browse/HSEARCH-2026) - Upgrade to Byteman 3.0.2
+* [HSEARCH-2027](https://hibernate.atlassian.net/browse/HSEARCH-2027) - Upgrade to Hibernate ORM 5.0.3.Final
+* [HSEARCH-2028](https://hibernate.atlassian.net/browse/HSEARCH-2028) - Update documentation regarding the indexing of e-mail addresses
+* [HSEARCH-2039](https://hibernate.atlassian.net/browse/HSEARCH-2039) - Allow to run tests from "orm" module in the context of another module
+* [HSEARCH-2041](https://hibernate.atlassian.net/browse/HSEARCH-2041) - Upgrade to WildFly 10.0.0.CR4
+* [HSEARCH-2051](https://hibernate.atlassian.net/browse/HSEARCH-2051) - Introduce JMH based performance tests for the engine component
+* [HSEARCH-2053](https://hibernate.atlassian.net/browse/HSEARCH-2053) - Upgrade to Hibernate Commons Annotations 5.0.1.Final
+* [HSEARCH-2054](https://hibernate.atlassian.net/browse/HSEARCH-2054) - Upgrade to Hibernate ORM 5.0.4.Final
+* [HSEARCH-2059](https://hibernate.atlassian.net/browse/HSEARCH-2059) - Upgrade to Hibernate ORM 5.0.5.Final and align related dependencies
+* [HSEARCH-2076](https://hibernate.atlassian.net/browse/HSEARCH-2076) - Upgrade to Hibernate ORM 5.0.6 & other WildFly 10.0.0.CR5 upgrades
+* [HSEARCH-2079](https://hibernate.atlassian.net/browse/HSEARCH-2079) - Improve OSGi header generation with properties and review some stale definitions
+* [HSEARCH-2083](https://hibernate.atlassian.net/browse/HSEARCH-2083) - Upgrade to Apache Lucene 5.4.1
+* [HSEARCH-2084](https://hibernate.atlassian.net/browse/HSEARCH-2084) - Upgrade to WildFly 10.0.0.Final
+* [HSEARCH-2089](https://hibernate.atlassian.net/browse/HSEARCH-2089) - Ensure the performance tests do not use the WildFly embedded version of Search
+
+### Improvement
+* [HSEARCH-1282](https://hibernate.atlassian.net/browse/HSEARCH-1282) - @EmbeddedId should be detected and treated like @Id
+* [HSEARCH-1964](https://hibernate.atlassian.net/browse/HSEARCH-1964) - Review documentation chapter on combining queries with boolean operators
+* [HSEARCH-2007](https://hibernate.atlassian.net/browse/HSEARCH-2007) - Add Clirr plug-in configuration for creating API change report
+* [HSEARCH-2025](https://hibernate.atlassian.net/browse/HSEARCH-2025) - remove OpenBitSet from documentation
+* [HSEARCH-2029](https://hibernate.atlassian.net/browse/HSEARCH-2029) - Hibernate Search does not reuse JavaReflectionManager from Hibernate.
+* [HSEARCH-2035](https://hibernate.atlassian.net/browse/HSEARCH-2035) - Avoiding dependency to Lucene's Query type in TimeoutManagerImpl
+* [HSEARCH-2036](https://hibernate.atlassian.net/browse/HSEARCH-2036) - Extract base class with commonly used code from HSQueryImpl
+* [HSEARCH-2038](https://hibernate.atlassian.net/browse/HSEARCH-2038) - Performance: avoid scoring on operations which don't need scores to be computed
+* [HSEARCH-2042](https://hibernate.atlassian.net/browse/HSEARCH-2042) - Don't uninvert index when sorting by doc id or score
+* [HSEARCH-2044](https://hibernate.atlassian.net/browse/HSEARCH-2044) - Make spatial fields sortable by distance without index uninverting
+* [HSEARCH-2050](https://hibernate.atlassian.net/browse/HSEARCH-2050) - Avoid allocation cost of FacetConfig during creation of Document
+* [HSEARCH-2052](https://hibernate.atlassian.net/browse/HSEARCH-2052) - Avoid allocating an empty array on hot vararg invocation on ReflectionHelper
+* [HSEARCH-2078](https://hibernate.atlassian.net/browse/HSEARCH-2078) - Upgrade to Apache Lucene 5.4.0
+
+### Patch
+* [HSEARCH-2090](https://hibernate.atlassian.net/browse/HSEARCH-2090) - Using the wrong header in the distribution/pom.xml
+
+
+Version 5.5.0.Final (15-9-2015)
+
+### Bug
+* [HSEARCH-1870](https://hibernate.atlassian.net/browse/HSEARCH-1870) - The DSL should support keyword queries on numerically indexed Date fields
+* [HSEARCH-1955](https://hibernate.atlassian.net/browse/HSEARCH-1955) - ScheduledCommitPolicy helper threads not handling exceptions
+* [HSEARCH-1987](https://hibernate.atlassian.net/browse/HSEARCH-1987) - @NumericField doesn't work as expected when several fields are present
+* [HSEARCH-1992](https://hibernate.atlassian.net/browse/HSEARCH-1992) - Validation of valid sorting options to skip index uninverting needs to ensure consistent mapping across all entities of each involved index
+* [HSEARCH-1999](https://hibernate.atlassian.net/browse/HSEARCH-1999) - AbstractDocumentBuilder.isDirty() returns false for indexed fields if Hibernate property name does not correspond to the Java field name
+* [HSEARCH-2000](https://hibernate.atlassian.net/browse/HSEARCH-2000) - Ignore sortable fields when contained indirectly within embedded to-many association
+* [HSEARCH-2002](https://hibernate.atlassian.net/browse/HSEARCH-2002) - Have the Infinispan Directory maven redirect point to the right version
+* [HSEARCH-2003](https://hibernate.atlassian.net/browse/HSEARCH-2003) - numericField() in the DSL should take field name into account
+* [HSEARCH-2004](https://hibernate.atlassian.net/browse/HSEARCH-2004) - Queries in unit tests should be inside a transaction
+
+### New Feature
+* [HSEARCH-1993](https://hibernate.atlassian.net/browse/HSEARCH-1993) - Allow to define sortable fields through configuration DSL
+
+### Task
+* [HSEARCH-1933](https://hibernate.atlassian.net/browse/HSEARCH-1933) - Review javadoc warnings
+* [HSEARCH-1966](https://hibernate.atlassian.net/browse/HSEARCH-1966) - Some javadoc mistakes are causing background build errors
+* [HSEARCH-1983](https://hibernate.atlassian.net/browse/HSEARCH-1983) - Have the integration tests verify which Hibernate Search version they are using
+
+### Improvement
+* [HSEARCH-1997](https://hibernate.atlassian.net/browse/HSEARCH-1997) - NumericFieldUtils to avoid checking for Java8 time classes multiple times
+
+### Deprecation
+* [HSEARCH-2005](https://hibernate.atlassian.net/browse/HSEARCH-2005) - Deprecate ContainedInMapping#numericField()
+
+
+Version 5.5.0.CR1 (8-9-2015)
+
+### Bug
+* [HSEARCH-1956](https://hibernate.atlassian.net/browse/HSEARCH-1956) - Exception on sorting on NumericField and indexNullAs
+* [HSEARCH-1960](https://hibernate.atlassian.net/browse/HSEARCH-1960) - TypeMetadata and QueryValidator fail to recognize an Id being encoded as Numeric
+* [HSEARCH-1968](https://hibernate.atlassian.net/browse/HSEARCH-1968) - NPE on Faceting queries which represent and empty result
+* [HSEARCH-1973](https://hibernate.atlassian.net/browse/HSEARCH-1973) - ConnectedMultiFieldsTermQueryBuilder must unwrap a NullEncodingTwoWayFieldBridge before checking for NumericFieldBridge
+* [HSEARCH-1981](https://hibernate.atlassian.net/browse/HSEARCH-1981) - QueryBuilder should not tokenize the null-token when searching for null
+
+### New Feature
+* [HSEARCH-1491](https://hibernate.atlassian.net/browse/HSEARCH-1491) - Support queries on Numeric fields by value "null"
+* [HSEARCH-1947](https://hibernate.atlassian.net/browse/HSEARCH-1947) - Create custom bridges for Java 8 Date and Time classes
+* [HSEARCH-1984](https://hibernate.atlassian.net/browse/HSEARCH-1984) - Provide means of configuring fields to sort on
+
+### Task
+* [HSEARCH-1946](https://hibernate.atlassian.net/browse/HSEARCH-1946) - Make sure the performance tests do cleanup the filesystem indexes
+* [HSEARCH-1954](https://hibernate.atlassian.net/browse/HSEARCH-1954) - Require JDK 8 for building
+* [HSEARCH-1959](https://hibernate.atlassian.net/browse/HSEARCH-1959) - Add JavaDoc to ExtendedSearchIntegrator#getIndexedTypesPolymorphic()
+* [HSEARCH-1962](https://hibernate.atlassian.net/browse/HSEARCH-1962) - Verify if the indexwriter.max_thread_states configuration property still applies
+* [HSEARCH-1963](https://hibernate.atlassian.net/browse/HSEARCH-1963) - Make sure we point users to an Infinispan version for integration which supports Lucene 5
+* [HSEARCH-1965](https://hibernate.atlassian.net/browse/HSEARCH-1965) - Remove dead code from DocumentExtractorImpl
+* [HSEARCH-1972](https://hibernate.atlassian.net/browse/HSEARCH-1972) - Upgrade to Hibernate ORM 5.0.0.Final
+* [HSEARCH-1978](https://hibernate.atlassian.net/browse/HSEARCH-1978) - Fix example in projection documentation
+* [HSEARCH-1979](https://hibernate.atlassian.net/browse/HSEARCH-1979) - Upgrade to WildFly 10.0.0.Beta2
+* [HSEARCH-1980](https://hibernate.atlassian.net/browse/HSEARCH-1980) - Upgrade to JGroups 3.6.4.Final
+* [HSEARCH-1998](https://hibernate.atlassian.net/browse/HSEARCH-1998) - Upgrade to Hibernate ORM 5.0.1.Final
+
+### Improvement
+* [HSEARCH-1982](https://hibernate.atlassian.net/browse/HSEARCH-1982) - Upgrade to Apache Lucene 5.3.0
+* [HSEARCH-1989](https://hibernate.atlassian.net/browse/HSEARCH-1989) - Let maven build support maven-color
+
+
+Version 5.5.0.Alpha1 (7-8-2015)
+
+### Improvement
+* [HSEARCH-1849](https://hibernate.atlassian.net/browse/HSEARCH-1849) - Upgrade to Apache Lucene 5.2.1
+* [HSEARCH-1952](https://hibernate.atlassian.net/browse/HSEARCH-1952) - ScheduledCommitPolicy might open unnecessary IndexWriter instances
+
+### Task
+* [HSEARCH-1949](https://hibernate.atlassian.net/browse/HSEARCH-1949) - FSDirectoryTest is leaking file handles when run on Windows
+* [HSEARCH-1950](https://hibernate.atlassian.net/browse/HSEARCH-1950) - Integration tests should not hardcode the module slot
+* [HSEARCH-1953](https://hibernate.atlassian.net/browse/HSEARCH-1953) - Javadoc should be built by linking to the one from Hibernate ORM 5.0
+
+
+Version 5.4.0.CR2 (4-8-2015)
+
+### Bug
+* [HSEARCH-1708](https://hibernate.atlassian.net/browse/HSEARCH-1708) - Using DistanceSortField does not verify the field parameter passed to the constructor
+* [HSEARCH-1918](https://hibernate.atlassian.net/browse/HSEARCH-1918) - Spatial Search with distance projection is not returning all results
+* [HSEARCH-1936](https://hibernate.atlassian.net/browse/HSEARCH-1936) - Avro Serializer does not preserve value of field's term vector when it is set to YES
+* [HSEARCH-1941](https://hibernate.atlassian.net/browse/HSEARCH-1941) - Passing a null to Search.getFullTextSession causes a confusing error message
+* [HSEARCH-1945](https://hibernate.atlassian.net/browse/HSEARCH-1945) - Resolution of index storage paths with "." creates inconsistent directory trees
+
+### Task
+* [HSEARCH-1909](https://hibernate.atlassian.net/browse/HSEARCH-1909) - Rename logging category for the FullText-Query category
+* [HSEARCH-1932](https://hibernate.atlassian.net/browse/HSEARCH-1932) - Re-enable the performance tests
+* [HSEARCH-1934](https://hibernate.atlassian.net/browse/HSEARCH-1934) - Replace the Infinispan integration module with a Maven Relocation
+* [HSEARCH-1938](https://hibernate.atlassian.net/browse/HSEARCH-1938) - Integrate build tool to verify against usage of tricky JDK methods
+* [HSEARCH-1939](https://hibernate.atlassian.net/browse/HSEARCH-1939) - Upgrade to Hibernate ORM 5.0.0.CR3
+* [HSEARCH-1940](https://hibernate.atlassian.net/browse/HSEARCH-1940) - Use Maven Relocation to deprecate the old hibernate-search artifactId
+* [HSEARCH-1944](https://hibernate.atlassian.net/browse/HSEARCH-1944) - Enable profiles for testing on MariaDB and PostgreSQL
+* [HSEARCH-1948](https://hibernate.atlassian.net/browse/HSEARCH-1948) - Missing tools.jar make the performance integration tests fail on JDK9
+
+
+Version 5.4.0.CR1 (13-7-2015)
+
+### Bug
+* [HSEARCH-1681](https://hibernate.atlassian.net/browse/HSEARCH-1681) - Index optimisation should commit to publish the performed optimisation
+* [HSEARCH-1868](https://hibernate.atlassian.net/browse/HSEARCH-1868) - References to getSearchFactory in AbstractJMSHibernateSearchController documentation are outdated
+* [HSEARCH-1896](https://hibernate.atlassian.net/browse/HSEARCH-1896) - Documentation: duplicate <dependency> tag in example
+* [HSEARCH-1897](https://hibernate.atlassian.net/browse/HSEARCH-1897) - Download URLs for Hibernate 5 needs using a new pattern
+* [HSEARCH-1913](https://hibernate.atlassian.net/browse/HSEARCH-1913) - Integration test helper ConcertManager#saveConcerts will need a larger timeout
+* [HSEARCH-1924](https://hibernate.atlassian.net/browse/HSEARCH-1924) - JBoss Logging upgrade needs explicit dependencies in our sub-modules
+
+### Deprecation
+* [HSEARCH-1914](https://hibernate.atlassian.net/browse/HSEARCH-1914) - Deprecate the @CacheFromIndex annotation and FieldCache based projections
+
+### Improvement
+* [HSEARCH-1474](https://hibernate.atlassian.net/browse/HSEARCH-1474) - MassIndexer needs to avoid being timed out by the TransactionManager
+* [HSEARCH-1812](https://hibernate.atlassian.net/browse/HSEARCH-1812) - Documentation doesn't clearly explain how one obtains the existing SearchIntegrator
+* [HSEARCH-1882](https://hibernate.atlassian.net/browse/HSEARCH-1882) - Log Hibernate Search queries in a specific category
+* [HSEARCH-1891](https://hibernate.atlassian.net/browse/HSEARCH-1891) - Span transaction per id list in batch indexing engine
+* [HSEARCH-1901](https://hibernate.atlassian.net/browse/HSEARCH-1901) - Built-in TikaBridge repeatedly initializes the default parser
+* [HSEARCH-1919](https://hibernate.atlassian.net/browse/HSEARCH-1919) - Don't use FieldCache in SortTest
+* [HSEARCH-1922](https://hibernate.atlassian.net/browse/HSEARCH-1922) - JMS backend should set the JMS message header JMSXGroupID
+
+### New Feature
+* [HSEARCH-668](https://hibernate.atlassian.net/browse/HSEARCH-668) - Provide a setting to bring under the same transaction the DB operation and the JMS queue
+* [HSEARCH-1878](https://hibernate.atlassian.net/browse/HSEARCH-1878) - Add google analytics to the HTML documentation
+* [HSEARCH-1907](https://hibernate.atlassian.net/browse/HSEARCH-1907) - Include the JGroups backend in the modules distribution
+
+### Task
+* [HSEARCH-1783](https://hibernate.atlassian.net/browse/HSEARCH-1783) - Reproduce transaction timeouts during mass indexing
+* [HSEARCH-1815](https://hibernate.atlassian.net/browse/HSEARCH-1815) - Clarify the need to depend on an implementation of SerializationProvider
+* [HSEARCH-1854](https://hibernate.atlassian.net/browse/HSEARCH-1854) - ScheduledCommitPolicyTest fails on JDK9
+* [HSEARCH-1875](https://hibernate.atlassian.net/browse/HSEARCH-1875) - Upgrade to JBoss Byteman 3.0.0
+* [HSEARCH-1893](https://hibernate.atlassian.net/browse/HSEARCH-1893) - Enable again the distribution of custom JBoss Modules
+* [HSEARCH-1903](https://hibernate.atlassian.net/browse/HSEARCH-1903) - Avoid starting multiple unnecessary WildFly servers to run integration tests
+* [HSEARCH-1904](https://hibernate.atlassian.net/browse/HSEARCH-1904) - Include the jdeps Maven plugin in the build to allow creating JRE9 profile reports
+* [HSEARCH-1905](https://hibernate.atlassian.net/browse/HSEARCH-1905) - Disable the WildFly integration tests when running on JDK9
+* [HSEARCH-1906](https://hibernate.atlassian.net/browse/HSEARCH-1906) - Enable the WildFly integration tests even on Java 9
+* [HSEARCH-1908](https://hibernate.atlassian.net/browse/HSEARCH-1908) - Avoid the need to dynamically override the Analyzer to fieldname mapping
+* [HSEARCH-1910](https://hibernate.atlassian.net/browse/HSEARCH-1910) - Upgrade Spatial Query related implementations to avoid using Lucene's deprecated FieldCache
+* [HSEARCH-1912](https://hibernate.atlassian.net/browse/HSEARCH-1912) - Excluding superfluous dependencies from shrinkwrapped integration tests
+* [HSEARCH-1916](https://hibernate.atlassian.net/browse/HSEARCH-1916) - Use Path instead of File in the various test helpers
+* [HSEARCH-1920](https://hibernate.atlassian.net/browse/HSEARCH-1920) - Document the new 'enlist_in_transaction' setting
+* [HSEARCH-1923](https://hibernate.atlassian.net/browse/HSEARCH-1923) - Upgrade to Hibernate Commons Annotations 5.0.0.Final
+* [HSEARCH-1926](https://hibernate.atlassian.net/browse/HSEARCH-1926) - Checkstyle not running on the OSGi test modules
+* [HSEARCH-1928](https://hibernate.atlassian.net/browse/HSEARCH-1928) - Upgrade to Hibernate ORM 5.0.0.CR2
+* [HSEARCH-1930](https://hibernate.atlassian.net/browse/HSEARCH-1930) - Upgrade to WildFly 9.0.0.Final and align configuration files
+* [HSEARCH-1931](https://hibernate.atlassian.net/browse/HSEARCH-1931) - Upgrade integration tests to WildFly 10.0.0.Alpha5 to use provided Hibernate 5 modules
+
+
+Version 5.4.0.Alpha1 (5-6-2015)
+
+### Task
+* [HSEARCH-1874](https://hibernate.atlassian.net/browse/HSEARCH-1874) - Upgrade to Hibernate ORM 5.0.0.CR1
+
+
+Version 5.3.0.CR1 (1-6-2015)
+
+### Bug
+* [HSEARCH-1880](https://hibernate.atlassian.net/browse/HSEARCH-1880) - Unresolved slot for Infinispan in hibernate-search-engine module
+
+### Improvement
+* [HSEARCH-1877](https://hibernate.atlassian.net/browse/HSEARCH-1877) - Gracefully handle null values in TikaBridge
+* [HSEARCH-1883](https://hibernate.atlassian.net/browse/HSEARCH-1883) - Allow an optional dependency of the JBoss Modules to Apache Tika
+* [HSEARCH-1884](https://hibernate.atlassian.net/browse/HSEARCH-1884) - Upgrade to Hibernate ORM 4.3.10.Final
+
+
+Version 5.3.0.Beta2 (19-5-2015)
+
+### New Feature
+* [HSEARCH-1866](https://hibernate.atlassian.net/browse/HSEARCH-1866) - Revert changes to signatures of methods in TypeMetadata and PropertyMetadata
+
+### Task
+* [HSEARCH-1864](https://hibernate.atlassian.net/browse/HSEARCH-1864) - Module slot not following version name
+* [HSEARCH-1873](https://hibernate.atlassian.net/browse/HSEARCH-1873) - Upgrade integration tests and modules to target WildFly 9
+
+
+Version 5.3.0.Beta1 (6-5-2015)
+
+### Bug
+* [HSEARCH-900](https://hibernate.atlassian.net/browse/HSEARCH-900) - Faceting with manytoone relationship give wrong faceting count
+
+### Improvement
+* [HSEARCH-812](https://hibernate.atlassian.net/browse/HSEARCH-812) - Possibiltiy to set boolean type (SHOULD/MUST) when selecting multiple facets
+* [HSEARCH-1848](https://hibernate.atlassian.net/browse/HSEARCH-1848) - Replace the Infinispan Directory provider with the one distributed by the Infinispan project
+
+### Task
+* [HSEARCH-809](https://hibernate.atlassian.net/browse/HSEARCH-809) - Make use of the new faceting API offered by Lucene
+
+
+Version 5.2.0.Final (6-5-2015)
+
+### Bug
+* [HSEARCH-1855](https://hibernate.atlassian.net/browse/HSEARCH-1855) - Javadoc on MassIndexer mentioning that cancel is not supported
+
+### Task
+* [HSEARCH-1600](https://hibernate.atlassian.net/browse/HSEARCH-1600) - Re-enable disabled test HibernateSearchSessionFactoryObserverTest
+* [HSEARCH-1856](https://hibernate.atlassian.net/browse/HSEARCH-1856) - Missing paragraph separation in the multi-tenancy chapter of reference documentation
+* [HSEARCH-1858](https://hibernate.atlassian.net/browse/HSEARCH-1858) - Upgrade to Hibernate ORM 4.3.9.Final
+* [HSEARCH-1863](https://hibernate.atlassian.net/browse/HSEARCH-1863) - Upgrade to Infinispan 7.2.0.Final
+
+
+Version 5.2.0.Beta1 (16-4-2015)
+
+### Bug
+* [HSEARCH-1684](https://hibernate.atlassian.net/browse/HSEARCH-1684) - ResultTransformer ignores transformList on tuples
+* [HSEARCH-1793](https://hibernate.atlassian.net/browse/HSEARCH-1793) - CriteriaObjectInitializer causes too many object loads in cross hierarchy queries
+* [HSEARCH-1804](https://hibernate.atlassian.net/browse/HSEARCH-1804) - Boost on IndexedEmbedded properties
+* [HSEARCH-1811](https://hibernate.atlassian.net/browse/HSEARCH-1811) - Wildcard with multiple fields
+* [HSEARCH-1824](https://hibernate.atlassian.net/browse/HSEARCH-1824) - Hot-restarting a mutable SearchFactory has it "forget" the previously defined FilterDef and Analyzers
+* [HSEARCH-1825](https://hibernate.atlassian.net/browse/HSEARCH-1825) - NullEncodingTwoWayFieldBridge doesn't set the null marker when used as a FieldBridge
+* [HSEARCH-1836](https://hibernate.atlassian.net/browse/HSEARCH-1836) - Avoid NPE in NullEncodingTwoWayFieldBridge for non existing fields
+
+### Improvement
+* [HSEARCH-655](https://hibernate.atlassian.net/browse/HSEARCH-655) - Implements the FuturTask.cancel function in the MassIndexer
+* [HSEARCH-1356](https://hibernate.atlassian.net/browse/HSEARCH-1356) - Refactor WorkVisitor to match more the expectations on a Visitor pattern
+* [HSEARCH-1762](https://hibernate.atlassian.net/browse/HSEARCH-1762) - Improve javadocs of builtin bridges
+* [HSEARCH-1831](https://hibernate.atlassian.net/browse/HSEARCH-1831) - Correcting various typos in the documentation
+* [HSEARCH-1850](https://hibernate.atlassian.net/browse/HSEARCH-1850) - Avoid extending Startable and Stoppable interfaces as part of a Service contract
+
+### New Feature
+* [HSEARCH-1765](https://hibernate.atlassian.net/browse/HSEARCH-1765) - Add support for deleting by Query
+* [HSEARCH-1792](https://hibernate.atlassian.net/browse/HSEARCH-1792) - Support multi-tenancy
+* [HSEARCH-1837](https://hibernate.atlassian.net/browse/HSEARCH-1837) - Allow Integrators to customize default directory providers for shortcuts
+
+### Task
+* [HSEARCH-1773](https://hibernate.atlassian.net/browse/HSEARCH-1773) - org.hibernate.search.backend.impl.WorkVisitor not exported by engine osgi bundle
+* [HSEARCH-1835](https://hibernate.atlassian.net/browse/HSEARCH-1835) - Fix typo in javadoc of @Spatial
+* [HSEARCH-1841](https://hibernate.atlassian.net/browse/HSEARCH-1841) - Refactor DeleteByQuerySupport
+* [HSEARCH-1843](https://hibernate.atlassian.net/browse/HSEARCH-1843) - Bump hibernate search module slot name to "5.2"
+* [HSEARCH-1845](https://hibernate.atlassian.net/browse/HSEARCH-1845) - Upgrade to Pax Exam 4.4.0 to improve port allocation during tests
+
+
+Version 5.1.0.Final (3-3-2015)
+
+### Bug
+* [HSEARCH-818](https://hibernate.atlassian.net/browse/HSEARCH-818) - Cacheable instance filters are created multiple times before being cached
+* [HSEARCH-1649](https://hibernate.atlassian.net/browse/HSEARCH-1649) - MassIndexer not compatible with ORM multitenancy
+* [HSEARCH-1774](https://hibernate.atlassian.net/browse/HSEARCH-1774) - Osgi Paxexam tests passing even if bundle not resolved
+* [HSEARCH-1775](https://hibernate.atlassian.net/browse/HSEARCH-1775) - Osgi resolution error on hibernate-search-infinispan bundle
+* [HSEARCH-1786](https://hibernate.atlassian.net/browse/HSEARCH-1786) - Projection on properties from embedded types returns String rather than the mapped type
+* [HSEARCH-1791](https://hibernate.atlassian.net/browse/HSEARCH-1791) - QueryBuilder produces a NumericRange query for id fields
+* [HSEARCH-1796](https://hibernate.atlassian.net/browse/HSEARCH-1796) - SearchNewEntityJmsMasterSlaveUsingInfinispanAs2ndCacheAndModulesIT fails on OS X
+
+### Deprecation
+* [HSEARCH-1785](https://hibernate.atlassian.net/browse/HSEARCH-1785) - Deprecate annotation org.hibernate.search.annotations.Key
+
+### Improvement
+* [HSEARCH-633](https://hibernate.atlassian.net/browse/HSEARCH-633) - Allow definition of annotations at package-level in package-info.java
+* [HSEARCH-997](https://hibernate.atlassian.net/browse/HSEARCH-997) - Add short and byte numeric bridges
+* [HSEARCH-1663](https://hibernate.atlassian.net/browse/HSEARCH-1663) - Packages not exported from osgi bundles
+* [HSEARCH-1763](https://hibernate.atlassian.net/browse/HSEARCH-1763) - Inherit @FullTextFilterDef from superclass
+* [HSEARCH-1767](https://hibernate.atlassian.net/browse/HSEARCH-1767) - Multiple entity types sharing the index shouldn't necessarily prevent single-term deletions
+* [HSEARCH-1778](https://hibernate.atlassian.net/browse/HSEARCH-1778) - Add reference to migration notes to reference guide
+* [HSEARCH-1780](https://hibernate.atlassian.net/browse/HSEARCH-1780) - Update link to Luke in documentation
+* [HSEARCH-1801](https://hibernate.atlassian.net/browse/HSEARCH-1801) - Rename Asciidoc files from chxx to topic name for more documentation flexibility
+
+### New Feature
+* [HSEARCH-295](https://hibernate.atlassian.net/browse/HSEARCH-295) - Generate the "right" FilterKey instance even on parameterized filters
+* [HSEARCH-1624](https://hibernate.atlassian.net/browse/HSEARCH-1624) - Injection of an instance of ErrorHandler
+* [HSEARCH-1698](https://hibernate.atlassian.net/browse/HSEARCH-1698) - Async backends using Infinispan should enable Directory option writeFileListAsynchronously
+* [HSEARCH-1764](https://hibernate.atlassian.net/browse/HSEARCH-1764) - Programmatically defining includeEmbeddedObjectId for embedded entities
+* [HSEARCH-1795](https://hibernate.atlassian.net/browse/HSEARCH-1795) - Allow for the serialization of DocValues as part of the LuceneWork serialization
+
+### Task
+* [HSEARCH-1324](https://hibernate.atlassian.net/browse/HSEARCH-1324) - Create integration tests using  a combination of JBoss Modules, Infinispan and JMS
+* [HSEARCH-1784](https://hibernate.atlassian.net/browse/HSEARCH-1784) - Introduce CheckStyle rule to ban usage of java.lang.AssertionError
+* [HSEARCH-1798](https://hibernate.atlassian.net/browse/HSEARCH-1798) - Create integration test with WildFly that deploys an EAR with Hibernate Search
+* [HSEARCH-1805](https://hibernate.atlassian.net/browse/HSEARCH-1805) - Removing Serializable from LuceneWork
+* [HSEARCH-1806](https://hibernate.atlassian.net/browse/HSEARCH-1806) - Deleting implementation of serialization protocol using native Java serialization
+* [HSEARCH-1819](https://hibernate.atlassian.net/browse/HSEARCH-1819) - Upgrade to Apache Lucene 4.10.4
+* [HSEARCH-1820](https://hibernate.atlassian.net/browse/HSEARCH-1820) - Upgrade to Infinispan 7.1.1.Final and JGroups 3.6.2.Final
+* [HSEARCH-1821](https://hibernate.atlassian.net/browse/HSEARCH-1821) - Require Maven 3.2.3 minimum to run the builds
+* [HSEARCH-1822](https://hibernate.atlassian.net/browse/HSEARCH-1822) - The OSGi example features.xml is missing exports for org.tartarus to enable snowball analyzers
+
+
+Version 5.0.1.Final (9-1-2015)
+
+### Bug
+* [HSEARCH-1769](https://hibernate.atlassian.net/browse/HSEARCH-1769) - SyncWorkProcessor leads to NoSuchElementException on empty WorkList
+
+### New Feature
+* [HSEARCH-1770](https://hibernate.atlassian.net/browse/HSEARCH-1770) - Make it possible for an integrator to the Engine module to enforce using single-term delete operations
+
+### Task
+* [HSEARCH-1771](https://hibernate.atlassian.net/browse/HSEARCH-1771) - Upgrade to Apache Lucene 4.10.3
+* [HSEARCH-1772](https://hibernate.atlassian.net/browse/HSEARCH-1772) - Upgrade to Hibernate ORM 4.3.8.Final
+
+
+Version 5.0.0.Final (16-12-2014)
+
+### Bug
+* [HSEARCH-1759](https://hibernate.atlassian.net/browse/HSEARCH-1759) - Ambiguous mapping on Id field should be disallowed
+* [HSEARCH-1760](https://hibernate.atlassian.net/browse/HSEARCH-1760) - Projection on the "Id" keyword should not be repeated again as a normal field when an "id" field exists as well
+
+### Improvement
+* [HSEARCH-1757](https://hibernate.atlassian.net/browse/HSEARCH-1757) - Allow usage of Factory annotation to create FieldBridge instances
+
+### Task
+* [HSEARCH-1682](https://hibernate.atlassian.net/browse/HSEARCH-1682) - Document the need to optionally download the JBoss Modules from Infinispan
+* [HSEARCH-1755](https://hibernate.atlassian.net/browse/HSEARCH-1755) - Constructor of DefaultStringBridge needs to be public in order to be used via @FieldBridge
+* [HSEARCH-1756](https://hibernate.atlassian.net/browse/HSEARCH-1756) - Make sure documentation gets included in dist bundles
+* [HSEARCH-1758](https://hibernate.atlassian.net/browse/HSEARCH-1758) - Fallback strategy for RangeQuery builder should not necessarily pick a keyword based range query
+
+
+Version 5.0.0.CR2 (11-12-2014)
+
+### Bug
+* [HSEARCH-1744](https://hibernate.atlassian.net/browse/HSEARCH-1744) - NumericFieldBridge#objectToString does not check for null
+* [HSEARCH-1745](https://hibernate.atlassian.net/browse/HSEARCH-1745) - Define default resolution for date bridges
+* [HSEARCH-1751](https://hibernate.atlassian.net/browse/HSEARCH-1751) - Extend NumericFieldSettingsDescriptor to expose the numeric encoding type
+* [HSEARCH-1752](https://hibernate.atlassian.net/browse/HSEARCH-1752) - StringEncodingDateBridge does not comply with the TwoWayFieldBridge contract
+
+### Improvement
+* [HSEARCH-642](https://hibernate.atlassian.net/browse/HSEARCH-642) - Support for only manual indexing of particular entity types
+* [HSEARCH-1747](https://hibernate.atlassian.net/browse/HSEARCH-1747) - Reduce verbosity of logging message for start/stop of backend threads
+* [HSEARCH-1749](https://hibernate.atlassian.net/browse/HSEARCH-1749) - Separate the Avro Serialization module into its own isolated JBoss Module
+* [HSEARCH-1750](https://hibernate.atlassian.net/browse/HSEARCH-1750) - Rename SearchMappingBuilder to SearchMappingHelper
+
+### Task
+* [HSEARCH-1743](https://hibernate.atlassian.net/browse/HSEARCH-1743) - Rename SearchFactoryImplementor to ExtendedSearchIntegrator
+* [HSEARCH-1746](https://hibernate.atlassian.net/browse/HSEARCH-1746) - Update Infinispan to 7.0.2.Final and JGroups to 3.6.1.Final
+* [HSEARCH-1754](https://hibernate.atlassian.net/browse/HSEARCH-1754) - Speedup execution of InfinispanNativeLockFactoryTest: no need for a cluster
+
+
+Version 5.0.0.CR1 (8-12-2014)
+
+### Bug
+* [HSEARCH-968](https://hibernate.atlassian.net/browse/HSEARCH-968) - Index dates as numeric fields
+* [HSEARCH-1734](https://hibernate.atlassian.net/browse/HSEARCH-1734) - The locking_strategy property is ignored when using the Infinispan Directory
+* [HSEARCH-1735](https://hibernate.atlassian.net/browse/HSEARCH-1735) - Background threads should not be started when not required
+* [HSEARCH-1737](https://hibernate.atlassian.net/browse/HSEARCH-1737) - Locking strategy "native" ignoring "index base" on Infinispan Directory
+
+### Improvement
+* [HSEARCH-763](https://hibernate.atlassian.net/browse/HSEARCH-763) - Index numeric properties by using @NumericField by default
+* [HSEARCH-1738](https://hibernate.atlassian.net/browse/HSEARCH-1738) - Can prevent some I/O by aggressively exiting the FieldSelector visitor
+* [HSEARCH-1741](https://hibernate.atlassian.net/browse/HSEARCH-1741) - Various documentation improvements
+
+### Task
+* [HSEARCH-1673](https://hibernate.atlassian.net/browse/HSEARCH-1673) - Define and verify a clearly limited SPI for Infinispan Query
+* [HSEARCH-1730](https://hibernate.atlassian.net/browse/HSEARCH-1730) - Move all .impl classes in hibernate-search-engine into engine.impl
+* [HSEARCH-1733](https://hibernate.atlassian.net/browse/HSEARCH-1733) - Upgrade to WildFly 8.2.0.Final
+* [HSEARCH-1739](https://hibernate.atlassian.net/browse/HSEARCH-1739) - Rename SearchFactoryBuilder to SearchIntegrationBuilder
+* [HSEARCH-1740](https://hibernate.atlassian.net/browse/HSEARCH-1740) - Move SearchFactoryImplementor out of the SPI package
+
+
+Version 5.0.0.Beta3 (20-11-2014)
+
+### Bug
+* [HSEARCH-1731](https://hibernate.atlassian.net/browse/HSEARCH-1731) - Should not have a transitive dependency to jboss-logging-annotations
+
+### Improvement
+* [HSEARCH-1725](https://hibernate.atlassian.net/browse/HSEARCH-1725) - Improve allocation rate of the new Lucene synchronous batching backend
+* [HSEARCH-1732](https://hibernate.atlassian.net/browse/HSEARCH-1732) - Update links to javadoc external sites
+
+### New Feature
+* [HSEARCH-1728](https://hibernate.atlassian.net/browse/HSEARCH-1728) - Create a configuration attribute to allow usage of the Infinispan Directory option writeFileListAsynchronously
+
+### Task
+* [HSEARCH-1719](https://hibernate.atlassian.net/browse/HSEARCH-1719) - Performance tests are not able to run
+* [HSEARCH-1720](https://hibernate.atlassian.net/browse/HSEARCH-1720) - Switch the performance tests to use the Hikari connection pool
+* [HSEARCH-1721](https://hibernate.atlassian.net/browse/HSEARCH-1721) - Reconfigure build to make it possible to test the main modules on JDK9
+* [HSEARCH-1722](https://hibernate.atlassian.net/browse/HSEARCH-1722) - Fix race condition in OptimizerPerformanceTest
+* [HSEARCH-1723](https://hibernate.atlassian.net/browse/HSEARCH-1723) - Allow BackendStressTest to test clustered Infinispan configurations
+* [HSEARCH-1726](https://hibernate.atlassian.net/browse/HSEARCH-1726) - Allow performance validation tests to run on MariaDB
+* [HSEARCH-1727](https://hibernate.atlassian.net/browse/HSEARCH-1727) - Restore original package name for SearchFactory, break inheritance link with SearchFactoryIntegrator
+
+
+Version 5.0.0.Beta2 (13-11-2014)
+
+### Bug
+* [HSEARCH-1592](https://hibernate.atlassian.net/browse/HSEARCH-1592) - DefaultStringBridge cannot be used with programmatic configuration API
+* [HSEARCH-1655](https://hibernate.atlassian.net/browse/HSEARCH-1655) - Avro's ConcurrentServiceTest fails occasionally
+* [HSEARCH-1713](https://hibernate.atlassian.net/browse/HSEARCH-1713) - Remove the DefaultEntityInterceptor implementation of EntityIndexingInterceptor
+
+### Improvement
+* [HSEARCH-1173](https://hibernate.atlassian.net/browse/HSEARCH-1173) - JPA FullTextQuery toString() with query information
+* [HSEARCH-1273](https://hibernate.atlassian.net/browse/HSEARCH-1273) - Improve usability and consistency of spatial API
+* [HSEARCH-1368](https://hibernate.atlassian.net/browse/HSEARCH-1368) - FullTextIndexEventListener becomes final
+* [HSEARCH-1469](https://hibernate.atlassian.net/browse/HSEARCH-1469) - Consider the term 'geospatial' instead of 'spatial'
+* [HSEARCH-1470](https://hibernate.atlassian.net/browse/HSEARCH-1470) - Provide better error message when the user writes a geospatial query against a non spatial field
+* [HSEARCH-1699](https://hibernate.atlassian.net/browse/HSEARCH-1699) - Batching IndexWriter commits for multiple synchronous worksets
+* [HSEARCH-1718](https://hibernate.atlassian.net/browse/HSEARCH-1718) - Avoid array resize overhead in the ErrorContextBuilder
+
+### Task
+* [HSEARCH-1500](https://hibernate.atlassian.net/browse/HSEARCH-1500) - Review Serialization strategies
+* [HSEARCH-1579](https://hibernate.atlassian.net/browse/HSEARCH-1579) - Consider removing direct references to FieldBridges from BridgeFactory
+* [HSEARCH-1705](https://hibernate.atlassian.net/browse/HSEARCH-1705) - Mark the MoreLikeThis feature as experimental
+* [HSEARCH-1707](https://hibernate.atlassian.net/browse/HSEARCH-1707) - Upgrade to Apache Lucene 4.10.2
+* [HSEARCH-1712](https://hibernate.atlassian.net/browse/HSEARCH-1712) - Remove dependency to ParaNamer
+* [HSEARCH-1716](https://hibernate.atlassian.net/browse/HSEARCH-1716) - Simplify the Lucene writing backend by dropping the parallel execution of writer tasks
+* [HSEARCH-1717](https://hibernate.atlassian.net/browse/HSEARCH-1717) - Update Infinispan to 7.0.0.Final
+
+
+Version 5.0.0.Beta1 (31-10-2014)
+
+### Bug
+* [HSEARCH-1683](https://hibernate.atlassian.net/browse/HSEARCH-1683) - Bundled JBoss Modules being generated for Apache Lucene uses wrong slot name
+* [HSEARCH-1694](https://hibernate.atlassian.net/browse/HSEARCH-1694) - AsyncBackendLongWorkListStressTest is sync
+* [HSEARCH-1702](https://hibernate.atlassian.net/browse/HSEARCH-1702) - Misrendered internal links in documentation
+* [HSEARCH-1703](https://hibernate.atlassian.net/browse/HSEARCH-1703) - Infinispan module compatibility
+
+### Improvement
+* [HSEARCH-1680](https://hibernate.atlassian.net/browse/HSEARCH-1680) - Upgrade to Apache Lucene 4.10.1
+* [HSEARCH-1621](https://hibernate.atlassian.net/browse/HSEARCH-1621) - Upgrade to Apache Lucene 4.9
+* [HSEARCH-1693](https://hibernate.atlassian.net/browse/HSEARCH-1693) - Time based commit for async indexing
+
+### New Feature
+* [HSEARCH-1697](https://hibernate.atlassian.net/browse/HSEARCH-1697) - Enable async deleteFile operations on Infinispan Directory
+
+### Task
+* [HSEARCH-1595](https://hibernate.atlassian.net/browse/HSEARCH-1595) - Update services section on online documentation
+* [HSEARCH-1596](https://hibernate.atlassian.net/browse/HSEARCH-1596) - Removal of method LuceneWorksBuilder.addFieldWithBinaryData
+* [HSEARCH-1678](https://hibernate.atlassian.net/browse/HSEARCH-1678) - Remove workaround for ISPN-4754 when it is fixed
+* [HSEARCH-1687](https://hibernate.atlassian.net/browse/HSEARCH-1687) - Dependency versions in Arquillian integration tests  should not be hardcoded
+* [HSEARCH-1688](https://hibernate.atlassian.net/browse/HSEARCH-1688) - Upgrade to Infinispan 7.0.0.CR1
+* [HSEARCH-1696](https://hibernate.atlassian.net/browse/HSEARCH-1696) - Infinispan integration on WildFly should depend on a dedicated module (Port HSEARCH-1692 from branch 4.4)
+* [HSEARCH-1700](https://hibernate.atlassian.net/browse/HSEARCH-1700) - Update Infinispan to 7.0.0.CR2 and JGroups to 3.6.0.Final
+* [HSEARCH-1704](https://hibernate.atlassian.net/browse/HSEARCH-1704) - Update to Hibernate ORM 4.3.7.Final
+
+
+Version 5.0.0.Alpha7 (26-09-2014)
+
+### Bug
+* [HSEARCH-1665](https://hibernate.atlassian.net/browse/HSEARCH-1665) - Race condition in DirectoryProviderHelper.initializeIndexIfNeeded leads to failure in concurrent bootstrap
+* [HSEARCH-1576](https://hibernate.atlassian.net/browse/HSEARCH-1576) - Support Infinispan as the Hibernate Search directory provider
+
+### Improvement
+* [HSEARCH-1616](https://hibernate.atlassian.net/browse/HSEARCH-1616) - BooleanJunction isEmpty function
+* [HSEARCH-1657](https://hibernate.atlassian.net/browse/HSEARCH-1657) - Improve logging for inconsistent field configuration
+* [HSEARCH-1658](https://hibernate.atlassian.net/browse/HSEARCH-1658) - Expose configuration to enable Lucene Infostream
+* [HSEARCH-1670](https://hibernate.atlassian.net/browse/HSEARCH-1670) - Clarify warning message on extension points needing a public contructor
+* [HSEARCH-1671](https://hibernate.atlassian.net/browse/HSEARCH-1671) - Upgrade asciidoctor-maven-plugin to version 1.5.0
+* [HSEARCH-1676](https://hibernate.atlassian.net/browse/HSEARCH-1676) - Distributed JBoss modules for WildFly should expose a slot name [major.minor] rather than exact version
+* [HSEARCH-1677](https://hibernate.atlassian.net/browse/HSEARCH-1677) - Upgrade to Infinispan 7.0.0.Beta2
+
+### Task
+* [HSEARCH-1580](https://hibernate.atlassian.net/browse/HSEARCH-1580) - Decide how to support the "dependency graph" feature
+* [HSEARCH-1660](https://hibernate.atlassian.net/browse/HSEARCH-1660) - Upgrade JGroups to 3.5.0.Final
+* [HSEARCH-1674](https://hibernate.atlassian.net/browse/HSEARCH-1674) - OSGi integration tests shouldn't be deployed to Maven repositories during release
+
+
+Version 5.0.0.Alpha6 (18-08-2014)
+
+### Bug
+* [HSEARCH-1637](https://hibernate.atlassian.net/browse/HSEARCH-1637) - Non-Threadsafe usage of SerializationService implementations
+* [HSEARCH-1650](https://hibernate.atlassian.net/browse/HSEARCH-1650) - LuceneWorkSerializerImpl ignores FlushLuceneWork
+* [HSEARCH-1651](https://hibernate.atlassian.net/browse/HSEARCH-1651) - Backend configuration property name is documented incorrectly
+
+### Task
+* [HSEARCH-1638](https://hibernate.atlassian.net/browse/HSEARCH-1638) - Some tests leak resources, do some cleanup and review
+* [HSEARCH-1644](https://hibernate.atlassian.net/browse/HSEARCH-1644) - Improve the quickstart and WildFly modules section of the documentation
+* [HSEARCH-1646](https://hibernate.atlassian.net/browse/HSEARCH-1646) - Remove dependency on AssertionFailure from HCANN
+* [HSEARCH-1648](https://hibernate.atlassian.net/browse/HSEARCH-1648) - Upgrade to Infinispan 7.0.0.Beta1
+* [HSEARCH-1652](https://hibernate.atlassian.net/browse/HSEARCH-1652) - Introduce tests for backwards serialization compatibility for Avro
+* [HSEARCH-1653](https://hibernate.atlassian.net/browse/HSEARCH-1653) - Revision Avro based serialization Protocol to v1.1 to allow for protocol changes
+
+
+Version 5.0.0.Alpha5 (23-07-2014)
+
+### Sub-task
+* [HSEARCH-1633](https://hibernate.atlassian.net/browse/HSEARCH-1633) - Remove usage of Generics from DocumentBuilder and Work
+
+### Bug
+* [HSEARCH-1092](https://hibernate.atlassian.net/browse/HSEARCH-1092) - @IndexedEmbedded still includes id of embedded entity even when not in includePaths
+* [HSEARCH-1448](https://hibernate.atlassian.net/browse/HSEARCH-1448) - Missing result when using polymorphism and second level cache
+* [HSEARCH-1614](https://hibernate.atlassian.net/browse/HSEARCH-1614) - More like this query throws NullPointerException when comparingField() is set to an unkown field
+* [HSEARCH-1615](https://hibernate.atlassian.net/browse/HSEARCH-1615) - WildFly modules are missing support for the JMS indexing backend
+* [HSEARCH-1619](https://hibernate.atlassian.net/browse/HSEARCH-1619) - Testsuite failing on Windows: temporary directory for indexes is illegal
+* [HSEARCH-1622](https://hibernate.atlassian.net/browse/HSEARCH-1622) - Improve exception when Hibernate Search finds a @IndexedEmbedded type loop
+* [HSEARCH-1623](https://hibernate.atlassian.net/browse/HSEARCH-1623) - Concurrency problem with WeakIdentityHashMap in FullTextIndexEventListener
+
+### Improvement
+* [HSEARCH-704](https://hibernate.atlassian.net/browse/HSEARCH-704) - Loading objects leads to 1+n queries when JPA's @Id != @DocumentId property
+* [HSEARCH-1494](https://hibernate.atlassian.net/browse/HSEARCH-1494) - Metadata creation tries to process @Id property even though the entity is not indexed
+* [HSEARCH-1608](https://hibernate.atlassian.net/browse/HSEARCH-1608) - Improve documentation build via asciidoctor
+* [HSEARCH-1617](https://hibernate.atlassian.net/browse/HSEARCH-1617) - Clarify error cause in case of JMS backend misconfiguration
+* [HSEARCH-1618](https://hibernate.atlassian.net/browse/HSEARCH-1618) - AbstractJMSHibernateSearchController should not be limited to ORM users
+* [HSEARCH-1629](https://hibernate.atlassian.net/browse/HSEARCH-1629) - Register the SearchFactory as a Hibernate Service
+
+### New Feature
+* [HSEARCH-1119](https://hibernate.atlassian.net/browse/HSEARCH-1119) - Provide a global property to define the default ObjectLookupMethod and DatabaseRetrievalMethod
+
+### Task
+* [HSEARCH-1440](https://hibernate.atlassian.net/browse/HSEARCH-1440) - Re-enable JMS / WildFly disabled tests
+* [HSEARCH-1609](https://hibernate.atlassian.net/browse/HSEARCH-1609) - Resolve deprecation warnings for usage of JBoss Logger annotations
+* [HSEARCH-1610](https://hibernate.atlassian.net/browse/HSEARCH-1610) - Automatically enable JDT Annotation Processor support in Eclipse
+* [HSEARCH-1612](https://hibernate.atlassian.net/browse/HSEARCH-1612) - Upgrade to JGroups 3.5.0.Beta7
+* [HSEARCH-1613](https://hibernate.atlassian.net/browse/HSEARCH-1613) - Upgrade to WildFly 8.1.0.Final
+* [HSEARCH-1620](https://hibernate.atlassian.net/browse/HSEARCH-1620) - Make it easier to develop the project on Windows
+* [HSEARCH-1625](https://hibernate.atlassian.net/browse/HSEARCH-1625) - Upgrade H2 version to 1.4.178
+* [HSEARCH-1626](https://hibernate.atlassian.net/browse/HSEARCH-1626) - Upgrade JGroups to 3.5.0.Beta9
+* [HSEARCH-1627](https://hibernate.atlassian.net/browse/HSEARCH-1627) - Improve debugging options of Karaf features file
+* [HSEARCH-1628](https://hibernate.atlassian.net/browse/HSEARCH-1628) - Make sure all Maven plugins specify a versions and update all
+* [HSEARCH-1630](https://hibernate.atlassian.net/browse/HSEARCH-1630) - Update to Hibernate Commons Annotations 4.0.5.Final
+* [HSEARCH-1632](https://hibernate.atlassian.net/browse/HSEARCH-1632) - Update to Hibernate ORM 4.3.6.Final
+* [HSEARCH-1634](https://hibernate.atlassian.net/browse/HSEARCH-1634) - Upgrade to Infinispan 7.0.0.Alpha5
+* [HSEARCH-1635](https://hibernate.atlassian.net/browse/HSEARCH-1635) - Avoid using the AttributeFactory, dropped in Lucene 4.9
+* [HSEARCH-1636](https://hibernate.atlassian.net/browse/HSEARCH-1636) - Different IndexWriterConfig instances are required for each IndexWriter in Lucene 4.9
+
+
+Version 5.0.0.Alpha4 (20-05-2014)
+
+### Sub-task
+* [HSEARCH-1556](https://hibernate.atlassian.net/browse/HSEARCH-1556) - Configure maven-bundle-plugin to add OSGi metadata to manifest
+* [HSEARCH-1557](https://hibernate.atlassian.net/browse/HSEARCH-1557) - Write Karaf integration test
+* [HSEARCH-1560](https://hibernate.atlassian.net/browse/HSEARCH-1560) - Refactor packages to avoid split packages
+
+### Bug
+* [HSEARCH-1312](https://hibernate.atlassian.net/browse/HSEARCH-1312) - Conflicting warning and error on abstract class @Indexed
+* [HSEARCH-1583](https://hibernate.atlassian.net/browse/HSEARCH-1583) - Collection fields in @MappedSuperclasses are ignored on update
+* [HSEARCH-1601](https://hibernate.atlassian.net/browse/HSEARCH-1601) - The WildFly modules should not reuse the Infinispan core version provided by WildFly
+
+### Improvement
+* [HSEARCH-1002](https://hibernate.atlassian.net/browse/HSEARCH-1002) - Consolidate SearchTestCase with Hibernate's Core CustomRunner
+* [HSEARCH-1594](https://hibernate.atlassian.net/browse/HSEARCH-1594) - Support Apache Lucene 4.8
+* [HSEARCH-1607](https://hibernate.atlassian.net/browse/HSEARCH-1607) - Depend on a version range as OSGi dependency to Apache Lucene
+
+### New Feature
+* [HSEARCH-1465](https://hibernate.atlassian.net/browse/HSEARCH-1465) - Support running in OSGi containers
+* [HSEARCH-1552](https://hibernate.atlassian.net/browse/HSEARCH-1552) - Allow loading of additional "built-in bridges" via autodiscovery
+
+### Remove Feature
+* [HSEARCH-1564](https://hibernate.atlassian.net/browse/HSEARCH-1564) - Drop support for Java 6 and move builds to Java 7
+
+### Task
+* [HSEARCH-1455](https://hibernate.atlassian.net/browse/HSEARCH-1455) - Remove deprecated method and classes
+* [HSEARCH-1471](https://hibernate.atlassian.net/browse/HSEARCH-1471) - Migrate documentation to asciidoc
+* [HSEARCH-1553](https://hibernate.atlassian.net/browse/HSEARCH-1553) - Remove SearchConfiguration#getIndexManagerFactory and make index manager factory a service
+* [HSEARCH-1555](https://hibernate.atlassian.net/browse/HSEARCH-1555) - Update HibernateSearchResourceLoader to use the new ClassLoaderService
+* [HSEARCH-1593](https://hibernate.atlassian.net/browse/HSEARCH-1593) - Update README in root with new build instructions
+* [HSEARCH-1598](https://hibernate.atlassian.net/browse/HSEARCH-1598) - Upgrade to JGroups 3.5.0.Beta5
+* [HSEARCH-1599](https://hibernate.atlassian.net/browse/HSEARCH-1599) - Upgrade to Infinispan 7.0.0.Alpha4
+* [HSEARCH-1602](https://hibernate.atlassian.net/browse/HSEARCH-1602) - Change license headers
+* [HSEARCH-1603](https://hibernate.atlassian.net/browse/HSEARCH-1603) - Improve importing of project in Eclipse
+* [HSEARCH-1604](https://hibernate.atlassian.net/browse/HSEARCH-1604) - Make sure all modules are at least always compiled
+* [HSEARCH-1605](https://hibernate.atlassian.net/browse/HSEARCH-1605) - Upgrade to WildFly 8.1.0.CR2
+* [HSEARCH-1606](https://hibernate.atlassian.net/browse/HSEARCH-1606) - Upgrade to Apache Lucene 4.8.1
+
+
+Version 5.0.0.Alpha3 (03-04-2014)
+
+### Sub-task
+* [HSEARCH-1533](https://hibernate.atlassian.net/browse/HSEARCH-1533) - MoreLikeThis QueryBuilder is not including fields from indexedembedded components
+* [HSEARCH-1545](https://hibernate.atlassian.net/browse/HSEARCH-1545) - Support compressed fields in MoreLikeThis
+
+### Bug
+* [HSEARCH-1278](https://hibernate.atlassian.net/browse/HSEARCH-1278) - Spodaric test failure: org.hibernate.search.test.batchindexing.MassIndexerErrorReportingTest
+* [HSEARCH-1456](https://hibernate.atlassian.net/browse/HSEARCH-1456) - Review classloader usage
+* [HSEARCH-1525](https://hibernate.atlassian.net/browse/HSEARCH-1525) - Performance tests creating reports in a directory not compatible with Windows
+* [HSEARCH-1562](https://hibernate.atlassian.net/browse/HSEARCH-1562) - Race condition in error reporting during MassIndexer
+* [HSEARCH-1572](https://hibernate.atlassian.net/browse/HSEARCH-1572) - SerializationHelper not closing object streams
+
+### Improvement
+* [HSEARCH-1121](https://hibernate.atlassian.net/browse/HSEARCH-1121) - Work on a proper classloader strategy
+* [HSEARCH-1499](https://hibernate.atlassian.net/browse/HSEARCH-1499) - Avoid eager iteration on values read from AtomicReader in DistanceCollector until an explicit collect()
+* [HSEARCH-1508](https://hibernate.atlassian.net/browse/HSEARCH-1508) - Tune IndexWriter options to allow for highly concurrent usage
+* [HSEARCH-1510](https://hibernate.atlassian.net/browse/HSEARCH-1510) - Minimize distributed dependencies related to Apache Tika
+* [HSEARCH-1547](https://hibernate.atlassian.net/browse/HSEARCH-1547) - Define the exact behaviour of ServiceManager#releaseAllServices
+* [HSEARCH-1549](https://hibernate.atlassian.net/browse/HSEARCH-1549) - Reorganize classes under org.hibernate.search.test.util
+
+### New Feature
+* [HSEARCH-1575](https://hibernate.atlassian.net/browse/HSEARCH-1575) - Allow to override the JGroups configuration defined by the Infinispan configuration files
+
+### Patch
+* [HSEARCH-1551](https://hibernate.atlassian.net/browse/HSEARCH-1551) - Test in SerializationHelperTest is ineffective
+
+### Task
+* [HSEARCH-1516](https://hibernate.atlassian.net/browse/HSEARCH-1516) - FetchSizeConfigurationTest occasionally fails: race condition
+* [HSEARCH-1527](https://hibernate.atlassian.net/browse/HSEARCH-1527) - Upgrade to Apache Lucene 4.7
+* [HSEARCH-1558](https://hibernate.atlassian.net/browse/HSEARCH-1558) - Upgrade JGroups to 3.5.0.Beta2
+* [HSEARCH-1559](https://hibernate.atlassian.net/browse/HSEARCH-1559) - Upgrade Apache Avro to 1.7.6
+* [HSEARCH-1566](https://hibernate.atlassian.net/browse/HSEARCH-1566) - Update to JUnit 4.11
+* [HSEARCH-1567](https://hibernate.atlassian.net/browse/HSEARCH-1567) - Minor dependency updates and Maven plugin versions updates
+* [HSEARCH-1568](https://hibernate.atlassian.net/browse/HSEARCH-1568) - Exclude dependency to lucene-sandbox
+* [HSEARCH-1569](https://hibernate.atlassian.net/browse/HSEARCH-1569) - Update used JavaEE APIs to JavaEE 7 definitions
+* [HSEARCH-1570](https://hibernate.atlassian.net/browse/HSEARCH-1570) - Reorganize distribution assembly and management of dependency versions
+* [HSEARCH-1571](https://hibernate.atlassian.net/browse/HSEARCH-1571) - Upgrade to Infinispan 7.0.0.Alpha2
+* [HSEARCH-1584](https://hibernate.atlassian.net/browse/HSEARCH-1584) - Upgrade to Apache Lucene 4.7.1
+* [HSEARCH-1585](https://hibernate.atlassian.net/browse/HSEARCH-1585) - Upgrade to Hibernate ORM 4.3.5.Final
+* [HSEARCH-1586](https://hibernate.atlassian.net/browse/HSEARCH-1586) - Remove redundant Surefire configurations
+
+
+Version 5.0.0.Alpha2 (05-03-2014)
+
+### Bug
+* [HSEARCH-726](https://hibernate.atlassian.net/browse/HSEARCH-726) - Facetted search on embedded collections takes only first element from collection
+* [HSEARCH-1513](https://hibernate.atlassian.net/browse/HSEARCH-1513) - CachingWrapperFilter attempts to cache null docIdSets
+* [HSEARCH-1515](https://hibernate.atlassian.net/browse/HSEARCH-1515) - NPE because of inverted boolean check in IdentifierConsumerDocumentProducer
+* [HSEARCH-1522](https://hibernate.atlassian.net/browse/HSEARCH-1522) - Javadoc generation is not linking correctly to the Lucene documentation
+* [HSEARCH-1523](https://hibernate.atlassian.net/browse/HSEARCH-1523) - Depending on both javax.transaction:jta and org.jboss.spec.javax.transaction specs
+* [HSEARCH-1524](https://hibernate.atlassian.net/browse/HSEARCH-1524) - JGroups tests failing on Windows
+* [HSEARCH-1532](https://hibernate.atlassian.net/browse/HSEARCH-1532) - JGroups backend buffer handling is not considering the offset on message delivery
+
+### Improvement
+* [HSEARCH-1505](https://hibernate.atlassian.net/browse/HSEARCH-1505) - Reuse the JBoss Modules already included in WildFly 8
+* [HSEARCH-1509](https://hibernate.atlassian.net/browse/HSEARCH-1509) - Minor cleanups in the Query DSL
+* [HSEARCH-1511](https://hibernate.atlassian.net/browse/HSEARCH-1511) - Provide new FuzzyQuery options to the DSL
+* [HSEARCH-1514](https://hibernate.atlassian.net/browse/HSEARCH-1514) - A Service should be flagged Startable or Stoppable as an implementation detail
+* [HSEARCH-1517](https://hibernate.atlassian.net/browse/HSEARCH-1517) - Upgrade to WildFly 8.0.0.Final
+* [HSEARCH-1518](https://hibernate.atlassian.net/browse/HSEARCH-1518) - Upgrade to JTA spec 1.2
+* [HSEARCH-1519](https://hibernate.atlassian.net/browse/HSEARCH-1519) - Upgrade to ShrinkWrap stable 2.0
+* [HSEARCH-1520](https://hibernate.atlassian.net/browse/HSEARCH-1520) - Remove hibernate-search-analyzers module
+
+### New Feature
+* [HSEARCH-1492](https://hibernate.atlassian.net/browse/HSEARCH-1492) - Provide a "More Like This" feature to find similar entities
+
+### Patch
+* [HSEARCH-1534](https://hibernate.atlassian.net/browse/HSEARCH-1534) - Avoid usage of SLF4J in our testsuite
+
+### Remove Feature
+* [HSEARCH-1521](https://hibernate.atlassian.net/browse/HSEARCH-1521) - Stop including lucene-regex in the provided modules
+
+### Task
+* [HSEARCH-789](https://hibernate.atlassian.net/browse/HSEARCH-789) - Polish or remove topDocs being exposed on Query SPI
+* [HSEARCH-1529](https://hibernate.atlassian.net/browse/HSEARCH-1529) - Remove double InstanceInitializer call in DocumentBuilder
+* [HSEARCH-1530](https://hibernate.atlassian.net/browse/HSEARCH-1530) - Upgrade to Infinispan 7.0.0.Alpha1 and JGroups 3.5.0.Alpha1
+* [HSEARCH-1531](https://hibernate.atlassian.net/browse/HSEARCH-1531) - Upgrade to Hibernate ORM 4.3.4.Final
+* [HSEARCH-1535](https://hibernate.atlassian.net/browse/HSEARCH-1535) - Revert removal of DocumentExtractor#getTopDocs
+
+
+Version 5.0.0.Alpha1 (08-02-2014)
+
+### Bug
+* [HSEARCH-1260](https://hibernate.atlassian.net/browse/HSEARCH-1260) - LazyInitializationException while indexing
+* [HSEARCH-1365](https://hibernate.atlassian.net/browse/HSEARCH-1365) - Extract Lucene serialization support as well as remote backends into a dedicated modules
+* [HSEARCH-1442](https://hibernate.atlassian.net/browse/HSEARCH-1442) - IndexedEmbedded field not found
+* [HSEARCH-1447](https://hibernate.atlassian.net/browse/HSEARCH-1447) - Failure to boot if a non-indexed entity is having a complex ID for which no appropriate TwoWayFieldBridge can be guessed
+* [HSEARCH-1451](https://hibernate.atlassian.net/browse/HSEARCH-1451) - Nested @IndexedEmbedded is not recognized anymore
+* [HSEARCH-1459](https://hibernate.atlassian.net/browse/HSEARCH-1459) - Refactor ServiceManager and ServiceProvider
+* [HSEARCH-1462](https://hibernate.atlassian.net/browse/HSEARCH-1462) - Search should not use EntityKey constructor
+* [HSEARCH-1476](https://hibernate.atlassian.net/browse/HSEARCH-1476) - Configuration property 'merge_calibrate_by_deletes' not parsed correctly
+* [HSEARCH-1490](https://hibernate.atlassian.net/browse/HSEARCH-1490) - Wrong classloader used to load configuration files for a managed Infinispan cache
+* [HSEARCH-1495](https://hibernate.atlassian.net/browse/HSEARCH-1495) - Using MassIndexer leads to logged messages about unreleased service MassIndexerFactoryProvider
+
+### Deprecation
+* [HSEARCH-1484](https://hibernate.atlassian.net/browse/HSEARCH-1484) - Configuration property 'use_compound_file' is going to be ignored (deprecated)
+
+### Improvement
+* [HSEARCH-1191](https://hibernate.atlassian.net/browse/HSEARCH-1191) - Update to Lucene 4.x
+* [HSEARCH-1243](https://hibernate.atlassian.net/browse/HSEARCH-1243) - Reduce dependency to Solr analysis machinery from solr-analysis-extras to solr-core
+* [HSEARCH-1468](https://hibernate.atlassian.net/browse/HSEARCH-1468) - Reduce amount of objects created by the FacetCollector
+* [HSEARCH-1477](https://hibernate.atlassian.net/browse/HSEARCH-1477) - Trivial optimization for empty results
+* [HSEARCH-1480](https://hibernate.atlassian.net/browse/HSEARCH-1480) - Helper newArrayList should mandate a size hint
+* [HSEARCH-1486](https://hibernate.atlassian.net/browse/HSEARCH-1486) - Minimize allocation cost of iterating on metadata fields
+* [HSEARCH-1488](https://hibernate.atlassian.net/browse/HSEARCH-1488) - Improve release plugin configuration
+* [HSEARCH-1501](https://hibernate.atlassian.net/browse/HSEARCH-1501) - Remove dependency to Apache Solr
+* [HSEARCH-1503](https://hibernate.atlassian.net/browse/HSEARCH-1503) - Explain in README.md what each module is about
+* [HSEARCH-1506](https://hibernate.atlassian.net/browse/HSEARCH-1506) - Exclude transitive dependencies to jboss-logging-annotations
+
+### Task
+* [HSEARCH-1327](https://hibernate.atlassian.net/browse/HSEARCH-1327) - Reword reference for Quad Tree for Spatial Hash in spatial module
+* [HSEARCH-1437](https://hibernate.atlassian.net/browse/HSEARCH-1437) - Re-enable DependencyConvergence from Maven Enforcer plugin
+* [HSEARCH-1444](https://hibernate.atlassian.net/browse/HSEARCH-1444) - Disable usage of shadow services from ORM in our testsuite
+* [HSEARCH-1458](https://hibernate.atlassian.net/browse/HSEARCH-1458) - Disallow mistaken import statements, like using JGroups helpers instead of JUnit
+* [HSEARCH-1460](https://hibernate.atlassian.net/browse/HSEARCH-1460) - Migrate WFK performance test suite to Hibernate Search
+* [HSEARCH-1463](https://hibernate.atlassian.net/browse/HSEARCH-1463) - Upgrade to Hibernate ORM 4.3.0.CR2
+* [HSEARCH-1466](https://hibernate.atlassian.net/browse/HSEARCH-1466) - Enforce consistent order of test execution
+* [HSEARCH-1479](https://hibernate.atlassian.net/browse/HSEARCH-1479) - Speedup release operations by skipping second tests and remote checkout
+* [HSEARCH-1481](https://hibernate.atlassian.net/browse/HSEARCH-1481) - Upgrade to Hibernate ORM 4.3.0.Final
+* [HSEARCH-1482](https://hibernate.atlassian.net/browse/HSEARCH-1482) - Upgrade to Infinispan 6.0.1.Final and JGroups 3.4.2.Final
+* [HSEARCH-1483](https://hibernate.atlassian.net/browse/HSEARCH-1483) - Upgrade to WildFly 8.0.0.CR1
+* [HSEARCH-1485](https://hibernate.atlassian.net/browse/HSEARCH-1485) - Update H2 testing database to avoid some issues under load
+* [HSEARCH-1487](https://hibernate.atlassian.net/browse/HSEARCH-1487) - Upgrade to Hibernate ORM 4.3.1.Final
+* [HSEARCH-1489](https://hibernate.atlassian.net/browse/HSEARCH-1489) - The performance module should use the same versions as used by other modules
+* [HSEARCH-1496](https://hibernate.atlassian.net/browse/HSEARCH-1496) - EntityManagerSerializationTest was unintentionally disabled
+* [HSEARCH-1504](https://hibernate.atlassian.net/browse/HSEARCH-1504) - Update links to javadocs of related projects
+
+
+Version 4.5.0.Alpha1 (14-10-2013)
+
+### Task
+* [HSEARCH-1370](https://hibernate.atlassian.net/browse/HSEARCH-1370) - Create integration tests with WildFly
+* [HSEARCH-1373](https://hibernate.atlassian.net/browse/HSEARCH-1373) - Update Hibernate ORM to 4.3
+* [HSEARCH-1435](https://hibernate.atlassian.net/browse/HSEARCH-1435) - Update to Infinispan 6.0.0.CR2
+* [HSEARCH-1436](https://hibernate.atlassian.net/browse/HSEARCH-1436) - Change build to use JDK7 but keep Java6 compatibility
+
+
+Version 4.4.0.Final (14-10-2013)
+
+### Bug
+* [HSEARCH-1340](https://hibernate.atlassian.net/browse/HSEARCH-1340) - Add proper documentation for facet sort ordering
+* [HSEARCH-1431](https://hibernate.atlassian.net/browse/HSEARCH-1431) - PurgeTest uses reserved MySQL keywords
+
+### Improvement
+* [HSEARCH-1341](https://hibernate.atlassian.net/browse/HSEARCH-1341) - Clarify relationship between @NumericField and NumericFieldBridge in the documentation
+* [HSEARCH-1342](https://hibernate.atlassian.net/browse/HSEARCH-1342) - Add section on how to read facet data from the API after a query
+* [HSEARCH-1395](https://hibernate.atlassian.net/browse/HSEARCH-1395) - Improve MassIndexer documentation around threadsToLoadObjects and threadsForSubsequentFetching
+
+### Task
+* [HSEARCH-1432](https://hibernate.atlassian.net/browse/HSEARCH-1432) - Upgrade to Hibernate ORM 4.2.6.Final
+* [HSEARCH-1433](https://hibernate.atlassian.net/browse/HSEARCH-1433) - Minor upgrade to other components: JGroups, Logger, Narayana
+* [HSEARCH-1434](https://hibernate.atlassian.net/browse/HSEARCH-1434) - All test entities should have a public no-args constructor
+
+
+Version 4.4.0.CR1 (08-10-2013)
+
+### Bug
+* [HSEARCH-1271](https://hibernate.atlassian.net/browse/HSEARCH-1271) - FullTextSession purge fails on entities annoted with @ContainedIn
+* [HSEARCH-1358](https://hibernate.atlassian.net/browse/HSEARCH-1358) - Index not updated on Embedded ElementCollection (with FieldBridge)
+* [HSEARCH-1423](https://hibernate.atlassian.net/browse/HSEARCH-1423) - Log message about event listeners being enabled is wrong
+* [HSEARCH-1424](https://hibernate.atlassian.net/browse/HSEARCH-1424) - WorkerTestCase was (erroneously) disabled
+
+### Improvement
+* [HSEARCH-1427](https://hibernate.atlassian.net/browse/HSEARCH-1427) - Provide base class with default implementation of ShardIdentifierProvider
+* [HSEARCH-1428](https://hibernate.atlassian.net/browse/HSEARCH-1428) - Specify session factory type more precisely in MassIndexerFactory#createMassIndexer()
+
+### Task
+* [HSEARCH-1418](https://hibernate.atlassian.net/browse/HSEARCH-1418) - Checkstyle enable: EqualsAvoidNull, RedundantThrows, HideUtilityClassConstructor
+* [HSEARCH-1419](https://hibernate.atlassian.net/browse/HSEARCH-1419) - Introduce checkstyle rules to verify logged methods are i18 friendly
+* [HSEARCH-1420](https://hibernate.atlassian.net/browse/HSEARCH-1420) - More Checkstyle rules to can usage of legacy code
+* [HSEARCH-1421](https://hibernate.atlassian.net/browse/HSEARCH-1421) - BoostStrategy, FilterDef and Discriminator instance creation not using the user friendly helpers
+* [HSEARCH-1422](https://hibernate.atlassian.net/browse/HSEARCH-1422) - Redundant null check in JGroupsChannel initialization
+* [HSEARCH-1430](https://hibernate.atlassian.net/browse/HSEARCH-1430) - Document ShardIdentifierProvider is experimental
+
+
+Version 4.4.0.Beta1 (27-09-2013)
+
+### Bug
+* [HSEARCH-1400](https://hibernate.atlassian.net/browse/HSEARCH-1400) - AppliedOnTypeAwareBridge is not applied to class bridges
+
+### Deprecation
+* [HSEARCH-1414](https://hibernate.atlassian.net/browse/HSEARCH-1414) - Deprecate usage of @Similarity annotation
+
+### Improvement
+* [HSEARCH-1392](https://hibernate.atlassian.net/browse/HSEARCH-1392) - Assorted fixes to the pom files for 4.4.0
+
+### New Feature
+* [HSEARCH-472](https://hibernate.atlassian.net/browse/HSEARCH-472) - Support for dynamic sharding
+* [HSEARCH-1409](https://hibernate.atlassian.net/browse/HSEARCH-1409) - Provide non-public extension to query DSL for passing field bridges
+
+### Task
+* [HSEARCH-1415](https://hibernate.atlassian.net/browse/HSEARCH-1415) - Remove deprecated method DocumentBuilderIndexedEntity#getTerm
+
+
+Version 4.4.0.Alpha2 (18-09-2013)
+
+### Bug
+* [HSEARCH-1386](https://hibernate.atlassian.net/browse/HSEARCH-1386) - NoClassDefFoundError when using Hibernate ORM 4.3.0
+* [HSEARCH-1390](https://hibernate.atlassian.net/browse/HSEARCH-1390) - Avoid force unlock operations on unlocked directories
+* [HSEARCH-1393](https://hibernate.atlassian.net/browse/HSEARCH-1393) - new getIndexBindingForEntity(Class) implementation doesn't deal with non-indexed entities
+* [HSEARCH-1406](https://hibernate.atlassian.net/browse/HSEARCH-1406) - Some unnecessary jars are added in the packaged JBoss Modules
+* [HSEARCH-1412](https://hibernate.atlassian.net/browse/HSEARCH-1412) - IndexedClassBridgeMapping is missing norms and analyze methods
+
+### Improvement
+* [HSEARCH-1384](https://hibernate.atlassian.net/browse/HSEARCH-1384) - Add the ability to set the number of different root types indexed in parallel
+* [HSEARCH-1388](https://hibernate.atlassian.net/browse/HSEARCH-1388) - Upgrade to JGroups 3.3.4.Final and refresh default configuration files
+* [HSEARCH-1389](https://hibernate.atlassian.net/browse/HSEARCH-1389) - Avoid context switching on single-task indexing transactions
+* [HSEARCH-1391](https://hibernate.atlassian.net/browse/HSEARCH-1391) - ErrorContextBuilder should build error placeholders lazily
+* [HSEARCH-1405](https://hibernate.atlassian.net/browse/HSEARCH-1405) - Remove dependency to org.xerial.snappy
+* [HSEARCH-1407](https://hibernate.atlassian.net/browse/HSEARCH-1407) - Update Apache Avro to version 1.7.5
+* [HSEARCH-1410](https://hibernate.atlassian.net/browse/HSEARCH-1410) - Upgrade Hibernate Commons Annotations to 4.0.4.Final
+* [HSEARCH-1411](https://hibernate.atlassian.net/browse/HSEARCH-1411) - Upgrade Apache Tika to 1.4
+
+### New Feature
+* [HSEARCH-1396](https://hibernate.atlassian.net/browse/HSEARCH-1396) - A FieldBridge should be able to easily acquire services/resources
+
+### Task
+* [HSEARCH-1387](https://hibernate.atlassian.net/browse/HSEARCH-1387) - Add @Override annotation on the methods inherited from interfaces
+* [HSEARCH-1399](https://hibernate.atlassian.net/browse/HSEARCH-1399) - MassIndexer service registration should not depend on ORM services registry
+* [HSEARCH-1408](https://hibernate.atlassian.net/browse/HSEARCH-1408) - Upgrade to Hibernate ORM 4.2.5.Final
+
+
+Version 4.4.0.Alpha1 (02-08-2013)
+
+### Bug
+* [HSEARCH-703](https://hibernate.atlassian.net/browse/HSEARCH-703) - QueryBuilder should support specialization by superclasses of indexed entities
+* [HSEARCH-1374](https://hibernate.atlassian.net/browse/HSEARCH-1374) - IDE project import error on Windows: com.sun:tools dependency missing
+* [HSEARCH-1377](https://hibernate.atlassian.net/browse/HSEARCH-1377) - Polish some minor concurrency mistakes
+* [HSEARCH-1378](https://hibernate.atlassian.net/browse/HSEARCH-1378) - Inclusive flags swapped for numeric range queries
+
+### Improvement
+* [HSEARCH-1352](https://hibernate.atlassian.net/browse/HSEARCH-1352) - Clarify limitations of programmatic mapping not recognizing inherited properties
+* [HSEARCH-1354](https://hibernate.atlassian.net/browse/HSEARCH-1354) - Document parse failures need graceful recovery
+* [HSEARCH-1355](https://hibernate.atlassian.net/browse/HSEARCH-1355) - Rename EntityIndexBinder to EntityIndexBinding
+* [HSEARCH-1361](https://hibernate.atlassian.net/browse/HSEARCH-1361) - Upgrade to Hibernate ORM 4.2.3.Final
+* [HSEARCH-1362](https://hibernate.atlassian.net/browse/HSEARCH-1362) - Upgrade to Infinispan 5.3.0.Final and JGroups 3.3.2
+* [HSEARCH-1363](https://hibernate.atlassian.net/browse/HSEARCH-1363) - Formatting and style improvements in the documentation
+
+### New Feature
+* [HSEARCH-436](https://hibernate.atlassian.net/browse/HSEARCH-436) - Expose a metadata API
+
+### Task
+* [HSEARCH-1293](https://hibernate.atlassian.net/browse/HSEARCH-1293) - Verify Hibernate Envers integration
+* [HSEARCH-1326](https://hibernate.atlassian.net/browse/HSEARCH-1326) - Checkstyle Improvement
+* [HSEARCH-1360](https://hibernate.atlassian.net/browse/HSEARCH-1360) - UpdateIndexedEmbeddedCollectionTest failing on Oracle, DB2 and MySQL of too long table names
+* [HSEARCH-1366](https://hibernate.atlassian.net/browse/HSEARCH-1366) - Allow ORM SessionFactory to be completely created prior to bootstrapping the Search factory
+* [HSEARCH-1371](https://hibernate.atlassian.net/browse/HSEARCH-1371) - Update Maven plugin versions
+
+
+Version 4.3.0.Final (08-06-2013)
+
+### Bug
+* [HSEARCH-1338](https://hibernate.atlassian.net/browse/HSEARCH-1338) - excludeLimit with repeated from().to() fail on facet DSL
+* [HSEARCH-1339](https://hibernate.atlassian.net/browse/HSEARCH-1339) - Fix typo in FacetSortOrder.RANGE_DEFINITION_ODER (deprecation)
+* [HSEARCH-1346](https://hibernate.atlassian.net/browse/HSEARCH-1346) - Selected Facet object not equal to computed Facet object
+
+### Improvement
+* [HSEARCH-1345](https://hibernate.atlassian.net/browse/HSEARCH-1345) - Document type limitation of DSL generated Queries
+
+
+Version 4.3.0.CR1 (28-05-2013)
+
+### Improvement
+* [HSEARCH-1337](https://hibernate.atlassian.net/browse/HSEARCH-1337) - Make the message clearer and provide a hint when no matching @Latitude/@Longitude is found for a @Spatial index
+
+
+Version 4.3.0.Beta1 (24-05-2013)
+
+### Bug
+* [HSEARCH-1307](https://hibernate.atlassian.net/browse/HSEARCH-1307) - NRT backend could hit AlreadyClosedException: this IndexReader is closed
+* [HSEARCH-1314](https://hibernate.atlassian.net/browse/HSEARCH-1314) - Allow @Latitude and @Longitude annotations on methods (getters) too
+* [HSEARCH-1319](https://hibernate.atlassian.net/browse/HSEARCH-1319) - AS7 kit does not include JMS dependency
+* [HSEARCH-1320](https://hibernate.atlassian.net/browse/HSEARCH-1320) - SharedIndexWorkspaceImpl holding index lock indefinitely
+* [HSEARCH-1323](https://hibernate.atlassian.net/browse/HSEARCH-1323) - A full build creates indextemp and simpleJndi test directory which don't get cleaned up
+* [HSEARCH-1330](https://hibernate.atlassian.net/browse/HSEARCH-1330) - Performance tests create a test directory outside the target directory
+* [HSEARCH-1332](https://hibernate.atlassian.net/browse/HSEARCH-1332) - The Solr JBoss Module should include the specific version of Lucene it requires
+
+### Improvement
+* [HSEARCH-1311](https://hibernate.atlassian.net/browse/HSEARCH-1311) - Create a dedicated distribution module
+* [HSEARCH-1315](https://hibernate.atlassian.net/browse/HSEARCH-1315) - Spatial API polishing
+* [HSEARCH-1317](https://hibernate.atlassian.net/browse/HSEARCH-1317) - NRT backend flush operation could work in parallel with Readers refresh
+* [HSEARCH-1334](https://hibernate.atlassian.net/browse/HSEARCH-1334) - Remove dependency to Guava
+* [HSEARCH-1336](https://hibernate.atlassian.net/browse/HSEARCH-1336) - Upgrade to Hibernate ORM 4.2.2.Final
+
+### Task
+* [HSEARCH-735](https://hibernate.atlassian.net/browse/HSEARCH-735) - Create a test for HSEARCH-734
+* [HSEARCH-1259](https://hibernate.atlassian.net/browse/HSEARCH-1259) - Remove archetype module
+* [HSEARCH-1292](https://hibernate.atlassian.net/browse/HSEARCH-1292) - Add more rules to checkstyle
+* [HSEARCH-1308](https://hibernate.atlassian.net/browse/HSEARCH-1308) - Upgrade from JBoss Transactions 4.16.4 to Narayana 4.17.4
+* [HSEARCH-1309](https://hibernate.atlassian.net/browse/HSEARCH-1309) - Split integration tests in isolated sub modules
+* [HSEARCH-1310](https://hibernate.atlassian.net/browse/HSEARCH-1310) - Drop the hibernate-search prefix from the module directories
+* [HSEARCH-1322](https://hibernate.atlassian.net/browse/HSEARCH-1322) - Upgrade to Hibernate Commons Annotations 4.0.2.Final
+* [HSEARCH-1325](https://hibernate.atlassian.net/browse/HSEARCH-1325) - Control line endings with an appropriate .gitattributes file
+* [HSEARCH-1329](https://hibernate.atlassian.net/browse/HSEARCH-1329) - The two variants of ReaderPerformanceTestCase are failing
+* [HSEARCH-1335](https://hibernate.atlassian.net/browse/HSEARCH-1335) - The hibernate-search-modules project should be built before the integration test one
+
+
+Version 4.3.0.Alpha1 (19-04-2013)
+
+### Bug
+* [HSEARCH-1261](https://hibernate.atlassian.net/browse/HSEARCH-1261) - Array Index Out Of Bound in JGroups Backend AutoNodeSelect
+* [HSEARCH-1267](https://hibernate.atlassian.net/browse/HSEARCH-1267) - Spatial search with sort by distance and paging orders entities incorrectly and repeats them
+* [HSEARCH-1281](https://hibernate.atlassian.net/browse/HSEARCH-1281) - Invalid code in search example - Getting Start section of documentation
+* [HSEARCH-1289](https://hibernate.atlassian.net/browse/HSEARCH-1289) - Infinispan module can't parse Infinispan configuration files in a modular environment
+* [HSEARCH-1297](https://hibernate.atlassian.net/browse/HSEARCH-1297) - The Solr module from the AS7 kit contains a set of incorrect dependencies
+
+### Improvement
+* [HSEARCH-1304](https://hibernate.atlassian.net/browse/HSEARCH-1304) - Allow configuration of JGroups message timeout
+* [HSEARCH-1305](https://hibernate.atlassian.net/browse/HSEARCH-1305) - JGroups backends should be able to delegate also to the non-default one
+
+### New Feature
+* [HSEARCH-1268](https://hibernate.atlassian.net/browse/HSEARCH-1268) - Make it possible to plug in a custom MassIndexer implementation
+* [HSEARCH-1287](https://hibernate.atlassian.net/browse/HSEARCH-1287) - Include Infinispan Directory in published JBoss Module
+* [HSEARCH-1296](https://hibernate.atlassian.net/browse/HSEARCH-1296) - Provide an option on the JGroups backend for synchronous updates
+
+### Patch
+* [HSEARCH-1277](https://hibernate.atlassian.net/browse/HSEARCH-1277) - Apply minor style and typo fixes to documentation
+* [HSEARCH-1285](https://hibernate.atlassian.net/browse/HSEARCH-1285) - Disable annotation processors of test classes
+
+### Task
+* [HSEARCH-1262](https://hibernate.atlassian.net/browse/HSEARCH-1262) - Upgrade to Infinispan 5.2.CR2
+* [HSEARCH-1264](https://hibernate.atlassian.net/browse/HSEARCH-1264) - Document usage of JBoss AS 7 module
+* [HSEARCH-1272](https://hibernate.atlassian.net/browse/HSEARCH-1272) - Upgrade to Hibernate ORM 4.2.0.CR1
+* [HSEARCH-1274](https://hibernate.atlassian.net/browse/HSEARCH-1274) - Update to Infinispan 5.2.1.Final and related JGroups 3.2.7.Final
+* [HSEARCH-1280](https://hibernate.atlassian.net/browse/HSEARCH-1280) - Upgrade to Hibernate ORM 4.2.0.CR2
+* [HSEARCH-1283](https://hibernate.atlassian.net/browse/HSEARCH-1283) - Update to Hibernate ORM 4.2.0.Final
+* [HSEARCH-1284](https://hibernate.atlassian.net/browse/HSEARCH-1284) - Add an executable example of a sort on a date field
+* [HSEARCH-1286](https://hibernate.atlassian.net/browse/HSEARCH-1286) - Update integration tests to JBoss AS 7.2 alpha1
+* [HSEARCH-1288](https://hibernate.atlassian.net/browse/HSEARCH-1288) - Upgrade to Infinispan 5.2.5.Final
+* [HSEARCH-1299](https://hibernate.atlassian.net/browse/HSEARCH-1299) - Upgrade to JGroups 3.2.8.Final
+* [HSEARCH-1300](https://hibernate.atlassian.net/browse/HSEARCH-1300) - Reference Infinispan configuration no longer requires batching
+
+
+Version 4.2.0.Final (15-01-2013)
+
+### Bug
+* [HSEARCH-1256](https://hibernate.atlassian.net/browse/HSEARCH-1256) - Improve error handling and error message in ConnectedMultiFieldsTermQueryBuilder#buildSearchTerm
+* [HSEARCH-1258](https://hibernate.atlassian.net/browse/HSEARCH-1258) - Document faceting limitation for @NumericField
+
+### Improvement
+* [HSEARCH-1168](https://hibernate.atlassian.net/browse/HSEARCH-1168) - Improve documentation on Spatial integrations
+* [HSEARCH-1225](https://hibernate.atlassian.net/browse/HSEARCH-1225) - Clarify effect of conditional indexing interceptor on index() method
+* [HSEARCH-1242](https://hibernate.atlassian.net/browse/HSEARCH-1242) - Improve details on the spatial feature
+* [HSEARCH-1255](https://hibernate.atlassian.net/browse/HSEARCH-1255) - Warn about skipping field bridges when querying a Tika field
+
+### Task
+* [HSEARCH-943](https://hibernate.atlassian.net/browse/HSEARCH-943) - Consolidate tests against more database dialects
+* [HSEARCH-1224](https://hibernate.atlassian.net/browse/HSEARCH-1224) - Modernize recommendations about optimizing in the documentation
+* [HSEARCH-1249](https://hibernate.atlassian.net/browse/HSEARCH-1249) - Serialization protocol version being logged without enough context
+
+Version 4.2.0.CR1 (03-01-2013)
+
+### Bug
+* [HSEARCH-1048](https://hibernate.atlassian.net/browse/HSEARCH-1048) - More than one DocumentId found while only one is declared
+* [HSEARCH-1219](https://hibernate.atlassian.net/browse/HSEARCH-1219) - new DistanceSortField doesn't work with FullTextQuery#setMaxResults
+* [HSEARCH-1220](https://hibernate.atlassian.net/browse/HSEARCH-1220) - Search Distance Projection doesn't work as expected with some sets of coordinates
+* [HSEARCH-1221](https://hibernate.atlassian.net/browse/HSEARCH-1221) - Change in SearchConfiguration SPI broke integrators
+* [HSEARCH-1228](https://hibernate.atlassian.net/browse/HSEARCH-1228) - Build fails on mac: jdk tools.jar not properly detected
+* [HSEARCH-1238](https://hibernate.atlassian.net/browse/HSEARCH-1238) - Checkstyle integration haves Eclipse fail the project import
+* [HSEARCH-1240](https://hibernate.atlassian.net/browse/HSEARCH-1240) - Regression in the Mass indexer due to the fix for HSEARCH-1201
+* [HSEARCH-1241](https://hibernate.atlassian.net/browse/HSEARCH-1241) - Polymorphism, lazy initialization and @ContainedIn don't work well together
+* [HSEARCH-1252](https://hibernate.atlassian.net/browse/HSEARCH-1252) - Documentation of spatial sort and projection feature contains old api
+
+### Improvement
+* [HSEARCH-1222](https://hibernate.atlassian.net/browse/HSEARCH-1222) - Readability of @Latitude and @Longitude
+* [HSEARCH-1223](https://hibernate.atlassian.net/browse/HSEARCH-1223) - Coaleshing of refresh operations can save some disk reads on SharingBufferReaderProvider.PerDirectoryLatestReader.refreshAndGet()
+* [HSEARCH-1226](https://hibernate.atlassian.net/browse/HSEARCH-1226) - Apply JDBC fetch size hinting in the MassIndexer
+* [HSEARCH-1246](https://hibernate.atlassian.net/browse/HSEARCH-1246) - NRT performance: avoid flushing unnecessary delete operations
+* [HSEARCH-1247](https://hibernate.atlassian.net/browse/HSEARCH-1247) - NRT performance: avoid refreshing an IndexReader aggressively
+* [HSEARCH-1248](https://hibernate.atlassian.net/browse/HSEARCH-1248) - WorkQueuePerIndexSplitter doesn't need to use IdentityHashMap
+* [HSEARCH-1251](https://hibernate.atlassian.net/browse/HSEARCH-1251) - Update to Apache Lucene 3.6.2
+
+### Task
+* [HSEARCH-1178](https://hibernate.atlassian.net/browse/HSEARCH-1178) - Integrate checkstyle into the build process
+* [HSEARCH-1218](https://hibernate.atlassian.net/browse/HSEARCH-1218) - Assemble as a JBoss Module during releases
+* [HSEARCH-1229](https://hibernate.atlassian.net/browse/HSEARCH-1229) - Update to Hibernate ORM 4.1.8.Final
+* [HSEARCH-1230](https://hibernate.atlassian.net/browse/HSEARCH-1230) - Better tests for IndexReader passed to Filter to be consistent with latest writes
+* [HSEARCH-1250](https://hibernate.atlassian.net/browse/HSEARCH-1250) - Update to Hibernate ORM 4.1.9.Final
+
+
+Version 4.2.0.Beta2 (18-10-2012)
+
+### Bug
+* [HSEARCH-1025](https://hibernate.atlassian.net/browse/HSEARCH-1025) - StatisticsInfoMBean is never unregistered
+* [HSEARCH-1026](https://hibernate.atlassian.net/browse/HSEARCH-1026) - It's impossible to expose statistics via JMX from more than one application
+* [HSEARCH-1179](https://hibernate.atlassian.net/browse/HSEARCH-1179) - SearchBeforeIndexSynchronizationJmsMasterSlaveIT makes wrong test assumptions
+* [HSEARCH-1183](https://hibernate.atlassian.net/browse/HSEARCH-1183) - Documentation does not build in JDK 7
+* [HSEARCH-1184](https://hibernate.atlassian.net/browse/HSEARCH-1184) - JMS Master/Slave index replication mechanism doesn't pass user/password to remote server
+* [HSEARCH-1190](https://hibernate.atlassian.net/browse/HSEARCH-1190) - IndexingInterceptors not applied to MassIndexer
+* [HSEARCH-1193](https://hibernate.atlassian.net/browse/HSEARCH-1193) - Projection on Numeric fields should return Numbers
+* [HSEARCH-1201](https://hibernate.atlassian.net/browse/HSEARCH-1201) - MassIndexer: @IndexEmbedded, lazy field and FieldBridge problem
+* [HSEARCH-1204](https://hibernate.atlassian.net/browse/HSEARCH-1204) - New Spatial methods on FullTextQuery are not exposed on the JPA FullTextQuery
+* [HSEARCH-1212](https://hibernate.atlassian.net/browse/HSEARCH-1212) - Docbook maven plugin hangs
+
+### Improvement
+* [HSEARCH-1100](https://hibernate.atlassian.net/browse/HSEARCH-1100) - Serialization protocol version is logged twice
+* [HSEARCH-1169](https://hibernate.atlassian.net/browse/HSEARCH-1169) - Should expose the FullTextSessionBuilder on public API
+* [HSEARCH-1170](https://hibernate.atlassian.net/browse/HSEARCH-1170) - Mark API deprecated consistently to Hibernate ORM
+* [HSEARCH-1175](https://hibernate.atlassian.net/browse/HSEARCH-1175) - Return distance to search center in spatial queries
+* [HSEARCH-1180](https://hibernate.atlassian.net/browse/HSEARCH-1180) - Upgrade to Hibernate ORM 4.1.6.Final
+* [HSEARCH-1181](https://hibernate.atlassian.net/browse/HSEARCH-1181) - Upgrade to Infinispan 5.1.6.FINAL and JGroups 3.0.13.Final
+* [HSEARCH-1186](https://hibernate.atlassian.net/browse/HSEARCH-1186) - Document safety of refresh period on wrong estimate
+* [HSEARCH-1196](https://hibernate.atlassian.net/browse/HSEARCH-1196) - JMS connections should be reused
+* [HSEARCH-1198](https://hibernate.atlassian.net/browse/HSEARCH-1198) - MessageSender should be stopped when provider is stopped
+* [HSEARCH-1199](https://hibernate.atlassian.net/browse/HSEARCH-1199) - Convert the Serializer components into a managed Service
+* [HSEARCH-1200](https://hibernate.atlassian.net/browse/HSEARCH-1200) - BuildContext should be dereferenced after the SearchFactory has been initialized
+* [HSEARCH-1207](https://hibernate.atlassian.net/browse/HSEARCH-1207) - LuceneWorkSerializer service should be lazily initialized
+* [HSEARCH-1208](https://hibernate.atlassian.net/browse/HSEARCH-1208) - Avoid creating multiple instances of DefaultBoostStrategy
+* [HSEARCH-1211](https://hibernate.atlassian.net/browse/HSEARCH-1211) - Allow override of IndexManager aliases and factory methods as an extension point
+* [HSEARCH-1215](https://hibernate.atlassian.net/browse/HSEARCH-1215) - Update to Infinispan 5.1.8.Final and JGroups 3.0.14.Final
+
+### New Feature
+* [HSEARCH-1130](https://hibernate.atlassian.net/browse/HSEARCH-1130) - Support @Spatial without depending on the Coordinates class
+* [HSEARCH-1171](https://hibernate.atlassian.net/browse/HSEARCH-1171) - Tika StringBrigde
+* [HSEARCH-1174](https://hibernate.atlassian.net/browse/HSEARCH-1174) - Sorting by distance on spatial queries
+
+### Task
+* [HSEARCH-970](https://hibernate.atlassian.net/browse/HSEARCH-970) - log4j version must be explicitly specified in all sub modules
+* [HSEARCH-1000](https://hibernate.atlassian.net/browse/HSEARCH-1000) - Update to Byteman 2.1
+* [HSEARCH-1177](https://hibernate.atlassian.net/browse/HSEARCH-1177) - Update to Apache Lucene 3.6.1
+* [HSEARCH-1187](https://hibernate.atlassian.net/browse/HSEARCH-1187) - Remove classloader helper which breaks in modular environments
+* [HSEARCH-1192](https://hibernate.atlassian.net/browse/HSEARCH-1192) - Update Maven build plugins and require explicit Maven version
+* [HSEARCH-1194](https://hibernate.atlassian.net/browse/HSEARCH-1194) - Some tests use a too long identifier
+* [HSEARCH-1197](https://hibernate.atlassian.net/browse/HSEARCH-1197) - Timing failures in test SearchBeforeIndexSynchronizationJmsMasterSlaveIT
+* [HSEARCH-1202](https://hibernate.atlassian.net/browse/HSEARCH-1202) - Document @Latitude and @Longitude features of Spatial
+* [HSEARCH-1203](https://hibernate.atlassian.net/browse/HSEARCH-1203) - SpatialQueryBuilder assumes usage of "km" units
+* [HSEARCH-1206](https://hibernate.atlassian.net/browse/HSEARCH-1206) - Fix some javadocs and coding consistency
+* [HSEARCH-1209](https://hibernate.atlassian.net/browse/HSEARCH-1209) - Integration test might fail to download dependencies
+* [HSEARCH-1210](https://hibernate.atlassian.net/browse/HSEARCH-1210) - Spatial test is using reserved table name in tests
+* [HSEARCH-1216](https://hibernate.atlassian.net/browse/HSEARCH-1216) - Minor cleanup in the Infinispan integration
+
+
+Version 4.2.0.Beta1 (21-6-2012)
+
+### Sub-task
+* [HSEARCH-1008](https://hibernate.atlassian.net/browse/HSEARCH-1008) - Point (an impl class) is used in a public API SpatialQueryBuilder.buildGridFilter
+* [HSEARCH-1009](https://hibernate.atlassian.net/browse/HSEARCH-1009) - buildSpatialQuery vs buildGridQuery is still a bit confusing
+* [HSEARCH-1010](https://hibernate.atlassian.net/browse/HSEARCH-1010) - Move from HSSI_xx_fieldname to fieldname_HSSI_xx for readability
+* [HSEARCH-1012](https://hibernate.atlassian.net/browse/HSEARCH-1012) - Add @Spatial as a marker annotation for the spatial bridge
+* [HSEARCH-1013](https://hibernate.atlassian.net/browse/HSEARCH-1013) - Support entities implementing Coordinates (instead of a property returning Coordinates)
+* [HSEARCH-1014](https://hibernate.atlassian.net/browse/HSEARCH-1014) - Write documentation for spatial indexing and queries
+* [HSEARCH-1016](https://hibernate.atlassian.net/browse/HSEARCH-1016) - Move spatial code to JBoss Logging
+* [HSEARCH-1018](https://hibernate.atlassian.net/browse/HSEARCH-1018) - Implement bridge that supports indexing for boolean queries based on lat and long instead of the whole grid
+* [HSEARCH-1155](https://hibernate.atlassian.net/browse/HSEARCH-1155) - Test @Embeddable nesting
+* [HSEARCH-1156](https://hibernate.atlassian.net/browse/HSEARCH-1156) - Add more tests to cover Range/Grid and Class/Member level combinations
+
+### Bug
+* [HSEARCH-1088](https://hibernate.atlassian.net/browse/HSEARCH-1088) - Specifying an analyzer on an entity class bridge using the programmatic API is broken
+* [HSEARCH-1090](https://hibernate.atlassian.net/browse/HSEARCH-1090) - IndexReader leaks file handles on close
+* [HSEARCH-1095](https://hibernate.atlassian.net/browse/HSEARCH-1095) - Near Real Time produces NPEs in worker thread on first flush
+* [HSEARCH-1096](https://hibernate.atlassian.net/browse/HSEARCH-1096) - @Transient Fields are never marked dirty
+* [HSEARCH-1106](https://hibernate.atlassian.net/browse/HSEARCH-1106) - Compile error on MappingModelMetadataProvider on some JVMs only
+* [HSEARCH-1115](https://hibernate.atlassian.net/browse/HSEARCH-1115) - Failure to load Analyzer class when deployed into AS7
+* [HSEARCH-1118](https://hibernate.atlassian.net/browse/HSEARCH-1118) - Wrong property name to configure worker scope
+* [HSEARCH-1164](https://hibernate.atlassian.net/browse/HSEARCH-1164) - QueryBuilder example in chapter 1.5 "Searching" uses an unsupported keyword query
+* [HSEARCH-1165](https://hibernate.atlassian.net/browse/HSEARCH-1165) - Wrong name in documentation for Infinispan configuration properties
+
+### Deprecation
+* [HSEARCH-1102](https://hibernate.atlassian.net/browse/HSEARCH-1102) - Avoid forceful generation of loggers compatible with older JBoss Logger
+
+### Improvement
+* [HSEARCH-852](https://hibernate.atlassian.net/browse/HSEARCH-852) - Locks to manage IndexWriter instances should not prevent a concurrent get and a commit operation
+* [HSEARCH-1098](https://hibernate.atlassian.net/browse/HSEARCH-1098) - Update to Apache Lucene 3.6
+* [HSEARCH-1122](https://hibernate.atlassian.net/browse/HSEARCH-1122) - Update Avro dependency to 1.6.3
+* [HSEARCH-1124](https://hibernate.atlassian.net/browse/HSEARCH-1124) - Log level for Log#indexDirectoryNotFoundCreatingNewOne should be INFO and not WARN
+* [HSEARCH-1125](https://hibernate.atlassian.net/browse/HSEARCH-1125) - archetype improvement
+* [HSEARCH-1126](https://hibernate.atlassian.net/browse/HSEARCH-1126) - minor doc change to be consistent
+* [HSEARCH-1158](https://hibernate.atlassian.net/browse/HSEARCH-1158) - Make NRT ReaderProvider lockless on the hot path
+* [HSEARCH-1159](https://hibernate.atlassian.net/browse/HSEARCH-1159) - Avoid cloning of IndexReader instances for concurrent searchers
+* [HSEARCH-1161](https://hibernate.atlassian.net/browse/HSEARCH-1161) - Throw a more specific exception type on searching on meaningless input
+* [HSEARCH-1162](https://hibernate.atlassian.net/browse/HSEARCH-1162) - Shutdown services in dependency order
+* [HSEARCH-1163](https://hibernate.atlassian.net/browse/HSEARCH-1163) - Have JGroups optionally use a MUX channel
+
+### New Feature
+* [HSEARCH-923](https://hibernate.atlassian.net/browse/HSEARCH-923) - Add support for geospatial queries
+* [HSEARCH-1157](https://hibernate.atlassian.net/browse/HSEARCH-1157) - Create an option to assume @ProvidedId by default
+
+### Patch
+* [HSEARCH-1114](https://hibernate.atlassian.net/browse/HSEARCH-1114) - javadoc typo: changed StoreNorm -> Norms (Andrej Golovnin)
+
+### Task
+* [HSEARCH-1001](https://hibernate.atlassian.net/browse/HSEARCH-1001) - Create a testcase using HornetQ on JBoss7 for the backend
+* [HSEARCH-1094](https://hibernate.atlassian.net/browse/HSEARCH-1094) - Typo method name SearchMapping#getFullTextFilerDefs
+* [HSEARCH-1103](https://hibernate.atlassian.net/browse/HSEARCH-1103) - Fix CustomLockProviderTest to pass on Java7 as well
+* [HSEARCH-1104](https://hibernate.atlassian.net/browse/HSEARCH-1104) - Remove warnings about experimental features which are no longer experimental
+* [HSEARCH-1110](https://hibernate.atlassian.net/browse/HSEARCH-1110) - Add a test to verify stored indexes in Infinispan's cacheloader
+* [HSEARCH-1117](https://hibernate.atlassian.net/browse/HSEARCH-1117) - Minor version upgrade of core dependencies
+* [HSEARCH-1129](https://hibernate.atlassian.net/browse/HSEARCH-1129) - Enable automatic setup of annotation processors on Eclipse project import
+* [HSEARCH-1160](https://hibernate.atlassian.net/browse/HSEARCH-1160) - PassThroughAnalyzer requires the Lucene Version option
+
+
+Version 4.1.0.Final (4-4-2012)
+
+### Bug
+* [HSEARCH-959](https://hibernate.atlassian.net/browse/HSEARCH-959) - Create copyright.txt as mentioned by the license headers
+* [HSEARCH-979](https://hibernate.atlassian.net/browse/HSEARCH-979) - Programmatic API: mapping a composite primary key
+* [HSEARCH-1083](https://hibernate.atlassian.net/browse/HSEARCH-1083) - Programmatic Mapping examples in documentation not compiling
+* [HSEARCH-1084](https://hibernate.atlassian.net/browse/HSEARCH-1084) - Annotation proxies created by Programmatic Mapping use the context classloader
+
+### Task
+* [HSEARCH-1081](https://hibernate.atlassian.net/browse/HSEARCH-1081) - Upgrade to Infinispan 5.1.3.FINAL
+* [HSEARCH-1082](https://hibernate.atlassian.net/browse/HSEARCH-1082) - Upgrade to JBoss JTA 4.16.3.Final
+
+
+Version 4.1.0.CR3 (29-3-2012)
+
+### Bug
+* [HSEARCH-1049](https://hibernate.atlassian.net/browse/HSEARCH-1049) - includePaths bombs on inclusion of id members
+* [HSEARCH-1063](https://hibernate.atlassian.net/browse/HSEARCH-1063) - maven-release-plugin 2.2.2 causes exception during release process
+* [HSEARCH-1064](https://hibernate.atlassian.net/browse/HSEARCH-1064) - Shrinkwrap tests need not be set in offline mode
+* [HSEARCH-1067](https://hibernate.atlassian.net/browse/HSEARCH-1067) - Path used in tests on Windows is illegal in certain test order executions
+* [HSEARCH-1069](https://hibernate.atlassian.net/browse/HSEARCH-1069) - Fix integration tests on Oracle 11gR1
+* [HSEARCH-1070](https://hibernate.atlassian.net/browse/HSEARCH-1070) - JGroups channels need to be shared across multiple backends
+* [HSEARCH-1079](https://hibernate.atlassian.net/browse/HSEARCH-1079) - Programmatic API, ClassBridgeMapping: missing analyze() norms() from @ClassBridge (Manthos)
+
+### Improvement
+* [HSEARCH-1072](https://hibernate.atlassian.net/browse/HSEARCH-1072) - ServiceManager should initialize classes lazily
+* [HSEARCH-1074](https://hibernate.atlassian.net/browse/HSEARCH-1074) - DSL phrase query should not throw an exception in case all specified terms are stop words
+* [HSEARCH-1075](https://hibernate.atlassian.net/browse/HSEARCH-1075) - Clarify documentation of JMS configuration parameter refresh
+
+### New Feature
+* [HSEARCH-1071](https://hibernate.atlassian.net/browse/HSEARCH-1071) - Allow usage of existing injected JGroups channel
+
+### Remove Feature
+* [HSEARCH-1080](https://hibernate.atlassian.net/browse/HSEARCH-1080) - Simplify JGroups configuration by removing options of inlining configuration in Hibernate configuration
+
+### Task
+* [HSEARCH-1057](https://hibernate.atlassian.net/browse/HSEARCH-1057) - Upgrade to Hibernate ORM 4.1.1.Final
+* [HSEARCH-1066](https://hibernate.atlassian.net/browse/HSEARCH-1066) - Exclude maven-jdocbook-plugin from Eclipse m2
+* [HSEARCH-1068](https://hibernate.atlassian.net/browse/HSEARCH-1068) - Have version numbers injected in docbook entities
+* [HSEARCH-1073](https://hibernate.atlassian.net/browse/HSEARCH-1073) - Minor version upgrade of Infinispan, JBoss Logging, JGroups
+
+
+Version 4.1.0.CR2 (15-3-2012)
+
+### Bug
+* [HSEARCH-1055](https://hibernate.atlassian.net/browse/HSEARCH-1055) - Configuration setting isTransactionManagerExpected() is not applied
+* [HSEARCH-1059](https://hibernate.atlassian.net/browse/HSEARCH-1059) - JGroups backend should not serialize custom objects
+* [HSEARCH-1060](https://hibernate.atlassian.net/browse/HSEARCH-1060) - ClassLoaderHelper should look in both classloaders when enumerating multiple matches for a resource name
+
+### Improvement
+* [HSEARCH-1028](https://hibernate.atlassian.net/browse/HSEARCH-1028) - Use index update operations when possible
+* [HSEARCH-1053](https://hibernate.atlassian.net/browse/HSEARCH-1053) - Hibernate Search Maven should compile out of the box
+* [HSEARCH-1062](https://hibernate.atlassian.net/browse/HSEARCH-1062) - Add missing FuzzyContext.onFields(String... fields) method
+
+### Task
+* [HSEARCH-1052](https://hibernate.atlassian.net/browse/HSEARCH-1052) - Maven plugins need an update
+* [HSEARCH-1054](https://hibernate.atlassian.net/browse/HSEARCH-1054) - Create a base SearchConfiguration implementation
+* [HSEARCH-1056](https://hibernate.atlassian.net/browse/HSEARCH-1056) - Wrong timing assumption in JGroupsCommonTest
+* [HSEARCH-1058](https://hibernate.atlassian.net/browse/HSEARCH-1058) - Upgrade to Infinispan 5.1.2.FINAL and JGroups 3.0.6.Final
+* [HSEARCH-1061](https://hibernate.atlassian.net/browse/HSEARCH-1061) - Upgrade integration test to use JBoss AS 7.1.1
+
+
+Version 4.1.0.CR1 (29-2-2012)
+
+### Bug
+* [HSEARCH-1030](https://hibernate.atlassian.net/browse/HSEARCH-1030) - Reindexing embedded Collection FieldBridge throws a LazyInitializationException and stop reindexation
+
+### Improvement
+* [HSEARCH-1045](https://hibernate.atlassian.net/browse/HSEARCH-1045) - Avoid frequent construction of a ContextualException2WayBridge
+
+### New Feature
+* [HSEARCH-471](https://hibernate.atlassian.net/browse/HSEARCH-471) - Ability to selectively index an entity based on its state
+
+
+Version 4.1.0.Beta2 (13-2-2012)
+
+### Bug
+* [HSEARCH-1038](https://hibernate.atlassian.net/browse/HSEARCH-1038) - MassIndexer doesn't release Write Lock after completion
+* [HSEARCH-1047](https://hibernate.atlassian.net/browse/HSEARCH-1047) - Inconsistent field name interning
+
+### Deprecation
+* [HSEARCH-1046](https://hibernate.atlassian.net/browse/HSEARCH-1046) - Remove threadsForIndexWriter option in MassIndexer
+
+### Improvement
+* [HSEARCH-1041](https://hibernate.atlassian.net/browse/HSEARCH-1041) - Update Infinispan suggested configuration to match requirements of Infinispan 5.1.1
+* [HSEARCH-1042](https://hibernate.atlassian.net/browse/HSEARCH-1042) - Use generics in ParameterizedBridge
+* [HSEARCH-1043](https://hibernate.atlassian.net/browse/HSEARCH-1043) - Avoid frequent checking for index existance in backend
+* [HSEARCH-1044](https://hibernate.atlassian.net/browse/HSEARCH-1044) - Avoid multiple flush and optimize events on the same backend after MassIndexing shutdown
+
+### New Feature
+* [HSEARCH-886](https://hibernate.atlassian.net/browse/HSEARCH-886) - Provide the ability to configure specific paths to index within @IndexEmbedded as an alternative to depth
+* [HSEARCH-972](https://hibernate.atlassian.net/browse/HSEARCH-972) - Make it possible to plug in custom OptimizerStrategy implementations
+
+### Task
+* [HSEARCH-682](https://hibernate.atlassian.net/browse/HSEARCH-682) - Add tests for DSL handling fieldBridge for @IndexEmbedded fields
+* [HSEARCH-1033](https://hibernate.atlassian.net/browse/HSEARCH-1033) - Verify compatibility with Jackson 1.9.2
+* [HSEARCH-1039](https://hibernate.atlassian.net/browse/HSEARCH-1039) - Upgrade JBoss Logging and Infinispan dependencies to Final versions of AS7.1
+* [HSEARCH-1040](https://hibernate.atlassian.net/browse/HSEARCH-1040) - Upgrade integration test to use JBoss AS 7.1
+
+
+Version 4.1.0.Beta1 (3-2-2012)
+
+### Bug
+* [HSEARCH-1034](https://hibernate.atlassian.net/browse/HSEARCH-1034) - Mutable SearchFactory should not drop programmatic SearchMapping
+
+### Task
+* [HSEARCH-1035](https://hibernate.atlassian.net/browse/HSEARCH-1035) - Update to Hibernate Core version 4.0.1
+* [HSEARCH-1036](https://hibernate.atlassian.net/browse/HSEARCH-1036) - Update JBoss TransactionManager to 4.16.2.Final
+* [HSEARCH-1037](https://hibernate.atlassian.net/browse/HSEARCH-1037) - Update Infinispan to 5.1.1 and JGroups to 3.0.4.Final
+
+
+## 4.1.0.Alpha1 (9-1-2012)
+
+### Bug
+* [HSEARCH-1004](https://hibernate.atlassian.net/browse/HSEARCH-1004) - Updating a collection does not reindex (Guillaume Smet)
+* [HSEARCH-1020](https://hibernate.atlassian.net/browse/HSEARCH-1020) - Regression in 3.4: index not updated after updating a collection (Guillaume Smet)
+* [HSEARCH-1024](https://hibernate.atlassian.net/browse/HSEARCH-1024) - Using timeouts on queries creates a background thread which is never shutdown
+* [HSEARCH-1027](https://hibernate.atlassian.net/browse/HSEARCH-1027) - Analyzer delegates fail to delegate all methods
+
+### Improvement
+* [HSEARCH-638](https://hibernate.atlassian.net/browse/HSEARCH-638) - Limit graph traversal by @ContainedIn to the minimum required path
+* [HSEARCH-925](https://hibernate.atlassian.net/browse/HSEARCH-925) - Upgrade to JGroups 3 and Infinispan 5.1
+* [HSEARCH-981](https://hibernate.atlassian.net/browse/HSEARCH-981) - Upgrade to Lucene 3.5
+* [HSEARCH-1007](https://hibernate.atlassian.net/browse/HSEARCH-1007) - Make FullTextIndexEventListener extensible
+* [HSEARCH-1019](https://hibernate.atlassian.net/browse/HSEARCH-1019) - Profile mass indexer to reduce number of index commits
+* [HSEARCH-1022](https://hibernate.atlassian.net/browse/HSEARCH-1022) - Default to "native" Lucene LockFactory instead of simple
+
+### Patch
+* [HSEARCH-1031](https://hibernate.atlassian.net/browse/HSEARCH-1031) - Typos in the "Boosting" section of the documentation
+
+### Task
+* [HSEARCH-1021](https://hibernate.atlassian.net/browse/HSEARCH-1021) - Typos and errors in documentation (Guillaume Smet)
+* [HSEARCH-1029](https://hibernate.atlassian.net/browse/HSEARCH-1029) - FullTextSessionBuilder not cleaning up test indexes
+
+
+## 4.0.0.Final (15-12-2011)
+
+### Bug
+* [HSEARCH-678](https://hibernate.atlassian.net/browse/HSEARCH-678) - Document type limitations of @NumericField
+* [HSEARCH-955](https://hibernate.atlassian.net/browse/HSEARCH-955) - Property name for index manager selection should be defined in Environment
+* [HSEARCH-980](https://hibernate.atlassian.net/browse/HSEARCH-980) - Byteman dependency is not properly scoped
+* [HSEARCH-984](https://hibernate.atlassian.net/browse/HSEARCH-984) - Hibernate Search 4 violates javax.jms.Message contract, incompatible with HornetQ
+* [HSEARCH-986](https://hibernate.atlassian.net/browse/HSEARCH-986) - DB matrix test failures against Oracle
+* [HSEARCH-988](https://hibernate.atlassian.net/browse/HSEARCH-988) - DB matrix test failures against DB2
+* [HSEARCH-989](https://hibernate.atlassian.net/browse/HSEARCH-989) - DB matrix test org.hibernate.search.test.RamDirectoryTest against Sybase
+* [HSEARCH-990](https://hibernate.atlassian.net/browse/HSEARCH-990) - DB matrix test failures against SQLServer
+* [HSEARCH-992](https://hibernate.atlassian.net/browse/HSEARCH-992) - DB matrix test org.hibernate.search.test.bridge.BridgeTest fails against DB2
+* [HSEARCH-999](https://hibernate.atlassian.net/browse/HSEARCH-999) - TimeoutTest and JPATimeoutTest fail against Sybase
+* [HSEARCH-1005](https://hibernate.atlassian.net/browse/HSEARCH-1005) - Create properly aggregated javadocs
+
+### Improvement
+* [HSEARCH-983](https://hibernate.atlassian.net/browse/HSEARCH-983) - Improve compatibility of the MassIndexer with MySQL
+* [HSEARCH-987](https://hibernate.atlassian.net/browse/HSEARCH-987) - Expose option to set JDBC FetchSize in MassIndexer
+
+### New Feature
+* [HSEARCH-749](https://hibernate.atlassian.net/browse/HSEARCH-749) - Add AnalyzerUtils to src/main/java and distribute it in the main jar
+
+### Task
+* [HSEARCH-947](https://hibernate.atlassian.net/browse/HSEARCH-947) - Update to Hibernate Core 4.0.0.Final
+* [HSEARCH-991](https://hibernate.atlassian.net/browse/HSEARCH-991) - Upgrade to Hibernate Commons Annotations 4.0.1
+* [HSEARCH-993](https://hibernate.atlassian.net/browse/HSEARCH-993) - Create a test for @Lob fields
+* [HSEARCH-994](https://hibernate.atlassian.net/browse/HSEARCH-994) - Update JBoss Logger to 3.1.0.CR2
+* [HSEARCH-995](https://hibernate.atlassian.net/browse/HSEARCH-995) - Eclipse import fails as maven-dependency-plugin needs m2 exclusion
+* [HSEARCH-996](https://hibernate.atlassian.net/browse/HSEARCH-996) - Upgrade to Hibernate Core 4.0.0.CR7
+
+
+## 4.0.0.CR2 (16-11-2011)
+
+### Bug
+* [HSEARCH-745](https://hibernate.atlassian.net/browse/HSEARCH-745) - Empty Index and FacetManagerImpl.getFacets() NullPointerException
+* [HSEARCH-784](https://hibernate.atlassian.net/browse/HSEARCH-784) - Ensure all Analyzers are closed at shutdown
+* [HSEARCH-832](https://hibernate.atlassian.net/browse/HSEARCH-832) - Use Log constant for logs and exceptions raised in the Serialization layer
+* [HSEARCH-835](https://hibernate.atlassian.net/browse/HSEARCH-835) - Use more efficient serialization for simple types used as id in Avro serializer
+* [HSEARCH-932](https://hibernate.atlassian.net/browse/HSEARCH-932) - Line numbers of debug log statements are wrong
+* [HSEARCH-951](https://hibernate.atlassian.net/browse/HSEARCH-951) - excludeLimit() has no effect on QueryBuilder.range().above() queries
+* [HSEARCH-953](https://hibernate.atlassian.net/browse/HSEARCH-953) - Remove unused type variable in EntityIndexBinder
+* [HSEARCH-954](https://hibernate.atlassian.net/browse/HSEARCH-954) - BackendQueueProcessor should specify behaviour for the case of null passed to applyWork and applyStream work
+* [HSEARCH-956](https://hibernate.atlassian.net/browse/HSEARCH-956) - Avro resources loaded via the wrong ClassLoader
+* [HSEARCH-960](https://hibernate.atlassian.net/browse/HSEARCH-960) - Index.UN_TOKENIZED overrides other tokenized fields that share the same name
+* [HSEARCH-961](https://hibernate.atlassian.net/browse/HSEARCH-961) - ObjectNotFoundException not caught in FullTextSession for deleted objects
+* [HSEARCH-966](https://hibernate.atlassian.net/browse/HSEARCH-966) - logWorkDone is not called anymore from Add- or UpdateWorkDelegate
+* [HSEARCH-967](https://hibernate.atlassian.net/browse/HSEARCH-967) - Hibernate Search archetype resolver generated ${project.version} as org.hibernate:hibernate-search-analyzers version
+* [HSEARCH-969](https://hibernate.atlassian.net/browse/HSEARCH-969) - Logging events are split across multiple lines
+
+### Improvement
+* [HSEARCH-571](https://hibernate.atlassian.net/browse/HSEARCH-571) - MassIndexer eats lock Exception
+* [HSEARCH-831](https://hibernate.atlassian.net/browse/HSEARCH-831) - Better serialize AttributeImpl
+* [HSEARCH-853](https://hibernate.atlassian.net/browse/HSEARCH-853) - Review OptimizerStrategy API and Workspace interface
+* [HSEARCH-884](https://hibernate.atlassian.net/browse/HSEARCH-884) - Revisit the architecture section to make it clearer for an Hibernate Search user
+* [HSEARCH-957](https://hibernate.atlassian.net/browse/HSEARCH-957) - Rename default index manager name from 'transactional' to 'directory-based'
+* [HSEARCH-963](https://hibernate.atlassian.net/browse/HSEARCH-963) - Add authorgroup to docbook sources
+* [HSEARCH-971](https://hibernate.atlassian.net/browse/HSEARCH-971) - Make OptimizerStrategy threadsafe and skip excessive optimisation triggers
+* [HSEARCH-974](https://hibernate.atlassian.net/browse/HSEARCH-974) - Rename ClassNavigator to InstanceInitalizer
+
+### Task
+* [HSEARCH-680](https://hibernate.atlassian.net/browse/HSEARCH-680) - Clarify the documentation around date bridges and that they are using DateTools
+* [HSEARCH-732](https://hibernate.atlassian.net/browse/HSEARCH-732) - Add hibernate-entitymanager and javassist as optional dependencies in the distribution
+* [HSEARCH-829](https://hibernate.atlassian.net/browse/HSEARCH-829) - Example IdHashShardingStrategy doesn't handle PurgeAll properly
+* [HSEARCH-854](https://hibernate.atlassian.net/browse/HSEARCH-854) - OptimizerStrategy should be invoked by the backend
+* [HSEARCH-949](https://hibernate.atlassian.net/browse/HSEARCH-949) - Update online documentation
+* [HSEARCH-958](https://hibernate.atlassian.net/browse/HSEARCH-958) - Move slf4j dependecies out of the root project
+* [HSEARCH-964](https://hibernate.atlassian.net/browse/HSEARCH-964) - Upgrade to Hibernate Commons Annotations 4.0.0.Final
+* [HSEARCH-965](https://hibernate.atlassian.net/browse/HSEARCH-965) - Upgrade JBoss Logging dependencies to 3.1.0.CR1
+* [HSEARCH-973](https://hibernate.atlassian.net/browse/HSEARCH-973) - Make sure Hibernate Search builds against JDK 7
+* [HSEARCH-978](https://hibernate.atlassian.net/browse/HSEARCH-978) - Upgrade to Hibernate Core 4.0.0.CR6 and Logging processor 1.0.0.CR5
+
+
+## 4.0.0.CR1 (13-10-2011)
+
+### Bug
+* [HSEARCH-887](https://hibernate.atlassian.net/browse/HSEARCH-887) - Version conflict of dependency jackson-mapper-asl with the one included in JBoss AS7
+* [HSEARCH-926](https://hibernate.atlassian.net/browse/HSEARCH-926) - Duplicate InfinispanDirectoryProviders created when multiple sub-classes share the same index directory (Zach Kurey)
+* [HSEARCH-928](https://hibernate.atlassian.net/browse/HSEARCH-928) - Move documentation into its own maven module using the jdocbook packaging
+* [HSEARCH-936](https://hibernate.atlassian.net/browse/HSEARCH-936) - Move service locator file to hibernate-search-orm (from hibernate-search-engine)
+* [HSEARCH-945](https://hibernate.atlassian.net/browse/HSEARCH-945) - Arquillian integration test fails due to bug in Shrinkwrap
+
+### Improvement
+* [HSEARCH-938](https://hibernate.atlassian.net/browse/HSEARCH-938) - Failure to delete a file should not be logged at error level
+
+### New Feature
+* [HSEARCH-944](https://hibernate.atlassian.net/browse/HSEARCH-944) - default two way String bridge for type java.util.UUID (Gregory Beachy)
+
+### Task
+* [HSEARCH-778](https://hibernate.atlassian.net/browse/HSEARCH-778) - Move Hibernate Search to new artifactId
+* [HSEARCH-930](https://hibernate.atlassian.net/browse/HSEARCH-930) - Follow up Jenkins feedback on Hibernate Search build on Windows
+* [HSEARCH-933](https://hibernate.atlassian.net/browse/HSEARCH-933) - update DB profiles used for testing
+* [HSEARCH-934](https://hibernate.atlassian.net/browse/HSEARCH-934) - Upgrade to Hibernate Core 4.0.0.CR4
+* [HSEARCH-935](https://hibernate.atlassian.net/browse/HSEARCH-935) - Upgrade to Infinispan 5.0.1.FINAL
+* [HSEARCH-940](https://hibernate.atlassian.net/browse/HSEARCH-940) - Add an integration test with JBoss AS7 (Davide D'Alto)
+* [HSEARCH-941](https://hibernate.atlassian.net/browse/HSEARCH-941) - Update JBoss Logger to 3.0.1.GA
+
+
+## 4.0.0.Beta2 (29-09-2011)
+
+### Bug
+* [HSEARCH-871](https://hibernate.atlassian.net/browse/HSEARCH-871) - Only the last enabled FullTextFilter is in effect if multiple FullTextFilters of the same type, different parameters are enabled
+* [HSEARCH-916](https://hibernate.atlassian.net/browse/HSEARCH-916) - Fix query DSL documentation errors
+* [HSEARCH-921](https://hibernate.atlassian.net/browse/HSEARCH-921) - NullPointerException in AvroSerializationProvider due to wrong resource path
+* [HSEARCH-922](https://hibernate.atlassian.net/browse/HSEARCH-922) - Remove interface DocumentBuilder
+
+### Improvement
+* [HSEARCH-849](https://hibernate.atlassian.net/browse/HSEARCH-849) - Simplify ErrorHandler interface
+* [HSEARCH-905](https://hibernate.atlassian.net/browse/HSEARCH-905) - Upgrade to Lucene 3.4
+* [HSEARCH-919](https://hibernate.atlassian.net/browse/HSEARCH-919) - Index Merging thread names should contain the index name
+
+### New Feature
+* [HSEARCH-643](https://hibernate.atlassian.net/browse/HSEARCH-643) - Have the MassIndexer use the error handler to report exceptions
+* [HSEARCH-677](https://hibernate.atlassian.net/browse/HSEARCH-677) - Isolate Hibernate Core dependency to make Hibernate Search fully standalone
+
+### Task
+* [HSEARCH-666](https://hibernate.atlassian.net/browse/HSEARCH-666) - Get documentation onto translate.jboss.org
+* [HSEARCH-920](https://hibernate.atlassian.net/browse/HSEARCH-920) - Upgrade to Hibernate core 4.0.0.CR3
+* [HSEARCH-927](https://hibernate.atlassian.net/browse/HSEARCH-927) - Improve timeouts of JGroupsMasterTest
+* [HSEARCH-929](https://hibernate.atlassian.net/browse/HSEARCH-929) - Introduce SHARED_LOOPBACK JGroups protocol to make the tests more reliable
+
+
+## 4.0.0.Beta1 (14-09-2011)
+
+### Bug
+* [HSEARCH-620](https://hibernate.atlassian.net/browse/HSEARCH-620) - Archetype does not deploy on JBoss Nexus repository due to missing pom fields
+* [HSEARCH-876](https://hibernate.atlassian.net/browse/HSEARCH-876) - Extracted archetype does not compile
+* [HSEARCH-901](https://hibernate.atlassian.net/browse/HSEARCH-901) - ClassCastException during creation of index: Hibernate (Search) assumes varchar entity field called "id" is an Integer but it isn't
+* [HSEARCH-912](https://hibernate.atlassian.net/browse/HSEARCH-912) - JBoss Logger processor and generator is marked as a compile scope dependency
+* [HSEARCH-913](https://hibernate.atlassian.net/browse/HSEARCH-913) - org.hibernate.search.test.embedded.EmbeddedTest#testEmbeddedToManyInSuperslass fails against MySQL with a constraint violation
+* [HSEARCH-977](https://hibernate.atlassian.net/browse/HSEARCH-977) - MassIndexer freezes when there is an indexed 'id' filed, which is not document's id
+
+### Deprecation
+* [HSEARCH-711](https://hibernate.atlassian.net/browse/HSEARCH-711) - Review of @org.hibernate.search.annotations.Field parameters
+
+### Improvement
+* [HSEARCH-881](https://hibernate.atlassian.net/browse/HSEARCH-881) - @Fields annotation calling getter multiple times (Adam Brin)
+* [HSEARCH-895](https://hibernate.atlassian.net/browse/HSEARCH-895) - Shorten documentation about configuring the JBoss Maven repository
+* [HSEARCH-902](https://hibernate.atlassian.net/browse/HSEARCH-902) - Shutdown should not log a warning about forcing the index lock release
+* [HSEARCH-903](https://hibernate.atlassian.net/browse/HSEARCH-903) - expose an IndexReader created by IndexManager names
+* [HSEARCH-911](https://hibernate.atlassian.net/browse/HSEARCH-911) - Workspace implementors have to release IndexWriter on IO errors
+* [HSEARCH-914](https://hibernate.atlassian.net/browse/HSEARCH-914) - Migrate Byteman tests to BMUnit tests
+* [HSEARCH-915](https://hibernate.atlassian.net/browse/HSEARCH-915) - Use maven profiles to include tools.jar for BMUnit
+
+### New Feature
+* [HSEARCH-710](https://hibernate.atlassian.net/browse/HSEARCH-710) - Add option to index fields using ANALYZED_NO_NORMS
+* [HSEARCH-890](https://hibernate.atlassian.net/browse/HSEARCH-890) - Enable projection on unknown fields
+
+### Task
+* [HSEARCH-898](https://hibernate.atlassian.net/browse/HSEARCH-898) - Introduce Nexus plugin and update some more build plugins
+* [HSEARCH-906](https://hibernate.atlassian.net/browse/HSEARCH-906) - Revise warning about Java7 as the bugs where fixed in b2
+* [HSEARCH-909](https://hibernate.atlassian.net/browse/HSEARCH-909) - Document Maven archetype usage
+
+
+## 4.0.0.Alpha2 (01-09-2011)
+
+### Bug
+* [HSEARCH-753](https://hibernate.atlassian.net/browse/HSEARCH-753) - Raise exception when there is a risk of having fullTextQuery.getResultList().size() != fullTextQuery.getResultSize()
+* [HSEARCH-833](https://hibernate.atlassian.net/browse/HSEARCH-833) - Make sure that we wrap exceptions from the serialization layer into a SearchException (unless it's already a SearchException)
+* [HSEARCH-834](https://hibernate.atlassian.net/browse/HSEARCH-834) - Field level Boost is not (de)serialized on NumericField and should
+* [HSEARCH-861](https://hibernate.atlassian.net/browse/HSEARCH-861) - Documentation section "Using filters in a sharded environment" uses the old ShardingStrategy interface as example
+* [HSEARCH-862](https://hibernate.atlassian.net/browse/HSEARCH-862) - CollectionUpdateEventTest2 is never run
+* [HSEARCH-864](https://hibernate.atlassian.net/browse/HSEARCH-864) - Avro serializer improperly converts termVector as byte[]
+* [HSEARCH-866](https://hibernate.atlassian.net/browse/HSEARCH-866) - Deserialization layer build TermVector off Field.isStore instead of Field.isTermVectorStored
+* [HSEARCH-874](https://hibernate.atlassian.net/browse/HSEARCH-874) - Javadocs of IndexShardingStrategy are incorrect
+* [HSEARCH-883](https://hibernate.atlassian.net/browse/HSEARCH-883) - Index out of bound exception on range facets when IncludeZeroCount = false, maxCount > actual count (Elmer van Chastelet)
+
+### Improvement
+* [HSEARCH-758](https://hibernate.atlassian.net/browse/HSEARCH-758) - Have DirectoryManager handle different I/O aspects of an index
+* [HSEARCH-759](https://hibernate.atlassian.net/browse/HSEARCH-759) - Provide Near-Real-Time Lucene updates
+* [HSEARCH-837](https://hibernate.atlassian.net/browse/HSEARCH-837) - Write a test for TokenStream based Field serialization
+* [HSEARCH-855](https://hibernate.atlassian.net/browse/HSEARCH-855) - Classes extending BackendQueueProcessor are misleadingly named XYZBackendQueueProcessorFactory
+* [HSEARCH-865](https://hibernate.atlassian.net/browse/HSEARCH-865) - Make i18n log parameter safe for right to left languages or languages requiring different parameter ordering
+* [HSEARCH-869](https://hibernate.atlassian.net/browse/HSEARCH-869) - Make avro files in subpackages to clarify structure
+* [HSEARCH-872](https://hibernate.atlassian.net/browse/HSEARCH-872) - Reorganize serialization module packages
+* [HSEARCH-875](https://hibernate.atlassian.net/browse/HSEARCH-875) - Bad variable names in HSQueryImpl
+* [HSEARCH-879](https://hibernate.atlassian.net/browse/HSEARCH-879) - Better serialize class fields in Avro
+* [HSEARCH-888](https://hibernate.atlassian.net/browse/HSEARCH-888) - Depend on Hibernate Commons Annotations 4
+* [HSEARCH-892](https://hibernate.atlassian.net/browse/HSEARCH-892) - Avoid initializing ContextualException2WayBridge instances for non-requested fields during projection
+
+### New Feature
+* [HSEARCH-539](https://hibernate.atlassian.net/browse/HSEARCH-539) - Add Indexing Support(out of the box) For Simple Collections, Like Set<Integer>
+* [HSEARCH-566](https://hibernate.atlassian.net/browse/HSEARCH-566) - Support mapping of @javax.persistence.ElementCollection
+* [HSEARCH-670](https://hibernate.atlassian.net/browse/HSEARCH-670) - Add indexNullAs to @IndexedEmbedded
+* [HSEARCH-823](https://hibernate.atlassian.net/browse/HSEARCH-823) - Make it possible to plug in custom IndexManager implementations
+* [HSEARCH-860](https://hibernate.atlassian.net/browse/HSEARCH-860) - Allow JGroups to use IPV6
+
+### Remove Feature
+* [HSEARCH-877](https://hibernate.atlassian.net/browse/HSEARCH-877) - Remove option to override the BatchBackend to customize MassIndexer
+* [HSEARCH-878](https://hibernate.atlassian.net/browse/HSEARCH-878) - Remove option to change the number of backend threads when starting a MassIndexer
+
+### Task
+* [HSEARCH-820](https://hibernate.atlassian.net/browse/HSEARCH-820) - Document limitations and workarounds for JVM bug affecting Lucene users
+* [HSEARCH-889](https://hibernate.atlassian.net/browse/HSEARCH-889) - Remove compile (direct) dependency to slf4j
+* [HSEARCH-891](https://hibernate.atlassian.net/browse/HSEARCH-891) - Upgrade components: JBossTS at same version as AS7
+* [HSEARCH-894](https://hibernate.atlassian.net/browse/HSEARCH-894) - Depend on Hibernate Core 4.0.0.CR2
+
+
+## 4.0.0.Alpha1 (18-08-2011)
+
+### Bug
+* [HSEARCH-597](https://hibernate.atlassian.net/browse/HSEARCH-597) - Inconsistent treatment of extended FullTextIndexEventListener
+* [HSEARCH-662](https://hibernate.atlassian.net/browse/HSEARCH-662) - Re-indexing failure in @IndexedEmbedded entities in @ManyToOne relationship
+* [HSEARCH-681](https://hibernate.atlassian.net/browse/HSEARCH-681) - NotSerializableException when NumericField gets serialized in JMSBackendQueueProcessor
+* [HSEARCH-740](https://hibernate.atlassian.net/browse/HSEARCH-740) - TimeoutTest and ClasstypeFieldCacheExtractionTest
+* [HSEARCH-741](https://hibernate.atlassian.net/browse/HSEARCH-741) - NPE using two fulltext filters, one of them matching nothing (some filters only)
+* [HSEARCH-742](https://hibernate.atlassian.net/browse/HSEARCH-742) - Failure to open IndexWriter is hidden as NullPointerException in backend
+* [HSEARCH-744](https://hibernate.atlassian.net/browse/HSEARCH-744) - NullPointerException when using a range query on a numeric field and searching for values below a given boundary (Mathieu Perez)
+* [HSEARCH-747](https://hibernate.atlassian.net/browse/HSEARCH-747) - Add documentation on ability to add programmatic mapping via a @Factory class
+* [HSEARCH-770](https://hibernate.atlassian.net/browse/HSEARCH-770) - Range facets: .below on numeric null values (AssertionFailure: Unsupported range type)
+* [HSEARCH-776](https://hibernate.atlassian.net/browse/HSEARCH-776) - maxFacetCount returns incorrect results when ordering a faceted query
+* [HSEARCH-779](https://hibernate.atlassian.net/browse/HSEARCH-779) - classBridge not applicable in indexed() entities in the programmatic mapping API
+* [HSEARCH-780](https://hibernate.atlassian.net/browse/HSEARCH-780) - Dirty analysis of @IndexedEmbedded on a superclass collection fails (Samppa Saarela)
+* [HSEARCH-782](https://hibernate.atlassian.net/browse/HSEARCH-782) - Unnecessary loading of @ContainedIn entities causes big performance hit
+* [HSEARCH-802](https://hibernate.atlassian.net/browse/HSEARCH-802) - IndexControlMBeanTest fails with NPE because Hibernate Core closes the JNDI context
+* [HSEARCH-803](https://hibernate.atlassian.net/browse/HSEARCH-803) - JGroups configuration error leading to parsing exception in JGroupsSlaveTest
+* [HSEARCH-815](https://hibernate.atlassian.net/browse/HSEARCH-815) - IncrementalOptimizer uses wrong logging statements
+* [HSEARCH-819](https://hibernate.atlassian.net/browse/HSEARCH-819) - Performance and Integration tests still using HSQLDB (project uses H2)
+* [HSEARCH-822](https://hibernate.atlassian.net/browse/HSEARCH-822) - SearchFactoryState should use concurrent Maps for incrementally updated metadata
+* [HSEARCH-850](https://hibernate.atlassian.net/browse/HSEARCH-850) - Some InterruptedExceptions don't restore the interrupted thread state
+
+### Improvement
+* [HSEARCH-723](https://hibernate.atlassian.net/browse/HSEARCH-723) - Upgrade to Infinispan 5
+* [HSEARCH-748](https://hibernate.atlassian.net/browse/HSEARCH-748) - Point out that defining an Analyzer is not enough to use it
+* [HSEARCH-750](https://hibernate.atlassian.net/browse/HSEARCH-750) - Have an IndexManager concept to manage IndexWriters, Readers and backend
+* [HSEARCH-757](https://hibernate.atlassian.net/browse/HSEARCH-757) - Explicitly control binary format of communication with the backend
+* [HSEARCH-762](https://hibernate.atlassian.net/browse/HSEARCH-762) - enable exclusive_index_use=true by default
+* [HSEARCH-773](https://hibernate.atlassian.net/browse/HSEARCH-773) - Example in documentation contains compilation erros (Nabeel Ali Memon and Juraj Martinka)
+* [HSEARCH-783](https://hibernate.atlassian.net/browse/HSEARCH-783) - Upgrade to Lucene 3.3
+* [HSEARCH-785](https://hibernate.atlassian.net/browse/HSEARCH-785) - Expose topDocs to integration layer, and make HSQueryImpl Serializable
+* [HSEARCH-792](https://hibernate.atlassian.net/browse/HSEARCH-792) - Consider renaming LockFactoryFactory to LockFactoryProvider
+* [HSEARCH-796](https://hibernate.atlassian.net/browse/HSEARCH-796) - Remove EventListenerRegister after move to Hibernate Core 4
+* [HSEARCH-806](https://hibernate.atlassian.net/browse/HSEARCH-806) - Recommend specifying a Lucene compatibility version in configuration
+* [HSEARCH-814](https://hibernate.atlassian.net/browse/HSEARCH-814) - Avoid optimizing more than once the same index
+* [HSEARCH-830](https://hibernate.atlassian.net/browse/HSEARCH-830) - Make LuceneWork use Class<?> instead of the raw type
+* [HSEARCH-848](https://hibernate.atlassian.net/browse/HSEARCH-848) - Isolated failures in backend work operations don't affect subsequent operations in same workQueue
+
+### New Feature
+* [HSEARCH-626](https://hibernate.atlassian.net/browse/HSEARCH-626) - Allow MassIndexer to work alongside regular indexing / querying
+* [HSEARCH-675](https://hibernate.atlassian.net/browse/HSEARCH-675) - Move to i18n logs and exception via JBoss Logging
+* [HSEARCH-746](https://hibernate.atlassian.net/browse/HSEARCH-746) - Split API, SPI and private classes into separate packages
+* [HSEARCH-754](https://hibernate.atlassian.net/browse/HSEARCH-754) - Add configuration options to control maximum size of segments
+* [HSEARCH-756](https://hibernate.atlassian.net/browse/HSEARCH-756) - send "Update" operations to the backend
+* [HSEARCH-761](https://hibernate.atlassian.net/browse/HSEARCH-761) - Have a backend instance for each index
+* [HSEARCH-799](https://hibernate.atlassian.net/browse/HSEARCH-799) - Move Hibernate Search Integrator class from Hibernate Core to Hibernate Search
+
+### Remove Feature
+* [HSEARCH-743](https://hibernate.atlassian.net/browse/HSEARCH-743) - Unify configuration settings for batch and transaction indexwriter settings
+* [HSEARCH-751](https://hibernate.atlassian.net/browse/HSEARCH-751) - Remove SharedReaderProvider
+* [HSEARCH-752](https://hibernate.atlassian.net/browse/HSEARCH-752) - Remove deprecated methods and constants
+
+### Task
+* [HSEARCH-660](https://hibernate.atlassian.net/browse/HSEARCH-660) - Remove DirtyStrategy when we start depending on Core 4.x
+* [HSEARCH-676](https://hibernate.atlassian.net/browse/HSEARCH-676) - Split contracts between public APIs, SPIs and internal classes
+* [HSEARCH-738](https://hibernate.atlassian.net/browse/HSEARCH-738) - Add tests using Infinispan while scaling the cluster size
+* [HSEARCH-739](https://hibernate.atlassian.net/browse/HSEARCH-739) - Define an M2Eclipse configuration section in the parent pom.xml
+* [HSEARCH-755](https://hibernate.atlassian.net/browse/HSEARCH-755) - Upgrade to Hibernate Core 4
+* [HSEARCH-760](https://hibernate.atlassian.net/browse/HSEARCH-760) - ReaderProvider to not provide MultiSearchers
+* [HSEARCH-769](https://hibernate.atlassian.net/browse/HSEARCH-769) - dummy is a reserved keyword on sybase
+* [HSEARCH-771](https://hibernate.atlassian.net/browse/HSEARCH-771) - ProgrammaticMappingTest should pass when executing tests in any order
+* [HSEARCH-772](https://hibernate.atlassian.net/browse/HSEARCH-772) - Isolate JGroups tests to be able to run different test profiles in parallel
+* [HSEARCH-774](https://hibernate.atlassian.net/browse/HSEARCH-774) - build using Java6 as target
+* [HSEARCH-775](https://hibernate.atlassian.net/browse/HSEARCH-775) - Have all tests close the SessionFactory and other resources
+* [HSEARCH-788](https://hibernate.atlassian.net/browse/HSEARCH-788) - Several components minor versions upgrades
+* [HSEARCH-790](https://hibernate.atlassian.net/browse/HSEARCH-790) - upgrade to org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final
+* [HSEARCH-801](https://hibernate.atlassian.net/browse/HSEARCH-801) - Move Version.touch() to an appropriate position
+* [HSEARCH-805](https://hibernate.atlassian.net/browse/HSEARCH-805) - Cleanup dependencies, reorganize jars in distribution
+* [HSEARCH-807](https://hibernate.atlassian.net/browse/HSEARCH-807) - Document dependency to Hibernate 4
+* [HSEARCH-808](https://hibernate.atlassian.net/browse/HSEARCH-808) - Add an option to SearchConfiguration to disable warnings about missing transactions
+* [HSEARCH-825](https://hibernate.atlassian.net/browse/HSEARCH-825) - Align documentation with the IndexManager approach
+* [HSEARCH-838](https://hibernate.atlassian.net/browse/HSEARCH-838) - Upgrade do Hibernate Core 4.0.0.Beta5
+* [HSEARCH-839](https://hibernate.atlassian.net/browse/HSEARCH-839) - Upgrade to Infinispan 5.0.0.FINAL and JGroups 2.12.1.3.Final
+* [HSEARCH-844](https://hibernate.atlassian.net/browse/HSEARCH-844) - Update Byteman to version 1.5.2
+* [HSEARCH-845](https://hibernate.atlassian.net/browse/HSEARCH-845) - Update JBoss Logger to 3.0.0.GA
+* [HSEARCH-857](https://hibernate.atlassian.net/browse/HSEARCH-857) - Upgrade to Hibernate Core 4.0.0.CR1
+
+
+## 3.4.0.Final (18-04-2011)
+
+### Bug
+* [HSEARCH-727](https://hibernate.atlassian.net/browse/HSEARCH-727) - Non initialized entities are returned in the list when using initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID )
+* [HSEARCH-734](https://hibernate.atlassian.net/browse/HSEARCH-734) - NPE when deleting a collection which triggers @IndexedEmbedded
+
+### Improvement
+* [HSEARCH-720](https://hibernate.atlassian.net/browse/HSEARCH-720) - Add a screenshot of amazon.com and the related concepts pointed via arrow for faceting
+* [HSEARCH-730](https://hibernate.atlassian.net/browse/HSEARCH-730) - Proper error messages when preferIPv4Stack JVM option was not defined
+
+### Task
+* [HSEARCH-729](https://hibernate.atlassian.net/browse/HSEARCH-729) - Add a test on dynamic cluster formation for Infinispan Directory
+* [HSEARCH-731](https://hibernate.atlassian.net/browse/HSEARCH-731) - Upgrade Hibernate Core to 3.6.3.Final
+* [HSEARCH-733](https://hibernate.atlassian.net/browse/HSEARCH-733) - prevent JBoss transactions in integration tests module from creating log files
+
+
+## 3.4.0.CR2 (06-04-2011)
+
+### Bug
+* [HSEARCH-679](https://hibernate.atlassian.net/browse/HSEARCH-679) - Entity whose related entity collection is updated causes loading of @ContainedIn entities
+* [HSEARCH-721](https://hibernate.atlassian.net/browse/HSEARCH-721) - When using DatabaseRetrievalMethod.FIND_BY_ID, HSearch still constructs a Criteria query (though it does not use it)
+
+### Improvement
+* [HSEARCH-705](https://hibernate.atlassian.net/browse/HSEARCH-705) - Migrate to Lucene 3.1
+
+### Task
+* [HSEARCH-722](https://hibernate.atlassian.net/browse/HSEARCH-722) - Speedup JGroups tests
+* [HSEARCH-724](https://hibernate.atlassian.net/browse/HSEARCH-724) - Fix build assembly - jars in release distribution are misplaced
+* [HSEARCH-725](https://hibernate.atlassian.net/browse/HSEARCH-725) - Archetype not deploying because of incomplete metadata
+
+
+## 3.4.0.CR1 (28-03-2011)
+
+### Bug
+* [HSEARCH-719](https://hibernate.atlassian.net/browse/HSEARCH-719) - MutableSearchFactory might skip copying properties from previous SearchFactory during incrementalRebuild
+
+### New Feature
+* [HSEARCH-718](https://hibernate.atlassian.net/browse/HSEARCH-718) - Expose "isStopped" method on SearchFactoryIntegrator interface
+
+
+## 3.4.0.Beta1 (21-03-2011)
+
+### Bug
+* [HSEARCH-620](https://hibernate.atlassian.net/browse/HSEARCH-620) - Archetype does not deploy on JBoss Nexus repository due to missing pom fields
+* [HSEARCH-689](https://hibernate.atlassian.net/browse/HSEARCH-689) - MassIndexer throwing LazyInitializationException on associated collections
+* [HSEARCH-706](https://hibernate.atlassian.net/browse/HSEARCH-706) - Use FieldCacheCollector for faceting and introduce FacetManager interface to collect all facet related methods
+* [HSEARCH-709](https://hibernate.atlassian.net/browse/HSEARCH-709) - Minor typos in documentation
+* [HSEARCH-716](https://hibernate.atlassian.net/browse/HSEARCH-716) - Lucene FieldCache might not load all required values
+
+### Improvement
+* [HSEARCH-323](https://hibernate.atlassian.net/browse/HSEARCH-323) - Fault tolerant FSSlaveDirectoryProvider (Oliver Siegmar)
+* [HSEARCH-520](https://hibernate.atlassian.net/browse/HSEARCH-520) - Make work queue size configurable in Lucene backend
+* [HSEARCH-701](https://hibernate.atlassian.net/browse/HSEARCH-701) - Avoid reflection used for debugging purposes during query results processing
+* [HSEARCH-712](https://hibernate.atlassian.net/browse/HSEARCH-712) - Add below / above support in faceting DSL
+* [HSEARCH-715](https://hibernate.atlassian.net/browse/HSEARCH-715) - Update JUnit to v.4
+
+### New Feature
+* [HSEARCH-708](https://hibernate.atlassian.net/browse/HSEARCH-708) - Allow date range faceting
+
+### Task
+* [HSEARCH-543](https://hibernate.atlassian.net/browse/HSEARCH-543) - SyncBackendLongWorklistsStressTest takes too long to execute (~40s)
+* [HSEARCH-695](https://hibernate.atlassian.net/browse/HSEARCH-695) - Remove deprecated constructor form DocumentExtractor
+* [HSEARCH-714](https://hibernate.atlassian.net/browse/HSEARCH-714) - Upgrade to Hibernate Core 3.6.2
+* [HSEARCH-717](https://hibernate.atlassian.net/browse/HSEARCH-717) - Write documentation for faceting
+
+
+## 3.4.0.Alpha1 (07-03-2011)
+
+### Bug
+* [HSEARCH-650](https://hibernate.atlassian.net/browse/HSEARCH-650) - Regression in 3.3.0: Using hibernate.use_identifier_rollback property causes exceptions on deletes
+* [HSEARCH-669](https://hibernate.atlassian.net/browse/HSEARCH-669) - String2FieldBridgeAdaptor does not implement StringBridge causing DocumentBuilderIndexedEntity to not recognize it as a StringBridge
+* [HSEARCH-672](https://hibernate.atlassian.net/browse/HSEARCH-672) - Incorrect chapter sections on query's module (Limiting the time of a query)
+* [HSEARCH-683](https://hibernate.atlassian.net/browse/HSEARCH-683) - NullPointerException while using DocumentExtract on entities using @ProvidedId
+* [HSEARCH-685](https://hibernate.atlassian.net/browse/HSEARCH-685) - Deletion of Document having a NumericField ID might fail when the identifier field name is overriden
+* [HSEARCH-686](https://hibernate.atlassian.net/browse/HSEARCH-686) - Failing tests hide the assertion failure message by consequently failing cleanup methods
+* [HSEARCH-688](https://hibernate.atlassian.net/browse/HSEARCH-688) - Exclude indirect dependency on JBoss WS Native
+* [HSEARCH-690](https://hibernate.atlassian.net/browse/HSEARCH-690) - FieldSelectors are never used
+* [HSEARCH-696](https://hibernate.atlassian.net/browse/HSEARCH-696) - QueryTimeoutException thrown even if there's plenty of time left
+* [HSEARCH-698](https://hibernate.atlassian.net/browse/HSEARCH-698) - NPE when loading invalid stopwords file
+* [HSEARCH-699](https://hibernate.atlassian.net/browse/HSEARCH-699) - SecondLCAndPCLookupTest does not run against MySQL or PostgreSQL
+
+### Improvement
+* [HSEARCH-531](https://hibernate.atlassian.net/browse/HSEARCH-531) - Use Lucene fieldcache
+* [HSEARCH-651](https://hibernate.atlassian.net/browse/HSEARCH-651) - Improve error reporting on null values in querybuilder DSL
+* [HSEARCH-652](https://hibernate.atlassian.net/browse/HSEARCH-652) - Cache NumericField usage in Delete operation for single entity-per-index case
+* [HSEARCH-657](https://hibernate.atlassian.net/browse/HSEARCH-657) - Update dependencies for Infinispan module to Infinispan 4.2.0.FINAL and JGroups 2.11.0.GA
+* [HSEARCH-674](https://hibernate.atlassian.net/browse/HSEARCH-674) - Improve error messages on incorrectly defined Solr Analyzers
+* [HSEARCH-691](https://hibernate.atlassian.net/browse/HSEARCH-691) - Automatically figure out the minimum set of fields needed to be loaded via a FieldSelector
+* [HSEARCH-693](https://hibernate.atlassian.net/browse/HSEARCH-693) - Avoid reflection when associating query matches to their DocumentBuilders
+* [HSEARCH-700](https://hibernate.atlassian.net/browse/HSEARCH-700) - Cache value of DocumentBuilderIndexedEntity.getIdentifierName
+
+
+### New Feature
+* [HSEARCH-361](https://hibernate.atlassian.net/browse/HSEARCH-361) - Only index an entity if an indexed property has changed
+* [HSEARCH-370](https://hibernate.atlassian.net/browse/HSEARCH-370) - Monitoring of mass indexer state and progress
+* [HSEARCH-430](https://hibernate.atlassian.net/browse/HSEARCH-430) - Use multiple threads for text analysis in MassIndexer
+* [HSEARCH-645](https://hibernate.atlassian.net/browse/HSEARCH-645) - Ability to load objects from the second level cache and if unavailable from the database
+* [HSEARCH-667](https://hibernate.atlassian.net/browse/HSEARCH-667) - Implement a facenting API and implementation
+* [HSEARCH-687](https://hibernate.atlassian.net/browse/HSEARCH-687) - Expose core of query engine as SPI for use by alternative object sources (independent of Hibernate Core)
+
+
+### Task
+* [HSEARCH-654](https://hibernate.atlassian.net/browse/HSEARCH-654) - Remove usage of deprecated org.hibernate.cfg.AnnotationConfiguration
+* [HSEARCH-656](https://hibernate.atlassian.net/browse/HSEARCH-656) - Add unit tests for different analyzers on @Fields
+* [HSEARCH-658](https://hibernate.atlassian.net/browse/HSEARCH-658) - Create test to check dirtyness of mutable properties
+* [HSEARCH-671](https://hibernate.atlassian.net/browse/HSEARCH-671) - Add EasyTesting's FEST-Assert as a dependency for nicer test assertions
+* [HSEARCH-673](https://hibernate.atlassian.net/browse/HSEARCH-673) - Update Infinispan and JGroups components
+* [HSEARCH-684](https://hibernate.atlassian.net/browse/HSEARCH-684) - Upgrade to Infinispan 4.2.1.CR1 and make IndexSearcherWithPayload public
+* [HSEARCH-694](https://hibernate.atlassian.net/browse/HSEARCH-694) - Keep legacy constructor of DocumentExtractor for people using Infinispan Query 5.0.0.Alpha3
+* [HSEARCH-702](https://hibernate.atlassian.net/browse/HSEARCH-702) - Make sure testsuite of hibernate-search module compiles with Java5
+
+
+ 3.3.0.Final (15-12-2010)
+
+### Bug
+* [HSEARCH-629](https://hibernate.atlassian.net/browse/HSEARCH-629) - Mark the NumericField feature as experimental (Lucene mark it as such)
+* [HSEARCH-646](https://hibernate.atlassian.net/browse/HSEARCH-646) - Unable to run tests against non in memory db
+* [HSEARCH-647](https://hibernate.atlassian.net/browse/HSEARCH-647) - WorkPlan causes ConcurrentModificationException on finding new entity types during processContainedInAndPrepareExecution
+* [HSEARCH-649](https://hibernate.atlassian.net/browse/HSEARCH-649) - Fix assembly not containing Infinispan dependencies
+
+
+### Improvement
+* [HSEARCH-648](https://hibernate.atlassian.net/browse/HSEARCH-648) - Apply suggestions from Infinispan team to Infinispan default configuration
+
+
+## 3.3.0.CR2 (09-12-2010)
+
+### Bug
+* [HSEARCH-513](https://hibernate.atlassian.net/browse/HSEARCH-513) - Experiencing long delays when indexing entities saved in different transactions
+* [HSEARCH-577](https://hibernate.atlassian.net/browse/HSEARCH-577) - IllegalArgumentException when using @Proxy and trying to delete a loaded but proxied class
+* [HSEARCH-625](https://hibernate.atlassian.net/browse/HSEARCH-625) - Some errors triggered by Lucene are not catched by the ErrorHandler
+* [HSEARCH-635](https://hibernate.atlassian.net/browse/HSEARCH-635) - Remove build cycle and duplicate classes from hibernate-search-testing module
+* [HSEARCH-640](https://hibernate.atlassian.net/browse/HSEARCH-640) - MassIndexer/JBoss 6: Could not register synchronization for container transaction
+* [HSEARCH-641](https://hibernate.atlassian.net/browse/HSEARCH-641) - idProvided flag in DocumentBuilderIndexedEntity is always false
+
+
+### Improvement
+* [HSEARCH-511](https://hibernate.atlassian.net/browse/HSEARCH-511) - Clean up orphaned lock files on startup
+* [HSEARCH-570](https://hibernate.atlassian.net/browse/HSEARCH-570) - Optimize the o^2 loop in DocumentBuilderIndexedEntity.addWorkToQueue
+* [HSEARCH-630](https://hibernate.atlassian.net/browse/HSEARCH-630) - Rename limitFetchTime() to query.limitTimeAllowedTo() or limitExecutionTimeTo() in Query API
+* [HSEARCH-631](https://hibernate.atlassian.net/browse/HSEARCH-631) - Protect against excessive proxying (in particular in Seam)
+* [HSEARCH-632](https://hibernate.atlassian.net/browse/HSEARCH-632) - Make sure indexAsNull and Query DSL work like a charm together
+* [HSEARCH-639](https://hibernate.atlassian.net/browse/HSEARCH-639) - Update dependency to Lucene 3.0.3
+
+### New Feature
+* [HSEARCH-307](https://hibernate.atlassian.net/browse/HSEARCH-307) - Implement clustering with Infinispan
+* [HSEARCH-416](https://hibernate.atlassian.net/browse/HSEARCH-416) - Analyze Payload and how this could be used to store id and class in the index and not the document
+* [HSEARCH-644](https://hibernate.atlassian.net/browse/HSEARCH-644) - Enable Byteman for unit tests
+
+
+### Task
+* [HSEARCH-579](https://hibernate.atlassian.net/browse/HSEARCH-579) - Ensure compatibility with latest Hibernate Core 3.6
+* [HSEARCH-602](https://hibernate.atlassian.net/browse/HSEARCH-602) - Create new hibernate-search-infinispan skeleton module
+* [HSEARCH-637](https://hibernate.atlassian.net/browse/HSEARCH-637) - Review documentation
+
+
+## 3.3.0.CR1 (08-11-2010)
+
+### Bug
+* [HSEARCH-513](https://hibernate.atlassian.net/browse/HSEARCH-513) - Experiencing long delays when indexing entities saved in different transactions
+* [HSEARCH-532](https://hibernate.atlassian.net/browse/HSEARCH-532) - FSSlaveDirectoryProvider could retry several times when the current marker file is not found
+* [HSEARCH-573](https://hibernate.atlassian.net/browse/HSEARCH-573) - PerDPQueueProcessor forces release of lock even if not held - causes corrupt index
+* [HSEARCH-610](https://hibernate.atlassian.net/browse/HSEARCH-610) - AndDocIdSet makeDocIdSetOnAgreedBits() returns wrong values
+* [HSEARCH-621](https://hibernate.atlassian.net/browse/HSEARCH-621) - Some dependencies have the wrong scope
+* [HSEARCH-624](https://hibernate.atlassian.net/browse/HSEARCH-624) - NumericField is not working properly with id fields
+
+
+### Improvement
+* [HSEARCH-115](https://hibernate.atlassian.net/browse/HSEARCH-115) - Add a default value for indexing null value
+* [HSEARCH-275](https://hibernate.atlassian.net/browse/HSEARCH-275) - support NIOFSDirectory and others as optimized FSDirectory extensions
+* [HSEARCH-618](https://hibernate.atlassian.net/browse/HSEARCH-618) - BridgeFactory should pass along the field type to the field bridge constructor (if an appropriate constructor exists)
+* [HSEARCH-627](https://hibernate.atlassian.net/browse/HSEARCH-627) - Use System.nanoTime() instead of currentTimeMillis() when measuring elapsed time (better precision)
+* [HSEARCH-628](https://hibernate.atlassian.net/browse/HSEARCH-628) - Provide shortcut names for the major DirectoryProviders
+
+### New Feature
+* [HSEARCH-390](https://hibernate.atlassian.net/browse/HSEARCH-390) - Allow customization of the charset used by analyzer components
+* [HSEARCH-434](https://hibernate.atlassian.net/browse/HSEARCH-434) - Make use of NumericField
+* [HSEARCH-615](https://hibernate.atlassian.net/browse/HSEARCH-615) - Support for queries limited in time: return the first nth elements within a given time
+
+
+### Task
+* [HSEARCH-622](https://hibernate.atlassian.net/browse/HSEARCH-622) - Remove <remoteTagging>true</remoteTagging> in the maven-release-plugin configuration (no longer needed)
+
+
+## 3.3.0.Beta3 (1-11-2010)
+
+### Bug
+* [HSEARCH-608](https://hibernate.atlassian.net/browse/HSEARCH-608) - Index not created if path contains tilde like ~/.lucene/
+* [HSEARCH-616](https://hibernate.atlassian.net/browse/HSEARCH-616) - Factory method invocation in FullTextQueryImpl swallows exception
+* [HSEARCH-619](https://hibernate.atlassian.net/browse/HSEARCH-619) - Update documentation about hibernate-search-analyzers module
+
+### Improvement
+* [HSEARCH-405](https://hibernate.atlassian.net/browse/HSEARCH-405) - Be able to set Similarity per index in configuration properties
+* [HSEARCH-424](https://hibernate.atlassian.net/browse/HSEARCH-424) - Update to Lucene 3.0
+* [HSEARCH-569](https://hibernate.atlassian.net/browse/HSEARCH-569) - duplicate identifiers on @AnalyzerDef are accepted and don't warn about the inconsistent configuration
+* [HSEARCH-611](https://hibernate.atlassian.net/browse/HSEARCH-611) - Automatic archetype deployment during build
+
+### New Feature
+* [HSEARCH-374](https://hibernate.atlassian.net/browse/HSEARCH-374) - Timeout support for full-text searches
+* [HSEARCH-603](https://hibernate.atlassian.net/browse/HSEARCH-603) - Support pluggable services and expose them to pluggable components like DirectoryProviders and ReaderProviders
+
+
+### Task
+* [HSEARCH-524](https://hibernate.atlassian.net/browse/HSEARCH-524) - Migrate unit tests to H2 (instead of HSQLDB) for inclusion in the Hudson train
+* [HSEARCH-607](https://hibernate.atlassian.net/browse/HSEARCH-607) - Consider creating a distribution project
+* [HSEARCH-613](https://hibernate.atlassian.net/browse/HSEARCH-613) - Automatic archetype install and deploy
+* [HSEARCH-617](https://hibernate.atlassian.net/browse/HSEARCH-617) - Move monitoring section as top level chapter
+
+
+## 3.3.0.Beta2 (15-10-2010)
+
+### Sub-task
+* [HSEARCH-435](https://hibernate.atlassian.net/browse/HSEARCH-435) - New token stream API, is there a benefit, work on our part?
+* [HSEARCH-449](https://hibernate.atlassian.net/browse/HSEARCH-449) - Consider LUCENE-1575 carefully: not scoring by default?
+* [HSEARCH-457](https://hibernate.atlassian.net/browse/HSEARCH-457) - Analyzers in Lucene 3.0 don't have a default constructor
+* [HSEARCH-593](https://hibernate.atlassian.net/browse/HSEARCH-593) - Upgrade/Update Solr analyzer framework
+* [HSEARCH-596](https://hibernate.atlassian.net/browse/HSEARCH-596) - Add isCompressed() to LuceneOptions
+
+### Bug
+* [HSEARCH-528](https://hibernate.atlassian.net/browse/HSEARCH-528) - MassIndexer attempts to index non-indexed subclasses of indexed types
+* [HSEARCH-545](https://hibernate.atlassian.net/browse/HSEARCH-545) - Unable to project FullTextQuery.SCORE when using a custom Sort
+* [HSEARCH-546](https://hibernate.atlassian.net/browse/HSEARCH-546) - ProjectionLoader ignores FetchMode.JOIN set via a Criteria
+* [HSEARCH-554](https://hibernate.atlassian.net/browse/HSEARCH-554) - Documentation about worker configuration is not up to date
+* [HSEARCH-587](https://hibernate.atlassian.net/browse/HSEARCH-587) - Maven release:perform fails
+* [HSEARCH-588](https://hibernate.atlassian.net/browse/HSEARCH-588) - Query DSL documentation has incorrect queries
+* [HSEARCH-589](https://hibernate.atlassian.net/browse/HSEARCH-589) - org.hibernate.search.test.TransactionTest fails under PostgreSQL 8.4
+* [HSEARCH-591](https://hibernate.atlassian.net/browse/HSEARCH-591) - Programmatic mapping raises exception when a non getter method is parsed by the metadata binder
+* [HSEARCH-594](https://hibernate.atlassian.net/browse/HSEARCH-594) - Typos in Hibernate Search documentation
+* [HSEARCH-600](https://hibernate.atlassian.net/browse/HSEARCH-600) - Sync Hibernate Search with Hibernate Core 3.6.0.Final
+* [HSEARCH-604](https://hibernate.atlassian.net/browse/HSEARCH-604) - Add better exception handling for FulltextQueryImpl.calculateTopDocsRetrievalSize()
+* [HSEARCH-606](https://hibernate.atlassian.net/browse/HSEARCH-606) - Exceptions during indexing are logged but swallowed when using local transactions (not JTA)
+
+### Deprecation
+* [HSEARCH-572](https://hibernate.atlassian.net/browse/HSEARCH-572) - Reconsider deprecating luceneOptions.getStore(), luceneOptions.getIndex() etc
+
+### Improvement
+* [HSEARCH-556](https://hibernate.atlassian.net/browse/HSEARCH-556) - Throw meaningful error on Search static helper methods used with null argument
+* [HSEARCH-575](https://hibernate.atlassian.net/browse/HSEARCH-575) - More useful error message on bridge indexing failure
+* [HSEARCH-586](https://hibernate.atlassian.net/browse/HSEARCH-586) - Rework the JMX chapter as a monitoring chapter describing the programmatic API and then how to expose it via JMX
+* [HSEARCH-592](https://hibernate.atlassian.net/browse/HSEARCH-592) - Make sure that all tests can be run from within the IDE
+
+### New Feature
+* [HSEARCH-555](https://hibernate.atlassian.net/browse/HSEARCH-555) - Properly expose as public API the SearchFactoryBuilder
+* [HSEARCH-574](https://hibernate.atlassian.net/browse/HSEARCH-574) - Allow @DocumentId and @Id to be put on different members
+
+
+### Task
+* [HSEARCH-371](https://hibernate.atlassian.net/browse/HSEARCH-371) - Refactor DocumentBuilder and introduce abstract base class
+* [HSEARCH-590](https://hibernate.atlassian.net/browse/HSEARCH-590) - update test db profile id against dballocator's schema and update jdbc driver version
+* [HSEARCH-602](https://hibernate.atlassian.net/browse/HSEARCH-602) - Create new hibernate-search-infinispan skeleton module
+
+
+## 3.3.0.Beta1 (25-08-2010)
+
+### Bug
+* [HSEARCH-585](https://hibernate.atlassian.net/browse/HSEARCH-585) - ClassBridgeAndProjectionTest and NestedContainedInTest hang when run against PostgreSQL due to missing transactions
+
+
+### Improvement
+* [HSEARCH-580](https://hibernate.atlassian.net/browse/HSEARCH-580) - Copy SoftLimitMRUCache into Hibernate Search codebase to no longer depend on Hibernate Core internals
+* [HSEARCH-581](https://hibernate.atlassian.net/browse/HSEARCH-581) - No longer use Hibernate Core's Helper classes: use Commons Annotations Helpers instead
+* [HSEARCH-582](https://hibernate.atlassian.net/browse/HSEARCH-582) - Move Query DSL package to org.hibernate.search.query.dsl
+* [HSEARCH-583](https://hibernate.atlassian.net/browse/HSEARCH-583) - Add enforcer plugin to Search master pom to enforce JDK 6
+
+### New Feature
+* [HSEARCH-135](https://hibernate.atlassian.net/browse/HSEARCH-135) - Create a RAMDirectoryProvider from an existing Lucene FSDirectory
+* [HSEARCH-278](https://hibernate.atlassian.net/browse/HSEARCH-278) - Create a Search Statistic JMX Bean
+
+
+### Task
+* [HSEARCH-562](https://hibernate.atlassian.net/browse/HSEARCH-562) - Convert or add JBossTS usage to the integrationtest module
+* [HSEARCH-563](https://hibernate.atlassian.net/browse/HSEARCH-563) - Document the DSL query language
+* [HSEARCH-564](https://hibernate.atlassian.net/browse/HSEARCH-564) - Document the API changes of the semi public APIs
+* [HSEARCH-584](https://hibernate.atlassian.net/browse/HSEARCH-584) - Upgrade to Hibernate Core 3.6.0.Beta3
+
+    
+## 3.3.0.Alpha1 (26-07-2010)
+
+### Sub-task
+* [HSEARCH-507](https://hibernate.atlassian.net/browse/HSEARCH-507) - Rename exact() to keywords() and move fuzzy() and wildcard() back as suboperations of keywords()
+* [HSEARCH-508](https://hibernate.atlassian.net/browse/HSEARCH-508) - Support query on multiple fields
+* [HSEARCH-509](https://hibernate.atlassian.net/browse/HSEARCH-509) - Add support for all() query and all except ones
+* [HSEARCH-533](https://hibernate.atlassian.net/browse/HSEARCH-533) - Use Hibernate Search bridge system to convert input
+* [HSEARCH-541](https://hibernate.atlassian.net/browse/HSEARCH-541) - Restructure various initialize contracts to allow SearchFactory implementors to be immutable
+* [HSEARCH-544](https://hibernate.atlassian.net/browse/HSEARCH-544) - Provide an immutable SearchFactory implementation
+
+### Bug
+* [HSEARCH-487](https://hibernate.atlassian.net/browse/HSEARCH-487) - Find why the zh-CN translation fails
+* [HSEARCH-530](https://hibernate.atlassian.net/browse/HSEARCH-530) - Entity analyzers (aka scoped analyzers) improperly return random analyzers on field not marked as TOKENIZED
+* [HSEARCH-534](https://hibernate.atlassian.net/browse/HSEARCH-534) - circular graphs of IndexedEmbedded might break MassIndexer
+* [HSEARCH-536](https://hibernate.atlassian.net/browse/HSEARCH-536) - IndexingGeneratedCorpusTest raises OOME and hangs
+* [HSEARCH-537](https://hibernate.atlassian.net/browse/HSEARCH-537) - SearchIndexerTest fails
+* [HSEARCH-540](https://hibernate.atlassian.net/browse/HSEARCH-540) - JTA transaction commit causes AssertionFailure: Access a Sealed WorkQueue which has not been sealed
+* [HSEARCH-548](https://hibernate.atlassian.net/browse/HSEARCH-548) - Specify explicit version for deploy and artifact plugins in partent pom
+* [HSEARCH-560](https://hibernate.atlassian.net/browse/HSEARCH-560) - Version is displayed after the SearchFactory metadata creation
+* [HSEARCH-568](https://hibernate.atlassian.net/browse/HSEARCH-568) - Unable to push stagged releases because hibernate-search-testing does not deploy the sources artifacts
+
+
+### Improvement
+* [HSEARCH-535](https://hibernate.atlassian.net/browse/HSEARCH-535) - Always setAccessible to true as it makes property access faster (bypass repetitive security checkings)
+* [HSEARCH-549](https://hibernate.atlassian.net/browse/HSEARCH-549) - Isolate Hibernate.initialize / Hibernate.getClass calls into HibernateHelper
+* [HSEARCH-552](https://hibernate.atlassian.net/browse/HSEARCH-552) - Raise an exception when the object passed to the worker is not of an unindexed or contained type
+* [HSEARCH-553](https://hibernate.atlassian.net/browse/HSEARCH-553) - Mutualize class extraction logic from a Work object
+* [HSEARCH-559](https://hibernate.atlassian.net/browse/HSEARCH-559) - Migrate to SLF4J 1.6 for graceful degradation when no slf4j implementation is provided
+* [HSEARCH-561](https://hibernate.atlassian.net/browse/HSEARCH-561) - Add tests making use of JTA and Spring in a new module
+
+### New Feature
+* [HSEARCH-397](https://hibernate.atlassian.net/browse/HSEARCH-397) - Allow classes to be lazily added to the SearchFactory
+* [HSEARCH-414](https://hibernate.atlassian.net/browse/HSEARCH-414) - Add support for a Lucene query builder using a fluent API
+* [HSEARCH-538](https://hibernate.atlassian.net/browse/HSEARCH-538) - Allow Hibernate Search to use the @FailureExpected test framework
+
+
+### Task
+* [HSEARCH-523](https://hibernate.atlassian.net/browse/HSEARCH-523) - Build the distribution package with the docs in the same directory structure as on the docs server
+* [HSEARCH-558](https://hibernate.atlassian.net/browse/HSEARCH-558) - Align Search with Core 3.6
+
+
+## 3.2.0.Final (05-05-2010)
+
+### Bug
+* [HSEARCH-333](https://hibernate.atlassian.net/browse/HSEARCH-333) - Remove or improve log warning in DocumentBuilderContainedEntity.checkDocumentId
+* [HSEARCH-396](https://hibernate.atlassian.net/browse/HSEARCH-396) - disableFullTextFilter(String name) in FullTextQueryImpl does not disable the filter.
+* [HSEARCH-485](https://hibernate.atlassian.net/browse/HSEARCH-485) - mvn site is currently not working (in ./hibernate-search)
+* [HSEARCH-512](https://hibernate.atlassian.net/browse/HSEARCH-512) - MassIndexer might associate proxies to two open session
+* [HSEARCH-515](https://hibernate.atlassian.net/browse/HSEARCH-515) - Lucene AlreadyClosedExceptions During Batch Processing With ASYNC Workers
+* [HSEARCH-516](https://hibernate.atlassian.net/browse/HSEARCH-516) - Lucene Directories might be closed before the backend finished all tasks on shutdown
+* [HSEARCH-517](https://hibernate.atlassian.net/browse/HSEARCH-517) - ThreadLocal in ContextHolder causes memory leak when deployed in a web container
+* [HSEARCH-518](https://hibernate.atlassian.net/browse/HSEARCH-518) - pom.xml misses pluginrepository
+* [HSEARCH-522](https://hibernate.atlassian.net/browse/HSEARCH-522) - Search only compiles against JDK 6 with the current version of JGroups
+
+
+### Improvement
+* [HSEARCH-506](https://hibernate.atlassian.net/browse/HSEARCH-506) - Bump dependency to core 3.5.1-Final
+* [HSEARCH-519](https://hibernate.atlassian.net/browse/HSEARCH-519) - Update JGroups dependencies
+
+### New Feature
+* [HSEARCH-467](https://hibernate.atlassian.net/browse/HSEARCH-467) - publish Maven artifacts containing the testsuite
+
+### Patch
+* [HSEARCH-503](https://hibernate.atlassian.net/browse/HSEARCH-503) - Generated archetype broken for any package name with dot (.)
+* [HSEARCH-514](https://hibernate.atlassian.net/browse/HSEARCH-514) - logging and typo improvements in JGroups backend
+
+### Task
+* [HSEARCH-486](https://hibernate.atlassian.net/browse/HSEARCH-486) - Review the getting started section's pom and archetype creation
+* [HSEARCH-510](https://hibernate.atlassian.net/browse/HSEARCH-510) - Update pom to use the new distributationManagement information
+    
+
+## 3.2.0.CR1 (12-04-2010)
+
+### Sub-task
+* [HSEARCH-411](https://hibernate.atlassian.net/browse/HSEARCH-411) - Get a feature complete programmatic mapping (Amin Mohammed-Coleman)
+* [HSEARCH-459](https://hibernate.atlassian.net/browse/HSEARCH-459) - Update quickstart archetype
+* [HSEARCH-480](https://hibernate.atlassian.net/browse/HSEARCH-480) - Some add/delete operations have null primary keys
+* [HSEARCH-481](https://hibernate.atlassian.net/browse/HSEARCH-481) - In a given sealed queue, only apply the same add/delete operation once
+* [HSEARCH-493](https://hibernate.atlassian.net/browse/HSEARCH-493) - Continuous integration builds fail some tests on Oracle databases
+* [HSEARCH-496](https://hibernate.atlassian.net/browse/HSEARCH-496) - Some hudson configurations need more time to run the testsuite
+* [HSEARCH-497](https://hibernate.atlassian.net/browse/HSEARCH-497) - sybase15 Hudson configuration fails because of java.net.ConnectException: Connection refused
+* [HSEARCH-498](https://hibernate.atlassian.net/browse/HSEARCH-498) - Postgres Hudson configurations fail by SQLGrammarException
+
+### Bug
+* [HSEARCH-305](https://hibernate.atlassian.net/browse/HSEARCH-305) - Hibernate search doesn't work with criteria when it is not initialized laziily
+* [HSEARCH-321](https://hibernate.atlassian.net/browse/HSEARCH-321) - FSSlaveDirectoryProvider incorrectly creates a subdirectory named 0
+* [HSEARCH-346](https://hibernate.atlassian.net/browse/HSEARCH-346) - Setup hudson job testing Search against several databases
+* [HSEARCH-382](https://hibernate.atlassian.net/browse/HSEARCH-382) - Indexing fails silently in case the file based index is mounted read only
+* [HSEARCH-385](https://hibernate.atlassian.net/browse/HSEARCH-385) - Lazy ManyToOne association with @containedIn annotation cause HSearch create entity index with documentId = 0
+* [HSEARCH-386](https://hibernate.atlassian.net/browse/HSEARCH-386) - In a Transaction, Delete on unindexed entities referenced by indexed entities with ContainedIn throw LazyInitializationException
+* [HSEARCH-393](https://hibernate.atlassian.net/browse/HSEARCH-393) - unit test of the NotSharedReaderPerfTest hangs on with some database
+* [HSEARCH-399](https://hibernate.atlassian.net/browse/HSEARCH-399) - NPE in org.hibernate.search.backend.WorkQueue.clear()
+* [HSEARCH-422](https://hibernate.atlassian.net/browse/HSEARCH-422) - Properly implement delegation for FullTextEntityManager, FullTextSession and FullTextQuery methods of the new Hibernate version
+* [HSEARCH-440](https://hibernate.atlassian.net/browse/HSEARCH-440) - FSSlaveDirectoryProvider creates a wrong index directory in case the current marker file does not exist
+* [HSEARCH-443](https://hibernate.atlassian.net/browse/HSEARCH-443) - Using a Field extending AbstractField causes a ClassCastException in DocumentBuilderIndexedEntity when using @AnalyzerDiscriminator
+* [HSEARCH-448](https://hibernate.atlassian.net/browse/HSEARCH-448) - Update JPATestCase after renaming of HibernatePersistence to AvailableSettings in Core
+* [HSEARCH-450](https://hibernate.atlassian.net/browse/HSEARCH-450) - Example 1.9. superfluous hibernate word
+* [HSEARCH-452](https://hibernate.atlassian.net/browse/HSEARCH-452) - FSMasterDirectoryProvider: typo in marker file name (Stephan Bublava)
+* [HSEARCH-456](https://hibernate.atlassian.net/browse/HSEARCH-456) - CalendarBridge ignoring setParameterValues
+* [HSEARCH-473](https://hibernate.atlassian.net/browse/HSEARCH-473) - Fields for _hibernate_class and the document ID are hard-coded to be analyzed and have "norms" enabled (Dobes Vandermeer)
+* [HSEARCH-474](https://hibernate.atlassian.net/browse/HSEARCH-474) - Ensure IndexWriter is closed on errors in backend
+* [HSEARCH-476](https://hibernate.atlassian.net/browse/HSEARCH-476) - Work queue contains the same operation multiple times and some add/delete operations have null primary keys
+* [HSEARCH-478](https://hibernate.atlassian.net/browse/HSEARCH-478) - Entities with composite PK lead to query exceptions on MySQL
+* [HSEARCH-479](https://hibernate.atlassian.net/browse/HSEARCH-479) - Return empty result list - Composed primary key - lucene search ok - primary key bridge ok
+* [HSEARCH-484](https://hibernate.atlassian.net/browse/HSEARCH-484) - Building documentation fails
+* [HSEARCH-488](https://hibernate.atlassian.net/browse/HSEARCH-488) - Nested use of @ContainedIn: changes not propagated to Lucene index
+* [HSEARCH-490](https://hibernate.atlassian.net/browse/HSEARCH-490) - MassIndexer needs to use distinct on primary key selection
+* [HSEARCH-492](https://hibernate.atlassian.net/browse/HSEARCH-492) - FSMasterDirectoryProvider and FSSlaveDirectoryProvider don't shutdown the Executor
+* [HSEARCH-495](https://hibernate.atlassian.net/browse/HSEARCH-495) - IdentifierProducer: ClassCastException
+* [HSEARCH-500](https://hibernate.atlassian.net/browse/HSEARCH-500) - Some tests don't close the SessionFactory and SearchFactory
+* [HSEARCH-505](https://hibernate.atlassian.net/browse/HSEARCH-505) - JGroupsMasterTest uses native SQL failing on DB2 and sybase
+
+
+### Improvement
+* [HSEARCH-437](https://hibernate.atlassian.net/browse/HSEARCH-437) - When using Thread bound sessions, Hibernate Search FTSession creation fails if out of transaction
+* [HSEARCH-441](https://hibernate.atlassian.net/browse/HSEARCH-441) - Custom LockFactory loading should use PluginLoader
+* [HSEARCH-447](https://hibernate.atlassian.net/browse/HSEARCH-447) - The build should use the maven-injection-plugin in order to dynamically inject the version string into org.hibernate.search.Version
+* [HSEARCH-464](https://hibernate.atlassian.net/browse/HSEARCH-464) - Upgrade Lucene to 2.9.2
+* [HSEARCH-475](https://hibernate.atlassian.net/browse/HSEARCH-475) - Improve error message on wrong type as filter parameter
+* [HSEARCH-477](https://hibernate.atlassian.net/browse/HSEARCH-477) - Support for the new Solr's character filters (Gustavo Fernandes)
+* [HSEARCH-489](https://hibernate.atlassian.net/browse/HSEARCH-489) - Remove the code avoiding the use of in restrictions when a composite id is used: Core does it automatically
+* [HSEARCH-491](https://hibernate.atlassian.net/browse/HSEARCH-491) - Make some optional dependencies mandatory
+* [HSEARCH-501](https://hibernate.atlassian.net/browse/HSEARCH-501) - Make use of BeforeTransactionCompletionProcess and AfterTransactionCompletionProcess instead of Synchronization
+* [HSEARCH-502](https://hibernate.atlassian.net/browse/HSEARCH-502) - update MassIndexer to use new core features
+
+### New Feature
+* [HSEARCH-352](https://hibernate.atlassian.net/browse/HSEARCH-352) - Introduce a programmatic mapping API
+* [HSEARCH-372](https://hibernate.atlassian.net/browse/HSEARCH-372) - Support projection for ClassBridges that pass and use the field name passed in @ClassBridge.name
+* [HSEARCH-379](https://hibernate.atlassian.net/browse/HSEARCH-379) - Properly implement new JPA 2 methods (Query and EntityManager)
+* [HSEARCH-415](https://hibernate.atlassian.net/browse/HSEARCH-415) - Consider moving to Lucene 2.9
+* [HSEARCH-421](https://hibernate.atlassian.net/browse/HSEARCH-421) - Provide a callback on indexing exception (Amin Mohammed-Coleman)
+* [HSEARCH-429](https://hibernate.atlassian.net/browse/HSEARCH-429) - Add a configuration property to declaratively use a factory for the programmatic mapping API (Amin Mohammed-Coleman)
+
+
+### Task
+* [HSEARCH-322](https://hibernate.atlassian.net/browse/HSEARCH-322) - Review MultiClassesQueryLoader
+* [HSEARCH-408](https://hibernate.atlassian.net/browse/HSEARCH-408) - Improve execution speed of functional tests
+* [HSEARCH-425](https://hibernate.atlassian.net/browse/HSEARCH-425) - Reimplement support for compressed fields (support removed in Lucene3)
+* [HSEARCH-427](https://hibernate.atlassian.net/browse/HSEARCH-427) - Make the hibernate-search-artifact directory a proper maven module
+* [HSEARCH-428](https://hibernate.atlassian.net/browse/HSEARCH-428) - Update the Getting Started section of the documentation
+* [HSEARCH-432](https://hibernate.atlassian.net/browse/HSEARCH-432) - Add logging to trace the WorkQueue before being processed
+* [HSEARCH-439](https://hibernate.atlassian.net/browse/HSEARCH-439) - Merge fixes from JBAPP (v3_1_1_GA_CP) branch to trunk
+* [HSEARCH-442](https://hibernate.atlassian.net/browse/HSEARCH-442) - Upgrade existing code to Lucene 2.9.1
+* [HSEARCH-454](https://hibernate.atlassian.net/browse/HSEARCH-454) - Upgrade Solr dependencies (Gustavo Fernandes)
+* [HSEARCH-455](https://hibernate.atlassian.net/browse/HSEARCH-455) - Keep Search compatible with latest Hibernate Core
+* [HSEARCH-458](https://hibernate.atlassian.net/browse/HSEARCH-458) - Remove all deprecations from Lucene's 2.9 API usage
+* [HSEARCH-463](https://hibernate.atlassian.net/browse/HSEARCH-463) - Change the master docbook document to use the version number provided by the docbook plugin
+* [HSEARCH-465](https://hibernate.atlassian.net/browse/HSEARCH-465) - Move to commons-annotations 3.2.0.Final
+* [HSEARCH-468](https://hibernate.atlassian.net/browse/HSEARCH-468) - Refactor build to have a module setup
+* [HSEARCH-482](https://hibernate.atlassian.net/browse/HSEARCH-482) - Update dependencies to Hibernate Core 3.5.0-Final
+* [HSEARCH-483](https://hibernate.atlassian.net/browse/HSEARCH-483) - update readme.txt
+* [HSEARCH-494](https://hibernate.atlassian.net/browse/HSEARCH-494) - Fix hudson failures
+* [HSEARCH-504](https://hibernate.atlassian.net/browse/HSEARCH-504) - Fix ContainedIn tests which break on Oracle as they use a reserved keyword as column name
+
+
+## 3.2.0.Beta1 (30-11-2009)
+
+### Sub-task
+* [HSEARCH-410](https://hibernate.atlassian.net/browse/HSEARCH-410) - Write documentation for what's available of the programmatic mapping API (Amin Mohammed-Coleman)
+* [HSEARCH-412](https://hibernate.atlassian.net/browse/HSEARCH-412) - Provide the main mapping artifacts programmatically
+
+### Bug
+* [HSEARCH-178](https://hibernate.atlassian.net/browse/HSEARCH-178) - Out of transaction work causes collection lazy loading to throw AssertionFailure
+* [HSEARCH-332](https://hibernate.atlassian.net/browse/HSEARCH-332) - documentation errors: org.hibernate.Query  should be  javax.persistence.Query
+* [HSEARCH-353](https://hibernate.atlassian.net/browse/HSEARCH-353) - removing an entity and adding another with same PK  (in same TX) will not add second entity to index
+* [HSEARCH-355](https://hibernate.atlassian.net/browse/HSEARCH-355) - FilterOptimizationHelper was improperly using method overloading
+* [HSEARCH-357](https://hibernate.atlassian.net/browse/HSEARCH-357) - IdBridge being applied on null entity during purgeAll()
+* [HSEARCH-366](https://hibernate.atlassian.net/browse/HSEARCH-366) - typo in Discriminator.getAnanyzerDefinitionName()
+* [HSEARCH-367](https://hibernate.atlassian.net/browse/HSEARCH-367) - Support only one kind of Similarity per index
+* [HSEARCH-380](https://hibernate.atlassian.net/browse/HSEARCH-380) - Duplicate classes from Maven transitive dependencies (incompatible version of solr-lucene-core)
+* [HSEARCH-391](https://hibernate.atlassian.net/browse/HSEARCH-391) - Two-Level embedded objects don't get an index update
+* [HSEARCH-394](https://hibernate.atlassian.net/browse/HSEARCH-394) - @ProvidedId gets ignored
+* [HSEARCH-398](https://hibernate.atlassian.net/browse/HSEARCH-398) - NPE when named FullTextFilter is disabled without being enabled first
+* [HSEARCH-418](https://hibernate.atlassian.net/browse/HSEARCH-418) - ProvidedIdTest fails
+
+### Deprecation
+* [HSEARCH-201](https://hibernate.atlassian.net/browse/HSEARCH-201) - IndexWriter settings meant for transactional operations won't be inherited by the settings meant for batch operations
+
+### Improvement
+* [HSEARCH-246](https://hibernate.atlassian.net/browse/HSEARCH-246) - Run optimize at the end of the transaction even if flushToIndexes() is used
+* [HSEARCH-284](https://hibernate.atlassian.net/browse/HSEARCH-284) - Be able to configure a LockFactory
+* [HSEARCH-301](https://hibernate.atlassian.net/browse/HSEARCH-301) - Refactor JMSMasterTest and JMSSlaveTest
+* [HSEARCH-327](https://hibernate.atlassian.net/browse/HSEARCH-327) - Capability to reuse IndexWriter instances across transactions
+* [HSEARCH-328](https://hibernate.atlassian.net/browse/HSEARCH-328) - Add a builtin bridge for Calendar (Amin Mohammed-Coleman)
+* [HSEARCH-358](https://hibernate.atlassian.net/browse/HSEARCH-358) - @ClassBridge.impl is no longer defaulted
+* [HSEARCH-365](https://hibernate.atlassian.net/browse/HSEARCH-365) - Update pom.xml to include database profiles for QA Lab
+* [HSEARCH-369](https://hibernate.atlassian.net/browse/HSEARCH-369) - typos in documentation
+* [HSEARCH-384](https://hibernate.atlassian.net/browse/HSEARCH-384) - improve error messages for loading plugins and add consistency to the performed checks
+* [HSEARCH-404](https://hibernate.atlassian.net/browse/HSEARCH-404) - Update database profiles in pom.xml
+
+### New Feature
+* [HSEARCH-218](https://hibernate.atlassian.net/browse/HSEARCH-218) - add indexAll( Class type ) to rebuild indexes from all data
+* [HSEARCH-251](https://hibernate.atlassian.net/browse/HSEARCH-251) - Query on a shard subset based on a filter activation (Chase Seibert)
+* [HSEARCH-324](https://hibernate.atlassian.net/browse/HSEARCH-324) - @DynamicBoost(BoostStrategy.class)
+* [HSEARCH-334](https://hibernate.atlassian.net/browse/HSEARCH-334) - Create a builtin bridge for Character
+* [HSEARCH-345](https://hibernate.atlassian.net/browse/HSEARCH-345) - Use any custom LockFactory
+* [HSEARCH-347](https://hibernate.atlassian.net/browse/HSEARCH-347) - Adding a blackhole backend
+* [HSEARCH-392](https://hibernate.atlassian.net/browse/HSEARCH-392) - Provide a JGroups based backend
+
+
+### Task
+* [HSEARCH-82](https://hibernate.atlassian.net/browse/HSEARCH-82) - Migrate from ant  to maven2
+* [HSEARCH-326](https://hibernate.atlassian.net/browse/HSEARCH-326) - Drop support for IndexReader usage to update indexes.
+* [HSEARCH-348](https://hibernate.atlassian.net/browse/HSEARCH-348) - Upgrade to Lucene 2.4.1
+* [HSEARCH-359](https://hibernate.atlassian.net/browse/HSEARCH-359) - Fix usage of deprecated Hibernate commons-annotations methods
+* [HSEARCH-375](https://hibernate.atlassian.net/browse/HSEARCH-375) - Create pot files in order to allow translation of documentation
+* [HSEARCH-403](https://hibernate.atlassian.net/browse/HSEARCH-403) - Fix copyright notice and end-of-line terminators in source code
+* [HSEARCH-409](https://hibernate.atlassian.net/browse/HSEARCH-409) - Write documentation for JGroups based configuration (Lukasz Moren)
+* [HSEARCH-413](https://hibernate.atlassian.net/browse/HSEARCH-413) - Document all new features
+* [HSEARCH-419](https://hibernate.atlassian.net/browse/HSEARCH-419) - Create a proper @ProvidedId test
+* [HSEARCH-423](https://hibernate.atlassian.net/browse/HSEARCH-423) - Migrate to Hibernate Core 3.5 beta2 and JPA 2.0 CR1
+* [HSEARCH-426](https://hibernate.atlassian.net/browse/HSEARCH-426) - Update archetype sources 
+
+
+## 3.1.1.GA (28-05-2009)
+
+### Bug
+* [HSEARCH-178](https://hibernate.atlassian.net/browse/HSEARCH-178) - Out of transaction work causes collection lazy loading to throw AssertionFailure
+* [HSEARCH-310](https://hibernate.atlassian.net/browse/HSEARCH-310) - Out of Memory on ScrollableResults
+* [HSEARCH-325](https://hibernate.atlassian.net/browse/HSEARCH-325) - FullTextQuery.iterate() skips last result.
+* [HSEARCH-330](https://hibernate.atlassian.net/browse/HSEARCH-330) - NegativeArraySizeException if you use FullTextQuery.setMaxResults(Integer.MAX_VALUE)
+* [HSEARCH-338](https://hibernate.atlassian.net/browse/HSEARCH-338) - ScrollableResults initial position not coherent to core Hibernate
+* [HSEARCH-339](https://hibernate.atlassian.net/browse/HSEARCH-339) - ScrollableResults may return unmanaged entities from it's own cache
+* [HSEARCH-342](https://hibernate.atlassian.net/browse/HSEARCH-342) - Delete on unindexed entities referenced by indexed entities with ContainedIn annotation failed
+* [HSEARCH-355](https://hibernate.atlassian.net/browse/HSEARCH-355) - FilterOptimizationHelper was improperly using method overloading
+* [HSEARCH-357](https://hibernate.atlassian.net/browse/HSEARCH-357) - IdBridge being applied on null entity during purgeAll()
+* [HSEARCH-360](https://hibernate.atlassian.net/browse/HSEARCH-360) - Hibernate Search 3.1.0GA Bugs after HSEARCH-160
+
+
+### Improvement
+* [HSEARCH-340](https://hibernate.atlassian.net/browse/HSEARCH-340) - ScrollableResults exploits batch loading for backwards and random order scrolling
+* [HSEARCH-369](https://hibernate.atlassian.net/browse/HSEARCH-369) - typos in documentation
+
+
+### Task
+* [HSEARCH-348](https://hibernate.atlassian.net/browse/HSEARCH-348) - Upgrade to Lucene 2.4.1
+
+
+## 3.1.0.GA (4-12-2008)
+
+### Bug
+* [HSEARCH-233](https://hibernate.atlassian.net/browse/HSEARCH-233) - EntityNotFoundException during indexing
+* [HSEARCH-280](https://hibernate.atlassian.net/browse/HSEARCH-280) - Make FSSlaveAndMasterDPTest pass against postgresql
+* [HSEARCH-297](https://hibernate.atlassian.net/browse/HSEARCH-297) - Allow PatternTokenizerFactory to be used
+* [HSEARCH-309](https://hibernate.atlassian.net/browse/HSEARCH-309) - PurgeAllLuceneWork duplicates in work queue
+
+### Improvement
+* [HSEARCH-221](https://hibernate.atlassian.net/browse/HSEARCH-221) - Get Lucene Analyzer runtime (indexing)
+* [HSEARCH-265](https://hibernate.atlassian.net/browse/HSEARCH-265) - Raise warnings when an abstract class is marked @Indexed
+* [HSEARCH-285](https://hibernate.atlassian.net/browse/HSEARCH-285) - Refactor DocumentBuilder to support containedIn only and regular Indexed entities
+* [HSEARCH-298](https://hibernate.atlassian.net/browse/HSEARCH-298) - Warn for dangerous IndexWriter settings
+* [HSEARCH-299](https://hibernate.atlassian.net/browse/HSEARCH-299) - Use of faster Bit operations when possible to chain Filters
+* [HSEARCH-302](https://hibernate.atlassian.net/browse/HSEARCH-302) - Utilize pagination settings when retrieving TopDocs from the Lucene query to only retrieve required TopDocs
+* [HSEARCH-308](https://hibernate.atlassian.net/browse/HSEARCH-308) - getResultSize() implementation should not load documents
+* [HSEARCH-311](https://hibernate.atlassian.net/browse/HSEARCH-311) - Add a close() method to BackendQueueProcessorFactory
+* [HSEARCH-312](https://hibernate.atlassian.net/browse/HSEARCH-312) - Rename hibernate.search.filter.cache_bit_results.size to hibernate.search.filter.cache_docidresults.size
+
+### New Feature
+* [HSEARCH-160](https://hibernate.atlassian.net/browse/HSEARCH-160) - Truly polymorphic queries
+* [HSEARCH-268](https://hibernate.atlassian.net/browse/HSEARCH-268) - Apply changes to different indexes in parallel
+* [HSEARCH-296](https://hibernate.atlassian.net/browse/HSEARCH-296) - Expose managed entity class via a Projection constant
+
+### Task
+* [HSEARCH-303](https://hibernate.atlassian.net/browse/HSEARCH-303) - Review reference documentation
+
+
+## 3.1.0.CR1 (17-10-2008)
+
+### Bug
+* [HSEARCH-250](https://hibernate.atlassian.net/browse/HSEARCH-250) - In ReaderStrategies, ensure that the reader is current AND that the directory returned by the DirectoryProvider are the same
+* [HSEARCH-293](https://hibernate.atlassian.net/browse/HSEARCH-293) - AddLuceneWork is not being removed from the queue when DeleteLuceneWork is added for the same entity
+* [HSEARCH-300](https://hibernate.atlassian.net/browse/HSEARCH-300) - Fix documentation on use_compound_file
+
+### Improvement
+* [HSEARCH-213](https://hibernate.atlassian.net/browse/HSEARCH-213) - Use FieldSelector and doc(int, fieldSelector) to only select the necessary fields
+* [HSEARCH-224](https://hibernate.atlassian.net/browse/HSEARCH-224) - Use MultiClassesQueryLoader in ProjectionLoader
+* [HSEARCH-255](https://hibernate.atlassian.net/browse/HSEARCH-255) - Create a extensive Analyzer testing suite
+* [HSEARCH-266](https://hibernate.atlassian.net/browse/HSEARCH-266) - Do not switch to the current directory in FSSlaveDirectoryProvider if no file has been copied
+* [HSEARCH-274](https://hibernate.atlassian.net/browse/HSEARCH-274) - Use Lucene's new readonly IndexReader
+* [HSEARCH-281](https://hibernate.atlassian.net/browse/HSEARCH-281) - Work should be Work<T>
+* [HSEARCH-283](https://hibernate.atlassian.net/browse/HSEARCH-283) - Replace deprecated Classes and methods calls to Lucene 2.4
+
+### New Feature
+* [HSEARCH-104](https://hibernate.atlassian.net/browse/HSEARCH-104) - Make @DocumentId optional and rely on @Id
+* [HSEARCH-290](https://hibernate.atlassian.net/browse/HSEARCH-290) - Use IndexReader = readonly on Reader strategies (see Lucene 2.4)
+* [HSEARCH-294](https://hibernate.atlassian.net/browse/HSEARCH-294) - Rename INSTANCE_AND_BITSETRESULTS to INSTANCE_AND_DOCIDSETRESULTS
+
+### Task
+* [HSEARCH-288](https://hibernate.atlassian.net/browse/HSEARCH-288) - Evaluate changes in Lucene 2.4.0
+* [HSEARCH-289](https://hibernate.atlassian.net/browse/HSEARCH-289) - Move to new Lucene Filter DocIdSet
+* [HSEARCH-291](https://hibernate.atlassian.net/browse/HSEARCH-291) - improve documentation about thread safety requirements of Bridges.
+    
+
+## 3.1.0.Beta2 (27-10-2008)
+
+### Bug
+* [HSEARCH-142](https://hibernate.atlassian.net/browse/HSEARCH-142) - Modifications on objects indexed via @IndexedEmbedded not updated when not annotated @Indexed
+* [HSEARCH-162](https://hibernate.atlassian.net/browse/HSEARCH-162) - NPE on queries when no entity is marked as @Indexed
+* [HSEARCH-222](https://hibernate.atlassian.net/browse/HSEARCH-222) - Entities not found during concurrent update
+* [HSEARCH-225](https://hibernate.atlassian.net/browse/HSEARCH-225) - Avoid using IndexReader.deleteDocument when index is not shared amongst several entity types
+* [HSEARCH-232](https://hibernate.atlassian.net/browse/HSEARCH-232) - Using SnowballPorterFilterFactory throws NoClassDefFoundError
+* [HSEARCH-237](https://hibernate.atlassian.net/browse/HSEARCH-237) - IdHashShardingStrategy fails on IDs having negative hashcode
+* [HSEARCH-241](https://hibernate.atlassian.net/browse/HSEARCH-241) - initialize methods taking Properties cannot list available properties
+* [HSEARCH-247](https://hibernate.atlassian.net/browse/HSEARCH-247) - Hibernate Search cannot run without apache-solr-analyzer.jar
+* [HSEARCH-253](https://hibernate.atlassian.net/browse/HSEARCH-253) - Inconsistent detection of EventListeners during autoregistration into Hibernate listeners
+* [HSEARCH-257](https://hibernate.atlassian.net/browse/HSEARCH-257) - Ignore delete operation when Core does update then delete on the same entity
+* [HSEARCH-259](https://hibernate.atlassian.net/browse/HSEARCH-259) - Filter were not isolated by name in the cache
+* [HSEARCH-262](https://hibernate.atlassian.net/browse/HSEARCH-262) - fullTextSession.purgeAll(Class<?>) does not consider subclasses
+* [HSEARCH-263](https://hibernate.atlassian.net/browse/HSEARCH-263) - Wrong analyzers used in IndexWriter
+* [HSEARCH-267](https://hibernate.atlassian.net/browse/HSEARCH-267) - Inheritance of annotations and analyzer
+* [HSEARCH-271](https://hibernate.atlassian.net/browse/HSEARCH-271) - wrong Similarity used when sharing index among entities
+* [HSEARCH-287](https://hibernate.atlassian.net/browse/HSEARCH-287) - master.xml is mistakenly copied to the distribution
+
+### Deprecation
+* [HSEARCH-279](https://hibernate.atlassian.net/browse/HSEARCH-279) - deprecate SharedReaderProvider replaced by SharingBufferReaderProvider as default ReaderProvider
+
+### Improvement
+* [HSEARCH-145](https://hibernate.atlassian.net/browse/HSEARCH-145) - Document a configuration property
+* [HSEARCH-226](https://hibernate.atlassian.net/browse/HSEARCH-226) - Use Lucene ability to delete by query in IndexWriter
+* [HSEARCH-240](https://hibernate.atlassian.net/browse/HSEARCH-240) - Generify the IndexShardingStrategy
+* [HSEARCH-245](https://hibernate.atlassian.net/browse/HSEARCH-245) - Add ReaderStratregy.destroy() method
+* [HSEARCH-256](https://hibernate.atlassian.net/browse/HSEARCH-256) - Remove CacheBitResults.YES
+* [HSEARCH-260](https://hibernate.atlassian.net/browse/HSEARCH-260) - Simplify the Filter Caching definition: cache=FilterCacheModeType.[MODE]
+* [HSEARCH-272](https://hibernate.atlassian.net/browse/HSEARCH-272) - Improve contention on DirectoryProviders in lucene backend
+* [HSEARCH-273](https://hibernate.atlassian.net/browse/HSEARCH-273) - Make LuceneOptions an interface
+* [HSEARCH-282](https://hibernate.atlassian.net/browse/HSEARCH-282) - Make the API more Generics friendly
+
+### New Feature
+* [HSEARCH-170](https://hibernate.atlassian.net/browse/HSEARCH-170) - Support @Boost in @Field
+* [HSEARCH-235](https://hibernate.atlassian.net/browse/HSEARCH-235) - provide a destroy() method in ReaderProvider
+* [HSEARCH-252](https://hibernate.atlassian.net/browse/HSEARCH-252) - Document Solr integration
+* [HSEARCH-258](https://hibernate.atlassian.net/browse/HSEARCH-258) - Add configuration option for Lucene's UseCompoundFile
+
+### Patch
+* [HSEARCH-20](https://hibernate.atlassian.net/browse/HSEARCH-20) - Lucene extensions
+
+### Task
+* [HSEARCH-231](https://hibernate.atlassian.net/browse/HSEARCH-231) - Update the getting started guide with Solr analyzers
+* [HSEARCH-236](https://hibernate.atlassian.net/browse/HSEARCH-236) - Find whether or not indexWriter.optimize() requires an index lock
+* [HSEARCH-244](https://hibernate.atlassian.net/browse/HSEARCH-244) - Abiltiy to ask SearchFactory for the scoped analyzer of a given class
+* [HSEARCH-254](https://hibernate.atlassian.net/browse/HSEARCH-254) - Migrate to Solr 1.3
+* [HSEARCH-276](https://hibernate.atlassian.net/browse/HSEARCH-276) - upgrade to Lucene 2.4
+* [HSEARCH-286](https://hibernate.atlassian.net/browse/HSEARCH-286) - Align to GA versions of all dependencies
+* [HSEARCH-292](https://hibernate.atlassian.net/browse/HSEARCH-292) - Document the new Filter caching approach
+
+
+## 3.1.0.Beta1 (17-07-2008)
+
+### Bug
+* [HSEARCH-166](https://hibernate.atlassian.net/browse/HSEARCH-166) - documentation error : hibernate.search.worker.batch_size vs hibernate.worker.batch_size
+* [HSEARCH-171](https://hibernate.atlassian.net/browse/HSEARCH-171) - Do not log missing objects when using QueryLoader
+* [HSEARCH-173](https://hibernate.atlassian.net/browse/HSEARCH-173) - CachingWrapperFilter loses its WeakReference making filter caching inefficient
+* [HSEARCH-194](https://hibernate.atlassian.net/browse/HSEARCH-194) - Inconsistent performance between hibernate search and pure lucene access
+* [HSEARCH-196](https://hibernate.atlassian.net/browse/HSEARCH-196) - ObjectNotFoundException not caught in FullTextSession
+* [HSEARCH-198](https://hibernate.atlassian.net/browse/HSEARCH-198) - Documentation out of sync with implemented/released features
+* [HSEARCH-203](https://hibernate.atlassian.net/browse/HSEARCH-203) - Counter of index modification operations not always incremented
+* [HSEARCH-204](https://hibernate.atlassian.net/browse/HSEARCH-204) - Improper calls to Session during a projection not involving THIS
+* [HSEARCH-205](https://hibernate.atlassian.net/browse/HSEARCH-205) - Out of Memory on copy of large indexes
+* [HSEARCH-217](https://hibernate.atlassian.net/browse/HSEARCH-217) - Proper errors on parsing of all numeric configuration parameters
+* [HSEARCH-227](https://hibernate.atlassian.net/browse/HSEARCH-227) - Criteria based fetching is not used when objects are loaded one by one (iterate())
+
+### Improvement
+* [HSEARCH-19](https://hibernate.atlassian.net/browse/HSEARCH-19) - Do not filter classes on queries when we know that all Directories only contains the targeted classes
+* [HSEARCH-156](https://hibernate.atlassian.net/browse/HSEARCH-156) - Retrofit FieldBridge.set lucene parameters into a LuceneOptions class
+* [HSEARCH-157](https://hibernate.atlassian.net/browse/HSEARCH-157) - Make explicit in FAQ and doc that query.list() followed by query.getResultSize() triggers only one query
+* [HSEARCH-163](https://hibernate.atlassian.net/browse/HSEARCH-163) - Enhance error messages when @FieldBridge is wrongly used (no impl or impl not implementing the right interfaces)
+* [HSEARCH-176](https://hibernate.atlassian.net/browse/HSEARCH-176) - Permits alignment properties to lucene default (Sanne Grinovero)
+* [HSEARCH-179](https://hibernate.atlassian.net/browse/HSEARCH-179) - Documentation should be explicit that @FulltextFilter filters every object, regardless which object is annotated
+* [HSEARCH-181](https://hibernate.atlassian.net/browse/HSEARCH-181) - Better management of file-based index directories (Sanne Grinovero)
+* [HSEARCH-189](https://hibernate.atlassian.net/browse/HSEARCH-189) - Thread management improvements for Master/Slave DirectoryProviders
+* [HSEARCH-197](https://hibernate.atlassian.net/browse/HSEARCH-197) - Move to slf4j
+* [HSEARCH-199](https://hibernate.atlassian.net/browse/HSEARCH-199) - Property close Search resources on SessionFactory.close()
+* [HSEARCH-202](https://hibernate.atlassian.net/browse/HSEARCH-202) - Avoid many maps lookup in Workspace
+* [HSEARCH-207](https://hibernate.atlassian.net/browse/HSEARCH-207) - Make DateBridge TwoWay to facilitate projection
+* [HSEARCH-208](https://hibernate.atlassian.net/browse/HSEARCH-208) - Raise exception on index and purge when the entity is not an indexed entity
+* [HSEARCH-209](https://hibernate.atlassian.net/browse/HSEARCH-209) - merge FullTextIndexCollectionEventListener into FullTextIndexEventListener
+* [HSEARCH-215](https://hibernate.atlassian.net/browse/HSEARCH-215) - Rename Search.createFTS to Search.getFTS deprecating the old method
+* [HSEARCH-223](https://hibernate.atlassian.net/browse/HSEARCH-223) - Use multiple criteria queries rather than ObjectLoader in most cases
+* [HSEARCH-230](https://hibernate.atlassian.net/browse/HSEARCH-230) - Ensure initialization safety in a multi-core machine
+
+### New Feature
+* [HSEARCH-133](https://hibernate.atlassian.net/browse/HSEARCH-133) - Allow overriding DefaultSimilarity for indexing and searching (Nick Vincent)
+* [HSEARCH-141](https://hibernate.atlassian.net/browse/HSEARCH-141) - Allow term position information to be stored in an index
+* [HSEARCH-153](https://hibernate.atlassian.net/browse/HSEARCH-153) - Provide the possibility to configure writer.setRAMBufferSizeMB()  (Lucene 2.3)
+* [HSEARCH-154](https://hibernate.atlassian.net/browse/HSEARCH-154) - Provide a facility to access Lucene query explanations
+* [HSEARCH-164](https://hibernate.atlassian.net/browse/HSEARCH-164) - Built-in bridge to index java.lang.Class
+* [HSEARCH-165](https://hibernate.atlassian.net/browse/HSEARCH-165) - URI and URL built-in bridges
+* [HSEARCH-174](https://hibernate.atlassian.net/browse/HSEARCH-174) - Improve transparent filter caching by wrapping filters into our own CachingWrapperFilter
+* [HSEARCH-186](https://hibernate.atlassian.net/browse/HSEARCH-186) - Enhance analyzer to support the Solr model
+* [HSEARCH-190](https://hibernate.atlassian.net/browse/HSEARCH-190) - Add pom
+* [HSEARCH-191](https://hibernate.atlassian.net/browse/HSEARCH-191) - Make build independent of Hibernate Core structure
+* [HSEARCH-192](https://hibernate.atlassian.net/browse/HSEARCH-192) - Move to Hibernate Core 3.3
+* [HSEARCH-193](https://hibernate.atlassian.net/browse/HSEARCH-193) - Use dependency on Solr-analyzer JAR rather than the full Solr JAR
+* [HSEARCH-195](https://hibernate.atlassian.net/browse/HSEARCH-195) - Expose Analyzers instance by name: searchFactory.getAnalyzer(String)
+* [HSEARCH-200](https://hibernate.atlassian.net/browse/HSEARCH-200) - Expose IndexWriter setting MAX_FIELD_LENGTH via IndexWriterSetting
+* [HSEARCH-212](https://hibernate.atlassian.net/browse/HSEARCH-212) - Added ReaderProvider strategy reusing unchanged segments (using reader.reopen())
+* [HSEARCH-220](https://hibernate.atlassian.net/browse/HSEARCH-220) - introduce session.flushToIndexes API and deprecate batch_size
+
+### Task
+* [HSEARCH-169](https://hibernate.atlassian.net/browse/HSEARCH-169) - Migrate to Lucene 2.3.1 (index corruption possiblity in 2.3.0)
+* [HSEARCH-187](https://hibernate.atlassian.net/browse/HSEARCH-187) - Clarify which directories need read-write access, verify readonly behaviour on others.
+* [HSEARCH-214](https://hibernate.atlassian.net/browse/HSEARCH-214) - Upgrade Lucene to 2.3.2
+* [HSEARCH-229](https://hibernate.atlassian.net/browse/HSEARCH-229) - Deprecate FullTextQuery.BOOST
+
+
+## 3.0.1.GA (20-02-2008)
+
+### Bug
+* [HSEARCH-56](https://hibernate.atlassian.net/browse/HSEARCH-56) - Updating a collection does not reindex
+* [HSEARCH-123](https://hibernate.atlassian.net/browse/HSEARCH-123) - Use mkdirs instead of mkdir to create necessary parent directory in the DirectoryProviderHelper
+* [HSEARCH-128](https://hibernate.atlassian.net/browse/HSEARCH-128) - Indexing embedded children's child
+* [HSEARCH-136](https://hibernate.atlassian.net/browse/HSEARCH-136) - CachingWrapperFilter does not cache
+* [HSEARCH-137](https://hibernate.atlassian.net/browse/HSEARCH-137) - Wrong class name in Exception when a FieldBridge does not implement TwoWayFieldBridge for a document id property
+* [HSEARCH-138](https://hibernate.atlassian.net/browse/HSEARCH-138) - JNDI Property names have first character cut off
+* [HSEARCH-140](https://hibernate.atlassian.net/browse/HSEARCH-140) - @IndexedEmbedded default depth is effectively 1 due to integer overflow
+* [HSEARCH-146](https://hibernate.atlassian.net/browse/HSEARCH-146) - ObjectLoader doesn't catch javax.persistence.EntityNotFoundException
+* [HSEARCH-149](https://hibernate.atlassian.net/browse/HSEARCH-149) - Default FieldBridge for enums passing wrong class to EnumBridge constructor
+
+
+### Improvement
+* [HSEARCH-125](https://hibernate.atlassian.net/browse/HSEARCH-125) - Add support for fields declared by interface or unmapped superclass
+* [HSEARCH-127](https://hibernate.atlassian.net/browse/HSEARCH-127) - Wrong prefix for worker configurations
+* [HSEARCH-129](https://hibernate.atlassian.net/browse/HSEARCH-129) - IndexedEmbedded for Collections Documentation
+* [HSEARCH-130](https://hibernate.atlassian.net/browse/HSEARCH-130) - Should provide better log infos (on the indexBase parameter for the FSDirectoryProvider)
+* [HSEARCH-144](https://hibernate.atlassian.net/browse/HSEARCH-144) - Keep indexer running till finished on VM shutdown
+* [HSEARCH-147](https://hibernate.atlassian.net/browse/HSEARCH-147) - Allow projection of Lucene DocId
+
+### New Feature
+* [HSEARCH-114](https://hibernate.atlassian.net/browse/HSEARCH-114) - Introduce ResultTransformer to the query API
+* [HSEARCH-150](https://hibernate.atlassian.net/browse/HSEARCH-150) - Migrate to Lucene 2.3
+
+### Patch
+* [HSEARCH-126](https://hibernate.atlassian.net/browse/HSEARCH-126) - Better diagnostic when Search index directory cannot be opened (Ian)
+
+
+## 3.0.0.GA (23-09-2007)
+
+### Bug
+* [HSEARCH-116](https://hibernate.atlassian.net/browse/HSEARCH-116) - FullTextEntityManager acessing getDelegate() in the constructor leads to NPE in JBoss AS + Seam
+* [HSEARCH-117](https://hibernate.atlassian.net/browse/HSEARCH-117) - FullTextEntityManagerImpl and others should implement Serializable
+
+### Deprecation
+* [HSEARCH-122](https://hibernate.atlassian.net/browse/HSEARCH-122) - Remove query.setIndexProjection (replaced by query.setProjection)
+
+### Improvement
+* [HSEARCH-118](https://hibernate.atlassian.net/browse/HSEARCH-118) - Add ClassBridges (plural) functionality
+
+### New Feature
+* [HSEARCH-81](https://hibernate.atlassian.net/browse/HSEARCH-81) - Create a @ClassBridge Annotation (John Griffin)
+
+### Task
+* [HSEARCH-98](https://hibernate.atlassian.net/browse/HSEARCH-98) - Add a Getting started section to the reference documentation
+
+
+## 3.0.0.CR1 (4-09-2007)
+
+### Bug
+* [HSEARCH-108](https://hibernate.atlassian.net/browse/HSEARCH-108) - id of embedded object is not indexed when using @IndexedEmbedded
+* [HSEARCH-109](https://hibernate.atlassian.net/browse/HSEARCH-109) - Lazy loaded entity could not be indexed
+* [HSEARCH-110](https://hibernate.atlassian.net/browse/HSEARCH-110) - ScrollableResults does not obey out of bounds rules (John Griffin)
+* [HSEARCH-112](https://hibernate.atlassian.net/browse/HSEARCH-112) - Unkown @FullTextFilter  when attempting to associate a filter
+
+### Deprecation
+* [HSEARCH-113](https://hibernate.atlassian.net/browse/HSEARCH-113) - Remove @Text, @Keyword and @Unstored (old mapping annotations)
+
+### Improvement
+* [HSEARCH-107](https://hibernate.atlassian.net/browse/HSEARCH-107) - DirectoryProvider should have a start() method
+
+### New Feature
+* [HSEARCH-14](https://hibernate.atlassian.net/browse/HSEARCH-14) - introduce fetch_size for Hibernate Search scrollable resultsets (John Griffin)
+* [HSEARCH-69](https://hibernate.atlassian.net/browse/HSEARCH-69) - Ability to purge an index by class (John Griffin)
+* [HSEARCH-111](https://hibernate.atlassian.net/browse/HSEARCH-111) - Ability to disable event based indexing (for read only or batch based indexing)
+
+
+## 3.0.0.Beta4 (1-08-2007)
+
+### Bug
+* [HSEARCH-88](https://hibernate.atlassian.net/browse/HSEARCH-88) - Unable to update 2 entity types in the same transaction if they share the same index
+* [HSEARCH-90](https://hibernate.atlassian.net/browse/HSEARCH-90) - Use of setFirstResult / setMaxResults can lead to a list with negative capacity (John Griffin)
+* [HSEARCH-92](https://hibernate.atlassian.net/browse/HSEARCH-92) - NPE for null fields on projection
+* [HSEARCH-99](https://hibernate.atlassian.net/browse/HSEARCH-99) - Avoid returning non initialized proxies in scroll() and iterate() (loader.load(EntityInfo))
+
+
+### Improvement
+* [HSEARCH-79](https://hibernate.atlassian.net/browse/HSEARCH-79) - Recommend to use FlushMode.APPLICATION on massive indexing
+* [HSEARCH-84](https://hibernate.atlassian.net/browse/HSEARCH-84) - Migrate to Lucene 2.2
+* [HSEARCH-91](https://hibernate.atlassian.net/browse/HSEARCH-91) - Avoid wrapping a Session object if the Session is already FullTextSession
+* [HSEARCH-100](https://hibernate.atlassian.net/browse/HSEARCH-100) - Rename fullTextSession.setIndexProjection() to fullTextSession.setProjection()
+* [HSEARCH-102](https://hibernate.atlassian.net/browse/HSEARCH-102) - Default index operation in @Field to TOKENIZED
+* [HSEARCH-106](https://hibernate.atlassian.net/browse/HSEARCH-106) - Use the shared reader strategy as the default strategy
+
+### New Feature
+* [HSEARCH-6](https://hibernate.atlassian.net/browse/HSEARCH-6) - Provide access to the Hit.getScore() and potentially the Document on a query
+* [HSEARCH-15](https://hibernate.atlassian.net/browse/HSEARCH-15) - Notion of Filtered Lucene queries (Hardy Ferentschik)
+* [HSEARCH-41](https://hibernate.atlassian.net/browse/HSEARCH-41) - Allow fine grained analyzers (Entity, attribute, @Field)
+* [HSEARCH-45](https://hibernate.atlassian.net/browse/HSEARCH-45) - Support @Fields() for multiple indexing per property (useful for sorting)
+* [HSEARCH-58](https://hibernate.atlassian.net/browse/HSEARCH-58) - Support named Filters (and caching)
+* [HSEARCH-67](https://hibernate.atlassian.net/browse/HSEARCH-67) - Expose mergeFactor, maxMergeDocs and minMergeDocs (Hardy Ferentschik)
+* [HSEARCH-73](https://hibernate.atlassian.net/browse/HSEARCH-73) - IncrementalOptimizerStrategy triggered on transactions or operations limits
+* [HSEARCH-74](https://hibernate.atlassian.net/browse/HSEARCH-74) - Ability to project Lucene meta information (Score, Boost, Document, Id, This) (John Griffin)
+* [HSEARCH-83](https://hibernate.atlassian.net/browse/HSEARCH-83) - Introduce OptimizerStrategy
+* [HSEARCH-86](https://hibernate.atlassian.net/browse/HSEARCH-86) - Index sharding: multiple Lucene indexes per entity type
+* [HSEARCH-89](https://hibernate.atlassian.net/browse/HSEARCH-89) - FullText wrapper for JPA APIs
+* [HSEARCH-103](https://hibernate.atlassian.net/browse/HSEARCH-103) - Ability to override the indexName in the FSDirectoryProviders family
+
+### Task
+* [HSEARCH-94](https://hibernate.atlassian.net/browse/HSEARCH-94) - Deprecate ContextHelper
+
+
+## 3.0.0.Beta3 (6-06-2007)
+
+### Bug
+* [HSEARCH-64](https://hibernate.atlassian.net/browse/HSEARCH-64) - Exception Thrown If Index Directory Does Not Exist
+* [HSEARCH-66](https://hibernate.atlassian.net/browse/HSEARCH-66) - Some results not returned in some circumstances (Brandon Munroe)
+
+
+### Improvement
+* [HSEARCH-60](https://hibernate.atlassian.net/browse/HSEARCH-60) - Introduce SearchFactory / SearchFactoryImpl
+* [HSEARCH-68](https://hibernate.atlassian.net/browse/HSEARCH-68) - Set index copy threads as daemon
+* [HSEARCH-70](https://hibernate.atlassian.net/browse/HSEARCH-70) - Create the index base directory if it does not exists
+
+### New Feature
+* [HSEARCH-11](https://hibernate.atlassian.net/browse/HSEARCH-11) - Provide access to IndexWriter.optimize()
+* [HSEARCH-33](https://hibernate.atlassian.net/browse/HSEARCH-33) - hibernate.search.worker.batch_size to prevent OutOfMemoryException while inserting many objects
+* [HSEARCH-71](https://hibernate.atlassian.net/browse/HSEARCH-71) - Provide fullTextSession.getSearchFactory()
+* [HSEARCH-72](https://hibernate.atlassian.net/browse/HSEARCH-72) - searchFactory.optimize() and searchFactory.optimize(Class) (Andrew Hahn)
+
+
+## 3.0.0.Beta2 (31-05-2007)
+
+### Bug
+* [HSEARCH-37](https://hibernate.atlassian.net/browse/HSEARCH-37) - Verify that Serializable return type are not resolved by StringBridge built in type
+* [HSEARCH-39](https://hibernate.atlassian.net/browse/HSEARCH-39) - event listener declaration example is wrong
+* [HSEARCH-44](https://hibernate.atlassian.net/browse/HSEARCH-44) - Build the Lucene Document in the beforeComplete transaction phase
+* [HSEARCH-50](https://hibernate.atlassian.net/browse/HSEARCH-50) - Null Booleans lead to NPE
+* [HSEARCH-59](https://hibernate.atlassian.net/browse/HSEARCH-59) - Unable to index @indexEmbedded object through session.index when object is lazy and field access is used in object
+
+
+### Improvement
+* [HSEARCH-36](https://hibernate.atlassian.net/browse/HSEARCH-36) - Meaningful exception message when Search Listeners are not initialized
+* [HSEARCH-38](https://hibernate.atlassian.net/browse/HSEARCH-38) - Make the @IndexedEmbedded documentation example easier to understand
+* [HSEARCH-51](https://hibernate.atlassian.net/browse/HSEARCH-51) - Optimization: Use a query rather than batch-size to load objects when a single entity (hierarchy) is expected
+* [HSEARCH-63](https://hibernate.atlassian.net/browse/HSEARCH-63) - rename query.resultSize() to getResultSize()
+
+### New Feature
+* [HSEARCH-4](https://hibernate.atlassian.net/browse/HSEARCH-4) - Be able to use a Lucene Sort on queries (Hardy Ferentschik)
+* [HSEARCH-13](https://hibernate.atlassian.net/browse/HSEARCH-13) - Cache IndexReaders per SearchFactory
+* [HSEARCH-40](https://hibernate.atlassian.net/browse/HSEARCH-40) - Be able to embed collections in lucene index (@IndexedEmbeddable in collections)
+* [HSEARCH-43](https://hibernate.atlassian.net/browse/HSEARCH-43) - Expose resultSize and do not load object when only resultSize is retrieved
+* [HSEARCH-52](https://hibernate.atlassian.net/browse/HSEARCH-52) - Ability to load more efficiently an object graph from a lucene query by customizing the fetch modes
+* [HSEARCH-53](https://hibernate.atlassian.net/browse/HSEARCH-53) - Add support for projection (ie read the data from the index only)
+* [HSEARCH-61](https://hibernate.atlassian.net/browse/HSEARCH-61) - Move from MultiSearcher to MultiReader
+* [HSEARCH-62](https://hibernate.atlassian.net/browse/HSEARCH-62) - Support pluggable ReaderProvider strategies
+
+### Task
+* [HSEARCH-65](https://hibernate.atlassian.net/browse/HSEARCH-65) - Update to JBoss Embedded beta2
+
+
+## 3.0.0.Beta1 (19-03-2007)
+
+Initial release as a standalone product (see Hibernate Annotations changelog for previous informations)
+
+
+Release Notes - Hibernate Search - Version 3.0.0.beta1
+
+### Bug
+* [HSEARCH-7](https://hibernate.atlassian.net/browse/HSEARCH-7) - Ignore object found in the index but no longer present in the database (for out of date indexes)
+* [HSEARCH-21](https://hibernate.atlassian.net/browse/HSEARCH-21) - NPE in SearchFactory while using different threads
+* [HSEARCH-22](https://hibernate.atlassian.net/browse/HSEARCH-22) - Enum value Index.UN_TOKENISED is misspelled
+* [HSEARCH-24](https://hibernate.atlassian.net/browse/HSEARCH-24) - Potential deadlock when using multiple DirectoryProviders in a highly concurrent index update
+* [HSEARCH-25](https://hibernate.atlassian.net/browse/HSEARCH-25) - Class cast exception in org.hibernate.search.impl.FullTextSessionImpl<init>(FullTextSessionImpl.java:54)
+* [HSEARCH-28](https://hibernate.atlassian.net/browse/HSEARCH-28) - Wrong indexDir property in Apache Lucene Integration
+
+### Improvement
+* [HSEARCH-29](https://hibernate.atlassian.net/browse/HSEARCH-29) - Share the initialization state across all Search event listeners instance
+* [HSEARCH-30](https://hibernate.atlassian.net/browse/HSEARCH-30) - @FieldBridge now use o.h.s.a.Parameter rather than o.h.a.Parameter
+* [HSEARCH-31](https://hibernate.atlassian.net/browse/HSEARCH-31) - Move to Lucene 2.1.0
+
+### New Feature
+* [HSEARCH-1](https://hibernate.atlassian.net/browse/HSEARCH-1) - Give access to Directory providers
+* [HSEARCH-2](https://hibernate.atlassian.net/browse/HSEARCH-2) - Default FieldBridge for enums (Sylvain Vieujot)
+* [HSEARCH-3](https://hibernate.atlassian.net/browse/HSEARCH-3) - Default FieldBridge for booleans (Sylvain Vieujot)
+* [HSEARCH-9](https://hibernate.atlassian.net/browse/HSEARCH-9) - Introduce a worker factory and its configuration
+* [HSEARCH-16](https://hibernate.atlassian.net/browse/HSEARCH-16) - Cluster capability through JMS
+* [HSEARCH-23](https://hibernate.atlassian.net/browse/HSEARCH-23) - Support asynchronous batch worker queue
+    * [HSEARCH-27] - Ability to index associated / embedded objects
