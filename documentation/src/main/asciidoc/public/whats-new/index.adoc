@@ -37,6 +37,9 @@ Use Hibernate Search query DSL API to work with your query and results.
 [[orm-version]]
 Hibernate ORM::
 Hibernate Search targets the Hibernate ORM 8.0 series.
+[[lucene-version]]
+Lucene::
+The Lucene-next backend is now based on Lucene 10.5.0.
 [[opensearch-version]]
 OpenSearch::
 Hibernate Search is now also compatible with OpenSearch 3.7 as well as with previously compatible versions of OpenSearch.
