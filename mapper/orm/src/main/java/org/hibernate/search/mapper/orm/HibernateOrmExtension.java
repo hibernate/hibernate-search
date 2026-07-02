@@ -67,6 +67,10 @@ public final class HibernateOrmExtension
 	@Override
 	public Optional<HibernateOrmMappingContext> extendOptional(IdentifierBridgeToDocumentIdentifierContext original,
 			BridgeMappingContext mappingContext) {
+		// just need a CI to trigger a full run:
+		if ( original == null ) {
+			throw new IllegalStateException( "context cannot be null." );
+		}
 		return extendToOrmMappingContext( mappingContext );
 	}
 
