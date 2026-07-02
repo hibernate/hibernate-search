@@ -219,6 +219,8 @@ public class PojoIndexingPlanImpl
 		// also disable reindexing of other entities on updates,
 		// so they won't ever call this method.
 
+		checkCanReindexContainingEntities( typeIdentifier );
+
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
 		if ( delegate == null ) {
 			return;
@@ -230,16 +232,25 @@ public class PojoIndexingPlanImpl
 	public void updateBecauseOfContainedAssociation(PojoRawTypeIdentifier<?> typeIdentifier, Object containingEntity,
 			int dirtyAssociationPathOrdinal) {
 		// Note this method won't work when using provided identifiers
-		// or on contained entities that do not define a identifier mapping.
+		// or on contained entities that do not define an identifier mapping.
 		// Fortunately, the only platform making use of this method (Hibernate ORM)
 		// never uses provided identifiers and always defines an identifier mapping,
 		// so this should always work.
+		// Except for a stateless session ...
+
+		checkCanReindexContainingEntities( typeIdentifier );
 
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
 		if ( delegate == null ) {
 			return;
 		}
 		delegate.updateBecauseOfContainedAssociation( containingEntity, dirtyAssociationPathOrdinal );
+	}
+
+	private void checkCanReindexContainingEntities(PojoRawTypeIdentifier<?> containingTypeIdentifier) {
+		if ( !sessionContext.runtimeIntrospector().supportsReindexingContainingEntities() ) {
+			throw IndexingLog.INSTANCE.cannotReindexContainingEntity( containingTypeIdentifier );
+		}
 	}
 
 	@Override
