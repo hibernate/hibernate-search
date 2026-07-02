@@ -135,6 +135,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
 @Field final String DEFAULT_JDK_TOOL = 'OpenJDK 25 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.9'
+@Field final int PARALLEL_MODULE_COUNT = 2
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
@@ -447,6 +448,8 @@ stage('Default build') {
 			String commonMavenArgs = """ \
 					--fail-at-end \
 					-Pcoverage \
+					-Pparallel-tests-jenkins \
+					-T ${PARALLEL_MODULE_COUNT} \
 					${toTestEnvironmentArgs(environments.content.jdk.default)} \
 			"""
 
@@ -1096,6 +1099,8 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	mvn """ \
 			clean install -Pci-build \
 					${toTestEnvironmentArgs(buildEnv)} \
+					-Pparallel-tests-jenkins \
+					-T ${PARALLEL_MODULE_COUNT} \
 					--fail-at-end \
 					$args \
 	"""

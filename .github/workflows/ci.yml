@@ -48,6 +48,7 @@ defaults:
 env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
   TESTCONTAINERS_REUSE_ENABLE: true
+  PARALLEL_MODULE_COUNT: 2
 
 permissions: { } # none, jobs are defining their own if they need any
 
@@ -119,7 +120,8 @@ jobs:
           read -ra mvn_args <<< "$MAVEN_ARGS"
           read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
           ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean install \
-              -Pjqassistant -Pdist -Pci-build -DskipITs
+              -Pjqassistant -Pdist -Pci-build -Pparallel-tests-github -DskipITs \
+              -T "$PARALLEL_MODULE_COUNT"
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
@@ -140,7 +142,8 @@ jobs:
           read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
           read -ra mvn_incremental <<< "$MAVEN_INCREMENTAL_BUILD"
           ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean verify \
-              -Pskip-checks \
+              -Pskip-checks -Pparallel-tests-github \
+              -T "$PARALLEL_MODULE_COUNT" \
               "${mvn_incremental[@]}"
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
