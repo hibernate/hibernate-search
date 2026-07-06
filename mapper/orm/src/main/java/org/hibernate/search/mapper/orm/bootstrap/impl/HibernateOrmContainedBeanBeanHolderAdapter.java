@@ -5,7 +5,6 @@
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import org.hibernate.resource.beans.container.spi.ContainedBean;
-import org.hibernate.resource.beans.container.spi.ContainedBeanImplementor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 
 final class HibernateOrmContainedBeanBeanHolderAdapter<T> implements BeanHolder<T> {
@@ -30,8 +29,6 @@ final class HibernateOrmContainedBeanBeanHolderAdapter<T> implements BeanHolder<
 
 	@Override
 	public void close() {
-		if ( containedBean instanceof ContainedBeanImplementor ) {
-			( (ContainedBeanImplementor<?>) containedBean ).release();
-		}
+		containedBean.release();
 	}
 }

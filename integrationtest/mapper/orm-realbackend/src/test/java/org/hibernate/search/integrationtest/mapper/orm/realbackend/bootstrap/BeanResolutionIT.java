@@ -153,5 +153,13 @@ class BeanResolutionIT {
 		public T getBeanInstance() {
 			return bean;
 		}
+
+		@Override
+		public void initialize() {
+		}
+
+		@Override
+		public void release() {
+		}
 	}
 }
