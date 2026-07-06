@@ -254,7 +254,7 @@ class OutboxPollingCustomEntityMappingIT {
 				"This test only makes sense if the database supports schemas"
 		);
 		assumeTrue(
-				getDialect().canCreateSchema(),
+				getDialect().getNamespaceSupport().canCreateSchema(),
 				"This test only makes sense if the dialect supports creating schemas"
 		);
 
