@@ -135,7 +135,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.26.0</version.log4j>
+        <version.log4j>2.26.1</version.log4j>
         <version.junit-jupiter>6.0.3</version.junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <!-- Make sure to update Ryuk container version in `ryuk.Dockerfile` whenever updating testcontainers to align it with the lib. -->
@@ -163,7 +163,7 @@
 
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.4.240</version.com.h2database>
-        <version.org.postgresql>42.7.12</version.org.postgresql>
+        <version.org.postgresql>42.7.13</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.9</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>9.7.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.5.0</version.com.ibm.db2.jcc>
