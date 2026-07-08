@@ -10,17 +10,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Settings for an Elasticsearch index.
  */
-@JsonAdapter(IndexSettingsJsonAdapterFactory.class)
+@GsonSerializable
 public class IndexSettings {
 
 	public static final String MAX_RESULT_WINDOW_ATTRIBUTE = "max_result_window";
@@ -47,6 +47,13 @@ public class IndexSettings {
 		this.extraAttributes = extraAttributes;
 	}
 
+	public IndexSettings(Analysis analysis, Integer maxResultWindow, Boolean knn, Map<String, JsonElement> extraAttributes) {
+		this.analysis = analysis;
+		this.maxResultWindow = maxResultWindow;
+		this.knn = knn;
+		this.extraAttributes = extraAttributes;
+	}
+
 	public Analysis getAnalysis() {
 		return analysis;
 	}
@@ -57,6 +64,10 @@ public class IndexSettings {
 
 	public Integer getMaxResultWindow() {
 		return maxResultWindow;
+	}
+
+	public void setMaxResultWindow(Integer maxResultWindow) {
+		this.maxResultWindow = maxResultWindow;
 	}
 
 	public Boolean getKnn() {
@@ -71,9 +82,8 @@ public class IndexSettings {
 		return extraAttributes;
 	}
 
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
+		this.extraAttributes = extraAttributes;
 	}
 
 	/**
@@ -143,5 +153,10 @@ public class IndexSettings {
 			newExtraAttributes.remove( key );
 		}
 		return new IndexSettings( analysis, maxResultWindow, newExtraAttributes );
+	}
+
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 }

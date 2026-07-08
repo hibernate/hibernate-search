@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-License-Identifier: Apache-2.0
+    Copyright Red Hat Inc. and Hibernate Authors
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-build</artifactId>
+        <version>9.0.0-SNAPSHOT</version>
+        <relativePath>../parents/build</relativePath>
+    </parent>
+    <artifactId>hibernate-search-build-gson-processor</artifactId>
+
+    <name>Hibernate Search Build - Gson Type Adapter Processor</name>
+    <description>Annotation processor that generates reflection-free Gson TypeAdapter implementations</description>
+
+    <properties>
+        <checkstyle.skip>true</checkstyle.skip>
+        <forbiddenapis.skip>true</forbiddenapis.skip>
+        <format.skip>true</format.skip>
+
+        <deploy.skip>true</deploy.skip>
+        <jqassistant.maven.module.skip>true</jqassistant.maven.module.skip>
+    </properties>
+
+    <profiles>
+        <profile>
+            <!--
+                Eclipse compiler attempts to apply the annotation processor from this module to itself ?!
+                > ReportGeneratorRules.java: Internal compiler error: java.util.ServiceConfigurationError: javax.annotation.processing.Processor:
+                > Provider org.hibernate.search.build.report.loggers.LoggerCategoriesProcessor not found at java.base/java.util.ServiceLoader.fail(ServiceLoader.java:593)
+            -->
+            <id>compiler-eclipse</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default-compile</id>
+                                    <configuration>
+                                        <proc>none</proc>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

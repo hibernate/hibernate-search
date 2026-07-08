@@ -165,6 +165,7 @@
         <module>build/parents/build</module>
         <module>build/enforcer</module>
         <module>build/config</module>
+        <module>build/gson-processor</module>
         <module>build/parents/internal</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>

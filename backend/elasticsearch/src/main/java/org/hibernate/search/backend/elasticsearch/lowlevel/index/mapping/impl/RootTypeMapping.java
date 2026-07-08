@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.gson.annotations.JsonAdapter;
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -16,11 +17,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  */
-/*
- * CAUTION: JSON serialization is controlled by a specific adapter, which must be
- * updated whenever fields of this class are added, renamed or removed.
- */
-@JsonAdapter(RootTypeMappingJsonAdapterFactory.class)
+@GsonSerializable
 public class RootTypeMapping extends AbstractTypeMapping {
 
 	@SerializedName("_routing")
@@ -39,6 +36,10 @@ public class RootTypeMapping extends AbstractTypeMapping {
 
 	public List<NamedDynamicTemplate> getDynamicTemplates() {
 		return dynamicTemplates == null ? null : Collections.unmodifiableList( dynamicTemplates );
+	}
+
+	public void setDynamicTemplates(List<NamedDynamicTemplate> dynamicTemplates) {
+		this.dynamicTemplates = dynamicTemplates;
 	}
 
 	private List<NamedDynamicTemplate> getInitializedDynamicTemplates() {

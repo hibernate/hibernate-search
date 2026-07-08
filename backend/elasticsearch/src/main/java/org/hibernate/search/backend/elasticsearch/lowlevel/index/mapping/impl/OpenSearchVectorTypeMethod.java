@@ -6,10 +6,11 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -17,14 +18,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * See https://opensearch.org/docs/latest/field-types/supported-field-types/knn-vector/
  */
-/*
- * CAUTION:
- * 1. JSON serialization is controlled by a specific adapter, which must be
- * updated whenever fields of this class are added, renamed or removed.
- *
- * 2. Whenever adding more properties consider adding property validation to PropertyMappingValidator.
- */
-@JsonAdapter(OpenSearchVectorTypeMethodJsonAdapterFactory.class)
+@GsonSerializable
 public class OpenSearchVectorTypeMethod {
 
 	private String name;
@@ -79,7 +73,12 @@ public class OpenSearchVectorTypeMethod {
 		this.extraAttributes = extraAttributes;
 	}
 
-	@JsonAdapter(OpenSearchVectorTypeMethodJsonAdapterFactory.ParametersJsonAdapterFactory.class)
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
+	}
+
+	@GsonSerializable
 	public static class Parameters {
 
 		@SerializedName("ef_construction")
@@ -111,6 +110,11 @@ public class OpenSearchVectorTypeMethod {
 
 		public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
 			this.extraAttributes = extraAttributes;
+		}
+
+		@Override
+		public String toString() {
+			return GsonProviderHelper.toPrettyJson( this );
 		}
 	}
 }

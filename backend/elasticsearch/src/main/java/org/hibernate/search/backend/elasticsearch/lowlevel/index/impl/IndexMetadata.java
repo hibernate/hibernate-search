@@ -6,11 +6,10 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-
-import com.google.gson.GsonBuilder;
 
 /**
  * An object representing metadata of an Elasticsearch index: aliases, mapping, settings, ...
@@ -49,6 +48,6 @@ public class IndexMetadata {
 
 	@Override
 	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 }

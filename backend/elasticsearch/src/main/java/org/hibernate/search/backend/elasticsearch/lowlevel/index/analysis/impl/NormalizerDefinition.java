@@ -4,13 +4,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl;
 
-import com.google.gson.annotations.JsonAdapter;
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
 
 /**
  * A definition of an Elasticsearch normalizer, to be included in index settings.
  *
  */
-@JsonAdapter(NormalizerDefinitionJsonAdapterFactory.class)
+@GsonSerializable
 public class NormalizerDefinition extends AbstractCompositeAnalysisDefinition {
 
 }
