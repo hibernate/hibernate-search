@@ -4,9 +4,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
-
-import com.google.gson.GsonBuilder;
 
 /**
  * An object representing an Elasticsearch index that actually exists on the cluster.
@@ -24,7 +23,7 @@ public final class ExistingIndexMetadata {
 
 	@Override
 	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 
 	/**

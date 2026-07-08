@@ -6,10 +6,11 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -17,14 +18,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html
  */
-/*
- * CAUTION:
- * 1. JSON serialization is controlled by a specific adapter, which must be
- * updated whenever fields of this class are added, renamed or removed.
- *
- * 2. Whenever adding more properties consider adding property validation to PropertyMappingValidator#ElasticsearchDenseVectorIndexOptionsValidator.
- */
-@JsonAdapter(ElasticsearchDenseVectorIndexOptionsJsonAdapterFactory.class)
+@GsonSerializable
 public class ElasticsearchDenseVectorIndexOptions {
 
 	private String type;
@@ -67,5 +61,10 @@ public class ElasticsearchDenseVectorIndexOptions {
 
 	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
 		this.extraAttributes = extraAttributes;
+	}
+
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 }

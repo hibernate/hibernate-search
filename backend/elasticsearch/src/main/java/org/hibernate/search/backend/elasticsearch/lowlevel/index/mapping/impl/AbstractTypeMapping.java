@@ -9,18 +9,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 /**
  * An object representing Elasticsearch type mappings.
  * <p>
  * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping">Mapping</a>.
- */
-/*
- * CAUTION: JSON serialization is controlled by a specific adapter, which must be
- * updated whenever fields of this class are added, renamed or removed.
  */
 public abstract class AbstractTypeMapping {
 
@@ -46,6 +42,10 @@ public abstract class AbstractTypeMapping {
 		return properties == null ? null : Collections.unmodifiableMap( properties );
 	}
 
+	public void setProperties(Map<String, PropertyMapping> properties) {
+		this.properties = properties;
+	}
+
 	private Map<String, PropertyMapping> getInitializedProperties() {
 		if ( properties == null ) {
 			properties = new TreeMap<>();
@@ -67,11 +67,6 @@ public abstract class AbstractTypeMapping {
 
 	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
 		this.extraAttributes = extraAttributes;
-	}
-
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
 	}
 
 	/**
@@ -115,5 +110,10 @@ public abstract class AbstractTypeMapping {
 				addProperty( name, otherProperty );
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 }

@@ -7,7 +7,6 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -59,10 +58,4 @@ public abstract class AbstractCompositeAnalysisDefinition extends AnalysisDefini
 		}
 		return charFilters;
 	}
-
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
-	}
-
 }

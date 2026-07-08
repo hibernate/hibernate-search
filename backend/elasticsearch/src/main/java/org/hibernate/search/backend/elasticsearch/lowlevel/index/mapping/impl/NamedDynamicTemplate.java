@@ -4,8 +4,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.JsonAdapter;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
 /**
  * An object representing an Elasticsearch dynamic template with a name.
@@ -13,7 +12,6 @@ import com.google.gson.annotations.JsonAdapter;
  * This is the outer object in the array of templates, wrapping a {@link DynamicTemplate}.
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html
  */
-@JsonAdapter(NamedDynamicTemplateJsonAdapterFactory.class)
 public class NamedDynamicTemplate {
 
 	public final String name;
@@ -25,16 +23,16 @@ public class NamedDynamicTemplate {
 		this.template = template;
 	}
 
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
-	}
-
 	public String getName() {
 		return name;
 	}
 
 	public DynamicTemplate getTemplate() {
 		return template;
+	}
+
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 }

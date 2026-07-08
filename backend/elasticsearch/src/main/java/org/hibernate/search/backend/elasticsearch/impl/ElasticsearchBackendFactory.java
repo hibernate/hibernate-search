@@ -117,7 +117,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			dialect = dialectFactory.createModelDialect( version );
 
-			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
+			Gson userFacingGson = GsonProviderHelper.createUserFacingGson();
 
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider =
 					dialect.createIndexTypeFieldFactoryProvider( userFacingGson );

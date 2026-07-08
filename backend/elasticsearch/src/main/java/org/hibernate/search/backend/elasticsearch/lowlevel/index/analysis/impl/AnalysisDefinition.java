@@ -7,6 +7,7 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
 import com.google.gson.JsonElement;
 
@@ -37,4 +38,8 @@ public abstract class AnalysisDefinition {
 		this.parameters = parameters;
 	}
 
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
+	}
 }

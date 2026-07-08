@@ -6,11 +6,11 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -19,7 +19,7 @@ import com.google.gson.annotations.SerializedName;
  * This is the inner object in the array of templates, wrapped in a {@link NamedDynamicTemplate}.
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html
  */
-@JsonAdapter(DynamicTemplateJsonAdapterFactory.class)
+@GsonSerializable
 public class DynamicTemplate {
 
 	@SerializedName("match_mapping_type")
@@ -32,11 +32,6 @@ public class DynamicTemplate {
 
 	@SerializeExtraProperties
 	private Map<String, JsonElement> extraAttributes;
-
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
-	}
 
 	public String getMatchMappingType() {
 		return matchMappingType;
@@ -68,5 +63,10 @@ public class DynamicTemplate {
 
 	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
 		this.extraAttributes = extraAttributes;
+	}
+
+	@Override
+	public String toString() {
+		return GsonProviderHelper.toPrettyJson( this );
 	}
 }

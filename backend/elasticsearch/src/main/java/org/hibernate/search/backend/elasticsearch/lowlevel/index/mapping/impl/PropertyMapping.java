@@ -6,8 +6,10 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonTypeAdapter;
+
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -15,14 +17,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  */
-/*
- * CAUTION:
- * 1. JSON serialization is controlled by a specific adapter, which must be
- * updated whenever fields of this class are added, renamed or removed.
- *
- * 2. Whenever adding more properties consider adding property validation to PropertyMappingValidator.
- */
-@JsonAdapter(PropertyMappingJsonAdapterFactory.class)
+@GsonSerializable
 public class PropertyMapping extends AbstractTypeMapping {
 
 	private String type;
@@ -79,6 +74,7 @@ public class PropertyMapping extends AbstractTypeMapping {
 	 * Date datatype
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html
 	 */
+	@GsonTypeAdapter(FormatJsonAdapter.class)
 	private List<String> format;
 
 	@SerializedName("scaling_factor")

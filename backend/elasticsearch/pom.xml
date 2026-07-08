@@ -69,22 +69,26 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>add-module-infos</id>
+                        <id>default-compile</id>
                         <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <opens>
-                                        org.hibernate.search.backend.elasticsearch.lowlevel.index.* to com.google.gson
-                                    </opens>
-                                </moduleInfo>
-                            </module>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>org.hibernate.search</groupId>
+                                    <artifactId>hibernate-search-build-gson-processor</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
