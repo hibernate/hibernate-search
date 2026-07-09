@@ -48,6 +48,6 @@ public interface OrmLog extends ConfigurationLog, DeprecationLog, IndexingLog, L
 	 * here to the next value.
 	 */
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET + 145, value = "")
+	@Message(id = ID_OFFSET + 146, value = "")
 	void nextLoggerIdForConvenience();
 }

@@ -196,53 +196,42 @@ This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3
 but is long-term goal.
 
 [[limitations-stateless-session]]
-== Limitations of listener-triggered indexing with `StatelessSession`
+== Listener-triggered indexing with `StatelessSession`
 
 [[limitations-stateless-session-description]]
 === Description
 
-Hibernate Search's <<listener-triggered-indexing,listener-triggered indexing>> supports
-Hibernate ORM's `StatelessSession` for basic entity operations (`insert`, `update`, `delete`, `upsert`).
-Indexes are updated transparently, just like with a regular `Session`.
+Hibernate Search's <<listener-triggered-indexing,listener-triggered indexing>> with a `StatelessSession`
+requires the <<coordination-outbox-polling,outbox-polling coordination strategy>>.
 
-However, there are some differences compared to using a regular `Session`:
+With the default coordination strategy (<<coordination-none,no coordination>>),
+attempting to insert, update, or delete an indexed or embedded entity through a `StatelessSession`
+will result in an exception.
+This is to prevent stale data and incorrect index contents (because of the `StatelessSession` specifics).
+
+Even with <<coordination-outbox-polling,outbox-polling>>, there are some differences
+compared to using a regular `Session`:
 
 * No dirty checking optimization. When an entity is updated through a `StatelessSession`,
 Hibernate Search does not determine which properties actually changed.
 As a result, every update is treated as if all properties were modified,
 and the entity will always be reindexed, even if only non-indexed properties changed.
 With a regular `Session`, Hibernate Search would skip reindexing in such cases.
-* Updating a contained entity does not reindex containing entities and results in an exception.
-When an entity that is embedded in another entity's index
-(via <<mapping-indexedembedded,`@IndexedEmbedded`>>) is updated through a `StatelessSession`,
-Hibernate Search will **throw an exception** instead of potentially producing an inconsistent index.
-+
-For example, consider an indexed `Author` entity with `@IndexedEmbedded` on
-a `Book` association. If the `Book` title is updated through a `StatelessSession`,
-Hibernate Search would need to reindex the `Author` to reflect the new title.
-To do so, it loads the `Author` — but unlike a regular `Session`, `StatelessSession`
-does not maintain an identity map, so the loaded `Author` holds a reference to
-a _distinct_ `Book` instance still carrying the _old_ title.
-Reindexing the `Author` with that stale data would silently put incorrect data in the index,
-so Hibernate Search throws an exception instead.
-+
-This limitation applies when a _contained_ (non-indexed) entity is updated
-and the update would need to propagate to a _containing_ (indexed) entity.
-Directly inserting or updating the containing entity itself works correctly.
+
+Search operations from a `StatelessSession` (using `Search.session(StatelessSession)`)
+work regardless of the coordination strategy.
 
 [[limitations-stateless-session-solution]]
 === Solutions and workarounds
 
-For basic entity operations (`insert`, `update`, `delete`, `upsert`),
-listener-triggered indexing works transparently with `StatelessSession` --
-no special configuration is needed.
+To use `StatelessSession` for indexing, configure the
+<<coordination-outbox-polling,outbox-polling coordination strategy>>.
 
-If you need features that are not supported with `StatelessSession`
-(such as optimized dirty checking, etc.), use a regular `Session` instead.
+If outbox-polling is not an option, use a regular `Session` for indexing operations,
+and reserve the `StatelessSession` for search operations only.
 
-If your use of `StatelessSession` is not fully covered by the listener-triggered indexing,
-please report that back to us, and in the meantime you could always index these
-entities explicitly, either using the <<indexing-massindexer,`MassIndexer`>>,
+Alternatively, you could index entities explicitly,
+either using the <<indexing-massindexer,`MassIndexer`>>,
 using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
 or <<indexing-explicit,explicitly through a `Session` based `SearchIndexingPlan`>>.
 

@@ -5,7 +5,6 @@
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 
@@ -23,36 +22,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 class HibernateOrmStatelessSessionIndexingIT {
 
-	private static final int NUMBER_OF_BOOKS = 10;
-
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
-
-	@Test
-	void statelessSession_transparentIndexing() {
-		EntityManagerFactory entityManagerFactory = setupHelper.start()
-				.setup( Book.class, Author.class );
-		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
-
-		// tag::stateless-session-insert[]
-		sessionFactory.inStatelessTransaction( session -> {
-			for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
-				Book book = new Book();
-				book.setId( i );
-				book.setTitle( "Book #" + i );
-				session.insert( book );
-			}
-		} );
-		// end::stateless-session-insert[]
-
-		with( entityManagerFactory ).runInTransaction( entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			assertThat( searchSession.search( Book.class )
-					.where( f -> f.matchAll() )
-					.fetchTotalHitCount() )
-					.isEqualTo( NUMBER_OF_BOOKS );
-		} );
-	}
 
 	@Test
 	void statelessSession_searchAndLoadEntities() {
@@ -60,12 +31,12 @@ class HibernateOrmStatelessSessionIndexingIT {
 				.setup( Book.class, Author.class );
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
 
-		sessionFactory.inStatelessTransaction( session -> {
+		sessionFactory.inTransaction( session -> {
 			for ( int i = 0; i < 3; i++ ) {
 				Book book = new Book();
 				book.setId( i );
 				book.setTitle( "Book #" + i );
-				session.insert( book );
+				session.persist( book );
 			}
 		} );
 
