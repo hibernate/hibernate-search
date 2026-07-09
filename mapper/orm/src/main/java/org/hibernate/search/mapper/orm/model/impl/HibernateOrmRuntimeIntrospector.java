@@ -66,11 +66,6 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 	}
 
 	@Override
-	public boolean supportsReindexingContainingEntities() {
-		return !( sessionImplementor instanceof StatelessSessionImplementor );
-	}
-
-	@Override
 	public boolean isIgnorableDataAccessThrowable(Throwable throwable) {
 		if ( sessionImplementor instanceof StatelessSessionImplementor ) {
 			// With StatelessSession, lazy loading failures during reindexing resolution

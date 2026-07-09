@@ -37,6 +37,7 @@ import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.ConfigurationLog;
+import org.hibernate.search.mapper.orm.logging.impl.IndexingLog;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -59,11 +60,13 @@ public final class HibernateSearchEventListener
 
 	private final HibernateOrmListenerContextProvider contextProvider;
 	private final boolean dirtyCheckingEnabled;
+	private final boolean statelessSessionIndexingAllowed;
 
 	public HibernateSearchEventListener(HibernateOrmListenerContextProvider contextProvider,
-			boolean dirtyCheckingEnabled) {
+			boolean dirtyCheckingEnabled, boolean statelessSessionIndexingAllowed) {
 		this.contextProvider = contextProvider;
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
+		this.statelessSessionIndexingAllowed = statelessSessionIndexingAllowed;
 		ConfigurationLog.INSTANCE.dirtyChecksEnabled( dirtyCheckingEnabled );
 	}
 
@@ -94,6 +97,7 @@ public final class HibernateSearchEventListener
 		if ( typeContext == null ) {
 			return;
 		}
+		checkSessionCanProcessEvents( event.getSession() );
 		PojoTypeIndexingPlan plan = getCurrentIndexingPlanIfTypeIncluded( event.getSession(), typeContext );
 		if ( plan == null ) {
 			// This type is excluded through filters.
@@ -129,6 +133,7 @@ public final class HibernateSearchEventListener
 		if ( typeContext == null ) {
 			return;
 		}
+		checkSessionCanProcessEvents( event.getSession() );
 		PojoTypeIndexingPlan plan = getCurrentIndexingPlanIfTypeIncluded( event.getSession(), typeContext );
 		if ( plan == null ) {
 			// This type is excluded through filters.
@@ -165,6 +170,7 @@ public final class HibernateSearchEventListener
 			// Return early, to avoid creating an indexing plan.
 			return;
 		}
+		checkSessionCanProcessEvents( event.getSession() );
 		PojoTypeIndexingPlan plan = getCurrentIndexingPlanIfTypeIncluded( event.getSession(), typeContext );
 		if ( plan == null ) {
 			// This type is excluded through filters.
@@ -304,6 +310,12 @@ public final class HibernateSearchEventListener
 
 	private PojoIndexingPlan getCurrentIndexingPlanIfExisting(SharedSessionContractImplementor sessionImplementor) {
 		return contextProvider.currentIndexingPlanIfExisting( sessionImplementor );
+	}
+
+	private void checkSessionCanProcessEvents(SharedSessionContractImplementor session) {
+		if ( session instanceof StatelessSessionImplementor && !statelessSessionIndexingAllowed ) {
+			throw IndexingLog.INSTANCE.cannotUseStatelessSessionWithListenerTriggeredIndexing();
+		}
 	}
 
 	private void processPerEventIfStateless(SharedSessionContractImplementor session) {

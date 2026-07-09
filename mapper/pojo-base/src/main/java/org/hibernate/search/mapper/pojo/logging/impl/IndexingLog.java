@@ -108,14 +108,4 @@ public interface IndexingLog {
 			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> entityType,
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType);
 
-	@Message(id = ID_OFFSET + 180,
-			value = "Reindexing a containing entity of type '%1$s' as a result of a contained entity change"
-					+ " is not supported in this context."
-					+ " The underlying session does not support reindexing of containing entities,"
-					+ " because it does not provide an identity map"
-					+ " and the containing entity's @IndexedEmbedded data could be stale."
-					+ " You will need to disable listener-triggered indexing for this operation,"
-					+ " and reindex the containing entity explicitly.")
-	SearchException cannotReindexContainingEntity(PojoRawTypeIdentifier<?> containingType);
-
 }
