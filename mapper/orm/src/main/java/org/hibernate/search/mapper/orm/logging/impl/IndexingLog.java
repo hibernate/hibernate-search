@@ -49,4 +49,10 @@ public interface IndexingLog {
 	@Message(id = ID_OFFSET + 137,
 			value = "Processing Transaction's afterCompletion() phase for %s. Cancelling indexing plan due to transaction status %d")
 	void afterCompletionCanceling(Transaction transactionIdentifier, int status);
+
+	@Message(id = ID_OFFSET + 145,
+			value = "Listener-triggered indexing is not supported with a stateless session."
+					+ " Use an outbox-polling coordination strategy to enable indexing with a stateless session,"
+					+ " or use a regular session for indexing operations.")
+	SearchException cannotUseStatelessSessionWithListenerTriggeredIndexing();
 }

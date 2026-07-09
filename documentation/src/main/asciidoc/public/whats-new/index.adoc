@@ -26,17 +26,18 @@ It also cleans up previously deprecated APIs.
 === Hibernate ORM `StatelessSession` support
 Hibernate Search now supports Hibernate ORM's `StatelessSession` for both indexing and searching.
 +
-Entities inserted, updated, or deleted through a `StatelessSession`
-are indexed transparently via
-link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#listener-triggered-indexing[listener-triggered indexing],
-just like with a regular `Session`.
-Search queries can also be executed from a `StatelessSession`
-using the new `Search.session(StatelessSession)` entry point.
+Indexing through a `StatelessSession` requires the
+link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#coordination-outbox-polling[outbox-polling coordination strategy].
+With outbox-polling, entities inserted, updated, or deleted through a `StatelessSession`
+are indexed transparently, just like with a regular `Session`.
+With the default coordination strategy, indexing through a `StatelessSession` will result in an exception.
 +
-Some link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#limitations-stateless-session[limitations]
-apply compared to a regular `Session`: there is no dirty checking optimization,
-and updating a contained entity (referenced via `@IndexedEmbedded`)
-does not automatically reindex the containing entity.
+Search queries can be executed from a `StatelessSession`
+using the new `Search.session(StatelessSession)` entry point,
+regardless of the coordination strategy.
++
+See link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#limitations-stateless-session[limitations]
+for details.
 
 == Removals
 

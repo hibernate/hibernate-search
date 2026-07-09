@@ -19,7 +19,6 @@ import jakarta.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -68,153 +67,35 @@ class StatelessSessionBaseIT {
 	}
 
 	@Test
-	void insert() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "text", "number1" ) )
-				.add( "2", b -> b
-						.field( "text", "number2" ) )
-				.add( "3", b -> b
-						.field( "text", "number3" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			session.insert( new IndexedEntity( 1, "number1" ) );
-			session.insert( new IndexedEntity( 2, "number2" ) );
-			session.insert( new IndexedEntity( 3, "number3" ) );
-		} );
+	void insert_notAllowedWithListenerTriggeredIndexing() {
+		assertThatThrownBy( () -> {
+			sessionFactory.inStatelessTransaction( session -> {
+				session.insert( new IndexedEntity( 1, "number1" ) );
+			} );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
 
 		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	void update() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "text", "initial" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			session.insert( new IndexedEntity( 1, "initial" ) );
-		} );
-		defaultBackendMock.verifyExpectationsMet();
-
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.addOrUpdate( "1", b -> b
-						.field( "text", "updated" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			IndexedEntity entity = session.get( IndexedEntity.class, 1 );
-			entity.setText( "updated" );
-			session.update( entity );
-		} );
+	void update_notAllowedWithListenerTriggeredIndexing() {
+		assertThatThrownBy( () -> {
+			sessionFactory.inStatelessTransaction( session -> {
+				IndexedEntity entity = new IndexedEntity( 1, "initial" );
+				session.insert( entity );
+			} );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
 
 		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	void delete() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "text", "toDelete" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			session.insert( new IndexedEntity( 1, "toDelete" ) );
-		} );
-		defaultBackendMock.verifyExpectationsMet();
-
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.delete( "1" );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			IndexedEntity entity = session.get( IndexedEntity.class, 1 );
-			session.delete( entity );
-		} );
-
-		defaultBackendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	void mutationAfterInsert() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "text", "originalValue" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			IndexedEntity entity = new IndexedEntity( 1, "originalValue" );
-			session.insert( entity );
-			// nothing will pick up this change and we will only sync the state that the insert had:
-			entity.setText( "mutatedValue" );
-		} );
-
-		defaultBackendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	void insertAndUpdateInSameTransaction() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "text", "initial" ) )
-				.addOrUpdate( "1", b -> b
-						.field( "text", "updated" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			IndexedEntity entity = new IndexedEntity( 1, "initial" );
-			session.insert( entity );
-
-			entity.setText( "updated" );
-			session.update( entity );
-		} );
-
-		defaultBackendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * With StatelessSession, dirty checking information is not available.
-	 * As a result, even if only a non-indexed field is changed,
-	 * the entity will still be reindexed.
-	 */
-	@Test
-	void noDirtyChecking_nonIndexedFieldChange_stillReindexes() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "text", "value" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			session.insert( new IndexedEntity( 1, "value" ) );
-		} );
-		defaultBackendMock.verifyExpectationsMet();
-
-		// we are going to change a non-indexed field, but since we don't do
-		// dirty checking -- everything will be considered dirty, so an update should happen:
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.addOrUpdate( "1", b -> b
-						.field( "text", "value" ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			IndexedEntity entity = session.get( IndexedEntity.class, 1 );
-			entity.setNonIndexedText( "changed" );
-			session.update( entity );
-		} );
-
-		defaultBackendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	void rollback() {
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.createFollowingWorks()
-				.add( "1", b -> b
-						.field( "text", "shouldBeDiscarded" ) );
-
-		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.discardFollowingWorks()
-				.add( "1", b -> b
-						.field( "text", "shouldBeDiscarded" ) );
-
-		try ( StatelessSession session = sessionFactory.openStatelessSession() ) {
-			Transaction trx = session.beginTransaction();
-			session.insert( new IndexedEntity( 1, "shouldBeDiscarded" ) );
-			trx.rollback();
-		}
+	void delete_notAllowedWithListenerTriggeredIndexing() {
+		assertThatThrownBy( () -> {
+			sessionFactory.inStatelessTransaction( session -> {
+				session.insert( new IndexedEntity( 1, "toDelete" ) );
+			} );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
 
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -248,8 +129,8 @@ class StatelessSessionBaseIT {
 				.add( "1", b -> b
 						.field( "text", "hello" ) );
 
-		sessionFactory.inStatelessTransaction( session -> {
-			session.insert( new IndexedEntity( 1, "hello" ) );
+		sessionFactory.inTransaction( session -> {
+			session.persist( new IndexedEntity( 1, "hello" ) );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 
@@ -269,92 +150,17 @@ class StatelessSessionBaseIT {
 	}
 
 	@Test
-	void indexedEmbedded_insertContainingWithContained() {
-		defaultBackendMock.expectWorks( ContainingEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "name", "container" )
-						.objectField( "contained", b2 -> b2
-								.field( "detail", "embedded" ) ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			ContainedEntity contained = new ContainedEntity( 10, "embedded" );
-			session.insert( contained );
-
-			ContainingEntity containing = new ContainingEntity( 1, "container" );
-			containing.setContained( contained );
-			session.insert( containing );
-		} );
-
-		defaultBackendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	void indexedEmbedded_updateContainingDirectly() {
-		defaultBackendMock.expectWorks( ContainingEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "name", "initial" )
-						.objectField( "contained", b2 -> b2
-								.field( "detail", "embedded" ) ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			ContainedEntity contained = new ContainedEntity( 10, "embedded" );
-			session.insert( contained );
-
-			ContainingEntity containing = new ContainingEntity( 1, "initial" );
-			containing.setContained( contained );
-			session.insert( containing );
-		} );
-		defaultBackendMock.verifyExpectationsMet();
-
-		defaultBackendMock.expectWorks( ContainingEntity.INDEX_NAME )
-				.addOrUpdate( "1", b -> b
-						.field( "name", "updated" )
-						.objectField( "contained", b2 -> b2
-								.field( "detail", "embedded" ) ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			ContainingEntity containing = session.get( ContainingEntity.class, 1 );
-			containing.setName( "updated" );
-			session.update( containing );
-		} );
-
-		defaultBackendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	void indexedEmbedded_updateContainedEntity_throws() {
-		defaultBackendMock.expectWorks( ContainingEntity.INDEX_NAME )
-				.add( "1", b -> b
-						.field( "name", "container" )
-						.objectField( "contained", b2 -> b2
-								.field( "detail", "original" ) ) );
-
-		sessionFactory.inStatelessTransaction( session -> {
-			ContainedEntity contained = new ContainedEntity( 10, "original" );
-			session.insert( contained );
-
-			ContainingEntity containing = new ContainingEntity( 1, "container" );
-			containing.setContained( contained );
-			session.insert( containing );
-		} );
-		defaultBackendMock.verifyExpectationsMet();
-
+	void indexedEmbedded_notAllowedWithListenerTriggeredIndexing() {
 		assertThatThrownBy( () -> {
 			sessionFactory.inStatelessTransaction( session -> {
-				ContainedEntity contained = session.get( ContainedEntity.class, 10 );
-				contained.setDetail( "updated" );
-				session.update( contained );
-			} );
-		} ).hasMessageContaining( "ContainedEntity" );
+				ContainedEntity contained = new ContainedEntity( 10, "embedded" );
+				session.insert( contained );
 
-		assertThatThrownBy( () -> {
-			sessionFactory.inStatelessTransaction( session -> {
-				ContainedEntity contained = session.get( ContainedEntity.class, 10 );
-				session.fetch( contained.getContainingEntities() );
-				contained.setDetail( "updated" );
-				session.update( contained );
+				ContainingEntity containing = new ContainingEntity( 1, "container" );
+				containing.setContained( contained );
+				session.insert( containing );
 			} );
-		} ).hasMessageContaining( "ContainedEntity" );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
 
 		defaultBackendMock.verifyExpectationsMet();
 	}
