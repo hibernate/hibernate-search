@@ -65,6 +65,12 @@
                 <artifactId>lucene-highlighter</artifactId>
                 <version>${version.org.apache.lucene.next.updatable}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.carrotsearch</groupId>
+                <artifactId>hppc</artifactId>
+                <version>${version.com.carrotsearch.hppc.next}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

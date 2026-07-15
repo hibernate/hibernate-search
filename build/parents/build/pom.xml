@@ -43,7 +43,8 @@
         <javadoc.org.apache.lucene.analysis.common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analysis/common/</javadoc.org.apache.lucene.analysis.common.url>
         <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
 
-        <version.com.carrotsearch.hppc>0.11.1</version.com.carrotsearch.hppc>
+        <version.com.carrotsearch.hppc>0.10.0</version.com.carrotsearch.hppc>
+        <version.com.carrotsearch.hppc.next>0.11.1</version.com.carrotsearch.hppc.next>
         <version.org.apache.lucene.next>10.5.0</version.org.apache.lucene.next>
 
         <!-- >>> Elasticsearch -->
