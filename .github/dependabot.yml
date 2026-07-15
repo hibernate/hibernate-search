@@ -94,6 +94,8 @@ updates:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
       - dependency-name: "org.hibernate.*:*"
+      # We align this dependency on the Lucene version (more recent hppc versiosn need JDK 21+).
+      - dependency-name: "com.carrotsearch:*"
       # AWS SDK releases way too often (every week?); ignore all patch updates
       - dependency-name: "software.amazon.awssdk:*"
         update-types: ["version-update:semver-patch"]

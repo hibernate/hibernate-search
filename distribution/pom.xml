@@ -229,7 +229,7 @@
                                 <artifactItem>
                                     <groupId>com.carrotsearch</groupId>
                                     <artifactId>hppc</artifactId>
-                                    <version>${version.com.carrotsearch.hppc}</version>
+                                    <version>${version.com.carrotsearch.hppc.next}</version>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/dependencies-lucene-next</outputDirectory>

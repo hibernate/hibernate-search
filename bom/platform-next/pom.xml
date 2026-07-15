@@ -20,6 +20,7 @@
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
         <version.bom.org.apache.lucene>10.5.0</version.bom.org.apache.lucene>
+        <version.bom.com.carrotsearch.next>0.11.1</version.bom.com.carrotsearch.next>
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
     </properties>
 
@@ -37,6 +38,12 @@
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.carrotsearch</groupId>
+                <artifactId>hppc</artifactId>
+                <version>${version.bom.com.carrotsearch.next}</version>
             </dependency>
 
             <!-- Lucene dependencies -->

@@ -56,6 +56,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.carrotsearch</groupId>
+                <artifactId>hppc</artifactId>
+                <version>${version.com.carrotsearch.hppc.next}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene-next</artifactId>
                 <version>${project.version}</version>
