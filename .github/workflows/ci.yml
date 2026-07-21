@@ -70,6 +70,10 @@ jobs:
             maven: {
               # Since we only start an Elasticsearch container on Linux we add the profile to enable container reuse here:
               args: '-Pci-build'
+            },
+            reporting: {
+              coverage: false,
+              docs-preview: true
             }
           }
           # We can't start Linux containers on GitHub Actions' Windows VMs,
@@ -83,6 +87,10 @@ jobs:
             },
             maven: {
               args: '-Dtest.elasticsearch.skip=true'
+            },
+            reporting: {
+              coverage: false,
+              docs-preview: false
             }
           }
     steps:
@@ -133,6 +141,14 @@ jobs:
         with:
           name: build-scan-data-initial-${{ matrix.os.name }}
           path: ~/.m2/.develocity/build-scan-data
+
+      - name: Upload docs preview
+        if: ${{ matrix.os.reporting.docs-preview }}
+        uses: hibernate/.github/actions/build-docs-preview@197125e1a0e9624349ef9e8157dad8ab707f3da0 # main
+        with:
+          dist-path: 'documentation/target/dist'
+          src-paths: |
+            documentation/src
 
       - name: Run integration tests in the default environment
         run: |
