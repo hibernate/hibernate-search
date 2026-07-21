@@ -131,7 +131,7 @@
 
         <!-- >>> WildFly dependencies -->
         <!-- This is used to generate a link to the WildFly documentation -->
-        <version.org.wildfly>40.0.0.Final</version.org.wildfly>
+        <version.org.wildfly>41.0.0.Final</version.org.wildfly>
 
         <!-- Test dependencies -->
 
