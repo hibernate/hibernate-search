@@ -22,6 +22,7 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 	public Map<String, String> rawBackendProperties() {
 		Map<String, String> properties = new LinkedHashMap<>();
 		properties.put( "log.json_pretty_printing", "true" );
+		properties.put( "layout.strategy", ForkIsolatedIndexLayoutStrategy.NAME );
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
 		if ( ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS
 				.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {

@@ -5,14 +5,22 @@
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.util.impl.integrationtest.common.TestContainerLock;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
@@ -23,7 +31,9 @@ public final class SearchBackendContainer {
 	private SearchBackendContainer() {
 	}
 
-	private static final GenericContainer<?> SEARCH_CONTAINER;
+	private static final List<GenericContainer<?>> SEARCH_CONTAINERS;
+	private static final int CONTAINER_COUNT;
+	private static final Path CONTAINER_LOCK_FILE;
 
 	static {
 		ElasticsearchDistributionName distributionName = ElasticsearchDistributionName
@@ -31,55 +41,109 @@ public final class SearchBackendContainer {
 		String tag = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
 		Path containers = Path.of( System.getProperty( "org.hibernate.search.integrationtest.container.directory", "" ) );
 
+		CONTAINER_COUNT = Integer.parseInt(
+				System.getProperty( "test.parallel.elasticsearch.container.count", "1" ) );
+		CONTAINER_LOCK_FILE = containers.getParent().getParent().resolve( "target" )
+				.resolve( "hs-test-es.lock" );
+
 		try {
 			DockerImageNameAndVersion dockerImageName = parseDockerImageName( containers.resolve( "search-backend" )
 					.resolve( distributionName.externalRepresentation() + ".Dockerfile" ), tag );
-			switch ( distributionName ) {
-				case ELASTIC:
-					SEARCH_CONTAINER = elasticsearch( dockerImageName );
-					break;
-				case OPENSEARCH:
-				case AMAZON_OPENSEARCH_SERVERLESS:
-					SEARCH_CONTAINER = opensearch( dockerImageName );
-					break;
-				default:
-					throw new IllegalStateException( "Unknown distribution " + distributionName );
+
+			List<GenericContainer<?>> list = new ArrayList<>( CONTAINER_COUNT );
+			for ( int i = 0; i < CONTAINER_COUNT; i++ ) {
+				GenericContainer<?> container = switch ( distributionName ) {
+					case ELASTIC -> elasticsearch( dockerImageName );
+					case OPENSEARCH, AMAZON_OPENSEARCH_SERVERLESS -> opensearch( dockerImageName );
+				};
+				container.withLabel( "hs-es-instance", String.valueOf( i ) );
+				list.add( container );
 			}
+			SEARCH_CONTAINERS = List.copyOf( list );
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(
-					"Unable to initialize a Search Engine container [" + distributionName + ", " + tag + ", " + containers
+					"Unable to initialize Search Engine containers [" + distributionName + ", " + tag + ", " + containers
 							+ "]",
 					e );
 		}
 	}
 
-	public static int mappedPort(int port) {
-		startIfNeeded();
-		return SEARCH_CONTAINER.getMappedPort( port );
-	}
-
-	public static String host() {
-		startIfNeeded();
-		return SEARCH_CONTAINER.getHost();
-	}
-
 	public static String connectionUrl() {
 		String uris = System.getProperty( "test.elasticsearch.connection.uris" );
 		if ( uris == null || uris.trim().isEmpty() ) {
-			// need to start a container:
-			uris = host() + ":" + mappedPort( 9200 );
+			GenericContainer<?> container = containerForCurrentFork();
+			startIfNeeded();
+			return container.getHost() + ":" + container.getMappedPort( 9200 );
 		}
 		return uris;
 	}
 
+	private static GenericContainer<?> containerForCurrentFork() {
+		String forkNumber = System.getProperty( "test.parallel.fork.number",
+				System.getProperty( "surefire.forkNumber", "" ) );
+		int index = 0;
+		try {
+			index = ( Integer.parseInt( forkNumber ) - 1 ) % CONTAINER_COUNT;
+		}
+		catch (NumberFormatException e) {
+			// single-fork mode, use first container
+		}
+		return SEARCH_CONTAINERS.get( index );
+	}
+
 	private static void startIfNeeded() {
-		if ( !SEARCH_CONTAINER.isRunning() ) {
-			synchronized (SEARCH_CONTAINER) {
-				if ( !SEARCH_CONTAINER.isRunning() ) {
-					SEARCH_CONTAINER.start();
-				}
+		for ( GenericContainer<?> container : SEARCH_CONTAINERS ) {
+			if ( !container.isRunning() ) {
+				TestContainerLock.startContainersWithLock(
+						SEARCH_CONTAINERS, CONTAINER_LOCK_FILE,
+						SearchBackendContainer::applyTestIndexDefaults
+				);
+				return;
 			}
+		}
+	}
+
+	private static void applyTestIndexDefaults(GenericContainer<?> container) {
+		String url = "http://" + container.getHost()
+				+ ":" + container.getMappedPort( 9200 )
+				+ "/_index_template/test-optimization-defaults";
+		String body = """
+				{
+				"index_patterns": ["*"],
+				"priority": 0,
+				"template": {
+					"settings": {
+					"index.translog.durability": "async",
+					"index.translog.sync_interval": "120s",
+					"number_of_replicas": 0
+					}
+				}
+				}
+				""";
+		HttpClient client = HttpClient.newHttpClient();
+
+		// to let jdk 17 pass but actually close things on 21+
+		// need to cast to Object because of EJC
+		try ( var c = ( (Object) client ) instanceof AutoCloseable ac ? ac : null ) {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri( URI.create( url ) )
+					.header( "Content-Type", "application/json" )
+					.PUT( HttpRequest.BodyPublishers.ofString( body ) )
+					.build();
+			HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
+
+			if ( response.statusCode() >= 300 ) {
+				throw new IllegalStateException(
+						"Failed to apply test index template: HTTP " + response.statusCode() + " - " + response.body() );
+			}
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException( "Interrupted while waiting for a response from a search backend.", e );
+		}
+		catch (Exception e) {
+			throw new IllegalStateException( "Failed to apply test index template", e );
 		}
 	}
 
@@ -182,7 +246,8 @@ public final class SearchBackendContainer {
 				.withExposedPorts( 9200, 9300 )
 				.waitingFor( new HttpWaitStrategy().forPort( 9200 ).forStatusCode( 200 ) )
 				.withStartupTimeout( Duration.ofMinutes( 5 ) )
-				.withReuse( true );
+				.withReuse( true )
+				.withTmpFs( Map.of( "/usr/share/elasticsearch/data", "rw,size=1g" ) );
 	}
 
 

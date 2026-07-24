@@ -4,6 +4,9 @@
  */
 package org.hibernate.search.integrationtest.performance.backend.elasticsearch;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.Elas
 import org.hibernate.search.util.impl.test.SystemHelper;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +36,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
  */
 class SmokeIT {
 	private final List<SystemHelper.SystemPropertyRestorer> toClose = new ArrayList<>();
+
+	@BeforeAll
+	static void ensureTmpDir() throws IOException {
+		Files.createDirectories( Path.of( System.getProperty( "java.io.tmpdir" ) ) );
+	}
 
 	@BeforeEach
 	void setupConnectionInfo() {

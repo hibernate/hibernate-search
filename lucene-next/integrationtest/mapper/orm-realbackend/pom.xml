@@ -92,6 +92,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.lucene}</forkCount>
                             <skip>${test.lucene.skip}</skip>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-lucene</reportNameSuffix>
@@ -99,6 +100,7 @@
                             <summaryFile>${failsafe.lucene.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-elasticsearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
