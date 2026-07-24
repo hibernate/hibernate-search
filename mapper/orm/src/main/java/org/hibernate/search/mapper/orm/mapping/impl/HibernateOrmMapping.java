@@ -365,7 +365,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexingPlan currentIndexingPlanIfExisting(SessionImplementor session) {
+	public PojoIndexingPlan currentIndexingPlanIfExisting(SharedSessionContractImplementor session) {
 		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
 		if ( searchSession == null ) {
 			// Only happens if createIfDoesNotExist is false
@@ -414,7 +414,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public ConfiguredIndexingPlanSynchronizationStrategy currentIndexingPlanSynchronizationStrategy(
-			SessionImplementor session) {
+			SharedSessionContractImplementor session) {
 		return HibernateOrmSearchSession.get( this, session )
 				.configuredIndexingPlanSynchronizationStrategy();
 	}

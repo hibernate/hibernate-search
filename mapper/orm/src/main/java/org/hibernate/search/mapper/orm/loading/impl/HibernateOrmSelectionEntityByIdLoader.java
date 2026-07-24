@@ -15,7 +15,11 @@ import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 /**
- * An entity loader for indexed entities whose document ID is the entity ID.
+ * An entity loader for indexed entities whose document ID is the entity ID,
+ * using a stateful {@link org.hibernate.Session}.
+ * <p>
+ * Loads entities into the persistence context via a query,
+ * then retrieves them from the persistence context.
  *
  * @param <E> A common supertype of loaded entities.
  */
@@ -89,18 +93,11 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 		EntityKey[] entityKeys = new EntityKey[ids.size()];
 		for ( int i = 0; i < ids.size(); i++ ) {
 			Object id = ids.get( i );
-			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityMappingType.getEntityPersister() );
+			EntityKey entityKey =
+					sessionContext.sessionImplementor().generateEntityKey( id, entityMappingType.getEntityPersister() );
 			entityKeys[i] = ( entityKey );
 		}
 		return entityKeys;
-	}
-
-	private static <T> List<T> createListContainingNulls(int size) {
-		List<T> list = new ArrayList<>( size );
-		for ( int i = 0; i < size; i++ ) {
-			list.add( null );
-		}
-		return list;
 	}
 
 }

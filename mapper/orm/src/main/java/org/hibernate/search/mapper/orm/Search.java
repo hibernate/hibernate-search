@@ -4,11 +4,14 @@
  */
 package org.hibernate.search.mapper.orm;
 
+import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.SharedSessionContract;
+import org.hibernate.StatelessSession;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -75,8 +78,33 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the entity manager NOT {@link EntityManager#isOpen()}.
 	 */
 	public static SearchSession session(EntityManager entityManager) {
-		Session session = HibernateOrmUtils.toSession( entityManager );
-		return createSearchSession( session );
+		return createSearchSession( HibernateOrmUtils.toSession( entityManager ) );
+	}
+
+	/**
+	 * Retrieve the {@link SearchSession} from a Hibernate ORM {@link StatelessSession}.
+	 * <p>
+	 * The resulting instance depends on the passed {@link StatelessSession}:
+	 * closing the {@link StatelessSession} will close the {@link SearchSession}.
+	 *
+	 * @param statelessSession A Hibernate ORM stateless session.
+	 * @return The corresponding {@link SearchSession}.
+	 */
+	public static SearchSession session(StatelessSession statelessSession) {
+		return createSearchSession( statelessSession );
+	}
+
+	/**
+	 * Retrieve the {@link SearchSession} from a Hibernate ORM {@link StatelessSession}.
+	 * <p>
+	 * The resulting instance depends on the passed {@link StatelessSession}:
+	 * closing the {@link StatelessSession} will close the {@link SearchSession}.
+	 *
+	 * @param entityAgent A JPA Entity Agent.
+	 * @return The corresponding {@link SearchSession}.
+	 */
+	public static SearchSession session(EntityAgent entityAgent) {
+		return createSearchSession( HibernateOrmUtils.toStatelessSession( entityAgent ) );
 	}
 
 	private static SearchMapping getSearchMapping(SessionFactoryImplementor sessionFactoryImplementor) {
@@ -85,9 +113,9 @@ public final class Search {
 		return mappingContextProvider.get();
 	}
 
-	private static SearchSession createSearchSession(Session session) {
+	private static SearchSession createSearchSession(SharedSessionContract session) {
 		HibernateSearchContextProviderService mappingContextProvider = HibernateSearchContextProviderService.get(
-				HibernateOrmUtils.toSessionFactoryImplementor( session.getSessionFactory() ) );
+				HibernateOrmUtils.toSessionFactoryImplementor( session.getFactory() ) );
 		return new DelegatingSearchSession( mappingContextProvider, session );
 	}
 
