@@ -188,13 +188,18 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoTypeAdditionalMetadata metadata = typeAdditionalMetadataProvider.get( rawTypeModel );
 
 		if ( metadata.isEntity() ) {
+			String entityName = metadata.getEntityTypeMetadata().get().getEntityName();
+			if ( !delegate.isSupportedEntityType( rawTypeModel, entityName ) ) {
+				MappingLog.INSTANCE.ignoringEntityType( rawTypeModel );
+				return;
+			}
 			entityTypes.add( rawTypeModel );
 		}
 
 		Optional<PojoIndexedTypeAdditionalMetadata> indexedTypeMetadataOptional = metadata.getIndexedTypeMetadata();
 		// Ignore abstract types: indexing will be handled for concrete subtypes.
 		if ( !rawTypeModel.isAbstract() && indexedTypeMetadataOptional.isPresent() ) {
-			if ( !metadata.getEntityTypeMetadata().isPresent() ) {
+			if ( !metadata.isEntity() ) {
 				throw MappingLog.INSTANCE.missingEntityTypeMetadata( rawTypeModel );
 			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();

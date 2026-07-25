@@ -33,6 +33,11 @@ public final class HibernateOrmMapperDelegate
 	}
 
 	@Override
+	public boolean isSupportedEntityType(PojoRawTypeModel<?> rawTypeModel, String entityName) {
+		return typeContextContainerBuilder.isDiscoveredEntityName( entityName );
+	}
+
+	@Override
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ConfiguredListenerTriggeredIndexingStrategy::stop, configuredListenerTriggeredIndexing );
