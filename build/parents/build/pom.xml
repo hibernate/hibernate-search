@@ -692,6 +692,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-mapper-orm-standalone</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-mapper-orm-spring</artifactId>
                 <version>${project.version}</version>
             </dependency>
