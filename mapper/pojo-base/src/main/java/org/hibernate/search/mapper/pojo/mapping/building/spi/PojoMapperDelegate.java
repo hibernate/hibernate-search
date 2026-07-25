@@ -8,6 +8,7 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A delegate for the POJO mapper,
@@ -29,6 +30,14 @@ public interface PojoMapperDelegate<MPBS> extends BackendMapperContext {
 	default BackendMappingHints hints() {
 		return BackendMappingHints.NONE;
 	}
+
+	/**
+	 * @param rawTypeModel The raw type model for a type marked as an entity.
+	 * @param entityName The name of the entity type.
+	 * @return {@code true} if this delegate supports the given entity type, {@code false} if it should be ignored.
+	 */
+	@Incubating
+	boolean isSupportedEntityType(PojoRawTypeModel<?> rawTypeModel, String entityName);
 
 	/**
 	 * @param <E> The indexed entity type.

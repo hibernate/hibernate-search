@@ -47,4 +47,9 @@ public final class StandalonePojoMapperDelegate
 	public BackendMappingHints hints() {
 		return StandalonePojoMappingHints.INSTANCE;
 	}
+
+	@Override
+	public boolean isSupportedEntityType(PojoRawTypeModel<?> rawTypeModel, String entityName) {
+		return true;
+	}
 }

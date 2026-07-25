@@ -137,6 +137,10 @@ class HibernateOrmTypeContextContainer
 			this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		}
 
+		boolean isDiscoveredEntityName(String jpaEntityName) {
+			return basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName ) != null;
+		}
+
 		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
 			String hibernateOrmEntityName = basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName );
 			HibernateOrmIndexedTypeContext.Builder<E> builder = new HibernateOrmIndexedTypeContext.Builder<>( typeModel,

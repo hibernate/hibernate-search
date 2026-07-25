@@ -713,4 +713,11 @@ public interface MappingLog {
 
 	@Message(id = ID_OFFSET + 170, value = "Property name '%1$s' cannot contain dots.")
 	IllegalArgumentException propertyNameCannotContainDots(String propertyName);
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 180,
+			value = "Entity type '%1$s' is not supported by this mapper implementation and will be ignored."
+					+ " If this type is meant to be indexed, check your configuration.")
+	void ignoringEntityType(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
+
 }
