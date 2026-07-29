@@ -192,6 +192,9 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '27', testCompilerTool: 'OpenJDK 27 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(version: '28', testCompilerTool: 'OpenJDK 28 Latest',
+							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
 							condition: TestCondition.AFTER_MERGE)
 					// IMPORTANT: Make sure to update the documentation for any newly supported Java versions
 					//            See java-version.main.compatible.expected.text in POMs.
