@@ -165,10 +165,10 @@
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.4.240</version.com.h2database>
         <version.org.postgresql>42.7.13</version.org.postgresql>
-        <version.org.mariadb.jdbc>3.5.9</version.org.mariadb.jdbc>
-        <version.mysql.mysql-connector-j>9.7.0</version.mysql.mysql-connector-j>
+        <version.org.mariadb.jdbc>3.5.10</version.org.mariadb.jdbc>
+        <version.mysql.mysql-connector-j>26.7.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.5.0</version.com.ibm.db2.jcc>
-        <version.com.oracle.database.jdbc>23.26.2.0.0</version.com.oracle.database.jdbc>
+        <version.com.oracle.database.jdbc>23.26.3.0.0</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>13.4.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
@@ -189,7 +189,7 @@
         <version.dev.snowdrop>4.1.1</version.dev.snowdrop>
         <version.io.agroal>3.2.1</version.io.agroal>
 
-        <version.jsoup>1.22.2</version.jsoup>
+        <version.jsoup>1.23.1</version.jsoup>
         <version.snakeyaml>2.6</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
