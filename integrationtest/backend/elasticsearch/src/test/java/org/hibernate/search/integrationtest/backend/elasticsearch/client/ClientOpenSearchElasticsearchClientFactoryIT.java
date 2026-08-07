@@ -1006,6 +1006,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				);
 	}
 
+	@SuppressWarnings("deprecation")
 	@RetryExtension.TestWithRetry
 	void clientInstance() throws IOException, URISyntaxException {
 		try ( RestClient myRestClient = RestClient.builder( HttpHost.create( httpUrisFor( wireMockRule1 ) ) ).build() ) {

@@ -292,6 +292,12 @@
                 <artifactId>opensearch-rest-high-level-client</artifactId>
                 <version>${version.bom.org.opensearch.client}</version>
             </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-http-client</artifactId>
+                <version>${version.bom.org.opensearch.client}</version>
+            </dependency>
+
 
             <!--Other transitive dependencies: -->
 

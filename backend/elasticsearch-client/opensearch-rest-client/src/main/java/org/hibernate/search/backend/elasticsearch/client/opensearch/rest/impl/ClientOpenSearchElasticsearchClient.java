@@ -45,6 +45,7 @@ import org.opensearch.client.ResponseListener;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.sniff.Sniffer;
 
+@SuppressWarnings("deprecation")
 public class ClientOpenSearchElasticsearchClient implements ElasticsearchClientImplementor {
 
 	private final BeanHolder<? extends RestClient> restClientHolder;

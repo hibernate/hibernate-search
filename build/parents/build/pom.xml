@@ -471,6 +471,11 @@
             </dependency>
             <dependency>
                 <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-http-client</artifactId>
+                <version>${version.org.opensearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
                 <artifactId>opensearch-rest-client-sniffer</artifactId>
                 <version>${version.org.opensearch.client}</version>
             </dependency>
