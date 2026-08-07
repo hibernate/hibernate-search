@@ -40,6 +40,9 @@ Hibernate Search targets the Hibernate ORM 8.0 series.
 [[lucene-version]]
 Lucene::
 The Lucene-next backend is now based on Lucene 10.5.0.
+[[elasticsearch-version]]
+Elasticsearch::
+Hibernate Search is now also compatible with Elasticsearch 9.5 as well as with previously compatible versions of Elasticsearch.
 [[opensearch-version]]
 OpenSearch::
-Hibernate Search is now also compatible with OpenSearch 3.7 as well as with previously compatible versions of OpenSearch.
+Hibernate Search is now also compatible with OpenSearch 3.7 and 3.8 as well as with previously compatible versions of OpenSearch.
