@@ -53,6 +53,7 @@ import org.opensearch.client.sniff.SnifferBuilder;
 /**
  * @author Gunnar Morling
  */
+@SuppressWarnings("deprecation")
 public class ClientOpenSearchElasticsearchClientFactory implements ElasticsearchClientFactory {
 
 	public static final String NAME = "opensearch-rest";

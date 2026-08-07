@@ -26,6 +26,7 @@ import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 import org.opensearch.client.RestClient;
 
+@SuppressWarnings("deprecation")
 class ClientOpenSearchElasticsearchExtensionIT {
 
 	@RegisterExtension
