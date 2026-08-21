@@ -159,7 +159,7 @@
                   and if so - remove the commons-codec management.
                 - remove and generate the files in mapper/orm-outbox-polling/src/main/avro/generated
         -->
-        <version.org.apache.avro>1.12.1</version.org.apache.avro>
+        <version.org.apache.avro>1.12.2</version.org.apache.avro>
         <version.org.jboss.weld>5.1.7.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
@@ -540,7 +540,11 @@
                 <artifactId>avro</artifactId>
                 <version>${version.org.apache.avro}</version>
             </dependency>
-            <!-- Added to management to align the version between avro and elasticsearch-rest-client-sniffer -->
+            <!--
+                Originally added to align commons-codec between Avro and elasticsearch-rest-client-sniffer.
+                Avro no longer depends on commons-codec, so this now keeps the version brought
+                transitively by the Elasticsearch REST clients and Apache HTTP ones at a recent version.
+            -->
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>

@@ -5,6 +5,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl;
 
+import org.apache.avro.JsonSchemaParser;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -16,7 +17,7 @@ public class DirtinessDescriptorDto extends org.apache.avro.specific.SpecificRec
   private static final long serialVersionUID = -7710265205062761472L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DirtinessDescriptorDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"forceSelfDirty\",\"type\":\"boolean\"},{\"name\":\"forceContainingDirty\",\"type\":\"boolean\"},{\"name\":\"dirtyPaths\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"updateBecauseOfContained\",\"type\":\"boolean\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = JsonSchemaParser.parseInternal("{\"type\":\"record\",\"name\":\"DirtinessDescriptorDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"forceSelfDirty\",\"type\":\"boolean\"},{\"name\":\"forceContainingDirty\",\"type\":\"boolean\"},{\"name\":\"dirtyPaths\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"updateBecauseOfContained\",\"type\":\"boolean\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -583,10 +584,10 @@ public class DirtinessDescriptorDto extends org.apache.avro.specific.SpecificRec
   @Override
   public int hashCode() {
     int result = 1;
-    result = 31 * result + Boolean.hashCode(forceSelfDirty);
-    result = 31 * result + Boolean.hashCode(forceContainingDirty);
-    result = 31 * result + (dirtyPaths == null ? 0 : dirtyPaths.hashCode());
-    result = 31 * result + Boolean.hashCode(updateBecauseOfContained);
+    result = 31 * result + Boolean.hashCode(this.forceSelfDirty);
+    result = 31 * result + Boolean.hashCode(this.forceContainingDirty);
+    result = 31 * result + (this.dirtyPaths == null ? 0 : this.dirtyPaths.hashCode());
+    result = 31 * result + Boolean.hashCode(this.updateBecauseOfContained);
     return result;
   }
 

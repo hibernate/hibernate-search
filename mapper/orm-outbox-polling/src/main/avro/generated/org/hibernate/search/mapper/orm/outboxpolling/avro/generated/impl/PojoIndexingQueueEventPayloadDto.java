@@ -5,6 +5,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl;
 
+import org.apache.avro.JsonSchemaParser;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -16,7 +17,7 @@ public class PojoIndexingQueueEventPayloadDto extends org.apache.avro.specific.S
   private static final long serialVersionUID = 5862163703280173834L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PojoIndexingQueueEventPayloadDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"routes\",\"type\":{\"type\":\"record\",\"name\":\"DocumentRoutesDescriptorDto\",\"fields\":[{\"name\":\"currentRoute\",\"type\":[{\"type\":\"record\",\"name\":\"DocumentRouteDescriptorDto\",\"fields\":[{\"name\":\"routingKey\",\"type\":[\"string\",\"null\"]}]},\"null\"]},{\"name\":\"previousRoutes\",\"type\":{\"type\":\"array\",\"items\":\"DocumentRouteDescriptorDto\"}}]}},{\"name\":\"dirtiness\",\"type\":{\"type\":\"record\",\"name\":\"DirtinessDescriptorDto\",\"fields\":[{\"name\":\"forceSelfDirty\",\"type\":\"boolean\"},{\"name\":\"forceContainingDirty\",\"type\":\"boolean\"},{\"name\":\"dirtyPaths\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"updateBecauseOfContained\",\"type\":\"boolean\"}]}}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = JsonSchemaParser.parseInternal("{\"type\":\"record\",\"name\":\"PojoIndexingQueueEventPayloadDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"routes\",\"type\":{\"type\":\"record\",\"name\":\"DocumentRoutesDescriptorDto\",\"fields\":[{\"name\":\"currentRoute\",\"type\":[{\"type\":\"record\",\"name\":\"DocumentRouteDescriptorDto\",\"fields\":[{\"name\":\"routingKey\",\"type\":[\"string\",\"null\"]}]},\"null\"]},{\"name\":\"previousRoutes\",\"type\":{\"type\":\"array\",\"items\":\"DocumentRouteDescriptorDto\"}}]}},{\"name\":\"dirtiness\",\"type\":{\"type\":\"record\",\"name\":\"DirtinessDescriptorDto\",\"fields\":[{\"name\":\"forceSelfDirty\",\"type\":\"boolean\"},{\"name\":\"forceContainingDirty\",\"type\":\"boolean\"},{\"name\":\"dirtyPaths\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"updateBecauseOfContained\",\"type\":\"boolean\"}]}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -501,8 +502,8 @@ public class PojoIndexingQueueEventPayloadDto extends org.apache.avro.specific.S
   @Override
   public int hashCode() {
     int result = 1;
-    result = 31 * result + (routes == null ? 0 : routes.hashCode());
-    result = 31 * result + (dirtiness == null ? 0 : dirtiness.hashCode());
+    result = 31 * result + (this.routes == null ? 0 : this.routes.hashCode());
+    result = 31 * result + (this.dirtiness == null ? 0 : this.dirtiness.hashCode());
     return result;
   }
 

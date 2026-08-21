@@ -5,6 +5,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl;
 
+import org.apache.avro.JsonSchemaParser;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -16,7 +17,7 @@ public class DocumentRoutesDescriptorDto extends org.apache.avro.specific.Specif
   private static final long serialVersionUID = -6728432513893267771L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DocumentRoutesDescriptorDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"currentRoute\",\"type\":[{\"type\":\"record\",\"name\":\"DocumentRouteDescriptorDto\",\"fields\":[{\"name\":\"routingKey\",\"type\":[\"string\",\"null\"]}]},\"null\"]},{\"name\":\"previousRoutes\",\"type\":{\"type\":\"array\",\"items\":\"DocumentRouteDescriptorDto\"}}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = JsonSchemaParser.parseInternal("{\"type\":\"record\",\"name\":\"DocumentRoutesDescriptorDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"currentRoute\",\"type\":[{\"type\":\"record\",\"name\":\"DocumentRouteDescriptorDto\",\"fields\":[{\"name\":\"routingKey\",\"type\":[\"string\",\"null\"]}]},\"null\"]},{\"name\":\"previousRoutes\",\"type\":{\"type\":\"array\",\"items\":\"DocumentRouteDescriptorDto\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -504,8 +505,8 @@ public class DocumentRoutesDescriptorDto extends org.apache.avro.specific.Specif
   @Override
   public int hashCode() {
     int result = 1;
-    result = 31 * result + (currentRoute == null ? 0 : currentRoute.hashCode());
-    result = 31 * result + (previousRoutes == null ? 0 : previousRoutes.hashCode());
+    result = 31 * result + (this.currentRoute == null ? 0 : this.currentRoute.hashCode());
+    result = 31 * result + (this.previousRoutes == null ? 0 : this.previousRoutes.hashCode());
     return result;
   }
 
