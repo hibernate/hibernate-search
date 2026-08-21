@@ -5,6 +5,7 @@
  */
 package org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl;
 
+import org.apache.avro.JsonSchemaParser;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -16,7 +17,7 @@ public class DocumentRouteDescriptorDto extends org.apache.avro.specific.Specifi
   private static final long serialVersionUID = 2357993799192335234L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DocumentRouteDescriptorDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"routingKey\",\"type\":[\"string\",\"null\"]}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = JsonSchemaParser.parseInternal("{\"type\":\"record\",\"name\":\"DocumentRouteDescriptorDto\",\"namespace\":\"org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl\",\"fields\":[{\"name\":\"routingKey\",\"type\":[\"string\",\"null\"]}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -325,7 +326,7 @@ public class DocumentRouteDescriptorDto extends org.apache.avro.specific.Specifi
   @Override
   public int hashCode() {
     int result = 1;
-    result = 31 * result + (routingKey == null ? 0 : routingKey.hashCode());
+    result = 31 * result + (this.routingKey == null ? 0 : this.routingKey.hashCode());
     return result;
   }
 
