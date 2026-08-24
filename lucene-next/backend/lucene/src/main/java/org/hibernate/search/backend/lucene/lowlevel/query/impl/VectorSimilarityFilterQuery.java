@@ -134,7 +134,7 @@ public class VectorSimilarityFilterQuery extends Query {
 		}
 
 		@Override
-		public long cost() {
+		public long cost() throws IOException {
 			return delegate.cost();
 		}
 	}
