@@ -945,6 +945,66 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 with a call to `.boost(...)`.
 
 
+[[search-dsl-predicate-disjunctionMax]]
+== `disjunctionMax`: match any clause, scoring on the best one
+
+The `disjunctionMax` predicate matches documents that match **any** of its inner predicates,
+called "disjuncts" -- exactly like <<search-dsl-predicate-or,`or`>>.
+The difference is in the <<search-dsl-predicate-common-score,score>>:
+where `or` *sums* the scores of every matching disjunct,
+`disjunctionMax` takes the *highest* score among them.
+
+This is what you want when the disjuncts are alternative expressions of the *same* user intent --
+most commonly the same text matched against several fields.
+With `or`, a document that happens to repeat the search terms in many fields
+outranks a document that matches one field very well;
+with `disjunctionMax`, the best-matching field decides.
+
+.Matching any of multiple predicates, scoring on the best match
+====
+[source, java, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=disjunctionMax]
+----
+<1> The hits *should* have a `title` field matching the text `robot`.
+<2> The hits *should* have a `description` field matching the text `robot`.
+<3> All returned hits will match *at least one* of the disjuncts above,
+and will be scored on whichever of them matched best, not on the sum of both.
+====
+
+[[search-dsl-predicate-disjunctionMax-tieBreaker]]
+=== Letting the other disjuncts contribute with `tieBreaker(...)`
+
+By default only the best-scoring disjunct contributes to the score of a document.
+`tieBreaker(...)` sets the multiplier applied to the *other* matching disjuncts,
+so that a document matching several of them can still rank slightly higher
+than a document matching only one -- without the number of matches dominating the score.
+
+.Giving the non-best disjuncts a fraction of their score
+====
+[source, java, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=disjunctionMax-tieBreaker]
+----
+<1> Each matching disjunct that is not the best-scoring one contributes 30% of its score.
+====
+
+Values between `0` and `1` are the useful range; anything outside it is for experts only.
+It defaults to `0`, meaning only the best-scoring disjunct counts.
+A value of `1` makes every matching disjunct contribute its full score,
+which is the same scoring as <<search-dsl-predicate-or,`or`>>.
+
+[[search-dsl-predicate-disjunctionMax-other]]
+=== Options
+
+* The score of a `disjunctionMax` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `disjunctionMax` predicate can be <<search-dsl-predicate-common-boost,boosted>>
+with a call to `.boost(...)`.
+* Disjuncts can be added dynamically with `with(...)`,
+exactly as for <<search-dsl-predicate-or-lambda,`or`>>.
+
+
 [[search-dsl-predicate-not]]
 == `not`: negating another predicate
 
