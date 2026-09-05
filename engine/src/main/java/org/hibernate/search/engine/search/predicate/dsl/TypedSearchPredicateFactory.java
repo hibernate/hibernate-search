@@ -79,6 +79,16 @@ public interface TypedSearchPredicateFactory<SR> extends SearchPredicateFactory 
 	SimpleBooleanPredicateClausesStep<SR, ?> or();
 
 	/**
+	 * Match documents if they match any <a href="DisjunctionMaxPredicateClausesCollector.html#disjuncts">disjunct</a>,
+	 * scoring them on the <em>highest</em> scoring disjunct.
+	 *
+	 * @return The initial step of a DSL where disjuncts can be added and options can be set.
+	 * @see DisjunctionMaxPredicateClausesCollector
+	 */
+	@Override
+	DisjunctionMaxPredicateClausesStep<SR, ?> disjunctionMax();
+
+	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.
 	 * <p>
 	 * Note that "value matching" may be exact or approximate depending on the type of the targeted fields:

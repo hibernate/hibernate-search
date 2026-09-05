@@ -124,6 +124,39 @@ public interface SearchPredicateFactory {
 			SearchPredicate... otherSearchPredicates);
 
 	/**
+	 * Match documents if they match any <a href="DisjunctionMaxPredicateClausesCollector.html#disjuncts">disjunct</a>,
+	 * scoring them on the <em>highest</em> scoring disjunct rather than on the sum of all matching disjuncts.
+	 *
+	 * @return The initial step of a DSL where disjuncts can be added and options can be set.
+	 * @see DisjunctionMaxPredicateClausesCollector
+	 */
+	DisjunctionMaxPredicateClausesStep<?, ?> disjunctionMax();
+
+	/**
+	 * Match documents if they match any previously-built {@link SearchPredicate},
+	 * scoring them on the <em>highest</em> scoring one.
+	 *
+	 * @param firstSearchPredicate The first disjunct.
+	 * @param otherSearchPredicates The other disjuncts.
+	 * @return The step of a DSL where options can be set.
+	 * @see DisjunctionMaxPredicateClausesCollector
+	 */
+	DisjunctionMaxPredicateOptionsStep<?> disjunctionMax(SearchPredicate firstSearchPredicate,
+			SearchPredicate... otherSearchPredicates);
+
+	/**
+	 * Match documents if they match any disjunct,
+	 * scoring them on the <em>highest</em> scoring one.
+	 *
+	 * @param firstSearchPredicate The first disjunct.
+	 * @param otherSearchPredicates The other disjuncts.
+	 * @return The step of a DSL where options can be set.
+	 * @see DisjunctionMaxPredicateClausesCollector
+	 */
+	DisjunctionMaxPredicateOptionsStep<?> disjunctionMax(PredicateFinalStep firstSearchPredicate,
+			PredicateFinalStep... otherSearchPredicates);
+
+	/**
 	 * Match documents if they match any clause.
 	 *
 	 * @return The step of a DSL where options can be set.
