@@ -19,13 +19,11 @@ public class DoubleValuesSourceComparator extends DoubleComparator {
 	private final DoubleMultiValuesToSingleValuesSource source;
 
 	public DoubleValuesSourceComparator(int numHits, String field, Double missingValue, boolean reversed,
-			Pruning ignored, DoubleMultiValuesToSingleValuesSource source) {
-		// See Javadocs for org.apache.lucene.search.comparators.NumericComparator.NumericLeafComparator#getNumericDocValues(LeafReaderContext, String)
-		// >>  * If you override this method, you should probably always disable skipping as the comparator
-		//     * uses values from the points index to build its competitive iterators, and assumes that the
-		//     * values in doc values and points are the same.
-		// Disabling skipping in the leaf comparator is already too late as the leaf comparator is fully initialized and final skipping value is already set.
-		super( numHits, field, missingValue, reversed, Pruning.NONE );
+			Pruning pruning, DoubleMultiValuesToSingleValuesSource source) {
+		// Whether skipping is safe depends on the field, not on this class: it is only safe when our doc values
+		// return the raw value, which LuceneNumericFieldComparatorSource decides before calling us. It cannot be
+		// decided later, as the leaf comparator is fully initialized with a final skipping value.
+		super( numHits, field, missingValue, reversed, pruning );
 		this.source = source;
 	}
 

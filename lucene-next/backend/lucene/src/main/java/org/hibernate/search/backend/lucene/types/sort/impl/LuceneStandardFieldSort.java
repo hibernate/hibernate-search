@@ -152,18 +152,21 @@ public abstract class LuceneStandardFieldSort extends AbstractLuceneDocumentValu
 
 		private final LuceneNumericDomain<E> domain;
 		private final E effectiveMissingValue;
+		private final boolean singleValuedInRoot;
 
 		private NumericFieldSort(NumericFieldBuilder<?, E> builder) {
 			super( builder );
 			domain = builder.codec.getDomain();
 			effectiveMissingValue = builder.getEffectiveMissingValue();
+			singleValuedInRoot = !builder.field.multiValuedInRoot();
 		}
 
 		@Override
 		protected LuceneFieldComparatorSource doCreateFieldComparatorSource(String nestedDocumentPath,
 				MultiValueMode multiValueMode, Query nestedFilter) {
 			return new LuceneNumericFieldComparatorSource<>(
-					nestedDocumentPath, domain, effectiveMissingValue, multiValueMode, nestedFilter );
+					nestedDocumentPath, domain, effectiveMissingValue, multiValueMode, nestedFilter,
+					singleValuedInRoot );
 		}
 	}
 
