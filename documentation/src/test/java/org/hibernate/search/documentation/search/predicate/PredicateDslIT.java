@@ -279,6 +279,40 @@ class PredicateDslIT {
 	}
 
 	@Test
+	void disjunctionMax() {
+		withinSearchSession( searchSession -> {
+			// tag::disjunctionMax[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.disjunctionMax()
+							.add( f.match().field( "title" )
+									.matching( "robot" ) ) // <1>
+							.add( f.match().field( "description" )
+									.matching( "robot" ) ) ) // <2>
+					.fetchHits( 20 ); // <3>
+			// end::disjunctionMax[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.contains( BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::disjunctionMax-tieBreaker[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.disjunctionMax()
+							.add( f.match().field( "title" )
+									.matching( "robot" ) )
+							.add( f.match().field( "description" )
+									.matching( "robot" ) )
+							.tieBreaker( 0.3f ) ) // <1>
+					.fetchHits( 20 );
+			// end::disjunctionMax-tieBreaker[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.contains( BOOK3_ID );
+		} );
+	}
+
+	@Test
 	void or() {
 		withinSearchSession( searchSession -> {
 			// tag::or[]

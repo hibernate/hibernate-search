@@ -15,6 +15,8 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.DisjunctionMaxPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.DisjunctionMaxPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep;
@@ -40,6 +42,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialS
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.BooleanPredicateClausesStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.DisjunctionMaxPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.ExistsPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.KnnPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchAllPredicateOptionsStepImpl;
@@ -128,6 +131,25 @@ public abstract class AbstractSearchPredicateFactory<
 			SearchPredicate... otherSearchPredicate) {
 		return new SimpleBooleanPredicateClausesStepImpl<>( OR, dslContext, this, firstSearchPredicate,
 				otherSearchPredicate );
+	}
+
+	@Override
+	public DisjunctionMaxPredicateClausesStep<SR, ?> disjunctionMax() {
+		return new DisjunctionMaxPredicateClausesStepImpl<>( dslContext, this );
+	}
+
+	@Override
+	public DisjunctionMaxPredicateOptionsStep<?> disjunctionMax(SearchPredicate firstSearchPredicate,
+			SearchPredicate... otherSearchPredicates) {
+		return new DisjunctionMaxPredicateClausesStepImpl<>( dslContext, this, firstSearchPredicate,
+				otherSearchPredicates );
+	}
+
+	@Override
+	public DisjunctionMaxPredicateOptionsStep<?> disjunctionMax(PredicateFinalStep firstSearchPredicate,
+			PredicateFinalStep... otherSearchPredicates) {
+		return new DisjunctionMaxPredicateClausesStepImpl<>( dslContext, this, firstSearchPredicate,
+				otherSearchPredicates );
 	}
 
 	@Override
