@@ -163,7 +163,7 @@
         <version.org.jboss.weld>5.1.7.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
-        <version.com.h2database>2.4.240</version.com.h2database>
+        <version.com.h2database>2.5.250</version.com.h2database>
         <version.org.postgresql>42.7.13</version.org.postgresql>
         <version.org.mariadb.jdbc>3.5.10</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>26.7.0</version.mysql.mysql-connector-j>
@@ -190,7 +190,7 @@
         <version.io.agroal>3.2.1</version.io.agroal>
 
         <version.jsoup>1.23.2</version.jsoup>
-        <version.snakeyaml>2.6</version.snakeyaml>
+        <version.snakeyaml>2.7</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
         <failOnJavadocWarning>true</failOnJavadocWarning>
