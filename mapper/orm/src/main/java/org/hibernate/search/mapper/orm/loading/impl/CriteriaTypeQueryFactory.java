@@ -15,8 +15,6 @@ import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
-import org.hibernate.MultiIdentifierLoadAccess;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.query.spi.SelectionQueryImplementor;
@@ -68,7 +66,8 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 
 	@Override
 	@SuppressWarnings({ "rawtypes" })
-	public SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
+	public SelectionQueryImplementor<E> createQueryForLoadByUniqueProperty(SharedSessionContractImplementor session,
+			String parameterName) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 		ParameterExpression<Collection> idsParameter = criteriaBuilder.parameter( Collection.class, parameterName );
 		CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( entityClass );
@@ -78,15 +77,8 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 		return session.createQuery( criteriaQuery );
 	}
 
-	@SuppressWarnings("removal")
-	@Deprecated(forRemoval = true, since = "8.2")
 	@Override
-	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
-		return session.byMultipleIds( entityClass );
-	}
-
-	@Override
-	public List<E> findMultiple(SessionImplementor session, List<?> ids, FindOption... options) {
+	public List<E> findMultiple(SharedSessionContractImplementor session, List<?> ids, FindOption... options) {
 		return session.findMultiple( entityClass, ids, options );
 	}
 }

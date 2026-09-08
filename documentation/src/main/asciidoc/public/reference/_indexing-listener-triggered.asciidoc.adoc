@@ -40,6 +40,10 @@ Follow the links for more details.
 |Detects changes occurring in ORM sessions (`session.persist(...)`, `session.delete(...)`, setters, ...)
 2+|<<indexing-automatic-concepts-changes-in-session,Yes>>
 
+|Supports `StatelessSession` for indexing
+|No (<<limitations-stateless-session,throws an exception>>)
+|<<limitations-stateless-session,Yes>>
+
 |Detects changes caused by JPQL or SQL queries (`insert`/`update`/`delete`)
 2+|<<limitations-changes-in-session,No>>
 
@@ -91,9 +95,14 @@ Hibernate Search uses internal events of Hibernate ORM in order to detect change
 These events will be triggered if you actually manipulate managed entity objects in your code:
 calls to `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
 
+Listener-triggered indexing also works with Hibernate ORM's `StatelessSession`,
+but only with the <<coordination-outbox-polling,outbox-polling coordination strategy>>.
+With the default coordination strategy, indexing through a `StatelessSession` will result in an exception.
+See <<limitations-stateless-session>> for details.
+
 This works great for most applications, but you need to consider some limitations:
 
-* <<limitations-stateless-session>>
+* <<limitations-stateless-session,`StatelessSession` requires outbox-polling for indexing>>
 * <<limitations-changes-in-session>>
 * <<limitations-changes-asymmetric-association-updates>>
 

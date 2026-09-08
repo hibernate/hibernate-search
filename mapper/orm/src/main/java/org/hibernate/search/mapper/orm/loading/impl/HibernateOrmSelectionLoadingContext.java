@@ -6,7 +6,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import jakarta.persistence.EntityGraph;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
@@ -36,7 +36,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 	@Override
 	public void checkOpen() {
 		try {
-			sessionContext.session().checkOpen();
+			sessionContext.sessionImplementor().checkOpen();
 		}
 		catch (IllegalStateException e) {
 			throw OrmMiscLog.INSTANCE.hibernateSessionIsClosed( e );
@@ -52,8 +52,8 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 		return sessionContext;
 	}
 
-	public SessionImplementor sessionImplementor() {
-		return sessionContext.session();
+	public SharedSessionContractImplementor sessionImplementor() {
+		return sessionContext.sessionImplementor();
 	}
 
 	public MutableEntityLoadingOptions loadingOptions() {
@@ -103,7 +103,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 		@Override
 		public SearchLoadingOptionsStep graph(String graphName, GraphSemantic semantic) {
 			Contracts.assertNotNull( graphName, "graphName" );
-			return graph( sessionContext.session().getEntityGraph( graphName ), semantic );
+			return graph( sessionContext.sessionImplementor().getEntityGraph( graphName ), semantic );
 		}
 
 		@Override

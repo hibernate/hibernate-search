@@ -74,7 +74,7 @@ public final class ConfiguredListenerTriggeredIndexingStrategy {
 		if ( INDEXING_LISTENERS_ENABLED.get( configurationSource ) ) {
 			ConfigurationLog.INSTANCE.hibernateSearchListenerEnabled();
 			HibernateSearchEventListener hibernateSearchEventListener =
-					new HibernateSearchEventListener( contextProvider, true );
+					new HibernateSearchEventListener( contextProvider, true, usesAsyncProcessing() );
 			hibernateSearchEventListener.registerTo( mappingContext.sessionFactory() );
 		}
 		else {

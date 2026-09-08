@@ -112,7 +112,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			throw invalidTypeException( targetEntityTypeContext );
 		}
 
-		var sessionFactory = sessionContext.session().getSessionFactory();
+		var sessionFactory = sessionContext.sessionImplementor().getSessionFactory();
 		var entityMapping = HibernateOrmUtils.entityMappingType( sessionFactory,
 				targetEntityTypeContext.secondaryEntityName() );
 

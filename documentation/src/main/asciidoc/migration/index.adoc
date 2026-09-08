@@ -129,6 +129,20 @@ with the following exceptions:
 
 * The `ElasticsearchBackendImplSettings` class (both `cfg.impl` and `cfg.spi` variants) has been removed.
 
+* The `HibernateOrmQueryLoader.createMultiIdentifierLoadAccess(SessionImplementor)` method has been removed.
+Use `HibernateOrmQueryLoader.findMultiple(SessionImplementor, List, FindOption...)` instead.
+
+* The `HibernateOrmLoadingSessionContext.session()` method now returns `SharedSessionContractImplementor`
+instead of `SessionImplementor`, and has been renamed to `sessionImplementor()`.
+This allows the loading context to work with both `Session` and `StatelessSession`.
+
+[[api-deprecations]]
+=== Deprecations
+
+* The `HibernateOrmSessionContext.session()` method returning `Session` has been deprecated.
+Use `HibernateOrmSessionContext.sessionContract()` instead, which returns `SharedSessionContract`
+and works with both `Session` and `StatelessSession`.
+
 [[behavior]]
 == Behavior
 

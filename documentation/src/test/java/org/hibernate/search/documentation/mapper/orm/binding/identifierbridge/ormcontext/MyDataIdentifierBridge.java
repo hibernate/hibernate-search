@@ -4,8 +4,8 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.identifierbridge.ormcontext;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.SharedSessionContract;
 import org.hibernate.search.mapper.orm.HibernateOrmExtension;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -33,8 +33,8 @@ public class MyDataIdentifierBridge implements IdentifierBridge<MyData> {
 	@Override
 	public MyData fromDocumentIdentifier(String documentIdentifier,
 			IdentifierBridgeFromDocumentIdentifierContext context) {
-		Session session = context.extension( HibernateOrmExtension.get() ) // <3>
-				.session(); // <4>
+		SharedSessionContract session = context.extension( HibernateOrmExtension.get() ) // <3>
+				.sessionContract(); // <4>
 		// ... do something with the session ...
 		//end::include[]
 		/*

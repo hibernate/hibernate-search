@@ -230,11 +230,10 @@ public class PojoIndexingPlanImpl
 	public void updateBecauseOfContainedAssociation(PojoRawTypeIdentifier<?> typeIdentifier, Object containingEntity,
 			int dirtyAssociationPathOrdinal) {
 		// Note this method won't work when using provided identifiers
-		// or on contained entities that do not define a identifier mapping.
+		// or on contained entities that do not define an identifier mapping.
 		// Fortunately, the only platform making use of this method (Hibernate ORM)
 		// never uses provided identifiers and always defines an identifier mapping,
 		// so this should always work.
-
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
 		if ( delegate == null ) {
 			return;

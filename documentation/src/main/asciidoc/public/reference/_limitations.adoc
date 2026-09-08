@@ -196,39 +196,44 @@ This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3
 but is long-term goal.
 
 [[limitations-stateless-session]]
-== Listener-triggered indexing does not work with `StatelessSession`
+== Listener-triggered indexing with `StatelessSession`
 
 [[limitations-stateless-session-description]]
 === Description
 
-Hibernate Search's <<listener-triggered-indexing,listener-triggered indexing>> does not support
-Hibernate ORM's `StatelessSession`.
+Hibernate Search's <<listener-triggered-indexing,listener-triggered indexing>> with a `StatelessSession`
+requires the <<coordination-outbox-polling,outbox-polling coordination strategy>>.
 
-If an application persists or updates <<mapping-entityindexmapping,indexed entities>> through a `StatelessSession`,
-Hibernate Search will throw an exception.
+With the default coordination strategy (<<coordination-none,no coordination>>),
+attempting to insert, update, or delete an indexed or embedded entity through a `StatelessSession`
+will result in an exception.
+This is to prevent stale data and incorrect index contents (because of the `StatelessSession` specifics).
 
-Non-indexed entities can be persisted through a `StatelessSession` without any issues,
-even if Hibernate Search is enabled.
+Even with <<coordination-outbox-polling,outbox-polling>>, there are some differences
+compared to using a regular `Session`:
+
+* No dirty checking optimization. When an entity is updated through a `StatelessSession`,
+Hibernate Search does not determine which properties actually changed.
+As a result, every update is treated as if all properties were modified,
+and the entity will always be reindexed, even if only non-indexed properties changed.
+With a regular `Session`, Hibernate Search would skip reindexing in such cases.
+
+Search operations from a `StatelessSession` (using `Search.session(StatelessSession)`)
+work regardless of the coordination strategy.
 
 [[limitations-stateless-session-solution]]
 === Solutions and workarounds
 
-If you need to use a `StatelessSession` to persist or update indexed entities,
-you can disable the <<indexing-automatic-configuration,listener-triggered indexing>>:
+To use `StatelessSession` for indexing, configure the
+<<coordination-outbox-polling,outbox-polling coordination strategy>>.
 
-* Globally, by setting the configuration property
-`hibernate.search.indexing.listeners.enabled` to `false`.
-* For a specific session, by <<indexing-plan-filter,configuring an indexing plan filter>>.
+If outbox-polling is not an option, use a regular `Session` for indexing operations,
+and reserve the `StatelessSession` for search operations only.
 
-You will then need to index these entities explicitly,
+Alternatively, you could index entities explicitly,
 either using the <<indexing-massindexer,`MassIndexer`>>,
 using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
-or <<indexing-explicit,explicitly through a `SearchIndexingPlan`>>.
-
-[[limitations-stateless-session-roadmap]]
-=== Roadmap
-
-Hibernate ORM's stateless session compatibility is planned for a future version of Hibernate Search.
+or <<indexing-explicit,explicitly through a `Session` based `SearchIndexingPlan`>>.
 
 [[limitations-indexing-plan-serialization]]
 == Listener-triggered indexing is not compatible with `Session` serialization

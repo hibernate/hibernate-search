@@ -7,6 +7,7 @@ package org.hibernate.search.mapper.orm.model.impl;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.engine.spi.StatelessSessionImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoRawTypeIdentifierResolver;
@@ -66,6 +67,11 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 
 	@Override
 	public boolean isIgnorableDataAccessThrowable(Throwable throwable) {
+		if ( sessionImplementor instanceof StatelessSessionImplementor ) {
+			// With StatelessSession, lazy loading failures during reindexing resolution
+			// indicate that we'll most likely be missing part of the info required to construct the document...
+			return false;
+		}
 		// Ideally we would only need to ignore LazyInitializationException,
 		// but we have to work around HHH-14811 somehow,
 		// and there are other situations where lazy loading with bytecode enhancement enabled lead to

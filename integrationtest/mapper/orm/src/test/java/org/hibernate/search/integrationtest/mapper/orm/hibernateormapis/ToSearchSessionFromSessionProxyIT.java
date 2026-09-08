@@ -5,6 +5,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.runInTransaction;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
@@ -21,6 +22,7 @@ import jakarta.persistence.Id;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.SharedSessionContract;
+import org.hibernate.StatelessSession;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.hibernate.engine.jdbc.LobCreationContext;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -54,7 +56,7 @@ class ToSearchSessionFromSessionProxyIT {
 			LobCreationContext.class,
 			EventSource.class,
 			SessionImplementor.class,
-			SharedSessionContract.class
+			SharedSessionContract.class,
 	};
 
 	@RegisterExtension
@@ -99,6 +101,33 @@ class ToSearchSessionFromSessionProxyIT {
 			}
 			wrapped.close();
 		} );
+	}
+
+	@Test
+	void testSessionWrapper_toOrmStatelessSession_throws() {
+		with( sessionFactory ).runNoTransaction( s -> {
+			SearchSession searchSession = Search.session( s );
+			assertThat( searchSession ).isNotNull();
+			assertThat( searchSession.toOrmSession() ).isSameAs( s );
+			assertThatThrownBy( searchSession::toOrmStatelessSession )
+					.hasMessageContaining( "StatelessSession" );
+			assertThatThrownBy( searchSession::toEntityAgent )
+					.hasMessageContaining( "EntityAgent" );
+		} );
+	}
+
+	@Test
+	void testStatelessSession() {
+		try ( StatelessSession statelessSession = sessionFactory.openStatelessSession() ) {
+			SearchSession searchSession = Search.session( statelessSession );
+			assertThat( searchSession ).isNotNull();
+			assertThat( searchSession.toOrmStatelessSession() ).isSameAs( statelessSession );
+			assertThat( searchSession.toEntityAgent() ).isSameAs( statelessSession );
+			assertThatThrownBy( searchSession::toOrmSession )
+					.hasMessageContaining( "Session" );
+			assertThatThrownBy( searchSession::toEntityManager )
+					.hasMessageContaining( "EntityManager" );
+		}
 	}
 
 	@SuppressWarnings("unused") // For EJC and lambda arg
