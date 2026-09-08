@@ -89,7 +89,7 @@ class LuceneIndexManagerIT {
 		IndexBinding binding = index.binding();
 		index.bulkIndexer()
 				.add( 100, i -> documentProvider(
-						String.valueOf( i ),
+						"sync_" + i,
 						document -> document.addValue( binding.normalized, "value" + i )
 				) )
 				.join();
@@ -112,7 +112,7 @@ class LuceneIndexManagerIT {
 		IndexBinding binding = index.binding();
 		index.bulkIndexer()
 				.add( 100, i -> documentProvider(
-						String.valueOf( i ),
+						"async_" + i,
 						document -> document.addValue( binding.normalized, "value" + i )
 				) )
 				.join();

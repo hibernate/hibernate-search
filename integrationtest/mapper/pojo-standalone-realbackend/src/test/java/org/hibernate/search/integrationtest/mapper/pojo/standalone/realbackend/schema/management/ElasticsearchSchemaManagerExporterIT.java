@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -78,10 +79,10 @@ class ElasticsearchSchemaManagerExporterIT {
 		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 						"  \"aliases\": {" +
-						"    \"book-write\": {" +
+						"    \"" + TestForkPrefix.PREFIX + "book-write\": {" +
 						"      \"is_write_index\": true" +
 						"    }," +
-						"    \"book-read\": {" +
+						"    \"" + TestForkPrefix.PREFIX + "book-read\": {" +
 						"      \"is_write_index\": false" +
 						"    }" +
 						"  }," +

@@ -106,12 +106,14 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.lucene}</forkCount>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene-jbatch}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-lucene-jbatch</reportNameSuffix>
                             <reportsDirectory>${failsafe.lucene-jbatch.reportsDirectory}</reportsDirectory>
                             <summaryFile>${failsafe.lucene-jbatch.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jberet-se</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.jberet:jberet-core</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.jberet:jberet-se</classpathDependencyExclude>
@@ -128,12 +130,14 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <forkCount>${test.parallel.forkCount.lucene}</forkCount>
                             <argLine>${failsafe.jvm.args.no-jacoco} @{failsafe.jvm.args.jacoco.lucene-jberet}</argLine>
                             <reportNameSuffix>${surefire.executionIdentifier}-lucene-jberet</reportNameSuffix>
                             <reportsDirectory>${failsafe.lucene-jberet.reportsDirectory}</reportsDirectory>
                             <summaryFile>${failsafe.lucene-jberet.summaryFile}</summaryFile>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
                                 <classpathDependencyExclude>com.ibm.jbatch:com.ibm.jbatch.container</classpathDependencyExclude>
                             </classpathDependencyExcludes>

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -19,15 +20,15 @@ public class ElasticsearchIndexMetadataTestUtils {
 	}
 
 	public static URLEncodedString defaultPrimaryName(String hibernateSearchIndexName) {
-		return IndexNames.encodeName( hibernateSearchIndexName + "-000001" );
+		return IndexNames.encodeName( TestForkPrefix.PREFIX + hibernateSearchIndexName + "-000001" );
 	}
 
 	public static URLEncodedString defaultWriteAlias(String hibernateSearchIndexName) {
-		return IndexNames.encodeName( hibernateSearchIndexName + "-write" );
+		return IndexNames.encodeName( TestForkPrefix.PREFIX + hibernateSearchIndexName + "-write" );
 	}
 
 	public static URLEncodedString defaultReadAlias(String hibernateSearchIndexName) {
-		return IndexNames.encodeName( hibernateSearchIndexName + "-read" );
+		return IndexNames.encodeName( TestForkPrefix.PREFIX + hibernateSearchIndexName + "-read" );
 	}
 
 	public static URLEncodedString encodeName(String name) {

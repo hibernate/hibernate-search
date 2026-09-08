@@ -13,6 +13,7 @@
     <description>Hibernate Search integration tests for the Elasticsearch backend, running the Backend TCK in particular</description>
 
     <properties>
+        <test.parallel.forkCount>${test.parallel.forkCount.elasticsearch}</test.parallel.forkCount>
         <surefire.module>elasticsearch</surefire.module>
 
         <failsafe.client.elasticsearch.reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch-rest</failsafe.client.elasticsearch.reportsDirectory>

@@ -13,6 +13,7 @@
     <description>Hibernate Search integration tests for metamodel generation with ORM mapper and the Elasticsearch backend</description>
 
     <properties>
+        <test.parallel.forkCount>${test.parallel.forkCount.elasticsearch}</test.parallel.forkCount>
     </properties>
 
     <dependencies>

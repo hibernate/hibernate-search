@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -72,7 +73,7 @@ class ElasticsearchImplicitFieldsIT {
 	void implicit_fields_index() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.match().field( "_index" ).matching( "main-000001" ) )
+				.where( f -> f.match().field( "_index" ).matching( TestForkPrefix.PREFIX + "main-000001" ) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasTotalHitCount( 6 )

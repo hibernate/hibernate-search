@@ -13,6 +13,7 @@
     <description>Hibernate Search integration tests for the Hibernate ORM integration</description>
 
     <properties>
+        <test.parallel.forkCount>${test.parallel.forkCount.orm}</test.parallel.forkCount>
         <surefire.jvm.args.module>
             ${test.mockito.agent.jvm.args}
         </surefire.jvm.args.module>
@@ -66,11 +67,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <systemPropertyVariables combine.self="append">
-                        <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
         </plugins>
     </build>

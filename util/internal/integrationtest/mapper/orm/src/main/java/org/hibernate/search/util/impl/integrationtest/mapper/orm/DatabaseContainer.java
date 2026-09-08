@@ -7,6 +7,10 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +26,10 @@ import javax.script.ScriptException;
 
 import org.hibernate.cfg.DialectSpecificSettings;
 import org.hibernate.cfg.JdbcSettings;
+import org.hibernate.cfg.MappingSettings;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.common.TestContainerLock;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.HostConfig;
@@ -45,12 +52,14 @@ public final class DatabaseContainer {
 	private static final Duration REGULAR_TIMEOUT = Duration.ofMinutes( 5 );
 	private static final Duration EXTENDED_TIMEOUT = Duration.ofMinutes( 10 );
 
+	private static volatile boolean forkDatabaseInitialized = false;
+
 	private DatabaseContainer() {
 	}
 
 	private static final SupportedDatabase DATABASE;
 	private static final HibernateSearchJdbcDatabaseContainer DATABASE_CONTAINER;
-
+	private static final Path CONTAINER_LOCK_FILE;
 
 	static {
 		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.kind", "" );
@@ -60,6 +69,14 @@ public final class DatabaseContainer {
 		DATABASE_CONTAINER = DATABASE.container(
 				containers.resolve( "database" ).resolve( name + ".Dockerfile" )
 		);
+		// Lock file under project-root/target/ — scoped to this checkout, avoids cross-project collisions.
+		// containers = <root>/build/container, so parent.parent = <root>
+		CONTAINER_LOCK_FILE = containers.getParent().getParent().resolve( "target" )
+				.resolve( "hs-test-db-" + name + ".lock" );
+	}
+
+	static String forkDatabaseName(String baseName) {
+		return TestForkPrefix.PREFIX + baseName;
 	}
 
 	public static Configuration configuration() {
@@ -79,9 +96,15 @@ public final class DatabaseContainer {
 		}
 		else {
 			if ( DATABASE_CONTAINER != null && !DATABASE_CONTAINER.isRunning() ) {
+				TestContainerLock.startContainersWithLock( List.of( DATABASE_CONTAINER ), CONTAINER_LOCK_FILE );
+			}
+			if ( !forkDatabaseInitialized
+					&& !TestForkPrefix.PREFIX.isEmpty()
+					&& DATABASE_CONTAINER != null ) {
 				synchronized (DATABASE_CONTAINER) {
-					if ( !DATABASE_CONTAINER.isRunning() ) {
-						DATABASE_CONTAINER.start();
+					if ( !forkDatabaseInitialized ) {
+						DATABASE.initForkDatabase( DATABASE_CONTAINER );
+						forkDatabaseInitialized = true;
 					}
 				}
 			}
@@ -152,6 +175,23 @@ public final class DatabaseContainer {
 			}
 
 			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkDbName = forkDatabaseName( "hibernate_orm_test" );
+				executeSqlIgnoringErrors( container,
+						"CREATE DATABASE \"" + forkDbName + "\""
+								+ " OWNER \"hibernate_orm_test\"" );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				String dbName = forkDatabaseName( "hibernate_orm_test" );
+				String baseUrl = container.getJdbcUrl();
+				String forkUrl = baseUrl.replace( "/hibernate_orm_test", "/" + dbName );
+				return new Configuration( this, container.getDriverClassName(),
+						forkUrl, container.getUsername(), container.getPassword(), "" );
+			}
+
+			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
 						parseDockerImageName( dockerfile ),
@@ -185,6 +225,24 @@ public final class DatabaseContainer {
 			}
 
 			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkDbName = forkDatabaseName( "hibernate_orm_test" );
+				executeSqlIgnoringErrors( container,
+						"CREATE DATABASE IF NOT EXISTS `" + forkDbName + "`" );
+				executeSqlIgnoringErrors( container,
+						"GRANT ALL ON `" + forkDbName + "`.* TO 'hibernate_orm_test'@'%'" );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				String dbName = forkDatabaseName( "hibernate_orm_test" );
+				String baseUrl = container.getJdbcUrl();
+				String forkUrl = baseUrl.replace( "/hibernate_orm_test", "/" + dbName );
+				return new Configuration( this, container.getDriverClassName(),
+						forkUrl, container.getUsername(), container.getPassword(), "" );
+			}
+
+			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
 						parseDockerImageName( dockerfile ),
@@ -212,6 +270,24 @@ public final class DatabaseContainer {
 			}
 
 			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkDbName = forkDatabaseName( "hibernate_orm_test" );
+				executeSqlIgnoringErrors( container,
+						"CREATE DATABASE IF NOT EXISTS `" + forkDbName + "`" );
+				executeSqlIgnoringErrors( container,
+						"GRANT ALL ON `" + forkDbName + "`.* TO 'hibernate_orm_test'@'%'" );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				String dbName = forkDatabaseName( "hibernate_orm_test" );
+				String baseUrl = container.getJdbcUrl();
+				String forkUrl = baseUrl.replace( "/hibernate_orm_test", "/" + dbName );
+				return new Configuration( this, container.getDriverClassName(),
+						forkUrl, container.getUsername(), container.getPassword(), "" );
+			}
+
+			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
 						parseDockerImageName( dockerfile ),
@@ -236,6 +312,23 @@ public final class DatabaseContainer {
 			@Override
 			String dialect() {
 				return org.hibernate.dialect.DB2Dialect.class.getName();
+			}
+
+			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkSchema = forkDatabaseName( "hreact" ).toUpperCase( Locale.ROOT );
+				executeSqlIgnoringErrors( container,
+						"CREATE SCHEMA " + forkSchema + " AUTHORIZATION hreact" );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				Configuration config = super.configuration( container );
+				if ( !TestForkPrefix.PREFIX.isEmpty() ) {
+					String forkSchema = forkDatabaseName( "hreact" ).toUpperCase( Locale.ROOT );
+					return config.withDefaultSchema( forkSchema );
+				}
+				return config;
 			}
 
 			@Override
@@ -274,6 +367,26 @@ public final class DatabaseContainer {
 			}
 
 			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkUser = forkDatabaseName( "HSEARCH" ).toUpperCase( Locale.ROOT );
+				executeSqlIgnoringErrors( container,
+						"CREATE USER " + forkUser + " IDENTIFIED BY hibernate_orm_test" );
+				executeSqlIgnoringErrors( container,
+						"GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE,"
+								+ " UNLIMITED TABLESPACE TO " + forkUser );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				if ( !TestForkPrefix.PREFIX.isEmpty() ) {
+					String forkUser = forkDatabaseName( "HSEARCH" ).toUpperCase( Locale.ROOT );
+					return new Configuration( this, container.getDriverClassName(),
+							container.getJdbcUrl(), forkUser, "hibernate_orm_test", "" );
+				}
+				return super.configuration( container );
+			}
+
+			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
 						parseDockerImageName( dockerfile ),
@@ -298,6 +411,27 @@ public final class DatabaseContainer {
 			}
 
 			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkDbName = forkDatabaseName( "hsearch_test" );
+				executeSqlIgnoringErrors( container,
+						"IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = '"
+								+ forkDbName + "') CREATE DATABASE [" + forkDbName + "]" );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				if ( !TestForkPrefix.PREFIX.isEmpty() ) {
+					String forkDbName = forkDatabaseName( "hsearch_test" );
+					String baseUrl = container.getJdbcUrl();
+					String forkUrl = baseUrl.replace( "databaseName=tempdb",
+							"databaseName=" + forkDbName );
+					return new Configuration( this, container.getDriverClassName(),
+							forkUrl, container.getUsername(), container.getPassword(), "" );
+				}
+				return super.configuration( container );
+			}
+
+			@Override
 			HibernateSearchJdbcDatabaseContainer container(Path dockerfile) {
 				return new HibernateSearchJdbcDatabaseContainer(
 						parseDockerImageName( dockerfile ),
@@ -316,6 +450,25 @@ public final class DatabaseContainer {
 			@Override
 			String dialect() {
 				return org.hibernate.dialect.CockroachDialect.class.getName();
+			}
+
+			@Override
+			void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+				String forkDbName = forkDatabaseName( "defaultdb" );
+				executeSqlIgnoringErrors( container,
+						"CREATE DATABASE IF NOT EXISTS \"" + forkDbName + "\"" );
+				executeSqlIgnoringErrors( container,
+						"ALTER DATABASE \"" + forkDbName
+								+ "\" CONFIGURE ZONE USING gc.ttlseconds = 60" );
+			}
+
+			@Override
+			Configuration configuration(JdbcDatabaseContainer<?> container) {
+				String dbName = forkDatabaseName( "defaultdb" );
+				String baseUrl = container.getJdbcUrl();
+				String forkUrl = baseUrl.replace( "/defaultdb", "/" + dbName );
+				return new Configuration( this, container.getDriverClassName(),
+						forkUrl, container.getUsername(), container.getPassword(), "" );
 			}
 
 			@Override
@@ -390,6 +543,24 @@ public final class DatabaseContainer {
 					container.getPassword(),
 					""
 			);
+		}
+
+		void initForkDatabase(HibernateSearchJdbcDatabaseContainer container) {
+			// Default: no-op (H2 doesn't need fork-specific database creation)
+		}
+
+		static void executeSqlIgnoringErrors(HibernateSearchJdbcDatabaseContainer container,
+				String sql) {
+			try ( Connection conn = DriverManager.getConnection(
+					container.getJdbcUrl(), container.getUsername(), container.getPassword() ) ) {
+				conn.setAutoCommit( true );
+				try ( Statement stmt = conn.createStatement() ) {
+					stmt.execute( sql );
+				}
+			}
+			catch (SQLException e) {
+				// Ignore — database/schema may already exist from a previous run
+			}
 		}
 
 		abstract String dialect();
@@ -500,15 +671,22 @@ public final class DatabaseContainer {
 		private final String user;
 		private final String pass;
 		private final String isolation;
+		private final String defaultSchema;
 
 		private Configuration(DatabaseContainer.SupportedDatabase database, String driver, String url, String user, String pass,
 				String isolation) {
+			this( database, driver, url, user, pass, isolation, null );
+		}
+
+		private Configuration(DatabaseContainer.SupportedDatabase database, String driver, String url, String user, String pass,
+				String isolation, String defaultSchema) {
 			this.database = database;
 			this.driver = driver;
 			this.url = url;
 			this.user = user;
 			this.pass = pass;
 			this.isolation = isolation;
+			this.defaultSchema = defaultSchema;
 		}
 
 		public String driver() {
@@ -551,6 +729,9 @@ public final class DatabaseContainer {
 			map.put( JdbcSettings.USER, this.user );
 			map.put( JdbcSettings.PASS, this.pass );
 			map.put( JdbcSettings.ISOLATION, this.isolation );
+			if ( defaultSchema != null && !defaultSchema.isEmpty() ) {
+				map.put( MappingSettings.DEFAULT_SCHEMA, this.defaultSchema );
+			}
 			if ( database == DatabaseContainer.SupportedDatabase.ORACLE ) {
 				map.put( DialectSpecificSettings.ORACLE_VALUE_LOB_ENABLED, Boolean.FALSE );
 			}
@@ -570,35 +751,42 @@ public final class DatabaseContainer {
 			if ( driver == null ) {
 				return this;
 			}
-			return new Configuration( database, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation, defaultSchema );
 		}
 
 		private Configuration withUrl(String url) {
 			if ( url == null ) {
 				return this;
 			}
-			return new Configuration( database, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation, defaultSchema );
 		}
 
 		private Configuration withUser(String user) {
 			if ( user == null ) {
 				return this;
 			}
-			return new Configuration( database, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation, defaultSchema );
 		}
 
 		private Configuration withPass(String pass) {
 			if ( pass == null ) {
 				return this;
 			}
-			return new Configuration( database, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation, defaultSchema );
 		}
 
 		private Configuration withIsolation(String isolation) {
 			if ( isolation == null ) {
 				return this;
 			}
-			return new Configuration( database, driver, url, user, pass, isolation );
+			return new Configuration( database, driver, url, user, pass, isolation, defaultSchema );
+		}
+
+		Configuration withDefaultSchema(String defaultSchema) {
+			if ( defaultSchema == null ) {
+				return this;
+			}
+			return new Configuration( database, driver, url, user, pass, isolation, defaultSchema );
 		}
 	}
 }
