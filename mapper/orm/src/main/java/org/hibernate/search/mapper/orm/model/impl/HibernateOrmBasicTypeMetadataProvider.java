@@ -109,6 +109,8 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		);
 	}
 
+	// TODO: this needs accessors and maybe more changes/thought after that ?
+	@SuppressWarnings("removal")
 	private static void collectClassProperty(Builder metadataProviderBuilder,
 			Map<String, HibernateOrmBasicClassPropertyMetadata> collectedProperties,
 			Class<?> propertyHolderJavaClass, Property property, boolean isId) {

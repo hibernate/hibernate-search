@@ -185,7 +185,9 @@ class HibernateOrmIntegrationBooterIT {
 		BootstrapContext bootstrapContext = ( (MetadataBuilderImplementor) metadataBuilderImplementor ).getBootstrapContext();
 		Metadata metadata = metadataBuilderImplementor.build();
 
-		return HibernateOrmIntegrationBooter.builder( metadata, bootstrapContext )
+		return HibernateOrmIntegrationBooter
+				.builder( metadata, bootstrapContext.getServiceRegistry(),
+						bootstrapContext.getModelsContext().getClassDetailsRegistry() )
 				.valueReadHandleFactory( valueHandleFactoryMock )
 				.build();
 	}

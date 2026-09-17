@@ -11,7 +11,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
 
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -40,7 +39,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
-		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
+		ServiceRegistry serviceRegistry = builder.serviceRegistry;
 		this.valueHandleFactory = builder.valueHandleFactory != null
 				? builder.valueHandleFactory
 				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
@@ -72,7 +71,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				this.environmentSynchronizer = Optional.empty();
 			}
 		}
-		this.classDetailsRegistry = builder.bootstrapContext.getModelsContext().getClassDetailsRegistry();
+		this.classDetailsRegistry = builder.classDetailsRegistry;
 	}
 
 	@Override
@@ -183,14 +182,17 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	public static class BuilderImpl implements Builder {
 		private final Metadata metadata;
-		private final BootstrapContext bootstrapContext;
+		private final ServiceRegistry serviceRegistry;
+		private final ClassDetailsRegistry classDetailsRegistry;
 
 		private ValueHandleFactory valueHandleFactory;
 
-		public BuilderImpl(Metadata metadata, BootstrapContext bootstrapContext) {
+		public BuilderImpl(Metadata metadata, ServiceRegistry serviceRegistry, ClassDetailsRegistry classDetailsRegistry) {
 			this.metadata = metadata;
-			this.bootstrapContext = bootstrapContext;
+			this.serviceRegistry = serviceRegistry;
+			this.classDetailsRegistry = classDetailsRegistry;
 		}
+
 
 		@Override
 		public Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
