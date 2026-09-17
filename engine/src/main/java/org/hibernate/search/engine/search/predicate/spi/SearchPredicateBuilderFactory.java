@@ -20,6 +20,8 @@ public interface SearchPredicateBuilderFactory {
 
 	BooleanPredicateBuilder bool();
 
+	DisjunctionMaxPredicateBuilder disjunctionMax();
+
 	SimpleQueryStringPredicateBuilder simpleQueryString();
 
 	QueryStringPredicateBuilder queryString();
