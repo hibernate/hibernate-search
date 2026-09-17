@@ -744,7 +744,7 @@ stage('Sonar analysis') {
                 }
 
 				// we don't clean to keep the unstashed jacoco reports:
-				sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestEnvironmentArgs(environments.content.jdk.default)}"
+				sh "mvn package -Pskip-checks -Pci-build -DskipTests -DskipITs -Pcoverage-report ${toTestEnvironmentArgs(environments.content.jdk.default)}"
                 def currentJavaVersion = sh(script: 'mvn help:evaluate -Dexpression=java-version.main.release -q -DforceStdout', returnStdout: true).trim()
 
 				// WARNING: Make sure credentials are evaluated by sh, not Groovy.

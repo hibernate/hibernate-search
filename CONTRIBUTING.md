@@ -293,7 +293,7 @@ you'll have to close your IDE then use `./mvnw clean` to get back to a clean sta
 To only build Hibernate Search, without running tests, use the following command:
 
 ```bash
-./mvnw clean install -DskipTests
+./mvnw clean install -DskipTests -DskipITs
 ```
 
 ### Documentation
@@ -303,7 +303,7 @@ The documentation is based on [Asciidoctor](http://asciidoctor.org/).
 To generate the documentation only, without running tests, use:
 
 ```bash
-./mvnw clean install -pl documentation -am -DskipTests
+./mvnw clean install -pl documentation -am -DskipTests -DskipITs
 ```
 
 You can then find the freshly built documentation at the following location:
@@ -315,7 +315,7 @@ You can then find the freshly built documentation at the following location:
 By default, only the HTML output is enabled; to also generate the PDF output, enable the `documentation-pdf` profile:
 
 ```bash
-./mvnw clean install -pl documentation -am -DskipTests -Pdocumentation-pdf
+./mvnw clean install -pl documentation -am -DskipTests -DskipITs -Pdocumentation-pdf
 ```
 
 ### Distribution
@@ -329,7 +329,7 @@ To build the distribution bundle, enable the `documentation-pdf` and `dist` prof
 Or if you don't want to run tests:
 
 ```bash
-./mvnw clean install -Pdocumentation-pdf,dist -DskipTests
+./mvnw clean install -Pdocumentation-pdf,dist -DskipTests -DskipITs
 ```
 
 ### <a id="other-jdks"></a> Other JDKs
@@ -471,7 +471,7 @@ You can request static analysis and sanity checks with the `jqassistant` profile
 Tests do not need to be run for these checks.
 
 ```bash
-./mvnw clean install -Pjqassistant -DskipTests
+./mvnw clean install -Pjqassistant -DskipTests -DskipITs
 ```
 
 To also check cyclic dependencies between packages, use `-Djqassistant.groups=default,cycles`.
@@ -479,7 +479,7 @@ Cyclic dependency analysis is costly and may add significant overhead to the bui
 at least 10 seconds, maybe one minute or more depending on your setup.
 
 ```bash
-./mvnw clean install -Pjqassistant -DskipTests -Djqassistant.groups=default,cycles
+./mvnw clean install -Pjqassistant -DskipTests -DskipITs -Djqassistant.groups=default,cycles
 ```
 
 You can also inspect the created Neo4j datastore after a build,

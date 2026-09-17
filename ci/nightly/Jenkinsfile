@@ -85,7 +85,7 @@ pipeline {
 								echo "Generate documentation and distribution packages."
 								sh """mvn clean install \
 									-Pdocumentation-pdf \
-									-DskipTests \
+									-DskipTests -DskipITs \
 									--fail-at-end \
 									-Dscan=false -Dno-build-cache
 								"""

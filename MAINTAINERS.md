@@ -90,7 +90,7 @@ Note you can test dependency updates locally by calling the script `ci/dependenc
 First, make sure to have all the necessary artifacts in your local Maven repository:
 
 ```shell
-./mvnw clean install -Pdist -DskipTests
+./mvnw clean install -Pdist -DskipTests -DskipITs
 ```
 
 Then update the dependencies and apply necessary patches to tests with this command:
@@ -149,7 +149,7 @@ In any case:
 If you **added a new Maven module** that should be included in the distribution,
 **check that it has been included in the distribution** (javadoc and ZIP distribution):
 
-* `mvn clean install -Pdocumentation-pdf,dist -DskipTests`
+* `mvn clean install -Pdocumentation-pdf,dist -DskipTests -DskipITs`
 * Check the distribution package as built by Maven (`distribution/target/hibernate-search-<version>-dist`).
   In particular, check the jar files in the subdirectories:
   * `lib/required`
