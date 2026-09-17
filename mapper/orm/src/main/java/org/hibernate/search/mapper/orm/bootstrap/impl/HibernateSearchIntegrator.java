@@ -9,12 +9,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
-import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 /**
  * Integrates Hibernate Search into Hibernate Core by registering its needed listeners
@@ -26,10 +24,11 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
-	public void integrate(Metadata metadata, BootstrapContext bootstrapContext,
+	public void integrate(Metadata metadata,
+			Context context,
 			SessionFactoryImplementor sessionFactory) {
 		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
-				HibernateOrmUtils.getServiceOrEmpty( bootstrapContext.getServiceRegistry(),
+				HibernateOrmUtils.getServiceOrEmpty( sessionFactory.getServiceRegistry(),
 						HibernateSearchPreIntegrationService.class );
 
 		if ( !preIntegrationServiceOptional.isPresent() ) {
@@ -38,7 +37,8 @@ public class HibernateSearchIntegrator implements Integrator {
 		}
 
 		HibernateOrmIntegrationBooterImpl booter =
-				new HibernateOrmIntegrationBooterImpl.BuilderImpl( metadata, bootstrapContext )
+				new HibernateOrmIntegrationBooterImpl.BuilderImpl( metadata, sessionFactory.getServiceRegistry(),
+						context.getClassDetailsRegistry() )
 						.build();
 		// Orchestrate bootstrap and shutdown
 		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();
@@ -52,10 +52,4 @@ public class HibernateSearchIntegrator implements Integrator {
 		);
 		sessionFactory.addObserver( observer );
 	}
-
-	@Override
-	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-		// Nothing to do, Hibernate Search shuts down automatically when the SessionFactory is closed
-	}
-
 }

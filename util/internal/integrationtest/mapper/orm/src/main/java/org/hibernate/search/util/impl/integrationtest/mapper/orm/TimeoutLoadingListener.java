@@ -4,6 +4,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import java.sql.SQLException;
+
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.Session;
 import org.hibernate.SessionEventListener;
@@ -17,6 +19,6 @@ public class TimeoutLoadingListener implements SessionEventListener {
 
 	@Override
 	public void jdbcPrepareStatementEnd() {
-		throw new QueryTimeoutException( "Simulated timeout exception from the JBDC driver", null, "" );
+		throw new QueryTimeoutException( "Simulated timeout exception from the JBDC driver", new SQLException( "" ), "" );
 	}
 }
