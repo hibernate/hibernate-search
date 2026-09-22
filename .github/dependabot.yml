@@ -141,6 +141,11 @@ updates:
         update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
       - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
         versions: [ "13.3.0.jre11-preview" ]
+        # 3.6.0 has several bugs that make this version not a great fit for running the Search test suite
+      - dependency-name: "org.apache.maven.plugins:maven-surefire-plugin"
+        versions: [ "3.6.0" ]
+      - dependency-name: "org.apache.maven.plugins:maven-failsafe-plugin"
+        versions: [ "3.6.0" ]
 
   - package-ecosystem: "docker"
     registries:
