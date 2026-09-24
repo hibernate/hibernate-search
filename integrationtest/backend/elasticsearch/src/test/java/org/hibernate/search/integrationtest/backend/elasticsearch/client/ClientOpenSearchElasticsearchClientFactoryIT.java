@@ -98,6 +98,7 @@ import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBu
 import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
 import org.apache.hc.client5.http.nio.AsyncConnectionEndpoint;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -1119,6 +1120,10 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.setTlsStrategy(
 						ClientTlsStrategyBuilder.create()
 								.setSslContext( buildAllowAnythingSSLContext() )
+								// Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
+								// (previously it was set after the parameters were copied to the engine and had no effect).
+								// Use CLIENT policy so that only the noop verifier below runs, keeping WireMock's self-signed cert accepted.
+								.setHostVerificationPolicy( HostnameVerificationPolicy.CLIENT )
 								.setHostnameVerifier( org.apache.http.conn.ssl.NoopHostnameVerifier.INSTANCE )
 								.buildAsync()
 				)
@@ -1359,6 +1364,11 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 													.setTlsStrategy(
 															ClientTlsStrategyBuilder.create()
 																	.setSslContext( buildAllowAnythingSSLContext() )
+																	// Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
+																	// (previously it was set after the parameters were copied to the engine and had no effect).
+																	// Use CLIENT policy so that only the noop verifier below runs, keeping WireMock's self-signed cert accepted.
+																	.setHostVerificationPolicy(
+																			HostnameVerificationPolicy.CLIENT )
 																	.setHostnameVerifier( NoopHostnameVerifier.INSTANCE )
 																	.buildAsync()
 													)
