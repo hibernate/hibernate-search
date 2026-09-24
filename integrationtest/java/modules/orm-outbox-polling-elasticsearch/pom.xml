@@ -60,6 +60,10 @@
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.accessor</groupId>
+            <artifactId>hibernate-accessor-bytebuddy</artifactId>
+        </dependency>
 
         <!-- Access to testcontainers -->
         <dependency>

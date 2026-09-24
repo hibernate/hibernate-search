@@ -104,6 +104,7 @@
             `net.bytebuddy.experimental` property can be removed.
          -->
         <version.org.hibernate.orm>8.0.0.Beta2</version.org.hibernate.orm>
+        <version.org.hibernate.accessor>0.1.0.Alpha3</version.org.hibernate.accessor>
 
         <javadoc.org.hibernate.orm.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.hibernate.org/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
@@ -410,6 +411,13 @@
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-platform</artifactId>
                 <version>${version.org.hibernate.orm}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.accessor</groupId>
+                <artifactId>hibernate-accessor-bom</artifactId>
+                <version>${version.org.hibernate.accessor}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
