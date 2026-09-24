@@ -436,7 +436,8 @@
         <jacoco.environment.sub-directory>${surefire.environment}</jacoco.environment.sub-directory>
 
         <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
-        <failsafe.spring.skip>false</failsafe.spring.skip>
+        <!-- Spring needs to upgrade to JPA 4 before we can run the tests on it -->
+        <failsafe.spring.skip>true</failsafe.spring.skip>
 
         <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
         <surefire.executionIdentifier>${surefire.module}-${surefire.environment}</surefire.executionIdentifier>
