@@ -24,6 +24,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.Instantiator;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.models.spi.AnnotationTarget;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassDetailsRegistry;
@@ -35,12 +38,10 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingExcepti
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
-import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 import org.jboss.jandex.IndexView;
 
@@ -48,21 +49,23 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 
 	private static final String INDEX_MODELS_CONFIG_PARAM = "hibernate.models.jandex.index";
 
+	protected final AccessorFactory valueHandleFactory;
+	private final AccessorFactory annotationValueHandleFactory;
 	private final PojoModelsClassOrdering typeOrdering;
-	protected final ValueHandleFactory valueHandleFactory;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassResolver classResolver, ResourceResolver resourceResolver,
 			IndexView indexView,
-			ValueHandleFactory valueHandleFactory) {
-		this( simpleClassDetailsRegistry( classResolver, resourceResolver, indexView ), valueHandleFactory );
+			AccessorFactoriesContext accessorFactories) {
+		this( simpleClassDetailsRegistry( classResolver, resourceResolver, indexView ), accessorFactories );
 	}
 
 	protected AbstractPojoModelsBootstrapIntrospector(ClassDetailsRegistry classDetailsRegistry,
-			ValueHandleFactory valueHandleFactory) {
+			AccessorFactoriesContext accessorFactories) {
 		this.classDetailsRegistry = classDetailsRegistry;
 		this.typeOrdering = new PojoModelsClassOrdering( classDetailsRegistry );
-		this.valueHandleFactory = valueHandleFactory;
+		this.valueHandleFactory = accessorFactories.accessorFactory();
+		this.annotationValueHandleFactory = accessorFactories.annotationAccessorFactory();
 	}
 
 	private static ClassDetailsRegistry simpleClassDetailsRegistry(ClassResolver classResolver,
@@ -77,8 +80,8 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 	}
 
 	@Override
-	public ValueHandleFactory annotationValueHandleFactory() {
-		return valueHandleFactory;
+	public AccessorFactory annotationValueHandleFactory() {
+		return annotationValueHandleFactory;
 	}
 
 	public Stream<? extends Annotation> annotations(AnnotationTarget annotationTarget) {
@@ -110,20 +113,20 @@ public abstract class AbstractPojoModelsBootstrapIntrospector implements PojoBoo
 		return typeOrdering.descendingSuperTypes( classDetails ).map( this::toClass );
 	}
 
-	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor)
+	protected <T> Instantiator<T> createValueCreateHandle(Constructor<T> constructor)
 			throws IllegalAccessException {
 		throw new AssertionFailure( this + " doesn't support constructor handles."
 				+ " '" + getClass().getName() + " should be updated to implement createValueCreateHandle(Constructor)." );
 	}
 
-	protected ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
+	protected ValueReader<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
-			return valueHandleFactory.createForMethod( method );
+			return valueHandleFactory.valueReader( method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
-			return valueHandleFactory.createForField( field );
+			return valueHandleFactory.valueReader( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

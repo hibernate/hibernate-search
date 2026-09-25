@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
+import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooterBehavior;
@@ -34,7 +36,6 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMa
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingKey;
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegrationBooter {
 
@@ -48,14 +49,21 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 
 	private final List<AnnotatedTypeSource> annotatedTypeSources;
 	private final ConfigurationPropertyChecker propertyChecker;
-	private final ValueHandleFactory valueHandleFactory;
+	private final AccessorFactoriesContext accessorFactories;
 	private final Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer;
 	private final ConfigurationPropertySource propertySource;
 
 	private StandalonePojoIntegrationBooterImpl(BuilderImpl builder) {
 		annotatedTypeSources = builder.annotatedTypeSources;
 		propertyChecker = ConfigurationPropertyChecker.create();
-		valueHandleFactory = builder.valueHandleFactory;
+		accessorFactories = new AccessorFactoriesContext(
+				builder.accessorFactory != null
+						? builder.accessorFactory
+						: AccessorFactory.lambda( MethodHandles.publicLookup() ),
+				builder.annotationAccessorFactory != null
+						? builder.annotationAccessorFactory
+						: AccessorFactory.reflection()
+		);
 		introspectorCustomizer = builder.introspectorCustomizer;
 
 		propertySource = propertyChecker.wrap(
@@ -97,9 +105,7 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 							environment.classResolver(),
 							environment.resourceResolver(),
 							null,
-							valueHandleFactory != null
-									? valueHandleFactory
-									: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) );
+							accessorFactories );
 			introspector = introspectorCustomizer.apply( introspector );
 			StandalonePojoMappingKey mappingKey = new StandalonePojoMappingKey();
 			StandalonePojoMappingInitiator mappingInitiator = new StandalonePojoMappingInitiator( introspector );
@@ -151,7 +157,8 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	public static class BuilderImpl implements Builder {
 		private final List<AnnotatedTypeSource> annotatedTypeSources = new ArrayList<>();
 		private final Map<String, Object> properties = new HashMap<>();
-		private ValueHandleFactory valueHandleFactory;
+		private AccessorFactory accessorFactory;
+		private AccessorFactory annotationAccessorFactory;
 		private Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer = Function.identity();
 
 		public BuilderImpl() {
@@ -164,8 +171,14 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		}
 
 		@Override
-		public BuilderImpl valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
-			this.valueHandleFactory = valueHandleFactory;
+		public BuilderImpl accessorFactory(AccessorFactory accessorFactory) {
+			this.accessorFactory = accessorFactory;
+			return this;
+		}
+
+		@Override
+		public BuilderImpl annotationAccessorFactory(AccessorFactory annotationAccessorFactory) {
+			this.annotationAccessorFactory = annotationAccessorFactory;
 			return this;
 		}
 

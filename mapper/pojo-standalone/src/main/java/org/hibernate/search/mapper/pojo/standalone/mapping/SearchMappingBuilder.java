@@ -11,11 +11,11 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.standalone.bootstrap.spi.StandalonePojoIntegrationBooter;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 @Incubating
 public final class SearchMappingBuilder {
@@ -27,8 +27,8 @@ public final class SearchMappingBuilder {
 				.annotatedTypeSource( annotatedTypeSource );
 	}
 
-	/* package-protected */ SearchMappingBuilder valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
-		booterBuilder.valueReadHandleFactory( valueHandleFactory );
+	/* package-protected */ SearchMappingBuilder accessorFactory(AccessorFactory accessorFactory) {
+		booterBuilder.accessorFactory( accessorFactory );
 		return this;
 	}
 

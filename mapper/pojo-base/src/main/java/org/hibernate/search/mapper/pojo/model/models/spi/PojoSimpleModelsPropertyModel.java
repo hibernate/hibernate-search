@@ -7,8 +7,8 @@ package org.hibernate.search.mapper.pojo.model.models.spi;
 import java.lang.reflect.Member;
 import java.util.List;
 
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.models.spi.MemberDetails;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 final class PojoSimpleModelsPropertyModel<T>
 		extends
@@ -23,7 +23,7 @@ final class PojoSimpleModelsPropertyModel<T>
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	protected ValueReadHandle<T> createHandle(Member member) throws IllegalAccessException {
-		return (ValueReadHandle<T>) introspector.createValueReadHandle( member );
+	protected ValueReader<T> createHandle(Member member) throws IllegalAccessException {
+		return (ValueReader<T>) introspector.createValueReadHandle( member );
 	}
 }

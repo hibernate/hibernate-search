@@ -7,7 +7,7 @@ package org.hibernate.search.mapper.pojo.model.spi;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.accessor.ValueReader;
 
 final class GenericContextAwarePojoPropertyModel<T> implements PojoPropertyModel<T> {
 
@@ -38,7 +38,7 @@ final class GenericContextAwarePojoPropertyModel<T> implements PojoPropertyModel
 
 	@Override
 	@SuppressWarnings("unchecked") // We know that, in the current generic context, this cast is legal
-	public ValueReadHandle<T> handle() {
-		return (ValueReadHandle<T>) rawPropertyModel.handle();
+	public ValueReader<T> handle() {
+		return (ValueReader<T>) rawPropertyModel.handle();
 	}
 }
