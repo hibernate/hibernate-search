@@ -7,10 +7,13 @@ package org.hibernate.search.mapper.orm.session.impl;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.SharedSessionContract;
+import org.hibernate.StatelessSession;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.NonStaticMetamodelScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -36,10 +39,10 @@ import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;
 public class DelegatingSearchSession implements SearchSession {
 
 	private final Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider;
-	private final Session session;
+	private final SharedSessionContract session;
 
 	public DelegatingSearchSession(Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider,
-			Session session) {
+			SharedSessionContract session) {
 		this.mappingContextProvider = mappingContextProvider;
 		this.session = session;
 	}
@@ -118,12 +121,34 @@ public class DelegatingSearchSession implements SearchSession {
 
 	@Override
 	public EntityManager toEntityManager() {
-		return session;
+		if ( session instanceof EntityManager entityManager ) {
+			return entityManager;
+		}
+		return getDelegate().toEntityManager();
+	}
+
+	@Override
+	public EntityAgent toEntityAgent() {
+		if ( session instanceof EntityAgent entityAgent ) {
+			return entityAgent;
+		}
+		return getDelegate().toEntityAgent();
 	}
 
 	@Override
 	public Session toOrmSession() {
-		return session;
+		if ( session instanceof Session s ) {
+			return s;
+		}
+		return getDelegate().toOrmSession();
+	}
+
+	@Override
+	public StatelessSession toOrmStatelessSession() {
+		if ( session instanceof StatelessSession statelessSession ) {
+			return statelessSession;
+		}
+		return getDelegate().toOrmStatelessSession();
 	}
 
 	@Override
@@ -146,7 +171,13 @@ public class DelegatingSearchSession implements SearchSession {
 		// because the session may be a proxy that returns a different session based
 		// on the current thread (Spring, SessionFactory.getCurrentSession(), ...)
 		// See https://hibernate.atlassian.net/browse/HSEARCH-4108
-		SessionImplementor sessionImpl = HibernateOrmUtils.toSessionImplementor( session );
+		SharedSessionContractImplementor sessionImpl;
+		if ( session instanceof Session s ) {
+			sessionImpl = HibernateOrmUtils.toSessionImplementor( s );
+		}
+		else {
+			sessionImpl = (SharedSessionContractImplementor) session;
+		}
 		return HibernateOrmSearchSession.get( mappingContextProvider.get(), sessionImpl );
 	}
 }

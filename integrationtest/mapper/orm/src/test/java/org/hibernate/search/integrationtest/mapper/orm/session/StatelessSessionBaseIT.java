@@ -4,16 +4,27 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
@@ -36,10 +47,12 @@ class StatelessSessionBaseIT {
 
 	@BeforeAll
 	void setup() {
-		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
+		defaultBackendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
+		defaultBackendMock.expectAnySchema( ContainingEntity.INDEX_NAME );
 
 		sessionFactory = ormSetupHelper.start()
-				.withAnnotatedTypes( IndexedEntity1.class, RandomEntity.class )
+				.withAnnotatedTypes( IndexedEntity.class, NonIndexedEntity.class,
+						ContainingEntity.class, ContainedEntity.class )
 				.setup();
 	}
 
@@ -54,40 +67,46 @@ class StatelessSessionBaseIT {
 	}
 
 	@Test
-	void searchEntity() {
+	void insert_notAllowedWithListenerTriggeredIndexing() {
 		assertThatThrownBy( () -> {
 			sessionFactory.inStatelessTransaction( session -> {
-				IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
-				IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
-				IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
-
-				session.insert( entity1 );
-				session.insert( entity2 );
-				session.insert( entity3 );
-
-				// should've been:
-				//			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-				//					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
-				//					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
-				//					.addOrUpdate( "3", b -> b.field( "text", "number3" ) );
+				session.insert( new IndexedEntity( 1, "number1" ) );
 			} );
-		} ).hasMessageContaining(
-				"Hibernate Search does not support working with org.hibernate.internal.StatelessSessionImpl session type" );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
 
 		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	void searchEntityNoListener() {
+	void update_notAllowedWithListenerTriggeredIndexing() {
+		assertThatThrownBy( () -> {
+			sessionFactory.inStatelessTransaction( session -> {
+				IndexedEntity entity = new IndexedEntity( 1, "initial" );
+				session.insert( entity );
+			} );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
+
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void delete_notAllowedWithListenerTriggeredIndexing() {
+		assertThatThrownBy( () -> {
+			sessionFactory.inStatelessTransaction( session -> {
+				session.insert( new IndexedEntity( 1, "toDelete" ) );
+			} );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
+
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void noListener() {
 		listenerEnabled( false );
 		sessionFactory.inStatelessTransaction( session -> {
-			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
-			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
-			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
-
-			session.insert( entity1 );
-			session.insert( entity2 );
-			session.insert( entity3 );
+			session.insert( new IndexedEntity( 1, "number1" ) );
+			session.insert( new IndexedEntity( 2, "number2" ) );
+			session.insert( new IndexedEntity( 3, "number3" ) );
 		} );
 
 		defaultBackendMock.verifyExpectationsMet();
@@ -96,24 +115,61 @@ class StatelessSessionBaseIT {
 	@Test
 	void nonSearchEntity() {
 		sessionFactory.inStatelessTransaction( session -> {
-			RandomEntity entity1 = new RandomEntity( 1, "number1" );
-			RandomEntity entity2 = new RandomEntity( 2, "number2" );
-			RandomEntity entity3 = new RandomEntity( 3, "number3" );
-
-			session.insert( entity1 );
-			session.insert( entity2 );
-			session.insert( entity3 );
+			session.insert( new NonIndexedEntity( 1, "number1" ) );
+			session.insert( new NonIndexedEntity( 2, "number2" ) );
+			session.insert( new NonIndexedEntity( 3, "number3" ) );
 		} );
 
 		defaultBackendMock.verifyExpectationsMet();
 	}
 
-	@Entity(name = IndexedEntity1.NAME)
-	@Indexed(index = IndexedEntity1.INDEX_NAME)
-	public static class IndexedEntity1 {
+	@Test
+	void searchFromStatelessSession() {
+		defaultBackendMock.expectWorks( IndexedEntity.INDEX_NAME )
+				.add( "1", b -> b
+						.field( "text", "hello" ) );
+
+		sessionFactory.inTransaction( session -> {
+			session.persist( new IndexedEntity( 1, "hello" ) );
+		} );
+		defaultBackendMock.verifyExpectationsMet();
+
+		try ( StatelessSession session = sessionFactory.openStatelessSession() ) {
+			SearchSession searchSession = Search.session( session );
+			defaultBackendMock.expectCount(
+					Arrays.asList( IndexedEntity.INDEX_NAME ), 1L );
+
+			long count = searchSession.search( IndexedEntity.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount();
+
+			assertThat( count ).isEqualTo( 1L );
+		}
+
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void indexedEmbedded_notAllowedWithListenerTriggeredIndexing() {
+		assertThatThrownBy( () -> {
+			sessionFactory.inStatelessTransaction( session -> {
+				ContainedEntity contained = new ContainedEntity( 10, "embedded" );
+				session.insert( contained );
+
+				ContainingEntity containing = new ContainingEntity( 1, "container" );
+				containing.setContained( contained );
+				session.insert( containing );
+			} );
+		} ).hasMessageContaining( "Listener-triggered indexing is not supported with a stateless session" );
+
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed(index = IndexedEntity.INDEX_NAME)
+	public static class IndexedEntity {
 
 		static final String NAME = "indexed1";
-
 		static final String INDEX_NAME = "index1Name";
 
 		@Id
@@ -122,33 +178,106 @@ class StatelessSessionBaseIT {
 		@GenericField
 		private String text;
 
-		protected IndexedEntity1() {
-			// For ORM
+		private String nonIndexedText;
+
+		protected IndexedEntity() {
 		}
 
-		IndexedEntity1(int id, String text) {
+		IndexedEntity(int id, String text) {
 			this.id = id;
 			this.text = text;
 		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
+		public void setNonIndexedText(String nonIndexedText) {
+			this.nonIndexedText = nonIndexedText;
+		}
 	}
 
-	@Entity(name = RandomEntity.NAME)
-	public static class RandomEntity {
+	@Entity(name = NonIndexedEntity.NAME)
+	public static class NonIndexedEntity {
 
-		static final String NAME = "RandomEntity";
+		static final String NAME = "NonIndexedEntity";
 
 		@Id
 		private Integer id;
 
 		private String text;
 
-		protected RandomEntity() {
-			// For ORM
+		protected NonIndexedEntity() {
 		}
 
-		RandomEntity(int id, String text) {
+		NonIndexedEntity(int id, String text) {
 			this.id = id;
 			this.text = text;
+		}
+	}
+
+	@Entity(name = ContainingEntity.NAME)
+	@Indexed(index = ContainingEntity.INDEX_NAME)
+	public static class ContainingEntity {
+
+		static final String NAME = "ContainingEntity";
+		static final String INDEX_NAME = "ContainingEntity";
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String name;
+
+		@ManyToOne(fetch = FetchType.EAGER)
+		@IndexedEmbedded
+		private ContainedEntity contained;
+
+		protected ContainingEntity() {
+		}
+
+		ContainingEntity(int id, String name) {
+			this.id = id;
+			this.name = name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public void setContained(ContainedEntity contained) {
+			this.contained = contained;
+		}
+	}
+
+	@Entity(name = ContainedEntity.NAME)
+	public static class ContainedEntity {
+
+		static final String NAME = "ContainedEntity";
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String detail;
+
+		@OneToMany(mappedBy = "contained")
+		private List<ContainingEntity> containingEntities = new ArrayList<>();
+
+		protected ContainedEntity() {
+		}
+
+		ContainedEntity(int id, String detail) {
+			this.id = id;
+			this.detail = detail;
+		}
+
+		public void setDetail(String detail) {
+			this.detail = detail;
+		}
+
+		public List<ContainingEntity> getContainingEntities() {
+			return containingEntities;
 		}
 	}
 }

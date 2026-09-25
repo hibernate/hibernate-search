@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.ConnectionAcquisitionMode;
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Session;
+import org.hibernate.SharedSessionContract;
+import org.hibernate.StatelessSession;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -20,20 +22,25 @@ import org.hibernate.search.mapper.orm.outboxpolling.logging.impl.OutboxPollingE
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 
-public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
+public abstract class OutboxPollingOutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
 
 	// Note the hash function / table implementations MUST NOT CHANGE,
 	// otherwise existing indexes will no longer work correctly.
 	private static final RangeCompatibleHashFunction HASH_FUNCTION = ShardAssignment.HASH_FUNCTION;
 
-	private final EntityReferenceFactory entityReferenceFactory;
-	private final Session session;
-	private final List<OutboxEvent> events = new ArrayList<>();
+	public static OutboxPollingOutboxEventSendingPlan create(EntityReferenceFactory entityReferenceFactory,
+			SharedSessionContract session) {
+		if ( session instanceof StatelessSession statelessSession ) {
+			return new StatelessSessionOutboxPollingOutboxEventSendingPlan( entityReferenceFactory, statelessSession );
+		}
+		return new SessionOutboxPollingOutboxEventSendingPlan( entityReferenceFactory, (Session) session );
+	}
 
-	public OutboxPollingOutboxEventSendingPlan(EntityReferenceFactory entityReferenceFactory,
-			Session session) {
+	protected final EntityReferenceFactory entityReferenceFactory;
+	protected final List<OutboxEvent> events = new ArrayList<>();
+
+	private OutboxPollingOutboxEventSendingPlan(EntityReferenceFactory entityReferenceFactory) {
 		this.entityReferenceFactory = entityReferenceFactory;
-		this.session = session;
 	}
 
 	@Override
@@ -51,48 +58,94 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 		events.clear();
 	}
 
-	@Override
-	public CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(OperationSubmitter operationSubmitter) {
-		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
-			throw OutboxPollingEventsLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
+	private static final class SessionOutboxPollingOutboxEventSendingPlan extends OutboxPollingOutboxEventSendingPlan {
+		private final Session session;
+
+		private SessionOutboxPollingOutboxEventSendingPlan(EntityReferenceFactory entityReferenceFactory, Session session) {
+			super( entityReferenceFactory );
+			this.session = session;
 		}
 
-		if ( session.isOpen() ) {
-			return sendAndReportOnSession( session, entityReferenceFactory );
+		@Override
+		public CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(
+				OperationSubmitter operationSubmitter) {
+			if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
+				throw OutboxPollingEventsLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
+			}
+
+			if ( session.isOpen() ) {
+				return doSendAndReport( session );
+			}
+
+			// See https://hibernate.atlassian.net/browse/HSEARCH-4198
+			// When JTA is enabled with Spring, the shouldReleaseBeforeCompletion strategy is used by default.
+			// Solution inspired by org.hibernate.envers.internal.synchronization.AuditProcess#doBeforeTransactionCompletion.
+			try ( Session temporarySession = session.sessionWithOptions()
+					.connection()
+					.autoClose( false )
+					.connectionHandling( ConnectionAcquisitionMode.AS_NEEDED, ConnectionReleaseMode.AFTER_TRANSACTION )
+					.openSession() ) {
+				return doSendAndReport( temporarySession );
+			}
 		}
 
-		// See https://hibernate.atlassian.net/browse/HSEARCH-4198
-		// When JTA is enabled with Spring, the shouldReleaseBeforeCompletion strategy is used by default.
-		// Solution inspired by org.hibernate.envers.internal.synchronization.AuditProcess#doBeforeTransactionCompletion.
-		try ( Session temporarySession = session.sessionWithOptions()
-				.connection()
-				.autoClose( false )
-				.connectionHandling( ConnectionAcquisitionMode.AS_NEEDED, ConnectionReleaseMode.AFTER_TRANSACTION )
-				.openSession() ) {
-			return sendAndReportOnSession( temporarySession, entityReferenceFactory );
+		private CompletableFuture<MultiEntityOperationExecutionReport> doSendAndReport(Session currentSession) {
+			try {
+				MultiEntityOperationExecutionReport.Builder builder = MultiEntityOperationExecutionReport.builder();
+				for ( OutboxEvent event : events ) {
+					try {
+						currentSession.persist( event );
+					}
+					catch (RuntimeException e) {
+						builder.throwable( e );
+						builder.failingEntityReference(
+								entityReferenceFactory, event.getEntityName(), event.getOriginalEntityId() );
+					}
+				}
+				currentSession.flush();
+				OutboxPollingEventsLog.INSTANCE.eventPlanNumberOfPersistedEvents( events.size(), events );
+				return CompletableFuture.completedFuture( builder.build() );
+			}
+			finally {
+				events.clear();
+			}
 		}
 	}
 
-	private CompletableFuture<MultiEntityOperationExecutionReport> sendAndReportOnSession(
-			Session currentSession, EntityReferenceFactory entityReferenceFactory) {
-		try {
-			MultiEntityOperationExecutionReport.Builder builder = MultiEntityOperationExecutionReport.builder();
-			for ( OutboxEvent event : events ) {
-				try {
-					currentSession.persist( event );
-				}
-				catch (RuntimeException e) {
-					builder.throwable( e );
-					builder.failingEntityReference(
-							entityReferenceFactory, event.getEntityName(), event.getOriginalEntityId() );
-				}
-			}
-			currentSession.flush();
-			OutboxPollingEventsLog.INSTANCE.eventPlanNumberOfPersistedEvents( events.size(), events );
-			return CompletableFuture.completedFuture( builder.build() );
+	private static final class StatelessSessionOutboxPollingOutboxEventSendingPlan extends OutboxPollingOutboxEventSendingPlan {
+		private final StatelessSession session;
+
+		private StatelessSessionOutboxPollingOutboxEventSendingPlan(EntityReferenceFactory entityReferenceFactory,
+				StatelessSession session) {
+			super( entityReferenceFactory );
+			this.session = session;
 		}
-		finally {
-			events.clear();
+
+		@Override
+		public CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(
+				OperationSubmitter operationSubmitter) {
+			if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
+				throw OutboxPollingEventsLog.INSTANCE.nonblockingOperationSubmitterNotSupported();
+			}
+
+			try {
+				MultiEntityOperationExecutionReport.Builder builder = MultiEntityOperationExecutionReport.builder();
+				for ( OutboxEvent event : events ) {
+					try {
+						session.insert( event );
+					}
+					catch (RuntimeException e) {
+						builder.throwable( e );
+						builder.failingEntityReference(
+								entityReferenceFactory, event.getEntityName(), event.getOriginalEntityId() );
+					}
+				}
+				OutboxPollingEventsLog.INSTANCE.eventPlanNumberOfPersistedEvents( events.size(), events );
+				return CompletableFuture.completedFuture( builder.build() );
+			}
+			finally {
+				events.clear();
+			}
 		}
 	}
 }

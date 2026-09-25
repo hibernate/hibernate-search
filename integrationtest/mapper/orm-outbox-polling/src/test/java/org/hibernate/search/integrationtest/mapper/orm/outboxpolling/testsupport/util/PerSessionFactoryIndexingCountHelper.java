@@ -181,7 +181,7 @@ public class PerSessionFactoryIndexingCountHelper {
 
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			String tenantId = context.extension( HibernateOrmExtension.get() ).session().getTenantIdentifier();
+			String tenantId = context.extension( HibernateOrmExtension.get() ).sessionContract().getTenantIdentifier();
 			StaticCounters.get().increment( counterKeys.forTenantId( tenantId ) );
 		}
 	}
