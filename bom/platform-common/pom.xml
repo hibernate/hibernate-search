@@ -18,7 +18,7 @@
         <deploy.skip>true</deploy.skip>
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
-        <version.bom.org.hibernate.orm>8.0.0.Beta2</version.bom.org.hibernate.orm>
+        <version.bom.org.hibernate.orm>8.0.0.Beta3</version.bom.org.hibernate.orm>
         <version.bom.org.hibernate.accessor>0.1.0.Alpha3</version.bom.org.hibernate.accessor>
         <version.bom.net.bytebuddy>1.18.11</version.bom.net.bytebuddy>
         <version.bom.org.elasticsearch.client>9.5.4</version.bom.org.elasticsearch.client>
@@ -28,7 +28,7 @@
         <version.bom.io.smallrye>3.6.0</version.bom.io.smallrye>
         <version.bom.org.jboss.logging.processor>3.0.4.Final</version.bom.org.jboss.logging.processor>
         <version.bom.org.jboss.logging>3.6.3.Final</version.bom.org.jboss.logging>
-        <version.bom.org.hibernate.models>1.3.3</version.bom.org.hibernate.models>
+        <version.bom.org.hibernate.models>1.3.4</version.bom.org.hibernate.models>
         <version.bom.org.apache.avro>1.12.2</version.bom.org.apache.avro>
         <version.bom.com.google.code.gson>2.14.0</version.bom.com.google.code.gson>
         <version.bom.jakarta.batch>2.1.1</version.bom.jakarta.batch>
