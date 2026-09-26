@@ -54,6 +54,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -237,7 +238,7 @@ class ElasticsearchExtensionIT {
 				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid document identifier: 'InvalidId'",
-						"No such document in index 'main-read'" );
+						"No such document in index '" + TestForkPrefix.PREFIX + "main-read'" );
 	}
 
 	@Test

@@ -21,7 +21,9 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ForkAwareNoAliasLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -43,8 +45,10 @@ class ElasticsearchSearchQueryIT {
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
 				Arguments.of( null, defaultReadAlias( index.name() ) ),
-				Arguments.of( "no-alias", encodeName( index.name() ) ),
-				Arguments.of( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) )
+				Arguments.of( new ForkAwareNoAliasLayoutStrategy(), encodeName( TestForkPrefix.PREFIX + index.name() ) ),
+				Arguments.of( new StubSingleIndexLayoutStrategy(
+						TestForkPrefix.PREFIX + "custom-write", TestForkPrefix.PREFIX + "custom-read" ),
+						encodeName( TestForkPrefix.PREFIX + "custom-read" ) )
 		);
 	}
 

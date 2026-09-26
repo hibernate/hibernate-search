@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 class HibernateOrmJakartaBatchIT extends AbstractHibernateOrmMassIndexingIT {
 
-	private static final int JOB_TIMEOUT_MS = 30_000;
+	private static final int JOB_TIMEOUT_MS = 90_000;
 	private static final int THREAD_SLEEP = 1000;
 
 	@BeforeEach

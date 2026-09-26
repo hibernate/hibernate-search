@@ -24,6 +24,8 @@
         <java-version.main.release>17</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
+        <!-- Use a module-specific temp dir so that parallel builds don't conflict on /tmp/jmh.lock -->
+        <surefire.jvm.args.misc.module-specific>-Djava.io.tmpdir=${project.build.directory}/tmp</surefire.jvm.args.misc.module-specific>
     </properties>
 
     <dependencyManagement>

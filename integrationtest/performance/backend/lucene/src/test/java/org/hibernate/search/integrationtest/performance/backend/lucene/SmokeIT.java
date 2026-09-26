@@ -4,6 +4,11 @@
  */
 package org.hibernate.search.integrationtest.performance.backend.lucene;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import org.openjdk.jmh.runner.Runner;
@@ -20,6 +25,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
  * See README to know how to run the benchmark from the command line to obtain more reliable results.
  */
 class SmokeIT {
+
+	@BeforeAll
+	static void ensureTmpDir() throws IOException {
+		Files.createDirectories( Path.of( System.getProperty( "java.io.tmpdir" ) ) );
+	}
 
 	@Test
 	void test() throws RunnerException {

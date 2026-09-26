@@ -22,8 +22,10 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ForkAwareNoAliasLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -44,8 +46,10 @@ class ElasticsearchIndexingIT {
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
 				Arguments.of( null, defaultWriteAlias( index.name() ) ),
-				Arguments.of( "no-alias", encodeName( index.name() ) ),
-				Arguments.of( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-write" ) )
+				Arguments.of( new ForkAwareNoAliasLayoutStrategy(), encodeName( TestForkPrefix.PREFIX + index.name() ) ),
+				Arguments.of( new StubSingleIndexLayoutStrategy(
+						TestForkPrefix.PREFIX + "custom-write", TestForkPrefix.PREFIX + "custom-read" ),
+						encodeName( TestForkPrefix.PREFIX + "custom-write" ) )
 		);
 	}
 

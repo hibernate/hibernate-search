@@ -23,6 +23,7 @@ import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEnco
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.common.TestForkPrefix;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -111,7 +112,7 @@ class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	void migrationFrom6Beta4OrEarlier(ElasticsearchIndexSchemaManagerOperation operation) {
 		// Index layout of 6.0.0.Beta4 and before: aliases are missing,
 		// and the primary Elasticsearch index name is just the Hibernate Search index name.
-		URLEncodedString oldIndexName = encodeName( index.name() );
+		URLEncodedString oldIndexName = encodeName( TestForkPrefix.PREFIX + index.name() );
 		elasticsearchClient.index( oldIndexName, null, null )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
