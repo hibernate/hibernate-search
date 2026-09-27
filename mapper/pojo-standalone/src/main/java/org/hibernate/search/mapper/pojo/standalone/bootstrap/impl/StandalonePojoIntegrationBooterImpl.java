@@ -59,7 +59,7 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		accessorFactories = new AccessorFactoriesContext(
 				builder.accessorFactory != null
 						? builder.accessorFactory
-						: AccessorFactory.lambda( MethodHandles.publicLookup() ),
+						: AccessorFactory.lambda( MethodHandles.lookup() ),
 				builder.annotationAccessorFactory != null
 						? builder.annotationAccessorFactory
 						: AccessorFactory.reflection()
