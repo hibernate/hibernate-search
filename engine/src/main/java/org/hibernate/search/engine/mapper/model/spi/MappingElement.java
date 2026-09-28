@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.engine.mapper.model.spi;
 
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;

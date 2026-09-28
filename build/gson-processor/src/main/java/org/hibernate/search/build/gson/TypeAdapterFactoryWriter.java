@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.build.gson;
 
 import java.io.IOException;
@@ -31,10 +27,6 @@ final class TypeAdapterFactoryWriter {
 	}
 
 	private void writeHeader(PrintWriter w, ClassModel model) {
-		w.println( "/*" );
-		w.println( " * SPDX-License-Identifier: Apache-2.0" );
-		w.println( " * Copyright Red Hat Inc. and Hibernate Authors" );
-		w.println( " */" );
 		w.println( "package " + model.packageName + ";" );
 		w.println();
 		w.println( "import java.io.IOException;" );

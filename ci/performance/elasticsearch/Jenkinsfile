@@ -1,9 +1,4 @@
 /*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
-
-/*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
 @Library('hibernate-jenkins-pipeline-helpers') _

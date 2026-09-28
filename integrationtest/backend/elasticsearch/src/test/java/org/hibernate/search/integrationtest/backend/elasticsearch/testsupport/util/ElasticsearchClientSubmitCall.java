@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;

@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.documentation.testsupport;
 
 import static org.hibernate.search.documentation.testsupport.DocumentationSetupHelper.SetupVariant.variant;

@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 [[binding-propertybridge]]
 = [[mapper-orm-bridge-propertybridge]] [[section-field-bridge]] Property bridge
 

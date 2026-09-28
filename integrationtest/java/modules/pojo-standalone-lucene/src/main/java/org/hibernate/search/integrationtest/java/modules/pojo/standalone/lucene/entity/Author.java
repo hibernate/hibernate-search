@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.entity;
 
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.config.MyLuceneAnalysisConfigurer;

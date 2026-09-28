@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.backend.elasticsearch.link.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;

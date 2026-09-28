@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-	SPDX-License-Identifier: Apache-2.0
-	Copyright Red Hat Inc. and Hibernate Authors
--->
-
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
 		"http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
