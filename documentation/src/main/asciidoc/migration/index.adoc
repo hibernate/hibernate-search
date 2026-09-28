@@ -133,4 +133,12 @@ with the following exceptions:
 == Behavior
 
 The behavior of Hibernate Search {hibernateSearchVersion}
-is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is, in general, backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort},
+with the following exception:
+
+* Hibernate Search no longer wraps exceptions thrown by property getters or constructor invocations
+in a `SearchException` with an "Exception while invoking" message.
+Property getter exceptions pass through unchanged,
+while constructor invocation exceptions are propagated as provided by Hibernate Accessor.
+Higher-level indexing operations may still add their usual contextual exceptions.
+Update exception handlers and tests that rely on the previous wrapper or cause chain.

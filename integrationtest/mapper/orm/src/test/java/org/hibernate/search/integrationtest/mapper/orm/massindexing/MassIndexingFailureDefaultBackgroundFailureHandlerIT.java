@@ -56,9 +56,7 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 			String exceptionMessage, String failingOperationAsString) {
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "Exception while invoking" )
-						.causedBy( SimulatedFailure.class )
+				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( exceptionMessage )
 						.build(),
 				failingOperationAsString,
@@ -81,7 +79,6 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "Exception while building document for entity '" + entityReference + "'" )
-						.withMessage( "Exception while invoking" )
 						.withMessage( exceptionMessage )
 						.rootCause( SimulatedFailure.class )
 						.build(),

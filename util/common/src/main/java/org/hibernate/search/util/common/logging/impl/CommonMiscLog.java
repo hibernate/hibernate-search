@@ -10,7 +10,6 @@ import static org.jboss.logging.Logger.Level.TRACE;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
@@ -72,10 +71,6 @@ public interface CommonMiscLog {
 			value = "'%1$s' must not be null or empty.")
 	IllegalArgumentException arrayMustNotBeNullNorEmpty(String objectDescription);
 
-	@Message(id = ID_OFFSET + 5, value = "Exception while invoking '%1$s' on '%2$s': %3$s.")
-	SearchException errorInvokingMember(Member member, String componentAsString,
-			@Cause Throwable cause, String causeMessage);
-
 	@Message(id = ID_OFFSET + 6,
 			value = "Requested type argument %3$s to type %2$s"
 					+ " in implementing type %1$s, but %2$s doesn't declare any type parameter.")
@@ -109,10 +104,6 @@ public interface CommonMiscLog {
 	@Message(id = ID_OFFSET + 11,
 			value = "'%1$s' must not contain any null element.")
 	IllegalArgumentException collectionMustNotContainNullElement(String collectionDescription);
-
-	@Message(id = ID_OFFSET + 12, value = "Exception while invoking '%1$s' with arguments %2$s: %3$s")
-	SearchException errorInvokingStaticMember(Member member, String argumentsAsString, @Cause Throwable cause,
-			String causeMessage);
 
 	@Message(id = ID_OFFSET + 13, value = "Exception while accessing Jandex index for '%1$s': %2$s")
 	SearchException errorAccessingJandexIndex(URL codeSourceLocation, String message, @Cause Throwable e);

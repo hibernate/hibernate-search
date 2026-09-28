@@ -273,11 +273,9 @@ public abstract class AbstractMassIndexingFailureIT {
 								"1 failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								"First failure on entity 'Book#2': ",
-								"Exception while invoking"
+								exceptionMessage
 						)
-						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" ),
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
@@ -314,11 +312,12 @@ public abstract class AbstractMassIndexingFailureIT {
 								"1 failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								"First failure on entity 'Book#2': ",
-								"Exception while invoking"
+								exceptionMessage
 						)
 						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" ),
+						.hasMessageContaining( exceptionMessage )
+						.hasRootCauseInstanceOf( SimulatedFailure.class ),
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
