@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package acme.org.hibernate.search.integrationtest.spring.repackaged.model;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;

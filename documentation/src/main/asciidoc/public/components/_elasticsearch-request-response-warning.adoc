@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 [WARNING]
 ====
 Direct changes to the HTTP request may conflict with Hibernate Search features

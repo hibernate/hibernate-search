@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;

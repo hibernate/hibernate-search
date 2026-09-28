@@ -1,6 +1,3 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright Red Hat Inc. and Hibernate Authors
-
 # This is not the main CI job, but it is useful on forks.
 # See MAINTAINERS.md for details about all available CI jobs.
 

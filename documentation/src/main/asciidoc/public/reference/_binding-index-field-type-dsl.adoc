@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 [[binding-index-field-type-dsl]]
 = [[mapper-orm-bridge-index-field-type-dsl]] Defining index field types
 

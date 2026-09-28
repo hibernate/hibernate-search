@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 [NOTE]
 ====
 Configuration properties from this section are applicable to the following clients:

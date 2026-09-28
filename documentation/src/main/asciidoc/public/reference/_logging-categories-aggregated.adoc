@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 [appendix]
 [[logging-categories-aggregated]]
 = List of all available logging categories

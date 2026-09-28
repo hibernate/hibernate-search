@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.search.engine.backend.document.model.spi;
 
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;

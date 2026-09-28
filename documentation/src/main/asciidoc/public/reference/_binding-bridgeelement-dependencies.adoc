@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 [[binding-bridgedelement-dependencies]]
 = [[mapper-orm-bridge-bridgedelement-dependencies]] Declaring dependencies to bridged elements
 
