@@ -35,8 +35,8 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 
 	public static List<? extends Arguments> params() {
 		return Arrays.asList(
-				Arguments.of( AccessorFactory.reflection() ),
-				Arguments.of( AccessorFactory.lambda( MethodHandles.publicLookup() ) )
+				Arguments.of( AccessorFactory.reflection( MethodHandles.lookup() ) ),
+				Arguments.of( AccessorFactory.lambda( MethodHandles.lookup() ) )
 		);
 	}
 
@@ -71,7 +71,7 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 
 		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, context.getClassDetailsRegistry(),
-				new AccessorFactoriesContext( accessorFactory, AccessorFactory.reflection() )
+				new AccessorFactoriesContext( accessorFactory, AccessorFactory.reflection( MethodHandles.lookup() ) )
 		);
 	}
 

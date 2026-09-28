@@ -47,7 +47,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 						: AccessorFactory.lambda( MethodHandles.lookup() ),
 				builder.annotationAccessorFactory != null
 						? builder.annotationAccessorFactory
-						: AccessorFactory.reflection()
+						: AccessorFactory.reflection( MethodHandles.lookup() )
 		);
 		this.preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );

@@ -19,7 +19,7 @@
 
         <!-- These versions will be checked against the ones resolved by Maven for the project in the enforcer rule -->
         <version.bom.org.hibernate.orm>8.0.0.Beta3</version.bom.org.hibernate.orm>
-        <version.bom.org.hibernate.accessor>0.1.0.Alpha3</version.bom.org.hibernate.accessor>
+        <version.bom.org.hibernate.accessor>0.1.0.Alpha4</version.bom.org.hibernate.accessor>
         <version.bom.net.bytebuddy>1.18.11</version.bom.net.bytebuddy>
         <version.bom.org.elasticsearch.client>9.5.4</version.bom.org.elasticsearch.client>
         <version.bom.org.elasticsearch.java.client>9.5.4</version.bom.org.elasticsearch.java.client>

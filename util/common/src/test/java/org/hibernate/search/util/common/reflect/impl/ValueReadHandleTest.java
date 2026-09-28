@@ -32,7 +32,7 @@ class ValueReadHandleTest {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		return Arrays.asList(
 				Arguments.of( AccessorFactory.lambda( lookup ) ),
-				Arguments.of( AccessorFactory.reflection() )
+				Arguments.of( AccessorFactory.reflection( lookup ) )
 		);
 	}
 

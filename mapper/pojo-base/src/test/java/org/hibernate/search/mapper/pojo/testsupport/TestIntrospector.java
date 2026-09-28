@@ -4,6 +4,7 @@
  */
 package org.hibernate.search.mapper.pojo.testsupport;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 
 import org.hibernate.accessor.AccessorFactory;
@@ -30,7 +31,8 @@ public class TestIntrospector extends AbstractPojoModelsBootstrapIntrospector {
 
 	private TestIntrospector(AccessorFactory valueHandleFactory, AggregatedClassLoader aggregatedClassLoader) {
 		super( DefaultClassResolver.create( aggregatedClassLoader ), DefaultResourceResolver.create( aggregatedClassLoader ),
-				null, new AccessorFactoriesContext( valueHandleFactory, AccessorFactory.reflection() ) );
+				null,
+				new AccessorFactoriesContext( valueHandleFactory, AccessorFactory.reflection( MethodHandles.lookup() ) ) );
 	}
 
 	@Override
