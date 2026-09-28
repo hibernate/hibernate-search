@@ -62,7 +62,7 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 						: AccessorFactory.lambda( MethodHandles.lookup() ),
 				builder.annotationAccessorFactory != null
 						? builder.annotationAccessorFactory
-						: AccessorFactory.reflection()
+						: AccessorFactory.reflection( MethodHandles.lookup() )
 		);
 		introspectorCustomizer = builder.introspectorCustomizer;
 
