@@ -1,6 +1,7 @@
 package org.hibernate.search.mapper.pojo.standalone.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.spi.AccessContext;
+import org.hibernate.accessor.spi.AccessorConfiguration;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -52,13 +55,15 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	private StandalonePojoIntegrationBooterImpl(BuilderImpl builder) {
 		annotatedTypeSources = builder.annotatedTypeSources;
 		propertyChecker = ConfigurationPropertyChecker.create();
+		final AccessorConfiguration accessorConfiguration =
+				new AccessorConfiguration( new StandalonePojoAccessContext(), Map.of() );
 		accessorFactories = new AccessorFactoriesContext(
 				builder.accessorFactory != null
 						? builder.accessorFactory
-						: AccessorFactory.lambda( MethodHandles.lookup() ),
+						: AccessorFactory.lambda( accessorConfiguration ),
 				builder.annotationAccessorFactory != null
 						? builder.annotationAccessorFactory
-						: AccessorFactory.reflection( MethodHandles.lookup() )
+						: AccessorFactory.reflection( accessorConfiguration )
 		);
 		introspectorCustomizer = builder.introspectorCustomizer;
 
@@ -199,6 +204,29 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		@Override
 		public StandalonePojoIntegrationBooterImpl build() {
 			return new StandalonePojoIntegrationBooterImpl( this );
+		}
+	}
+
+	private static final class StandalonePojoAccessContext implements AccessContext {
+		private final MethodHandles.Lookup lookup;
+
+		private StandalonePojoAccessContext() {
+			this.lookup = MethodHandles.lookup();
+		}
+
+		@Override
+		public MethodHandles.Lookup lookup() {
+			return lookup;
+		}
+
+		@Override
+		public void ensureReads(Module target) {
+			lookup.lookupClass().getModule().addReads( target );
+		}
+
+		@Override
+		public void makeAccessible(AccessibleObject member) {
+			member.setAccessible( true );
 		}
 	}
 }

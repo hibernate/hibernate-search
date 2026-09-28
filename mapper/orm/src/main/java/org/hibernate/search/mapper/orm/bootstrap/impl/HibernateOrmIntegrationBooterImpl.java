@@ -1,12 +1,16 @@
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
 
 import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.spi.AccessContext;
+import org.hibernate.accessor.spi.AccessorConfiguration;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
@@ -37,13 +41,15 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.serviceRegistry;
+		final AccessorConfiguration accessorConfiguration =
+				new AccessorConfiguration( new HibernateOrmAccessContext(), Map.of() );
 		this.accessorFactories = new AccessorFactoriesContext(
 				builder.accessorFactory != null
 						? builder.accessorFactory
-						: AccessorFactory.lambda( MethodHandles.lookup() ),
+						: AccessorFactory.lambda( accessorConfiguration ),
 				builder.annotationAccessorFactory != null
 						? builder.annotationAccessorFactory
-						: AccessorFactory.reflection( MethodHandles.lookup() )
+						: AccessorFactory.reflection( accessorConfiguration )
 		);
 		this.preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
@@ -212,6 +218,29 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		@Override
 		public HibernateOrmIntegrationBooterImpl build() {
 			return new HibernateOrmIntegrationBooterImpl( this );
+		}
+	}
+
+	private static final class HibernateOrmAccessContext implements AccessContext {
+		private final MethodHandles.Lookup lookup;
+
+		private HibernateOrmAccessContext() {
+			this.lookup = MethodHandles.lookup();
+		}
+
+		@Override
+		public MethodHandles.Lookup lookup() {
+			return lookup;
+		}
+
+		@Override
+		public void ensureReads(Module target) {
+			lookup.lookupClass().getModule().addReads( target );
+		}
+
+		@Override
+		public void makeAccessible(AccessibleObject member) {
+			member.setAccessible( true );
 		}
 	}
 }
