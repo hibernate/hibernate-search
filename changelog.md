@@ -1,5 +1,78 @@
 # Hibernate Search Changelog
 
+## 9.0.0.Beta1 (2026-09-28)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39073)
+
+
+### Improvement
+* [HSEARCH-5701](https://hibernate.atlassian.net/browse/HSEARCH-5701) - Do not wrap->re-throw exceptions thrown by getters/constructors let them passthrough
+* [HSEARCH-5700](https://hibernate.atlassian.net/browse/HSEARCH-5700) - Update to Hibernate ORM 8.0.0.Beta3
+* [HSEARCH-5698](https://hibernate.atlassian.net/browse/HSEARCH-5698) - Update Apache HTTP Client components to 5.6.4
+* [HSEARCH-5697](https://hibernate.atlassian.net/browse/HSEARCH-5697) - Update Apache HTTP Core client components to 5.4.4
+* [HSEARCH-5696](https://hibernate.atlassian.net/browse/HSEARCH-5696) - Update AWS SDK to 2.55.4
+* [HSEARCH-5695](https://hibernate.atlassian.net/browse/HSEARCH-5695) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.5.4
+* [HSEARCH-5694](https://hibernate.atlassian.net/browse/HSEARCH-5694) - Update Elasticsearch client (elasticsearch-rest-client) to 9.5.4
+* [HSEARCH-5692](https://hibernate.atlassian.net/browse/HSEARCH-5692) - Update to Hibernate ORM 8.0.0.Beta2
+* [HSEARCH-5691](https://hibernate.atlassian.net/browse/HSEARCH-5691) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.5.3
+* [HSEARCH-5690](https://hibernate.atlassian.net/browse/HSEARCH-5690) - Update Elasticsearch client (elasticsearch-rest-client) to 9.5.3
+* [HSEARCH-5689](https://hibernate.atlassian.net/browse/HSEARCH-5689) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.5.2
+* [HSEARCH-5688](https://hibernate.atlassian.net/browse/HSEARCH-5688) - Update Elasticsearch client (elasticsearch-rest-client) to 9.5.2
+* [HSEARCH-5683](https://hibernate.atlassian.net/browse/HSEARCH-5683) - Update to Apache Lucene 10.5.1
+* [HSEARCH-5680](https://hibernate.atlassian.net/browse/HSEARCH-5680) - Update Elasticsearch rest client (opensearch-rest-client) to 3.8.0
+* [HSEARCH-5679](https://hibernate.atlassian.net/browse/HSEARCH-5679) - Add compatibility with OpenSearch 3.8
+* [HSEARCH-5678](https://hibernate.atlassian.net/browse/HSEARCH-5678) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.5.0
+* [HSEARCH-5677](https://hibernate.atlassian.net/browse/HSEARCH-5677) - Update Elasticsearch client (elasticsearch-rest-client) to 9.5.0
+* [HSEARCH-5676](https://hibernate.atlassian.net/browse/HSEARCH-5676) - Add compatibility with Elasticsearch 9.5
+* [HSEARCH-5675](https://hibernate.atlassian.net/browse/HSEARCH-5675) - Update to commons-codec to 1.22.1
+* [HSEARCH-5674](https://hibernate.atlassian.net/browse/HSEARCH-5674) - Update Apache HTTP Client components to 5.6.3
+* [HSEARCH-5673](https://hibernate.atlassian.net/browse/HSEARCH-5673) - Update to AWS SDK 2.50.2
+* [HSEARCH-5672](https://hibernate.atlassian.net/browse/HSEARCH-5672) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.5
+* [HSEARCH-5669](https://hibernate.atlassian.net/browse/HSEARCH-5669) - Make sure that ORM and Standalone mappers can be started in the same app
+* [HSEARCH-5668](https://hibernate.atlassian.net/browse/HSEARCH-5668) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.4
+* [HSEARCH-5667](https://hibernate.atlassian.net/browse/HSEARCH-5667) - Update Elasticsearch client (elasticsearch-rest-client) to 9.4.4
+* [HSEARCH-5665](https://hibernate.atlassian.net/browse/HSEARCH-5665) - Update to AWS SDK 2.48.0
+* [HSEARCH-5664](https://hibernate.atlassian.net/browse/HSEARCH-5664) - Update com.carrotsearch:hppc to 0.11.1
+* [HSEARCH-5663](https://hibernate.atlassian.net/browse/HSEARCH-5663) - Generate reflection-free Gson type adapters
+* [HSEARCH-5662](https://hibernate.atlassian.net/browse/HSEARCH-5662) - Update to Jackson 2.22.1
+* [HSEARCH-5661](https://hibernate.atlassian.net/browse/HSEARCH-5661) - Update to AWS SDK 2.47.1
+* [HSEARCH-5659](https://hibernate.atlassian.net/browse/HSEARCH-5659) - Update Elasticsearch client (elasticsearch-rest-client) to 9.4.3
+* [HSEARCH-5658](https://hibernate.atlassian.net/browse/HSEARCH-5658) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.3
+* [HSEARCH-5657](https://hibernate.atlassian.net/browse/HSEARCH-5657) - Update Apache HTTP Core client components to 5.4.3
+* [HSEARCH-5656](https://hibernate.atlassian.net/browse/HSEARCH-5656) - Update Apache HTTP Client components to 5.6.2
+* [HSEARCH-5654](https://hibernate.atlassian.net/browse/HSEARCH-5654) - Update the lucene-next backend to Lucene 10.5.0
+* [HSEARCH-5652](https://hibernate.atlassian.net/browse/HSEARCH-5652) - Update to Jackson 2.22.0
+* [HSEARCH-5651](https://hibernate.atlassian.net/browse/HSEARCH-5651) - Update documentation theme to the current latest 6.1.3.Final
+* [HSEARCH-5650](https://hibernate.atlassian.net/browse/HSEARCH-5650) - Update to commons-logging to 1.4.0
+* [HSEARCH-5649](https://hibernate.atlassian.net/browse/HSEARCH-5649) - Update to Hibernate ORM 8.0.0.Beta1
+* [HSEARCH-5641](https://hibernate.atlassian.net/browse/HSEARCH-5641) - Update Elasticsearch rest client (opensearch-rest-client) to 3.7.0
+* [HSEARCH-5638](https://hibernate.atlassian.net/browse/HSEARCH-5638) - Update to Hibernate ORM 7.4.1.Final
+* [HSEARCH-5637](https://hibernate.atlassian.net/browse/HSEARCH-5637) - Update to Jackson 2.21.4
+* [HSEARCH-5636](https://hibernate.atlassian.net/browse/HSEARCH-5636) - Update to AWS SDK 2.46.2
+* [HSEARCH-5634](https://hibernate.atlassian.net/browse/HSEARCH-5634) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.2
+* [HSEARCH-5633](https://hibernate.atlassian.net/browse/HSEARCH-5633) - Update Elasticsearch client (elasticsearch-rest-client) to 9.4.2
+* [HSEARCH-5632](https://hibernate.atlassian.net/browse/HSEARCH-5632) - Do not fully boot the standalone mapper in the annotation processor
+* [HSEARCH-5628](https://hibernate.atlassian.net/browse/HSEARCH-5628) - Switch to Hibernate Accessor for handling field/property access
+* [HSEARCH-5339](https://hibernate.atlassian.net/browse/HSEARCH-5339) - Hibernate Search with a stateless Hibernate ORM session
+
+### Remove Feature
+* [HSEARCH-5653](https://hibernate.atlassian.net/browse/HSEARCH-5653) - Remove deprecated HibernateOrmQueryLoader#createMultiIdentifierLoadAccess
+* [HSEARCH-5648](https://hibernate.atlassian.net/browse/HSEARCH-5648) - Remove Version.getVersionString()
+* [HSEARCH-5647](https://hibernate.atlassian.net/browse/HSEARCH-5647) - Remove deprecated Converter API (rename)
+* [HSEARCH-5646](https://hibernate.atlassian.net/browse/HSEARCH-5646) - Remove org.hibernate.search.mapper.orm.common.EntityReference / org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport
+* [HSEARCH-5645](https://hibernate.atlassian.net/browse/HSEARCH-5645) - Remove AutomaticIndexingSynchronizationStrategy
+* [HSEARCH-5644](https://hibernate.atlassian.net/browse/HSEARCH-5644) - Remove org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory
+* [HSEARCH-5643](https://hibernate.atlassian.net/browse/HSEARCH-5643) - Remove List<Object> entityReferences() and void entityReference(Object entityReference) from MassIndexingEntityFailureContext/EntityIndexingFailureContext
+* [HSEARCH-5642](https://hibernate.atlassian.net/browse/HSEARCH-5642) - Remove org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings
+* [HSEARCH-5639](https://hibernate.atlassian.net/browse/HSEARCH-5639) - Remove JPA/ORM query extension and Search#toOrmQuery / Search#toOrmQuery
+* [HSEARCH-5635](https://hibernate.atlassian.net/browse/HSEARCH-5635) - Stop publishing migration helper and remove it from the build/project
+
+### Task
+* [HSEARCH-5682](https://hibernate.atlassian.net/browse/HSEARCH-5682) - Tune the content of javadoc jars to reduce the size of files published to Maven Central
+* [HSEARCH-5666](https://hibernate.atlassian.net/browse/HSEARCH-5666) - Test against latest Elasticsearch 9.4.4
+* [HSEARCH-5660](https://hibernate.atlassian.net/browse/HSEARCH-5660) - Test against latest Elasticsearch 9.4.3
+* [HSEARCH-5631](https://hibernate.atlassian.net/browse/HSEARCH-5631) - Test against latest Elasticsearch 9.4.2
+
 ## 8.4.0.Final (2026-05-27)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39072)
