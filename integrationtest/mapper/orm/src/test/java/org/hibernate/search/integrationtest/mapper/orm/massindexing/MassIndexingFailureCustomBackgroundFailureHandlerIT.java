@@ -21,7 +21,6 @@ import org.hibernate.search.util.common.SearchException;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import org.assertj.core.api.InstanceOfAssertFactories;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -87,11 +86,8 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" )
-						.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( exceptionMessage ) );
+						.hasMessage( exceptionMessage ) );
 	}
 
 	@Override
@@ -113,7 +109,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
 								"Exception while building document for entity '" + entityReference + "'",
-								"Exception while invoking",
 								exceptionMessage )
 						.hasRootCauseInstanceOf( SimulatedFailure.class ) );
 	}

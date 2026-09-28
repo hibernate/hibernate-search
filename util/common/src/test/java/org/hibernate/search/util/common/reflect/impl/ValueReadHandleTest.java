@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.hibernate.accessor.AccessorFactory;
@@ -131,23 +132,29 @@ class ValueReadHandleTest {
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
 		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
-				.hasMessageContaining( "runtimeExceptionThrowingMethod" );
+				.isExactlyInstanceOf( SimulatedRuntimeException.class )
+				.hasMessage( "runtimeExceptionThrowingMethod" )
+				.hasNoCause();
 	}
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	void failure_method_secondFailureInToString_runtimeException(AccessorFactory factory) throws Exception {
+	void failure_method_doesNotCallToString(AccessorFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
 		setAccessible( method );
 
 		ValueReader<?> valueReadHandle = factory.valueReader( method );
 
-		SimulatedRuntimeException toStringRuntimeException = new SimulatedRuntimeException( "toString" );
+		AtomicBoolean toStringCalled = new AtomicBoolean();
 		EntityType entity = new EntityType( () -> {
-			throw toStringRuntimeException;
+			toStringCalled.set( true );
+			throw new SimulatedRuntimeException( "toString" );
 		} );
 		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
-				.isInstanceOfAny( SimulatedRuntimeException.class, RuntimeException.class );
+				.isExactlyInstanceOf( SimulatedRuntimeException.class )
+				.hasMessage( "runtimeExceptionThrowingMethod" )
+				.hasNoCause();
+		assertThat( toStringCalled.get() ).isFalse();
 	}
 
 	private void testFieldValueReadHandleSuccess(AccessorFactory factory, String fieldName)
