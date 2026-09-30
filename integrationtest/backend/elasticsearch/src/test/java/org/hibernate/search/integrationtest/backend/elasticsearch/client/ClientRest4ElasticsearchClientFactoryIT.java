@@ -34,17 +34,15 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.client.impl.ClientRest4ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRest4ElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.spi.ClientRest4ElasticsearchBackendClientSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.rest4.impl.ClientRest4ElasticsearchClientFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
@@ -1266,18 +1264,15 @@ class ClientRest4ElasticsearchClientFactoryIT {
 		return node;
 	}
 
-	@SuppressWarnings("removal")
 	private static BeanConfigurer elasticsearchSslBeanConfigurer() {
 		return context -> {
 			context.define(
 					org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer.class,
-					BeanReference.ofInstance( new ElasticsearchHttpClientConfigurer() {
-						@Override
-						public void configure(ElasticsearchHttpClientConfigurationContext context) {
-							context.clientBuilder().setSSLHostnameVerifier( NoopHostnameVerifier.INSTANCE );
-							context.clientBuilder().setSSLContext( buildAllowAnythingSSLContext() );
-						}
-					} )
+					BeanReference.ofInstance(
+							(org.hibernate.search.backend.elasticsearch.client.rest4.ElasticsearchHttpClientConfigurer) clientContext -> {
+								clientContext.clientBuilder().setSSLHostnameVerifier( NoopHostnameVerifier.INSTANCE );
+								clientContext.clientBuilder().setSSLContext( buildAllowAnythingSSLContext() );
+							} )
 			);
 		};
 	}

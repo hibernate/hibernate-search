@@ -1,4 +1,4 @@
-package org.hibernate.search.backend.elasticsearch.client.impl;
+package org.hibernate.search.backend.elasticsearch.client.rest4.impl;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;

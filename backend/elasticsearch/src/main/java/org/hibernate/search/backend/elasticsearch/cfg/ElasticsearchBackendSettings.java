@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.rest4.cfg.ClientRest4ElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
@@ -128,123 +127,6 @@ public final class ElasticsearchBackendSettings {
 	public static final String PASSWORD = "password";
 
 	/**
-	 * The timeout when executing a request to an Elasticsearch server.
-	 * <p>
-	 * This includes the time needed to establish a connection, send the request and read the response.
-	 * <p>
-	 * Expects a positive Integer value in milliseconds, such as 60000,
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * Defaults to no request timeout.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#REQUEST_TIMEOUT} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String REQUEST_TIMEOUT = "request_timeout";
-
-	/**
-	 * The timeout when reading responses from an Elasticsearch server.
-	 * <p>
-	 * Expects a positive Integer value in milliseconds, such as {@code 60000},
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * Defaults to {@link Defaults#READ_TIMEOUT}.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#READ_TIMEOUT} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String READ_TIMEOUT = "read_timeout";
-
-	/**
-	 * The timeout when establishing a connection to an Elasticsearch server.
-	 * <p>
-	 * Expects a positive Integer value in milliseconds, such as {@code 3000},
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#CONNECTION_TIMEOUT} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String CONNECTION_TIMEOUT = "connection_timeout";
-
-	/**
-	 * The maximum number of simultaneous connections to the Elasticsearch cluster,
-	 * all hosts taken together.
-	 * <p>
-	 * Expects a positive Integer value, such as {@code 40},
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#MAX_CONNECTIONS} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String MAX_CONNECTIONS = "max_connections";
-
-	/**
-	 * The maximum number of simultaneous connections to each host of the Elasticsearch cluster.
-	 * <p>
-	 * Expects a positive Integer value, such as {@code 20},
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#MAX_CONNECTIONS_PER_ROUTE} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
-
-	/**
-	 * Whether automatic discovery of nodes in the Elasticsearch cluster is enabled.
-	 * <p>
-	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed into a Boolean value.
-	 * <p>
-	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#DISCOVERY_ENABLED} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String DISCOVERY_ENABLED = "discovery.enabled";
-
-	/**
-	 * The time interval between two executions of the automatic discovery, if enabled.
-	 * <p>
-	 * Expects a positive Integer value in seconds, such as {@code 2},
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#DISCOVERY_REFRESH_INTERVAL} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
-
-	/**
-	 * A {@link org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
-	 * <p>
-	 * It can be used for example to tune the SSL context to accept self-signed certificates.
-	 * It allows overriding other HTTP client settings, such as {@link #USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
-	 * <p>
-	 * Expects a reference to a bean of type {@link org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer}.
-	 * <p>
-	 * Defaults to no value.
-	 *
-	 * @deprecated Use client specific configurers instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String CLIENT_CONFIGURER = "client.configurer";
-
-	/**
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
@@ -316,25 +198,6 @@ public final class ElasticsearchBackendSettings {
 	public static final String SCROLL_TIMEOUT = "scroll_timeout";
 
 	/**
-	 * How long connections to the Elasticsearch cluster can be kept idle.
-	 * <p>
-	 * Expects a positive Long value of milliseconds, such as 60000,
-	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * If the response from an Elasticsearch cluster contains a {@code Keep-Alive} header,
-	 * then the effective max idle time will be whichever is lower:
-	 * the duration from the {@code Keep-Alive} header or the value of this property (if set).
-	 * <p>
-	 * If this property is not set, only the {@code Keep-Alive} header is considered,
-	 * and if it's absent, idle connections will be kept forever.
-	 *
-	 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings#MAX_KEEP_ALIVE} instead.
-	 * The setting itself is not deprecated, it just moved to the client-specific configuration.
-	 */
-	@Deprecated(since = "8.2", forRemoval = true)
-	public static final String MAX_KEEP_ALIVE = "max_keep_alive";
-
-	/**
 	 * This property defines if partial shard failures are ignored.
 	 * <p>
 	 * In case all shards fail, Elasticsearch cluster will return a 400 status code itself,
@@ -356,7 +219,7 @@ public final class ElasticsearchBackendSettings {
 	///
 	/// One of the following values can be provided:
 	/// * `jdk-rest`, no additional requirements.
-	/// * `elasticsearch-rest`, current default, requires that the
+	/// * `elasticsearch-rest4`, requires that the
 	///   `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` remain on the classpath.
 	/// * `elasticsearch-rest5`, requires that the
 	///   `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest5` is available on the classpath.
@@ -364,7 +227,8 @@ public final class ElasticsearchBackendSettings {
 	///   `org.hibernate.search:hibernate-search-backend-elasticsearch-client-opensearch-rest` is available on the
 	///   classpath.
 	///
-	/// Defaults to [Defaults#CLIENT_FACTORY].
+	/// If unset, the only available non-JDK client is selected; if there are multiple such clients, this property must
+	/// be set explicitly. Otherwise, the JDK client is used.
 	@Incubating
 	public static final String CLIENT_FACTORY = "client_factory";
 
@@ -379,42 +243,6 @@ public final class ElasticsearchBackendSettings {
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
 		public static final String PROTOCOL = "http";
 		public static final String PATH_PREFIX = "";
-		/**
-		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#READ_TIMEOUT} instead.
-		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
-		public static final int READ_TIMEOUT = 30000;
-		/**
-		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#CONNECTION_TIMEOUT} instead.
-		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
-		public static final int CONNECTION_TIMEOUT = 1000;
-		/**
-		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#MAX_CONNECTIONS} instead.
-		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
-		public static final int MAX_CONNECTIONS = 40;
-		/**
-		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#MAX_CONNECTIONS_PER_ROUTE} instead.
-		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
-		public static final int MAX_CONNECTIONS_PER_ROUTE = 20;
-		/**
-		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#DISCOVERY_ENABLED} instead.
-		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
-		public static final boolean DISCOVERY_ENABLED = false;
-		/**
-		 * @deprecated Use {@link ClientRest4ElasticsearchBackendClientSettings.Defaults#DISCOVERY_REFRESH_INTERVAL} instead.
-		 * The default value itself is not deprecated, just the constant defining it moved to a different, client-specific class.
-		 */
-		@Deprecated(since = "8.2", forRemoval = true)
-		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		/**
 		 * @deprecated The default for the {@link ElasticsearchBackendSettings#VERSION_CHECK_ENABLED} property
@@ -437,6 +265,10 @@ public final class ElasticsearchBackendSettings {
 				BeanReference.of( IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME );
 		public static final int SCROLL_TIMEOUT = 60;
 		public static final boolean QUERY_SHARD_FAILURE_IGNORE = false;
-		public static final String CLIENT_FACTORY = "elasticsearch-rest4";
+		/**
+		 * The fallback used when no optional Elasticsearch client is available.
+		 * When exactly one optional client is available, that client is selected instead.
+		 */
+		public static final String CLIENT_FACTORY = "jdk-rest";
 	}
 }

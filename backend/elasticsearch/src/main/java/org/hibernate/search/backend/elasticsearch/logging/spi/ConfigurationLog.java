@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -127,5 +128,9 @@ public interface ConfigurationLog {
 
 	@Message(id = ID_OFFSET + 194, value = "Invalid uri: '%1$s'. Reason: %2$s")
 	SearchException invalidUri(String uri, String reason, @Cause Exception e);
+
+	@Message(id = ID_OFFSET + 195, value = "Multiple Elasticsearch client factories are available: %1$s."
+			+ " Set the 'client_factory' property to select one explicitly.")
+	SearchException multipleElasticsearchClientFactories(List<? extends BeanReference<?>> factories);
 
 }

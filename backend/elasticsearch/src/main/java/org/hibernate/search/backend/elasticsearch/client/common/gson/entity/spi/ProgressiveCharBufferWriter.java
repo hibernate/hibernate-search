@@ -159,7 +159,7 @@ class ProgressiveCharBufferWriter extends Writer {
 	 * Flow control may push back, in which case this method or {@link #flushToOutput()}
 	 * should be called again later.
 	 *
-	 * @throws IOException when {@link org.apache.http.nio.ContentEncoder#write(ByteBuffer)} fails.
+	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
 	 */
 	public void resumePendingWrites() throws IOException {
 		flush();
@@ -181,7 +181,7 @@ class ProgressiveCharBufferWriter extends Writer {
 	 * <p>
 	 * Flow control may push back, in which case this method should be called again later.
 	 *
-	 * @throws IOException when {@link org.apache.http.nio.ContentEncoder#write(ByteBuffer)} fails.
+	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
 	 */
 	public void flushToOutput() throws IOException {
 		flush();

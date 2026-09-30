@@ -1,4 +1,4 @@
-package org.hibernate.search.backend.elasticsearch.client.impl;
+package org.hibernate.search.backend.elasticsearch.client.rest4.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -273,8 +273,8 @@ public class ClientRest4ElasticsearchClientFactory implements ElasticsearchClien
 			builder.setKeepAliveStrategy( new CustomConnectionKeepAliveStrategy( maxKeepAlive.get() ) );
 		}
 
-		ElasticsearchHttpClientConfigurationContext clientConfigurationContext =
-				new ElasticsearchHttpClientConfigurationContext( beanResolver, propertySource, builder );
+		ClientRest4ElasticsearchHttpClientConfigurationContext clientConfigurationContext =
+				new ClientRest4ElasticsearchHttpClientConfigurationContext( beanResolver, propertySource, builder );
 
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( clientConfigurationContext );
