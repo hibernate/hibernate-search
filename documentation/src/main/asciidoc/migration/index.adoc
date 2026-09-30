@@ -41,6 +41,19 @@ are the same as those of Hibernate Search {hibernateSearchPreviousStableVersionS
 The `hibernate-search-v5migrationhelper-engine` and `hibernate-search-v5migrationhelper-orm` artifacts are no longer published.
 If you are still using the migration helper, you will need to migrate to the current Hibernate Search APIs.
 
+[[elasticsearch-client-artifact]]
+=== Elasticsearch REST client is no longer a transitive dependency
+
+`hibernate-search-backend-elasticsearch` no longer depends on `hibernate-search-backend-elasticsearch-client-rest4`.
+If you want to keep using the Elasticsearch REST client based on Apache HTTP Client 4,
+add `org.hibernate.search:hibernate-search-backend-elasticsearch-client-rest4` explicitly to your application dependencies.
+
+Without an additional client artifact, the Elasticsearch backend now uses its JDK HTTP client.
+If exactly one additional client is available, Hibernate Search selects it automatically.
+If several are available, startup fails unless you set `hibernate.search.backend.client_factory`
+to `elasticsearch-rest4`, `elasticsearch-rest5`, `opensearch-rest`, or `jdk-rest`.
+The value of `ElasticsearchBackendSettings.Defaults.CLIENT_FACTORY` changed from `elasticsearch-rest4` to `jdk-rest`.
+
 Other than the migration helper removal, the coordinates of Maven artifacts in Hibernate Search {hibernateSearchVersion}
 are the same as in Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
@@ -112,6 +125,17 @@ Use `failingEntityReferences()` and `failingEntityReference(EntityReference)` in
 * The `ValueReadHandleFactory` SPI interface has been removed. Use `ValueHandleFactory` instead.
 
 * The `Version.getVersionString()` method has been removed. Use `Version.versionString()` instead.
+
+* The deprecated client-specific constants in `ElasticsearchBackendSettings` and its `Defaults` class have been removed.
+Use the corresponding constants in `ClientRest4ElasticsearchBackendClientSettings` for the REST4 client,
+or in the settings class for your chosen client.
+The configuration property keys themselves have not changed.
+
+* The deprecated `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer`
+and `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext` interfaces have been removed.
+For the REST4 client, use the corresponding interfaces in `org.hibernate.search.backend.elasticsearch.client.rest4`.
+To replace the old context's `configuredVersion()` method, read `ElasticsearchBackendSettings.VERSION`
+from `configurationPropertySource()`.
 
 [[spi]]
 == SPI

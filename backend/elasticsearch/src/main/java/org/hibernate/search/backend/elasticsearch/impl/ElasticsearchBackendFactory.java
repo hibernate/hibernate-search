@@ -1,12 +1,16 @@
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.impl.ClientJdkElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
@@ -51,13 +55,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
-	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
+	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
-					// Creating a reference here so that we don't "expose" the fact
-					//  that it's a bean reference to an SPI type to the users in the API interfaces:
-					.withDefault( BeanReference.of( ElasticsearchClientFactory.class,
-							ElasticsearchBackendSettings.Defaults.CLIENT_FACTORY ) )
 					.build();
 
 	private static final ConfigurationProperty<TypeNameMappingStrategyName> MAPPING_TYPE_STRATEGY =
@@ -86,8 +86,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		try {
 			threads = new BackendThreads( eventContext.render() );
 
-			// First, let's see if the factory was configured explicitly:
-			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
+			clientFactoryHolder = selectClientFactoryReference( propertySource, beanResolver ).resolve( beanResolver );
 			ConfigurationLog.INSTANCE.backendClientFactory( clientFactoryHolder, eventContext );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
@@ -138,6 +137,29 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.push( BackendThreads::onStop, threads );
 			throw e;
 		}
+	}
+
+	static BeanReference<? extends ElasticsearchClientFactory> selectClientFactoryReference(
+			ConfigurationPropertySource propertySource, BeanResolver beanResolver) {
+		Optional<BeanReference<? extends ElasticsearchClientFactory>> configured = CLIENT_FACTORY.get( propertySource );
+		if ( configured.isPresent() ) {
+			return configured.get();
+		}
+
+		Map<String, BeanReference<ElasticsearchClientFactory>> namedFactories =
+				beanResolver.namedConfiguredForRole( ElasticsearchClientFactory.class );
+		BeanReference<ElasticsearchClientFactory> jdkFactory =
+				namedFactories.get( ClientJdkElasticsearchClientFactory.NAME );
+		List<BeanReference<ElasticsearchClientFactory>> otherFactories = new ArrayList<>(
+				beanResolver.allConfiguredForRole( ElasticsearchClientFactory.class ) );
+		otherFactories.remove( jdkFactory );
+		if ( otherFactories.size() == 1 ) {
+			return otherFactories.get( 0 );
+		}
+		if ( otherFactories.size() > 1 ) {
+			throw ConfigurationLog.INSTANCE.multipleElasticsearchClientFactories( otherFactories );
+		}
+		return BeanReference.of( ElasticsearchClientFactory.class, ElasticsearchBackendSettings.Defaults.CLIENT_FACTORY );
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource,

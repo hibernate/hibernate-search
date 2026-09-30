@@ -1,4 +1,4 @@
-package org.hibernate.search.backend.elasticsearch.client.impl;
+package org.hibernate.search.backend.elasticsearch.client.rest4.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -163,13 +163,14 @@ which needs to be enabled explicitly.
 An Elasticsearch backend communicates with an Elasticsearch cluster through a REST client.
 Hibernate Search comes with a range of pluggable Elasticsearch REST clients that you can pick from.
 
-Currently, the default one is the <<backend-elasticsearch-configuration-client-elasticsearch-client-rest4,`hibernate-search-backend-elasticsearch-client-rest4`>>,
-which may change in a future version of Hibernate Search.
-You should explicitly define the REST client in the application dependencies,
-if it matters which one the Elasticsearch backend will pick.
+The backend includes the <<backend-elasticsearch-configuration-client-elasticsearch-client-jdk,JDK HTTP client>>.
+If exactly one other client is on the classpath, Hibernate Search uses it automatically.
+If several other clients are present, set the
+<<configuration-properties-aggregated-hibernate-search-backend-elasticsearchhibernate.search.backend.client_factory,client factory configuration property>>
+to select one; otherwise startup fails.
+You can also set this property to select the JDK client explicitly.
 
-To change the REST client you need to add the dependency that contains the client
-and specify the <<configuration-properties-aggregated-hibernate-search-backend-elasticsearchhibernate.search.backend.client_factory,client factory configuration property>>.
+To use another client, add its artifact to your application dependencies.
 
 :jdk-client-warn:
 === Available clients
@@ -183,7 +184,8 @@ ArtifactID::: `hibernate-search-backend-elasticsearch-client-rest4`
 Underlying HTTP Client::: Apache HTTP Client 4
 
 This Elasticsearch backend REST client is based on the Elasticsearch low level client (`org.elasticsearch.client:elasticsearch-rest-client`).
-Currently, the default REST client used by the Elasticsearch backend.
+Add this artifact to use this client when it is the only optional client available,
+or select `elasticsearch-rest4` explicitly with the client factory property.
 
 [[backend-elasticsearch-configuration-client-elasticsearch-client-rest5]]
 ==== Elasticsearch low level REST client (Apache HTTP Client 5)

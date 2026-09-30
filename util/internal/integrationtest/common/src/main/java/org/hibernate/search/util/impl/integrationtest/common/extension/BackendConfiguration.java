@@ -19,8 +19,8 @@ public abstract class BackendConfiguration {
 	//	public static final String IDE_BACKEND_TYPE = "elasticsearch";
 
 	// Uncomment one of the following lines to set the backend type when running tests from the IDE
-	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "elasticsearch-rest4";
-	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "jdk-rest";
+	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "jdk-rest";
+	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "elasticsearch-rest4";
 	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "opensearch-rest";
 	//	public static final String IDE_ELASTICSEARCH_BACKEND_CLIENT_TYPE = "elasticsearch-rest5";
 
