@@ -1,3 +1,3 @@
 # CockroachDB
 # See https://hub.docker.com/r/cockroachdb/cockroach/tags
-FROM docker.io/cockroachdb/cockroach:v26.3.1@sha256:204f131510c78393adb02345f289a8dbb32e1491e26cc92b6c7751f3b97be3c5
+FROM docker.io/cockroachdb/cockroach:v26.3.2@sha256:bc15746ef2c2493b2cfd46a76898a745587d068b1a259fff3c4447c3f3b36ea2
