@@ -10,13 +10,28 @@ in particular if Hibernate Search does not support this kind of requests out of 
 
 To that end, you can retrieve the Elasticsearch backend,
 then get access the Elasticsearch client used by Hibernate Search internally.
-See below for an example.
 
-.Accessing the low-level REST client
+The exact type of client you can retrieve depends on which Elasticsearch client artifact
+is on your classpath.
+Below are examples for the available clients.
+
+.Accessing the REST4 client (`org.elasticsearch.client.RestClient`)
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/ElasticsearchGetClientIT.java[tags=client]
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/rest4/ElasticsearchGetClientIT.java[tags=client]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `Backend`.
+<3> Narrow down the backend to the `ElasticsearchBackend` type.
+<4> Get the client, passing the expected type of the client as an argument.
+====
+
+.Accessing the JDK HTTP client (`java.net.http.HttpClient`)
+====
+[source, java, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/jdk/ElasticsearchGetClientIT.java[tags=client]
 ----
 <1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `Backend`.
@@ -28,7 +43,8 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/cl
 ====
 The client itself is not part of the Hibernate Search API,
 but of the
-link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[official Elasticsearch REST client API].
+link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[official Elasticsearch REST client API]
+or the JDK standard library.
 
 Hibernate Search may one day switch to another client with a different Java type,
 without prior notice.

@@ -1,4 +1,4 @@
-package org.hibernate.search.documentation.backend.elasticsearch.client;
+package org.hibernate.search.documentation.backend.elasticsearch.client.rest4;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,7 @@ import java.io.IOException;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.documentation.backend.elasticsearch.client.Book;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.Backend;
