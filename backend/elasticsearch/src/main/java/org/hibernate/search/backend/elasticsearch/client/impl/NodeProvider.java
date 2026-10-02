@@ -118,8 +118,9 @@ public class NodeProvider {
 				if ( actual.getPort() != -1 ) {
 					host = host + ":" + actual.getPort();
 				}
-				serverNodes.add( createServerNode( actual.getScheme(), host, pathPrefix ) );
-				boolean currentHttps = "https".equals( actual.getScheme() );
+				String scheme = actual.getScheme().toLowerCase( Locale.ROOT );
+				serverNodes.add( createServerNode( scheme, host, pathPrefix ) );
+				boolean currentHttps = "https".equals( scheme );
 				if ( https == null ) {
 					https = currentHttps;
 				}
