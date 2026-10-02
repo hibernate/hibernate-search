@@ -100,6 +100,11 @@ jobs:
           # Fetch the whole history to make sure that gitflow incremental builder
           # can find the base commit.
           fetch-depth: 0
+      # Checkstyle enforces this for the files it processes; this covers all the other ones.
+      # Only on Linux: the check is OS-independent, no point in paying for it twice.
+      - name: Check that no license header was reintroduced
+        if: "startsWith(matrix.os.runs-on, 'ubuntu')"
+        run: ./ci/check-no-license-headers.sh
       - name: Set up Java ${{ matrix.os.java.version }}
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
         with:
