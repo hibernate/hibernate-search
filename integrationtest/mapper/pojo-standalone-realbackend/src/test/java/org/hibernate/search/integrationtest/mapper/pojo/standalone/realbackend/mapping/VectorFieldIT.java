@@ -2,6 +2,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.ElasticsearchBackendConfigurationSupport.isVectorSearchSupportedByElasticsearch;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
@@ -271,11 +272,9 @@ class VectorFieldIT {
 
 	@SuppressWarnings("unused") // For EJC and lambda arg
 	private static boolean isVectorSearchSupported() {
-		return BackendConfiguration.isLucene()
-				|| ElasticsearchTestDialect.isActualVersion(
-						es -> !es.isLessThan( "8.12.0" ),
-						os -> !os.isLessThan( "2.9.0" ),
-						aoss -> true
-				);
+		if ( BackendConfiguration.isLucene() ) {
+			return true;
+		}
+		return isVectorSearchSupportedByElasticsearch();
 	}
 }

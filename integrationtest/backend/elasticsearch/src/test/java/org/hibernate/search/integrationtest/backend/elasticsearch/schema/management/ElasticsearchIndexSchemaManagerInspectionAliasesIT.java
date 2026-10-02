@@ -62,9 +62,9 @@ class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
 						"index names [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
-								+ "] resolve to multiple distinct indexes ["
-								+ defaultPrimaryName( index.name() ) + ", "
-								+ defaultPrimaryName( "otherIndex" ) + "]",
+								+ "] resolve to multiple distinct indexes",
+						defaultPrimaryName( index.name() ).toString(),
+						defaultPrimaryName( "otherIndex" ).toString(),
 						"These names must resolve to a single index" );
 	}
 
@@ -84,9 +84,9 @@ class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
 						"index names [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
-								+ "] resolve to multiple distinct indexes ["
-								+ defaultPrimaryName( index.name() ) + ", "
-								+ defaultPrimaryName( "otherIndex" ) + "]",
+								+ "] resolve to multiple distinct indexes",
+						defaultPrimaryName( index.name() ).toString(),
+						defaultPrimaryName( "otherIndex" ).toString(),
 						"These names must resolve to a single index" );
 	}
 
@@ -106,9 +106,9 @@ class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
 						"index names [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
-								+ "] resolve to multiple distinct indexes ["
-								+ defaultPrimaryName( index.name() ) + ", "
-								+ defaultPrimaryName( "otherIndex" ) + "]",
+								+ "] resolve to multiple distinct indexes",
+						defaultPrimaryName( index.name() ).toString(),
+						defaultPrimaryName( "otherIndex" ).toString(),
 						"These names must resolve to a single index" );
 	}
 

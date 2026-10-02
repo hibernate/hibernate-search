@@ -4,3 +4,4 @@ spring.jpa:
       backend:
         log.json_pretty_printing: true
         uris: ${ELASTICSEARCH_URIS:localhost:9200}
+        layout.strategy: fork-isolated

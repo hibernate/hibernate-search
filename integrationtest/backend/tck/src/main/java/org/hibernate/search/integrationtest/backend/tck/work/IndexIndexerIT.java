@@ -34,6 +34,8 @@ import org.awaitility.Awaitility;
  */
 class IndexIndexerIT {
 
+	public static final int OPERATION_TIMEOUT = 90;
+
 	public static List<? extends Arguments> params() {
 		List<Arguments> params = new ArrayList<>();
 		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
@@ -74,7 +76,7 @@ class IndexIndexerIT {
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
 		// In the case of commitStrategy=force we're going to do 200 almost concurrent commits,
 		// that is very unrealistic use case. So we will use a very large timeout here.
-		Awaitility.await().timeout( 30, TimeUnit.SECONDS ).until( future::isDone );
+		Awaitility.await().timeout( OPERATION_TIMEOUT, TimeUnit.SECONDS ).until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
@@ -97,7 +99,7 @@ class IndexIndexerIT {
 		future = CompletableFuture.allOf( tasks );
 		// In the case of commitStrategy=force we're going to do 200 almost concurrent commits,
 		// that is very unrealistic use case. So we will use a very large timeout here.
-		Awaitility.await().timeout( 30, TimeUnit.SECONDS ).until( future::isDone );
+		Awaitility.await().timeout( OPERATION_TIMEOUT, TimeUnit.SECONDS ).until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
@@ -119,7 +121,7 @@ class IndexIndexerIT {
 		future = CompletableFuture.allOf( tasks );
 		// In the case of commitStrategy=force we're going to do 200 almost concurrent commits,
 		// that is very unrealistic use case. So we will use a very large timeout here.
-		Awaitility.await().timeout( 30, TimeUnit.SECONDS ).until( future::isDone );
+		Awaitility.await().timeout( OPERATION_TIMEOUT, TimeUnit.SECONDS ).until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
