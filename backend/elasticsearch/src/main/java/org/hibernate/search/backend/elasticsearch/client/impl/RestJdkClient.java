@@ -6,6 +6,7 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Closer;
@@ -40,7 +41,12 @@ public class RestJdkClient implements AutoCloseable {
 				if ( ( (Object) httpClient ) instanceof AutoCloseable closeable ) {
 					closer.push( AutoCloseable::close, closeable );
 				}
-				if ( executor.isPresent() && executor.get() instanceof AutoCloseable closeable ) {
+				if ( executor.isPresent() && executor.get() instanceof ExecutorService executorService ) {
+					// ExecutorService is not AutoCloseable on JDK 17. On newer JDKs,
+					// close() waits indefinitely for tasks, so interrupt them without waiting.
+					closer.push( ExecutorService::shutdownNow, executorService );
+				}
+				else if ( executor.isPresent() && executor.get() instanceof AutoCloseable closeable ) {
 					closer.push( AutoCloseable::close, closeable );
 				}
 			}
