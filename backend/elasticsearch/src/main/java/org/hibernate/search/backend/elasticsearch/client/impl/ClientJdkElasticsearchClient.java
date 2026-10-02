@@ -80,7 +80,7 @@ public class ClientJdkElasticsearchClient implements ElasticsearchClientImplemen
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> clientClass) {
-		if ( HttpClient.class.isAssignableFrom( clientClass ) ) {
+		if ( RestJdkClient.class.isAssignableFrom( clientClass ) ) {
 			return (T) restClientHolder.get();
 		}
 		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, HttpClient.class );

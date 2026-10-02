@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.client.impl.RestJdkClient;
 import org.hibernate.search.documentation.backend.elasticsearch.client.Book;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
@@ -45,7 +45,7 @@ class ElasticsearchGetClientIT {
 		//tag::client[]
 		Backend backend = mapping.backend(); // <2>
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class ); // <3>
-		HttpClient client = elasticsearchBackend.client( HttpClient.class ); // <4>
+		RestJdkClient client = elasticsearchBackend.client( RestJdkClient.class ); // <4>
 		//end::client[]
 
 		// The configured connection URL may or may not already include a scheme.
@@ -55,7 +55,7 @@ class ElasticsearchGetClientIT {
 				.uri( baseUri.resolve( "/" ) )
 				.GET()
 				.build();
-		HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
+		HttpResponse<String> response = client.sendAsync( request, HttpResponse.BodyHandlers.ofString() ).join();
 		assertThat( response ).isNotNull();
 		assertThat( response.statusCode() ).isEqualTo( 200 );
 	}
