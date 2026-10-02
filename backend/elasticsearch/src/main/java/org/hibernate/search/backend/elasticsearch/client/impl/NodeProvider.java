@@ -141,24 +141,47 @@ public class NodeProvider {
 	}
 
 	public static final class ServerNode {
-		private final String protocol;
-		private final String host;
-		private final String basePath;
-		private final int port;
+		private final String baseUrl;
 
 		public ServerNode(String protocol, String host, String basePath, int port) {
-			this.protocol = protocol;
-			this.host = host;
-			this.basePath = normalizeBasePath( basePath );
-			this.port = port;
+			this.baseUrl = buildBaseUrl( protocol, host, normalizeBasePath( basePath ), port );
 		}
 
-		private String normalizeBasePath(String basePath) {
-			if ( "".equals( basePath ) ) {
-				return "";
+		/**
+		 * Builds the invariant part of request URIs: scheme, authority and base path.
+		 * <p>
+		 * Only the authority really needs to be built through the multi-argument {@link URI} constructor,
+		 * which takes care of escaping and of IPv6 literals in particular.
+		 * The base path, on the other hand, is treated as already URL-encoded,
+		 * just like the request paths it gets prepended to,
+		 * and consistently with how the REST clients handle their path prefix.
+		 */
+		private static String buildBaseUrl(String protocol, String host, String basePath, int port) {
+			String schemeAndAuthority;
+			try {
+				schemeAndAuthority = new URI( protocol, null, host, port, null, null, null ).toString();
 			}
-			else if ( basePath.endsWith( "/" ) ) {
+			catch (URISyntaxException e) {
+				throw ConfigurationLog.INSTANCE.invalidUri( protocol + "://" + host, e.getMessage(), e );
+			}
+			try {
+				// Validate eagerly, so that a malformed path prefix is reported on startup
+				// rather than on the first request.
+				return new URI( schemeAndAuthority + basePath ).toString();
+			}
+			catch (URISyntaxException e) {
+				throw ConfigurationLog.INSTANCE.invalidUri( schemeAndAuthority + basePath, e.getMessage(), e );
+			}
+		}
+
+		private static String normalizeBasePath(String basePath) {
+			if ( basePath.endsWith( "/" ) ) {
 				basePath = basePath.substring( 0, basePath.length() - 1 );
+			}
+			// Also covers a base path consisting of a single '/', which would otherwise
+			// result in a double slash once a request path gets appended.
+			if ( basePath.isEmpty() ) {
+				return "";
 			}
 			if ( !basePath.startsWith( "/" ) ) {
 				basePath = "/" + basePath;
@@ -193,14 +216,11 @@ public class NodeProvider {
 			if ( !path.isEmpty() && !path.startsWith( "/" ) ) {
 				throw new IllegalArgumentException( "Path must start with '/': " + path );
 			}
-			String fullpath = basePath + path;
 			String queryString = buildQueryString( parameters );
-			try {
-				return new URI( protocol, null, host, port, fullpath, queryString.isEmpty() ? null : queryString, null );
-			}
-			catch (URISyntaxException e) {
-				throw new IllegalArgumentException( "Invalid URI: " + e.getMessage(), e );
-			}
+			// Request paths are already URL-encoded (see URLEncodedString) and query string parameters
+			// are encoded in buildQueryString, so the URI is parsed as-is:
+			// the multi-argument URI constructor would escape the '%' characters a second time.
+			return URI.create( queryString.isEmpty() ? baseUrl + path : baseUrl + path + "?" + queryString );
 		}
 
 		@Override
@@ -208,14 +228,17 @@ public class NodeProvider {
 			if ( !( o instanceof ServerNode that ) ) {
 				return false;
 			}
-			return port == that.port
-					&& Objects.equals( protocol, that.protocol ) && Objects.equals( host, that.host )
-					&& Objects.equals( basePath, that.basePath );
+			return Objects.equals( baseUrl, that.baseUrl );
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( protocol, host, basePath, port );
+			return Objects.hash( baseUrl );
+		}
+
+		@Override
+		public String toString() {
+			return baseUrl;
 		}
 	}
 
