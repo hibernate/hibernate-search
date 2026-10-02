@@ -110,9 +110,10 @@ public class LoggerCategoriesProcessor extends AbstractProcessor {
 					}
 					else {
 						if ( moduleName == null || moduleName.isBlank() ) {
-							throw new IllegalArgumentException(
+							messager.printMessage( Diagnostic.Kind.WARNING,
 									"Module name cannot be null nor blank. Specify the %s annotation processor argument to define the module name"
 											.formatted( Configuration.MODULE_NAME ) );
+							return false;
 						}
 						Map<String, Object> data = new LinkedHashMap<>();
 						data.put( ReportConstants.MODULE_NAME, moduleName );
