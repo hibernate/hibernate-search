@@ -3,19 +3,11 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.http.HttpClient;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
@@ -188,18 +180,6 @@ public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientF
 		builder.executor( Executors.newCachedThreadPool(
 				threadProvider.createThreadFactory( threadNamePrefix + " - Transport thread" ) ) );
 
-		if ( !nodeProvider.isSslEnabled() ) {
-			SSLContext sslContext = null;
-			try {
-				sslContext = SSLContext.getInstance( "TLS" );
-				sslContext.init( null, TRUST_ALL_CERTS, new SecureRandom() );
-				builder.sslContext( sslContext );
-			}
-			catch (NoSuchAlgorithmException | KeyManagementException e) {
-				throw new RuntimeException( e );
-			}
-		}
-
 		builder.connectTimeout( Duration.ofMillis( CONNECTION_TIMEOUT.get( propertySource ) ) );
 
 
@@ -234,22 +214,4 @@ public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientF
 		return builder;
 	}
 
-	private static final TrustManager[] TRUST_ALL_CERTS = new TrustManager[] {
-			new X509TrustManager() {
-
-				private static final X509Certificate[] X_509_CERTIFICATES = new X509Certificate[0];
-
-				public X509Certificate[] getAcceptedIssuers() {
-					return X_509_CERTIFICATES;
-				}
-
-				public void checkClientTrusted(X509Certificate[] certs, String authType) {
-					// Do nothing: trust client certificates
-				}
-
-				public void checkServerTrusted(X509Certificate[] certs, String authType) {
-					// Do nothing: trust server certificates
-				}
-			}
-	};
 }
