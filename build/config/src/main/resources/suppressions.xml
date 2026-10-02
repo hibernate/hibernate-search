@@ -4,7 +4,8 @@
 	"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
 	<suppress checks="." files="ConcurrentReferenceHashMap\.java$" />
-	<!-- ignore everything but the header checks for xml files-->
-	<suppress checks="^((?!Header).)*$" files=".*\.xml" />
+	<!-- ignore everything but the license header check for xml files -->
+	<suppress id="AssertionErrorUsage" files=".*\.xml" />
+	<suppress id="DeprecatedWithoutSince" files=".*\.xml" />
 	<suppress files="[\\/]generated-sources[\\/]" checks="[a-zA-Z0-9]*"/>
 </suppressions>

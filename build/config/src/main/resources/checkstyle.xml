@@ -100,14 +100,27 @@
 	<module name="org.hibernate.search.build.checkstyle.filters.ExcludeTestPackages" />
 
 	<module name="RegexpSingleline">
+		<property name="id" value="AssertionErrorUsage" />
 		<!-- not using an "illegal import" rule as the java.lang package doesn't need to be imported -->
 		<property name="format" value="\s+throw new AssertionError\(" />
 		<property name="message" value="Avoid throwing 'AssertionError': use org.hibernate.search.util.common.AssertionFailure" />
 	</module>
 
 	<module name="RegexpSingleline">
+		<property name="id" value="DeprecatedWithoutSince" />
 		<property name="format" value="@Deprecated(?:\s*+\(\s*+(?!.*\bsince\s*+=).*\))?\s*+[^(].*+" />
 		<property name="message" value="When deprecating something include the `since` attribute" />
+	</module>
+
+	<!--
+		Source file license headers were removed in HSEARCH-5699: make sure they are not reintroduced.
+		This only covers the files Checkstyle processes (Java sources, and the XML/properties resources);
+		see ci/check-no-license-headers.sh for POMs, Asciidoc files, workflows, ...
+	-->
+	<module name="RegexpSingleline">
+		<property name="id" value="NoLicenseHeader" />
+		<property name="format" value="SPDX-License-Identifier|Copyright Red Hat Inc\. and Hibernate Authors" />
+		<property name="message" value="Source files must not have a license header: see HSEARCH-5699" />
 	</module>
 
 	<module name="SuppressionFilter">
