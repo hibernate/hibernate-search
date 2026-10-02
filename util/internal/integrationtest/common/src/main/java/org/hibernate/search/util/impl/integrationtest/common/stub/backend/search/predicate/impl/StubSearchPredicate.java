@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.DisjunctionMaxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -145,6 +146,7 @@ public class StubSearchPredicate implements SearchPredicate {
 			implements MatchAllPredicateBuilder,
 			MatchNonePredicateBuilder,
 			BooleanPredicateBuilder,
+			DisjunctionMaxPredicateBuilder,
 			MatchIdPredicateBuilder,
 			MatchPredicateBuilder,
 			RangePredicateBuilder,
@@ -192,6 +194,18 @@ public class StubSearchPredicate implements SearchPredicate {
 			// No-op, just check the type
 			from( clause );
 			hasClause = true;
+		}
+
+		@Override
+		public void disjunct(SearchPredicate clause) {
+			// No-op, just check the type
+			from( clause );
+			hasClause = true;
+		}
+
+		@Override
+		public void tieBreaker(float tieBreaker) {
+			// No-op
 		}
 
 		@Override
