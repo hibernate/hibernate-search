@@ -62,4 +62,4 @@ Elasticsearch::
 Hibernate Search is now also compatible with Elasticsearch 9.5 as well as with previously compatible versions of Elasticsearch.
 [[opensearch-version]]
 OpenSearch::
-Hibernate Search is now also compatible with OpenSearch 3.7 and 3.8 as well as with previously compatible versions of OpenSearch.
+Hibernate Search is now also compatible with OpenSearch 3.7, 3.8 and 3.9 as well as with previously compatible versions of OpenSearch.
