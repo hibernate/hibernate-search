@@ -13,6 +13,7 @@
     <description>Hibernate Search integration tests for the Hibernate ORM integration using outbox polling as coordination strategy</description>
 
     <properties>
+        <test.parallel.forkCount>${test.parallel.forkCount.orm}</test.parallel.forkCount>
         <surefire.module>coord-outbox</surefire.module>
     </properties>
 
@@ -92,9 +93,6 @@
                                      Those few cases that are acceptable are tested by an outbox polling specific test. -->
                                 <exclude>SessionIndexingPlanFilterIT</exclude>
                             </excludes>
-                            <systemPropertyVariables combine.self="append">
-                                <hibernate.testing.bytecode.enhancement.extension.engine.enabled>true</hibernate.testing.bytecode.enhancement.extension.engine.enabled>
-                            </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>
