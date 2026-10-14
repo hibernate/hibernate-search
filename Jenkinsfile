@@ -162,104 +162,34 @@ stage('Configure') {
 
 	requireApprovalForPullRequest 'hibernate'
 
+	// Most BEFORE_MERGE and AFTER_MERGE environments have been moved to GitHub Actions (ci.yml).
+	// This Jenkinsfile retains only:
+	// - Default environments (needed for the default build stage)
+	// - ON_DEMAND local Elasticsearch/OpenSearch versions
+	// - Amazon Elasticsearch/OpenSearch Service tests (need real AWS endpoints + locked resources)
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
-					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
-					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
-							condition: TestCondition.BEFORE_MERGE),
-					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
-							condition: TestCondition.AFTER_MERGE),
-					// We want to enable preview features when testing newer builds of OpenJDK:
-					// even if we don't use these features, just enabling them can cause side effects
-					// and it's useful to test that.
-
-					// The following JDKs aren't supported by Hibernate ORM out-of-the box yet:
-					// they require the use of -Dnet.bytebuddy.experimental=true.
-					// Make sure to remove that argument as soon as possible
-					// -- generally that requires upgrading bytebuddy in Hibernate ORM after the JDK goes GA.
 					new JdkBuildEnvironment(version: '25', testCompilerTool: 'OpenJDK 25 Latest',
 							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
 							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
-					new JdkBuildEnvironment(version: '26', testCompilerTool: 'OpenJDK 26 Latest',
-							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(version: '27', testCompilerTool: 'OpenJDK 27 Latest',
-							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(version: '28', testCompilerTool: 'OpenJDK 28 Latest',
-							testLauncherArgs: '--enable-preview -Dnet.bytebuddy.experimental=true',
-							condition: TestCondition.AFTER_MERGE)
-					// IMPORTANT: Make sure to update the documentation for any newly supported Java versions
-					//            See java-version.main.compatible.expected.text in POMs.
+							isDefault: true)
 			],
 			compiler: [
-					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
-							condition: TestCondition.BEFORE_MERGE)
 			],
 			database: [
 					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2',
 							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
-					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql',
-							condition: TestCondition.BEFORE_MERGE),
-                    new DatabaseBuildEnvironment(dbName: 'oracle', mavenProfile: 'ci-oracle',
-                            condition: TestCondition.BEFORE_MERGE),
-					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb',
-							condition: TestCondition.AFTER_MERGE),
-					new DatabaseBuildEnvironment(dbName: 'mysql', mavenProfile: 'ci-mysql',
-                    		condition: TestCondition.AFTER_MERGE),
-                    new DatabaseBuildEnvironment(dbName: 'db2', mavenProfile: 'ci-db2',
-                            slow: true,
-                            condition: TestCondition.AFTER_MERGE),
-                    new DatabaseBuildEnvironment(dbName: 'mssql', mavenProfile: 'ci-mssql',
-                            condition: TestCondition.AFTER_MERGE),
-                    // CockroachDB is split into two parallel CI jobs to stay within CI timeouts.
-                    // cockroachdb-1: ORM + Jakarta Batch
-                    // cockroachdb-2: Outbox Polling + remaining
-                    // TODO: merge them back once we improve the overall test execution time for the ORM modules
-                    new DatabaseBuildEnvironment(dbName: 'cockroachdb-1', mavenProfile: 'ci-cockroachdb',
-                            slow: true,
-                            condition: TestCondition.AFTER_MERGE,
-                            mavenModules: [
-                                    'hibernate-search-integrationtest-mapper-orm',
-                                    'hibernate-search-integrationtest-mapper-orm-jakarta-batch',
-                                    'hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene-next'
-                            ]),
-                    new DatabaseBuildEnvironment(dbName: 'cockroachdb-2', mavenProfile: 'ci-cockroachdb',
-                            slow: true,
-                            condition: TestCondition.AFTER_MERGE,
-                            mavenModules: [
-                                    'hibernate-search-integrationtest-mapper-orm-outbox-polling',
-                                    'hibernate-search-integrationtest-mapper-orm-realbackend',
-                                    'hibernate-search-integrationtest-mapper-orm-realbackend-lucene-next',
-                                    'hibernate-search-integrationtest-mapper-orm-envers',
-                                    'hibernate-search-integrationtest-mapper-orm-cdi',
-                                    'hibernate-search-integrationtest-showcase-library',
-                                    'hibernate-search-integrationtest-showcase-library-lucene-next',
-                                    'hibernate-search-integrationtest-spring-repackaged-application',
-                                    'hibernate-search-integrationtest-spring-repackaged-model'
-                            ]),
+							isDefault: true)
 			],
 			localElasticsearch: [
 					// --------------------------------------------
 					// Elasticsearch distribution from Elastic
-					// Not testing 7.9- since those versions are EOL'ed.
-					new LocalElasticsearchBuildEnvironment(version: '7.10.2', condition: TestCondition.AFTER_MERGE),
-					// Not testing 7.11 to make the build quicker.
-					// The only difference with 7.12+ is that wildcard predicates on analyzed fields get their pattern normalized,
-					// and that was deemed a bug: https://github.com/elastic/elasticsearch/pull/53127
+					// BEFORE_MERGE and AFTER_MERGE versions moved to GitHub Actions.
+					// ON_DEMAND versions kept here for manual/on-demand testing.
 					new LocalElasticsearchBuildEnvironment(version: '7.11.2', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '7.12.1', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '7.13.2', condition: TestCondition.ON_DEMAND),
-					// 7.14 and 7.15 have annoying bugs that make almost all of our test suite fail,
-					// so we don't test them
-					// See https://hibernate.atlassian.net/browse/HSEARCH-4340
 					new LocalElasticsearchBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '7.17.29', condition: TestCondition.AFTER_MERGE),
-					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
-					// Not testing 8.1-8.6 to make the build quicker.
 					new LocalElasticsearchBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.2.3', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.3.3', condition: TestCondition.ON_DEMAND),
@@ -278,7 +208,6 @@ stage('Configure') {
 					new LocalElasticsearchBuildEnvironment(version: '8.16.1', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.17.6', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '8.18.7', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.19.19', condition: TestCondition.AFTER_MERGE),
 					new LocalElasticsearchBuildEnvironment(version: '9.0.7', condition: TestCondition.ON_DEMAND),
                     new LocalElasticsearchBuildEnvironment(version: '9.1.5', condition: TestCondition.ON_DEMAND),
                     new LocalElasticsearchBuildEnvironment(version: '9.2.6', condition: TestCondition.ON_DEMAND),
@@ -291,9 +220,8 @@ stage('Configure') {
 
 					// --------------------------------------------
 					// OpenSearch
-					// Not testing 1.0 - 1.2 as these versions are EOL'ed.
-					new LocalOpenSearchBuildEnvironment(version: '1.3.20', condition: TestCondition.AFTER_MERGE),
-					// See https://opensearch.org/lines/1x.html for a list of all 1.x versions
+					// BEFORE_MERGE and AFTER_MERGE versions moved to GitHub Actions.
+					// ON_DEMAND versions kept here for manual/on-demand testing.
 					new LocalOpenSearchBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.2.1', condition: TestCondition.ON_DEMAND),
@@ -313,7 +241,6 @@ stage('Configure') {
 					new LocalOpenSearchBuildEnvironment(version: '2.16.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.17.1', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.18.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.19.4', condition: TestCondition.AFTER_MERGE),
 					new LocalOpenSearchBuildEnvironment(version: '3.0.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.1.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '3.2.0', condition: TestCondition.ON_DEMAND),
@@ -321,17 +248,10 @@ stage('Configure') {
                     new LocalOpenSearchBuildEnvironment(version: '3.4.0', condition: TestCondition.ON_DEMAND),
                     new LocalOpenSearchBuildEnvironment(version: '3.5.0', condition: TestCondition.ON_DEMAND),
                     new LocalOpenSearchBuildEnvironment(version: '3.6.0', condition: TestCondition.ON_DEMAND),
-                    new LocalOpenSearchBuildEnvironment(version: '3.7.0', condition: TestCondition.BEFORE_MERGE),
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
 					// IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions
 					//            See version.org.opensearch.compatible.expected.text
 					//            and version.org.opensearch.compatible.regularly-tested.text in POMs.
-
-					// --------------------------------------------
-					// Amazon OpenSearch Serverless dialect running against a local OpenSearch instance
-					// WARNING: this does NOT actually run against Amazon OpenSearch Serverless (yet)
-					// See https://hibernate.atlassian.net/browse/HSEARCH-4919
-					new AmazonOpenSearchServerlessLocalBuildEnvironment(condition: TestCondition.AFTER_MERGE)
 			],
 			amazonElasticsearch: [
 					// --------------------------------------------
