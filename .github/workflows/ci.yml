@@ -43,181 +43,97 @@ defaults:
 
 env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
-  TESTCONTAINERS_REUSE_ENABLE: true
-  DB_TEST_MODULES_EXCLUDES: >-
-    -pl !documentation
-    -pl !integrationtest/mapper/orm-spring
-    -pl !integrationtest/java/modules/orm-lucene
-    -pl !integrationtest/java/modules/orm-elasticsearch
-    -pl !integrationtest/java/modules/orm-outbox-polling-elasticsearch
-    -pl !lucene-next/documentation
-    -pl !lucene-next/integrationtest/java/modules/orm-lucene
 
 permissions: { } # none, jobs are defining their own if they need any
 
 jobs:
-  build:
-    name: ${{ matrix.name }}
-    # On forks, self-hosted runners are not available; fall back to ubuntu-latest.
-    runs-on: >-
-      ${{
-        github.repository == 'hibernate/hibernate-search' && matrix.runs-on
-        || !contains(matrix.runs-on || '', 'runs-on') && matrix.runs-on
-        || 'ubuntu-latest'
-      }}
-    # Default per-job timeout; individual matrix entries can override it via `timeout`.
-    timeout-minutes: ${{ matrix.timeout != '' && matrix.timeout || 60 }}
+  build-and-test:
+    uses: ./.github/workflows/ci-build-and-test.yml
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Default
-          - {
-            name: "Linux JDK 25",
-            jqassistant: true,
-            docs-preview: true
-          }
-          # JDKs
-          - {
-            name: "Linux JDK 17",
-            java-test-version: 17,
-            maven-args: '-f integrationtest -Dgib.buildAll=true'
-          }
-          # Compilers
-          - {
-            name: "Eclipse compiler",
-            eclipse: true,
-            coverage: false
-          }
-          # Databases
-          - {
-            name: "PostgreSQL",
-            db-profile: 'ci-postgresql'
-          }
-          - {
-            name: "Oracle",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            db-profile: 'ci-oracle'
-          }
-          # Search backends
-          - {
-            name: "OpenSearch 3.7",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=3.7.0 -Dtest.lucene.skip=true'
-          }
-          # Windows
-          # We can't start Linux containers on GitHub Actions' Windows VMs,
-          # so we can't run Elasticsearch tests.
-          # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
-          - {
-            name: "Windows JDK 25",
-            runs-on: 'windows-latest',
-            maven-args: '-Dtest.elasticsearch.skip=true',
-            coverage: false
-          }
-    steps: &build-steps
-      - name: Set up RunsOn
-        if: ${{ contains(matrix.runs-on || '', 'runs-on') && github.repository == 'hibernate/hibernate-search' }}
-        uses: runs-on/action@17b59092eb37ebfdbb034460892887c09100eaa3 # v2.5.0
+    with:
+      matrix-json: >-
+        [
+          { "name": "Default" },
+          { "name": "Linux JDK 17", "java-test-version": 17, "maven-args": "-f integrationtest -Dgib.buildAll=true" },
+          { "name": "PostgreSQL", "db-profile": "ci-postgresql" },
+          { "name": "Oracle", "runs-on": "runs-on/fleet=linux-standard/env=ibm", "db-profile": "ci-oracle" },
+          { "name": "OpenSearch 3.7", "runs-on": "runs-on/fleet=linux-standard/env=commonhaus", "maven-args": "-Pdist -Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=3.7.0 -Dtest.lucene.skip=true" }
+        ]
+    secrets: inherit
+
+  # Windows can't reuse Linux build artifacts; runs a full build + test.
+  # We can't start Linux containers on GitHub Actions' Windows VMs,
+  # so we can't run Elasticsearch tests.
+  # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
+  build-windows:
+    name: Windows JDK 25
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
       - name: Support longpaths on Windows
-        if: ${{ startsWith(matrix.runs-on || '', 'windows') }}
         run: git config --global core.longpaths true
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
         with:
           persist-credentials: false
-          # Fetch the whole history to make sure that gitflow incremental builder
-          # can find the base commit.
           fetch-depth: 0
-      # Checkstyle enforces this for the files it processes; this covers all the other ones.
-      - name: Check that no license header was reintroduced
-        if: ${{ matrix.jqassistant }}
-        run: ./ci/check-no-license-headers.sh
-      - name: Set up test JDK ${{ matrix.java-test-version }}
-        if: ${{ matrix.java-test-version }}
+      - name: Set up Java 25
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
         with:
-          java-version: ${{ matrix.java-test-version }}
+          java-version: 25
           distribution: temurin
-      - name: Capture test JDK home
-        if: ${{ matrix.java-test-version }}
-        run: echo "TEST_JDK_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-      - name: Set up Java ${{ matrix.java-version || '25' }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
-        with:
-          java-version: ${{ matrix.java-version || '25' }}
-          distribution: temurin
-      # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
           path: ~/.m2/repository
-          # use a different key than workflows running in trusted mode
           key: ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
       - name: Set up Maven
         run: ./mvnw -v
-      - name: Docker cleanup
-        run: ./ci/docker-cleanup.sh
-
-      - name: Build code and run unit tests and basic checks
-        if: ${{ !matrix.eclipse }}
+      - name: Build code and run tests
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
-          ./mvnw "${mvn_args[@]}" clean install \
-              ${{ matrix.jqassistant && '-Pjqassistant' || '' }} \
-              -Pdist -Pci-build -DskipITs \
-              ${{ env.AFTER_MERGE == 'true' && '-DskipTests' || '' }}
+          ./mvnw "${mvn_args[@]}" clean verify \
+              -Pdist -Pci-build \
+              -Dtest.elasticsearch.skip=true
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
-      # For jobs running on 'pull_request', upload build scan data.
-      # The actual publishing must be done in a separate job (see ci-report.yml).
-      # We don't write to the remote cache as that would be unsafe.
-      # For after-merge jobs, always upload (they only run on push).
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
-        if: "${{ !matrix.eclipse && (env.AFTER_MERGE == 'true' || github.event_name == 'pull_request') && !cancelled() }}"
+        if: "${{ !cancelled() }}"
         with:
-          name: build-scan-data-initial-${{ matrix.name }}
+          name: build-scan-data-Windows JDK 25
           path: ~/.m2/.develocity/build-scan-data
 
-      - name: Upload docs preview
-        if: ${{ matrix.docs-preview }}
-        uses: hibernate/.github/actions/build-docs-preview@197125e1a0e9624349ef9e8157dad8ab707f3da0 # main
+  build-eclipse:
+    name: Eclipse compiler
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
         with:
-          dist-path: 'documentation/target/dist'
-          src-paths: |
-            documentation/src
-
-      - name: Run integration tests
-        if: ${{ !matrix.eclipse }}
-        run: |
-          read -ra mvn_args <<< "$MAVEN_ARGS"
-          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
-          read -ra mvn_test_jdk_args <<< "$MAVEN_TEST_JDK_ARGS"
-          read -ra mvn_incremental <<< "$MAVEN_INCREMENTAL_BUILD"
-          db_args=()
-          if [[ -n "$DB_PROFILE" ]]; then
-            read -ra db_excludes <<< "$DB_TEST_MODULES_EXCLUDES"
-            db_args+=(-Pdist "-P$DB_PROFILE" "${db_excludes[@]}")
-          fi
-          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" "${mvn_test_jdk_args[@]}" "${db_args[@]}" clean verify \
-              -Pskip-checks -Pci-build \
-              ${{ matrix.coverage != false && '-Pcoverage' || '' }} \
-              "${mvn_incremental[@]}"
-        env:
-          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
-          DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
-          MAVEN_MATRIX_ARGS: ${{ matrix.maven-args }}
-          DB_PROFILE: ${{ matrix.db-profile }}
-          MAVEN_TEST_JDK_ARGS: ${{ env.TEST_JDK_HOME && format('-Djava-version.test.compiler.java_home={0} -Djava-version.test.release={1}', env.TEST_JDK_HOME, matrix.java-test-version) || '' }}
-          MAVEN_INCREMENTAL_BUILD: ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
-
+          persist-credentials: false
+      - name: Set up Java 25
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
+        with:
+          java-version: 25
+          distribution: temurin
+      - name: Cache local Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
+        with:
+          path: ~/.m2/repository
+          key: ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
+      - name: Set up Maven
+        run: ./mvnw -v
       - name: Check compilation with Eclipse compiler
-        if: ${{ matrix.eclipse }}
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" clean install \
@@ -229,146 +145,14 @@ jobs:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
 
-      # Same as above, but for the build scan of the latest Maven run.
-      - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
-        if: "${{ (env.AFTER_MERGE == 'true' || github.event_name == 'pull_request') && !cancelled() }}"
-        with:
-          name: build-scan-data-integrationtest-${{ matrix.name }}
-          path: ~/.m2/.develocity/build-scan-data
-
-      - name: Store coverage report
-        if: ${{ matrix.coverage != false }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
-        with:
-          name: build-coverage-data-${{ matrix.name }}
-          retention-days: 1
-          path: |
-            ./**/jacoco.exec
-
-      - name: Docker cleanup
-        run: ./ci/docker-cleanup.sh
-      - name: Omit produced artifacts from build cache
-        run: rm -r ~/.m2/repository/org/hibernate/search
-
-  # After-merge environments: run only on pushes.
-  build-after-merge:
-    if: github.event_name == 'push'
-    name: ${{ matrix.name }}
-    # On forks, self-hosted runners are not available; fall back to ubuntu-latest.
-    runs-on: >-
-      ${{
-        github.repository == 'hibernate/hibernate-search' && matrix.runs-on
-        || !contains(matrix.runs-on || '', 'runs-on') && matrix.runs-on
-        || 'ubuntu-latest'
-      }}
-    # Default per-job timeout; individual matrix entries can override it via `timeout`.
-    timeout-minutes: ${{ matrix.timeout != '' && matrix.timeout || 60 }}
-    permissions:
-      contents: read
-    env:
-      AFTER_MERGE: 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Databases
-          - {
-            name: "MySQL",
-            db-profile: 'ci-mysql'
-          }
-          - {
-            name: "MariaDB",
-            db-profile: 'ci-mariadb'
-          }
-          - {
-            name: "Db2",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            db-profile: 'ci-db2'
-          }
-          - {
-            name: "MSSQL",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            db-profile: 'ci-mssql'
-          }
-          - {
-            name: "CockroachDB-1",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            maven-args: '-Pci-cockroachdb -pl :hibernate-search-integrationtest-mapper-orm,:hibernate-search-integrationtest-mapper-orm-jakarta-batch,:hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene-next'
-          }
-          - {
-            name: "CockroachDB-2",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            maven-args: '-Pci-cockroachdb -pl :hibernate-search-integrationtest-mapper-orm-outbox-polling,:hibernate-search-integrationtest-mapper-orm-realbackend,:hibernate-search-integrationtest-mapper-orm-realbackend-lucene-next,:hibernate-search-integrationtest-mapper-orm-envers,:hibernate-search-integrationtest-mapper-orm-cdi,:hibernate-search-integrationtest-showcase-library,:hibernate-search-integrationtest-showcase-library-lucene-next,:hibernate-search-integrationtest-spring-repackaged-application,:hibernate-search-integrationtest-spring-repackaged-model'
-          }
-          # Extra JDKs
-          - {
-            name: "JDK 21",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            java-test-version: 21,
-            maven-args: '-f integrationtest -Dgib.buildAll=true'
-          }
-          - {
-            name: "JDK 26",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            java-test-version: 26,
-            maven-args: '-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true'
-          }
-          - {
-            name: "JDK 27",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            java-test-version: 27,
-            maven-args: '-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true'
-          }
-          - {
-            name: "JDK 28",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            java-test-version: 28,
-            maven-args: '-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true'
-          }
-          # Elasticsearch versions
-          - {
-            name: "Elasticsearch 7.10",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=elastic -Dtest.elasticsearch.version=7.10.2 -Dtest.lucene.skip=true'
-          }
-          - {
-            name: "Elasticsearch 7.17",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=elastic -Dtest.elasticsearch.version=7.17.29 -Dtest.lucene.skip=true'
-          }
-          - {
-            name: "Elasticsearch 8.19",
-            runs-on: 'runs-on/fleet=linux-standard/env=ibm',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=elastic -Dtest.elasticsearch.version=8.19.19 -Dtest.lucene.skip=true'
-          }
-          # OpenSearch versions
-          - {
-            name: "OpenSearch 1.3",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=1.3.20 -Dtest.lucene.skip=true'
-          }
-          - {
-            name: "OpenSearch 2.19",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=2.19.4 -Dtest.lucene.skip=true'
-          }
-          - {
-            name: "Amazon OpenSearch Serverless",
-            runs-on: 'runs-on/fleet=linux-standard/env=commonhaus',
-            maven-args: '-Pdist -Dtest.elasticsearch.distribution=amazon-opensearch-serverless -Dtest.elasticsearch.version= -Dtest.lucene.skip=true'
-          }
-    steps: *build-steps
-
   prepare-sonar-bundle:
     name: Prepare build bundle for Sonar scanner
     needs:
-      - build
-      - build-after-merge
+      - build-and-test
     if: |
       (github.repository == 'hibernate/hibernate-search' || !endsWith(github.ref, '/main'))
       && always() && !cancelled()
-      && needs.build.result != 'cancelled'
+      && needs.build-and-test.result != 'cancelled'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
