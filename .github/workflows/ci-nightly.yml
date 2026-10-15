@@ -5,12 +5,8 @@ name: CI Nightly
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '25 5 * * *'
   workflow_dispatch:
-
-concurrency:
-  group: "nightly-ci-${{ github.ref }}"
-  cancel-in-progress: true
 
 permissions: { }
 
