@@ -234,7 +234,7 @@ jobs:
           db_args=()
           if [[ -n "$DB_PROFILE" ]]; then
             read -ra db_excludes <<< "$DB_TEST_MODULES_EXCLUDES"
-            db_args+=(-Pdist "-P$DB_PROFILE" "${db_excludes[@]}")
+            db_args+=("-P$DB_PROFILE" "${db_excludes[@]}")
           fi
           ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" "${mvn_test_jdk_args[@]}" "${db_args[@]}" clean verify \
               -Pskip-checks -Pci-build \
@@ -267,7 +267,7 @@ jobs:
           read -ra mvn_args <<< "$MAVEN_ARGS"
           read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
           ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean verify \
-              -Pdist -Pci-build
+              -Pci-build
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"

@@ -51,7 +51,7 @@ jobs:
           { "name": "Linux JDK 17", "java-test-version": 17, "maven-args": "-f integrationtest -Dgib.buildAll=true" },
           { "name": "PostgreSQL", "db-profile": "ci-postgresql" },
           { "name": "Oracle", "runs-on": "runs-on/fleet=linux-standard/env=ibm", "db-profile": "ci-oracle" },
-          { "name": "OpenSearch 3.7", "runs-on": "runs-on/fleet=linux-standard/env=commonhaus", "maven-args": "-Pdist -Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=3.7.0 -Dtest.lucene.skip=true" },
+          { "name": "OpenSearch 3.7", "runs-on": "runs-on/fleet=linux-standard/env=commonhaus", "maven-args": "-Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=3.7.0 -Dtest.lucene.skip=true" },
           { "name": "Windows JDK 25", "runs-on": "windows-latest", "full-build": true, "maven-args": "-Dtest.elasticsearch.skip=true", "coverage": false },
           { "name": "Eclipse compiler", "eclipse": true, "coverage": false }
         ]
