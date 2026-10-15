@@ -251,11 +251,17 @@ jobs:
       - name: Omit produced artifacts from build cache
         run: rm -r ~/.m2/repository/org/hibernate/search
 
-  # After-merge environments: run only on pushes to the main repository.
+  # After-merge environments: run only on pushes.
   build-after-merge:
-    if: github.event_name == 'push' && github.repository == 'hibernate/hibernate-search'
+    if: github.event_name == 'push'
     name: ${{ matrix.name }}
-    runs-on: ${{ matrix.runs-on || 'ubuntu-latest' }}
+    # On forks, self-hosted runners are not available; fall back to ubuntu-latest.
+    runs-on: >-
+      ${{
+        github.repository == 'hibernate/hibernate-search' && matrix.runs-on
+        || !contains(matrix.runs-on || '', 'runs-on') && matrix.runs-on
+        || 'ubuntu-latest'
+      }}
     # Default per-job timeout; individual matrix entries can override it via `timeout`.
     timeout-minutes: ${{ matrix.timeout != '' && matrix.timeout || 60 }}
     permissions:
