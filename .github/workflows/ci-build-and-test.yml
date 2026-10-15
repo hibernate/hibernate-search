@@ -168,8 +168,14 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Set up test JDK ${{ matrix.java-test-version }} from jdk.java.net
+        if: ${{ matrix.java-test-version && matrix.java-test-from == 'jdk.java.net' }}
+        uses: oracle-actions/setup-java@fff43251af9936a0e6a4d5d0946e14f1680e9b6b # v1.5.0
+        with:
+          website: jdk.java.net
+          release: ${{ matrix.java-test-version }}
       - name: Set up test JDK ${{ matrix.java-test-version }}
-        if: ${{ matrix.java-test-version }}
+        if: ${{ matrix.java-test-version && matrix.java-test-from != 'jdk.java.net' }}
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
         with:
           java-version: ${{ matrix.java-test-version }}

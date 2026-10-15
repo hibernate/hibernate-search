@@ -34,7 +34,7 @@ jobs:
           { "name": "JDK 27", "runs-on": "runs-on/fleet=linux-standard/env=ibm",
             "java-test-version": 27, "maven-args": "-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true" },
           { "name": "JDK 28", "runs-on": "runs-on/fleet=linux-standard/env=ibm",
-            "java-test-version": 28, "maven-args": "-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true" },
+            "java-test-version": 28, "java-test-from": "jdk.java.net", "maven-args": "-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true" },
           { "name": "Elasticsearch 7.10", "runs-on": "runs-on/fleet=linux-standard/env=ibm",
             "maven-args": "-Dtest.elasticsearch.distribution=elastic -Dtest.elasticsearch.version=7.10.2 -Dtest.lucene.skip=true" },
           { "name": "Elasticsearch 7.17", "runs-on": "runs-on/fleet=linux-standard/env=ibm",
