@@ -12,7 +12,7 @@ permissions: { }
 
 jobs:
   build-and-test:
-    if: github.repository == 'hibernate/hibernate-search'
+    if: github.repository == 'hibernate/hibernate-search' || github.event_name != 'schedule'
     uses: ./.github/workflows/ci-build-and-test.yml
     permissions:
       contents: read
