@@ -240,7 +240,9 @@ jobs:
           path: .
       - name: Extract build result
         if: ${{ !matrix.full-build }}
-        run: tar -xzf m2-build-result.tgz -C ~
+        run: |
+          tar -xzf m2-build-result.tgz -C ~
+          rm m2-build-result.tgz
       # For full-build entries (Windows, Eclipse): use full Maven cache (save + restore).
       - name: Cache local Maven repository
         if: ${{ matrix.full-build }}
