@@ -165,7 +165,6 @@ stage('Configure') {
 	// Most BEFORE_MERGE and AFTER_MERGE environments have been moved to GitHub Actions (ci.yml).
 	// This Jenkinsfile retains only:
 	// - Default environments (needed for the default build stage)
-	// - ON_DEMAND local Elasticsearch/OpenSearch versions
 	// - Amazon Elasticsearch/OpenSearch Service tests (need real AWS endpoints + locked resources)
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
@@ -182,76 +181,7 @@ stage('Configure') {
 							isDefault: true)
 			],
 			localElasticsearch: [
-					// --------------------------------------------
-					// Elasticsearch distribution from Elastic
-					// BEFORE_MERGE and AFTER_MERGE versions moved to GitHub Actions.
-					// ON_DEMAND versions kept here for manual/on-demand testing.
-					new LocalElasticsearchBuildEnvironment(version: '7.11.2', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '7.12.1', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '7.13.2', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.2.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.3.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.4.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.5.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.6.2', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.7.1', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.8.2', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.9.2', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.10.4', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.11.4', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.12.2', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.13.4', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.14.3', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.15.4', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.16.1', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.17.6', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '8.18.7', condition: TestCondition.ON_DEMAND),
-					new LocalElasticsearchBuildEnvironment(version: '9.0.7', condition: TestCondition.ON_DEMAND),
-                    new LocalElasticsearchBuildEnvironment(version: '9.1.5', condition: TestCondition.ON_DEMAND),
-                    new LocalElasticsearchBuildEnvironment(version: '9.2.6', condition: TestCondition.ON_DEMAND),
-                    new LocalElasticsearchBuildEnvironment(version: '9.3.8', condition: TestCondition.ON_DEMAND),
-                    new LocalElasticsearchBuildEnvironment(version: '9.4.4', condition: TestCondition.ON_DEMAND),
 					new LocalElasticsearchBuildEnvironment(version: '9.5.0', condition: TestCondition.BEFORE_MERGE, isDefault: true),
-					// IMPORTANT: Make sure to update the documentation for any newly supported Elasticsearch versions
-					//            See version.org.elasticsearch.compatible.expected.text
-					//            and version.org.elasticsearch.compatible.regularly-tested.text in POMs.
-
-					// --------------------------------------------
-					// OpenSearch
-					// BEFORE_MERGE and AFTER_MERGE versions moved to GitHub Actions.
-					// ON_DEMAND versions kept here for manual/on-demand testing.
-					new LocalOpenSearchBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.2.1', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.3.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.4.1', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.5.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.6.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.7.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.8.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.9.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.10.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.11.1', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.12.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.13.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.14.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.15.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.16.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.17.1', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.18.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '3.0.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '3.1.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '3.2.0', condition: TestCondition.ON_DEMAND),
-                    new LocalOpenSearchBuildEnvironment(version: '3.3.2', condition: TestCondition.ON_DEMAND),
-                    new LocalOpenSearchBuildEnvironment(version: '3.4.0', condition: TestCondition.ON_DEMAND),
-                    new LocalOpenSearchBuildEnvironment(version: '3.5.0', condition: TestCondition.ON_DEMAND),
-                    new LocalOpenSearchBuildEnvironment(version: '3.6.0', condition: TestCondition.ON_DEMAND),
-					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
-					// IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions
-					//            See version.org.opensearch.compatible.expected.text
-					//            and version.org.opensearch.compatible.regularly-tested.text in POMs.
 			],
 			amazonElasticsearch: [
 					// --------------------------------------------
@@ -325,10 +255,10 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 		keepOnlyEnvironmentsFromSet(params.ENVIRONMENT_SET)
 	}
 
-	// Determine whether ITs need to be run in the default build
-	enableDefaultBuildIT = environments.content.any { key, envSet ->
-		return envSet.enabled.contains(envSet.default)
-	}
+	// Default environment integration tests are now handled by GitHub Actions (ci.yml).
+	// The default build stage below still compiles and produces the stash for Amazon ES/OS tests,
+	// but no longer runs ITs.
+	enableDefaultBuildIT = false
 	// No need to re-test default environments separately, they will be tested as part of the default build if needed
 	environments.content.each { key, envSet ->
 		envSet.enabled.remove(envSet.default)
@@ -616,87 +546,6 @@ stage('Non-default environments') {
 	}
 	else {
 		parallel(executions)
-	}
-}
-
-stage('Sonar analysis') {
-	def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
-    def sonarCliVersion = helper.configuration.file?.sonar?.cli?.version
-    def sonarCliInstallerHash = helper.configuration.file?.sonar?.cli?.hash
-	if (sonarCredentialsId) {
-		runBuildOnNode {
-			withMavenWorkspace {
-				dir(helper.configuration.maven.localRepositoryPath) {
-					unstash name: "default-build-cache"
-				}
-				if (enableDefaultBuild && enableDefaultBuildIT) {
-					unstash name: "default-build-jacoco-reports"
-				}
-				environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
-					unstash name: "${buildEnv.tag}-build-jacoco-reports"
-				}
-				environments.content.database.enabled.each { JdkBuildEnvironment buildEnv ->
-					unstash name: "${buildEnv.tag}-build-jacoco-reports"
-				}
-				environments.content.localElasticsearch.enabled.each { JdkBuildEnvironment buildEnv ->
-					unstash name: "${buildEnv.tag}-build-jacoco-reports"
-				}
-				environments.content.amazonElasticsearch.enabled.each { JdkBuildEnvironment buildEnv ->
-					unstash name: "${buildEnv.tag}-build-jacoco-reports"
-				}
-
-                dir('.sonar') {
-                    sh "curl --create-dirs -sSLo \"\$(pwd)\"/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${sonarCliVersion}.zip"
-                    def downloadedHash = sh(script: 'sha256sum $(pwd)/sonar-scanner.zip | awk \'{print $1}\'', returnStdout: true).trim()
-                    if (downloadedHash != sonarCliInstallerHash) {
-                        echo "Downloaded CLI sha256: $downloadedHash"
-                        echo "Expected CLI sha256: $sonarCliInstallerHash"
-                        throw new Exception("Downloaded CLI has an unexpected checksum. Stopping the build!")
-                    }
-                    sh "unzip -o \$(pwd)/sonar-scanner.zip -d \$(pwd)"
-                    sh "mv \"\$(pwd)/sonar-scanner-$sonarCliVersion\"/* \"\$(pwd)\""
-
-                }
-
-				// we don't clean to keep the unstashed jacoco reports:
-				sh "mvn package -Pskip-checks -Pci-build -DskipTests -DskipITs -Pcoverage-report ${toTestEnvironmentArgs(environments.content.jdk.default)}"
-                def currentJavaVersion = sh(script: 'mvn help:evaluate -Dexpression=java-version.main.release -q -DforceStdout', returnStdout: true).trim()
-
-				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
-				// To that end, escape the '$' when referencing the variables.
-				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
-				withCredentials([usernamePassword(
-						credentialsId: sonarCredentialsId,
-						usernameVariable: 'SONARCLOUD_ORGANIZATION',
-						// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
-						passwordVariable: 'SONAR_TOKEN'
-				)]) {
-                    def sonarCliArgs = "-Dsonar.java.source=${currentJavaVersion}"
-
-                    if (helper.scmSource.pullRequest) {
-                        sonarCliArgs+=" -Dsonar.pullrequest.branch=${helper.scmSource.branch.name}"
-                        sonarCliArgs+=" -Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id}"
-                        sonarCliArgs+=" -Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name}"
-                        if (helper.scmSource.gitHubRepoId) {
-                            sonarCliArgs+=" -Dsonar.pullrequest.provider=GitHub"
-                            sonarCliArgs+=" -Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId}"
-                        }
-                    } else {
-                        sonarCliArgs+=" -Dsonar.branch.name=${helper.scmSource.branch.name}"
-                    }
-
-                    sh """.sonar/bin/sonar-scanner $sonarCliArgs \\
-                        -Dsonar.host.url="https://sonarcloud.io" \\
-                        -Dsonar.organization="hibernate" \\
-                        -Dsonar.projectKey="org.hibernate.search:hibernate-search-parent" \\
-                        -Dsonar.java.libraries="\$(pwd)/build/reports/target/sonar-dependencies/*.jar" \\
-                        -Dsonar.coverage.jacoco.xmlReportPaths="\$(pwd)/build/reports/target/site/jacoco-aggregate/jacoco.xml"
-                    """
-				}
-			}
-		}
-	} else {
-		echo "Skipping Sonar report: no credentials."
 	}
 }
 

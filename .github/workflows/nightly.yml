@@ -1,20 +1,92 @@
+# See MAINTAINERS.md for details about all available CI jobs.
+#
+# Nightly CI: runs additional environments that are too expensive for every push/PR,
+# plus a reproducible build check across maintained branches.
+# Uses the same reusable workflow as ci.yml for the build + test pattern.
+
 name: Nightly
 
 on:
   schedule:
-    - cron: '25 3 * * *'
+    - cron: '25 5 * * *'
   workflow_dispatch:
 
 permissions: { }
 
 jobs:
   reproducible-build-check:
+    if: github.repository == 'hibernate/hibernate-search' || github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
-        branch: [ 'main', '8.4', '8.3', '8.2', '7.2', '7.1', '6.2' ]
+        branch: [ 'main', '8.4', '8.2', '7.2' ]
     uses: hibernate/.github/.github/workflows/reproducible-build-check.yml@main
     with:
       branch: ${{ matrix.branch }}
     permissions:
       contents: read
+
+  build-and-test:
+    if: github.repository == 'hibernate/hibernate-search' || github.event_name != 'schedule'
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+    with:
+      # --- Databases ---
+      # CockroachDB is split into two parallel CI jobs to stay within CI timeouts.
+      # TODO: merge them back once we improve the overall test execution time for the ORM modules.
+      #
+      # --- JDKs ---
+      # We enable preview features when testing newer builds of OpenJDK:
+      # even if we don't use these features, just enabling them can cause side effects
+      # and it's useful to test that.
+      # JDKs that aren't supported by Hibernate ORM out-of-the box yet
+      # require the use of -Dnet.bytebuddy.experimental=true.
+      # Make sure to remove that argument as soon as possible
+      # -- generally that requires upgrading bytebuddy in Hibernate ORM after the JDK goes GA.
+      # IMPORTANT: Make sure to update the documentation for any newly supported Java versions.
+      #            See java-version.main.compatible.expected.text in POMs.
+      #
+      # --- Elasticsearch ---
+      # Not testing 7.9- since those versions are EOL'ed.
+      # IMPORTANT: Make sure to update the documentation for any newly supported Elasticsearch versions.
+      #            See version.org.elasticsearch.compatible.expected.text
+      #            and version.org.elasticsearch.compatible.regularly-tested.text in POMs.
+      #
+      # --- OpenSearch ---
+      # Not testing 1.0-1.2 as those versions are EOL'ed.
+      # IMPORTANT: Make sure to update the documentation for any newly supported OpenSearch versions.
+      #            See version.org.opensearch.compatible.expected.text
+      #            and version.org.opensearch.compatible.regularly-tested.text in POMs.
+      #
+      # --- Amazon OpenSearch Serverless ---
+      # WARNING: this does NOT actually run against Amazon OpenSearch Serverless (yet).
+      # See https://hibernate.atlassian.net/browse/HSEARCH-4919
+      matrix-json: >-
+        [
+          { "name": "MySQL", "db-profile": "ci-mysql" },
+          { "name": "MariaDB", "db-profile": "ci-mariadb" },
+          { "name": "Db2", "db-profile": "ci-db2" },
+          { "name": "MSSQL", "db-profile": "ci-mssql" },
+          { "name": "CockroachDB-1", "timeout": 90,
+            "maven-args": "-Pci-cockroachdb -pl :hibernate-search-integrationtest-mapper-orm,:hibernate-search-integrationtest-mapper-orm-jakarta-batch,:hibernate-search-integrationtest-mapper-orm-jakarta-batch-lucene-next" },
+          { "name": "CockroachDB-2", "timeout": 90,
+            "maven-args": "-Pci-cockroachdb -pl :hibernate-search-integrationtest-mapper-orm-outbox-polling,:hibernate-search-integrationtest-mapper-orm-realbackend,:hibernate-search-integrationtest-mapper-orm-realbackend-lucene-next,:hibernate-search-integrationtest-mapper-orm-envers,:hibernate-search-integrationtest-mapper-orm-cdi,:hibernate-search-integrationtest-showcase-library,:hibernate-search-integrationtest-showcase-library-lucene-next,:hibernate-search-integrationtest-spring-repackaged-application,:hibernate-search-integrationtest-spring-repackaged-model" },
+          { "name": "JDK", "java-test-version": 21,
+            "maven-args": "-f integrationtest -Dgib.buildAll=true" },
+          { "name": "JDK", "java-test-version": 26,
+            "maven-args": "-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true" },
+          { "name": "JDK", "java-test-version": 27,
+            "maven-args": "-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true" },
+          { "name": "JDK", "java-test-version": 28, "java-test-from": "jdk.java.net",
+            "maven-args": "-f integrationtest -Dgib.buildAll=true -Dtest.launcher.args=--enable-preview -Dnet.bytebuddy.experimental=true" },
+          { "name": "Elasticsearch", "es-distribution": "elastic", "es-version": "7.10.2" },
+          { "name": "Elasticsearch", "es-distribution": "elastic", "es-version": "7.17.29" },
+          { "name": "Elasticsearch", "es-distribution": "elastic", "es-version": "8.19.19" },
+          { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "1.3.20" },
+          { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "2.19.4" },
+          { "name": "Amazon OpenSearch Serverless", "es-distribution": "amazon-opensearch-serverless" },
+          { "name": "Documentation PDF", "full-build": true, "coverage": false,
+            "maven-args": "-Pdocumentation-pdf -DskipTests -DskipITs" }
+        ]
+    secrets: inherit

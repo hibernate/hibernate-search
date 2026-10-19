@@ -1,7 +1,7 @@
 # Hibernate Search
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.search/hibernate-search-mapper-orm.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.search&sort=name)
-[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-search%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/job/hibernate-search/job/main)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/hibernate/hibernate-search/ci.yml?branch=main&style=for-the-badge)](https://github.com/hibernate/hibernate-search/actions/workflows/ci.yml?query=branch%3Amain)
 [![Sonar Coverage](https://img.shields.io/sonar/coverage/org.hibernate.search:hibernate-search-parent?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/project/activity?id=org.hibernate.search%3Ahibernate-search-parent&graph=coverage)
 [![Quality gate](https://img.shields.io/sonar/alert_status/org.hibernate.search:hibernate-search-parent?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
 [![Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle)](https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Search)
