@@ -304,7 +304,7 @@ pipeline {
 										pullContainerImages()
 										sh """ \
                                             mvn clean install -U -Pdependency-update -Pdist -Pci-build -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)} \
-                                            --fail-at-end -Dno-build-cache \
+                                            --fail-at-end -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false \
                                             ${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
                                         """
 									}
@@ -325,7 +325,7 @@ pipeline {
                                         sh """ \
                                             mvn clean install -U -Pdependency-update -Pdist -Pci-build -Pci-postgresql \
                                             -Dsurefire.environment=${normalize(env.DEPENDENCY_UPDATE_NAME)}-postgresql \
-                                            --fail-at-end -Dno-build-cache \
+                                            --fail-at-end -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false \
                                             ${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
                                         """
                                     }
