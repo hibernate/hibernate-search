@@ -13,9 +13,11 @@ IFS="," COMMA_SEPARATED_TESTED_ARTIFACT_IDS="$*"
 TESTED_ARTIFACT_IDS_REGEXP="(\Q$(echo "$*" | perl -pe 's/,/\\E|\\Q/g')\E)"
 
 # We don't want to use the build cache or build scans for this execution.
-# -Ddevelocity.scan.disabled disables scan capture entirely (not just publication),
-# preventing scan data from being saved and later published by the CI reporting workflow.
-MISC_MAVEN_ARGS="-Ddevelocity.scan.disabled=true -Dno-build-cache"
+# Use standard Develocity system properties rather than custom conventions:
+# - develocity.scan.disabled disables scan capture entirely (not just publication),
+#   preventing scan data from being saved and later published by the CI reporting workflow.
+# - develocity.cache.{local,remote}.enabled disables the build cache.
+MISC_MAVEN_ARGS="-Ddevelocity.scan.disabled=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false"
 
 {
 	./mvnw dependency:list $MISC_MAVEN_ARGS -pl :hibernate-search-parent-integrationtest -am -amd -DincludeArtifactIds="$COMMA_SEPARATED_TESTED_ARTIFACT_IDS"
