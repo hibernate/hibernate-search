@@ -1,17 +1,28 @@
-# Reusable workflow: build once, then run integration tests in parallel.
-# Called by ci.yml (before-merge entries) and ci-nightly.yml (after-merge entries).
+# See MAINTAINERS.md for details about all available CI jobs.
 #
-# Test matrix entries support three modes:
+# Reusable workflow: build once, then run integration tests in parallel.
+# Called by ci.yml (before-merge entries) and nightly.yml (after-merge entries).
+#
+# Test matrix entries support two modes:
 # - Default: downloads the initial build artifact and runs integration tests
-# - full-build: does a full build + test from scratch (for entries that can't reuse
-#   the initial build artifact, e.g. Windows)
-# - eclipse: runs a compile-only check with the Eclipse compiler
+# - full-build: does a full build from scratch (for entries that can't reuse
+#   the initial build artifact, e.g. Windows, Eclipse compiler check)
 
-name: CI Build and Test
+name: CI Build
 
 on:
   workflow_call:
     inputs:
+      initial-build-runs-on:
+        description: 'Runner label for the initial build job'
+        type: string
+        required: false
+        default: 'ubuntu-latest'
+      reports-runs-on:
+        description: 'Runner label for reporting jobs (e.g. Sonar bundle)'
+        type: string
+        required: false
+        default: 'ubuntu-latest-slim'
       matrix-json:
         description: 'JSON array of test matrix entries'
         type: string
@@ -22,9 +33,9 @@ defaults:
     shell: bash
 
 env:
-  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build"
   TESTCONTAINERS_REUSE_ENABLE: true
-  DB_TEST_MODULES_EXCLUDES: >-
+  MAVEN_ARGS_DB_MODULE_EXCLUDES: >-
     -pl !documentation
     -pl !integrationtest/mapper/orm-spring
     -pl !integrationtest/java/modules/orm-lucene
@@ -40,8 +51,8 @@ jobs:
     name: Initial build
     runs-on: >-
       ${{
-        github.repository == 'hibernate/hibernate-search'
-        && 'runs-on/fleet=linux-standard/env=commonhaus'
+        github.repository == 'hibernate/hibernate-search' && inputs.initial-build-runs-on
+        || !contains(inputs.initial-build-runs-on, 'runs-on') && inputs.initial-build-runs-on
         || 'ubuntu-latest'
       }}
     timeout-minutes: 60
@@ -49,12 +60,15 @@ jobs:
       contents: read
     steps:
       - name: Set up RunsOn
-        if: github.repository == 'hibernate/hibernate-search'
+        if: ${{ contains(inputs.initial-build-runs-on, 'runs-on') && github.repository == 'hibernate/hibernate-search' }}
         uses: runs-on/action@17b59092eb37ebfdbb034460892887c09100eaa3 # v2.5.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
         with:
           persist-credentials: false
+          # Fetch the whole history to make sure that gitflow incremental builder
+          # can find the base commit.
           fetch-depth: 0
+      # Checkstyle enforces this for the files it processes; this covers all the other ones.
       - name: Check that no license header was reintroduced
         run: ./ci/check-no-license-headers.sh
       - name: Set up Java 25
@@ -62,25 +76,24 @@ jobs:
         with:
           java-version: 25
           distribution: temurin
-      # On push/schedule, save + restore the Maven cache.
-      # On PR, restore only to avoid cache poisoning.
+      # Save + restore the Maven cache; restore only on PRs
+      # to avoid accumulating per-PR caches.
       - name: Cache local Maven repository
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
-        if: github.event_name == 'push' || github.event_name == 'schedule'
+        if: github.event_name != 'pull_request'
         with:
           path: ~/.m2/repository
-          key: trusted-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            trusted-${{ runner.os }}-maven-
+            maven-${{ runner.os }}-
       - name: Restore local Maven repository
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
-        if: github.event_name != 'push' && github.event_name != 'schedule'
+        if: github.event_name == 'pull_request'
         with:
           path: ~/.m2/repository
-          key: untrusted-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            untrusted-${{ runner.os }}-maven-
-            trusted-${{ runner.os }}-maven-
+            maven-${{ runner.os }}-
       - name: Cache Develocity local cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
@@ -88,6 +101,8 @@ jobs:
           key: develocity-cache-build-${{ github.event.pull_request.number || github.ref }}-${{ github.sha }}
           restore-keys: |
             develocity-cache-build-${{ github.event.pull_request.number || github.ref }}-
+            develocity-cache-build-refs/heads/${{ github.event.pull_request.base.ref || github.ref_name }}-
+            develocity-cache-build-refs/heads/main-
       - name: Set up Maven
         run: ./mvnw -v
       - name: Docker cleanup
@@ -96,10 +111,12 @@ jobs:
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" clean install \
-              -Pjqassistant -Pdist -Pci-build -DskipITs -Pcoverage
+              -Pjqassistant -Pdist -DskipITs -Pcoverage
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
+      # Upload build scan data for the Develocity build scan.
+      # The actual publishing must be done in a separate job (see ci-report.yml).
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         if: "${{ !cancelled() }}"
@@ -127,8 +144,9 @@ jobs:
         with:
           name: m2-build-result
           path: m2-build-result.tgz
-          retention-days: 7
+          retention-days: 1
       - name: Store coverage report
+        if: "${{ !cancelled() }}"
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
           name: build-coverage-data-Initial build
@@ -136,13 +154,18 @@ jobs:
           path: |
             ./**/jacoco.exec
       - name: Docker cleanup
+        if: "${{ !cancelled() }}"
         run: ./ci/docker-cleanup.sh
       - name: Delete snapshots from cache
-        if: github.event_name == 'push' || github.event_name == 'schedule'
+        if: github.event_name != 'pull_request'
         run: find ~/.m2 -name \*-SNAPSHOT -type d -exec rm -rf {} +
 
   test:
-    name: ${{ matrix.name }}
+    name: >-
+      ${{ matrix.name
+      }}${{ matrix.es-version && format(' {0}', matrix.es-version)
+      || matrix.java-test-version && format(' {0}', matrix.java-test-version)
+      || '' }}
     needs: build
     runs-on: >-
       ${{
@@ -167,7 +190,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
         with:
           persist-credentials: false
+          # Fetch the whole history to make sure that gitflow incremental builder
+          # can find the base commit.
           fetch-depth: 0
+      - name: Compute entry label
+        run: |
+          echo "ENTRY_LABEL=${_LABEL//[\":<>|*?\\\/]/-}" >> "$GITHUB_ENV"
+          echo "SUREFIRE_ENV=${_LABEL//[^a-zA-Z0-9_+-]/_}" >> "$GITHUB_ENV"
+        env:
+          _LABEL: >-
+            ${{ matrix.name
+            }}${{ matrix.es-version && format(' {0}', matrix.es-version)
+            || matrix.java-test-version && format(' {0}', matrix.java-test-version)
+            || '' }}
       - name: Set up test JDK ${{ matrix.java-test-version }} from jdk.java.net
         if: ${{ matrix.java-test-version && matrix.java-test-from == 'jdk.java.net' }}
         uses: oracle-actions/setup-java@fff43251af9936a0e6a4d5d0946e14f1680e9b6b # v1.5.0
@@ -188,77 +223,100 @@ jobs:
         with:
           java-version: ${{ matrix.java-version || '25' }}
           distribution: temurin
-      # For entries that depend on the initial build: restore Maven cache + download build artifact.
+      # For default entries: restore Maven cache (read-only) + download build artifact.
       - name: Restore local Maven repository
-        if: ${{ !matrix.full-build && !matrix.eclipse }}
+        if: ${{ !matrix.full-build }}
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
           path: ~/.m2/repository
-          key: trusted-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            trusted-${{ runner.os }}-maven-
+            maven-${{ runner.os }}-
       - name: Download build result
-        if: ${{ !matrix.full-build && !matrix.eclipse }}
+        if: ${{ !matrix.full-build }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # 8.0.1
         with:
           name: m2-build-result
           path: .
       - name: Extract build result
-        if: ${{ !matrix.full-build && !matrix.eclipse }}
+        if: ${{ !matrix.full-build }}
         run: tar -xzf m2-build-result.tgz -C ~
-      - name: Cache Develocity local cache
-        if: ${{ !matrix.full-build && !matrix.eclipse }}
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
-        with:
-          path: ~/.m2/.develocity/build-cache
-          key: develocity-cache-${{ matrix.name }}-${{ github.event.pull_request.number || github.ref }}-${{ github.sha }}
-          restore-keys: |
-            develocity-cache-${{ matrix.name }}-${{ github.event.pull_request.number || github.ref }}-
-      # For standalone entries (Windows, Eclipse): use full Maven cache (save + restore).
+      # For full-build entries (Windows, Eclipse): use full Maven cache (save + restore).
       - name: Cache local Maven repository
-        if: ${{ matrix.full-build || matrix.eclipse }}
+        if: ${{ matrix.full-build }}
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
           path: ~/.m2/repository
-          key: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ (github.event_name == 'push' || github.event_name == 'schedule') && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
+            maven-${{ runner.os }}-
+      # Develocity build cache: persisted per job across runs to avoid re-executing goals.
+      - name: Cache Develocity local cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
+        with:
+          path: ~/.m2/.develocity/build-cache
+          key: develocity-cache-${{ env.ENTRY_LABEL }}-${{ github.event.pull_request.number || github.ref }}-${{ github.sha }}
+          restore-keys: |
+            develocity-cache-${{ env.ENTRY_LABEL }}-${{ github.event.pull_request.number || github.ref }}-
+            develocity-cache-${{ env.ENTRY_LABEL }}-refs/heads/${{ github.event.pull_request.base.ref || github.ref_name }}-
+            develocity-cache-${{ env.ENTRY_LABEL }}-refs/heads/main-
       - name: Set up Maven
         run: ./mvnw -v
       - name: Docker cleanup
         if: ${{ !startsWith(matrix.runs-on || '', 'windows') }}
         run: ./ci/docker-cleanup.sh
+      - name: Determine test modules
+        run: |
+          if [[ -n "$_IT_ARTIFACT" ]]; then
+            modules=$(./ci/list-dependent-integration-tests.sh "$_IT_ARTIFACT")
+            echo "MAVEN_ARGS_IT_MODULES=-pl $modules" >> "$GITHUB_ENV"
+          fi
+        env:
+          _IT_ARTIFACT: >-
+            ${{
+              matrix.db-profile && 'hibernate-search-mapper-orm'
+              || matrix.es-distribution && 'hibernate-search-backend-elasticsearch'
+              || ''
+            }}
 
       # --- Standard integration test run (depends on initial build) ---
       - name: Run integration tests
-        if: ${{ !matrix.full-build && !matrix.eclipse }}
+        if: ${{ !matrix.full-build }}
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
-          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
-          read -ra mvn_test_jdk_args <<< "$MAVEN_TEST_JDK_ARGS"
-          read -ra mvn_incremental <<< "$MAVEN_INCREMENTAL_BUILD"
-          db_args=()
+          read -ra _a <<< "$MAVEN_ARGS_TEST_JDK"; mvn_args+=("${_a[@]}")
           if [[ -n "$DB_PROFILE" ]]; then
-            read -ra db_excludes <<< "$DB_TEST_MODULES_EXCLUDES"
-            db_args+=("-P$DB_PROFILE" "${db_excludes[@]}")
+            read -ra _a <<< "$MAVEN_ARGS_DB_MODULE_EXCLUDES"
+            mvn_args+=("-P$DB_PROFILE" "${_a[@]}")
           fi
-          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" "${mvn_test_jdk_args[@]}" "${db_args[@]}" clean verify \
-              -Pskip-checks -Pci-build \
-              ${{ matrix.coverage != false && '-Pcoverage' || '' }} \
-              "${mvn_incremental[@]}"
+          read -ra _a <<< "$MAVEN_ARGS_IT_MODULES"; mvn_args+=("${_a[@]}")
+          read -ra _a <<< "$MAVEN_ARGS_ES"; mvn_args+=("${_a[@]}")
+          read -ra _a <<< "$MAVEN_ARGS_INCREMENTAL"; mvn_args+=("${_a[@]}")
+          read -ra _a <<< "$MAVEN_ARGS_MATRIX"; mvn_args+=("${_a[@]}")
+          ./mvnw "${mvn_args[@]}" clean verify \
+              -Pskip-checks \
+              -Dsurefire.environment="$SUREFIRE_ENV" \
+              ${{ matrix.coverage != false && '-Pcoverage' || '' }}
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
-          MAVEN_MATRIX_ARGS: ${{ matrix.maven-args }}
+          MAVEN_ARGS_MATRIX: ${{ matrix.maven-args }}
           DB_PROFILE: ${{ matrix.db-profile }}
-          MAVEN_TEST_JDK_ARGS: >-
+          MAVEN_ARGS_ES: >-
+            ${{
+              matrix.es-distribution
+              && format('-Dtest.elasticsearch.distribution={0} -Dtest.elasticsearch.version={1} -Dtest.lucene.skip=true',
+                matrix.es-distribution, matrix.es-version || '')
+              || ''
+            }}
+          MAVEN_ARGS_TEST_JDK: >-
             ${{
               env.TEST_JDK_HOME
               && format('-Djava-version.test.compiler.java_home={0} -Djava-version.test.release={1}',
                 env.TEST_JDK_HOME, matrix.java-test-version)
               || ''
             }}
-          MAVEN_INCREMENTAL_BUILD: >-
+          MAVEN_ARGS_INCREMENTAL: >-
             ${{
               github.event.pull_request.base.ref
               && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}',
@@ -268,16 +326,16 @@ jobs:
 
       # --- Full build + test (for entries that can't reuse the initial build, e.g. Windows) ---
       - name: Build and run tests
-        if: ${{ matrix.full-build }}
+        if: ${{ matrix.full-build && !matrix.eclipse }}
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
-          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
-          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean verify \
-              -Pci-build
+          read -ra _a <<< "$MAVEN_ARGS_MATRIX"; mvn_args+=("${_a[@]}")
+          ./mvnw "${mvn_args[@]}" clean verify \
+              -Dsurefire.environment="$SUREFIRE_ENV"
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
-          MAVEN_MATRIX_ARGS: ${{ matrix.maven-args }}
+          MAVEN_ARGS_MATRIX: ${{ matrix.maven-args }}
 
       # --- Eclipse compiler check (compile-only, no tests) ---
       - name: Check compilation with Eclipse compiler
@@ -285,7 +343,7 @@ jobs:
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" clean install \
-              -Pci-build -DskipTests -DskipITs \
+              -DskipTests -DskipITs \
               -Pcompiler-eclipse,!javaModuleITs,!metamodelITs \
               -pl '!:hibernate-search-documentation,!:hibernate-search-documentation-lucene-next,!:hibernate-search-reports' \
               -Dgib.buildAll=true
@@ -293,25 +351,27 @@ jobs:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
 
+      # Upload build scan data for the Develocity build scan.
+      # The actual publishing must be done in a separate job (see ci-report.yml).
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         if: "${{ !cancelled() }}"
         with:
-          name: build-scan-data-${{ matrix.name }}
+          name: build-scan-data-${{ env.ENTRY_LABEL }}
           path: ~/.m2/.develocity/build-scan-data
       - name: Store coverage report
-        if: ${{ matrix.coverage != false }}
+        if: ${{ !cancelled() && matrix.coverage != false }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
-          name: build-coverage-data-${{ matrix.name }}
+          name: build-coverage-data-${{ env.ENTRY_LABEL }}
           retention-days: 1
           path: |
             ./**/jacoco.exec
       - name: Docker cleanup
-        if: ${{ !startsWith(matrix.runs-on || '', 'windows') }}
+        if: ${{ !cancelled() && !startsWith(matrix.runs-on || '', 'windows') }}
         run: ./ci/docker-cleanup.sh
       - name: Omit produced artifacts from build cache
-        if: ${{ !matrix.full-build && !matrix.eclipse }}
+        if: ${{ !matrix.full-build }}
         run: rm -r ~/.m2/repository/org/hibernate/search
 
   prepare-sonar-bundle:
@@ -321,11 +381,19 @@ jobs:
       always() && !cancelled()
       && (github.repository == 'hibernate/hibernate-search' || !endsWith(github.ref, '/main'))
       && needs.test.result != 'cancelled'
-    runs-on: ubuntu-latest
+    runs-on: >-
+      ${{
+        github.repository == 'hibernate/hibernate-search' && inputs.reports-runs-on
+        || !contains(inputs.reports-runs-on, 'runs-on') && inputs.reports-runs-on
+        || 'ubuntu-latest-slim'
+      }}
     timeout-minutes: 30
     permissions:
       contents: read
     steps:
+      - name: Set up RunsOn
+        if: ${{ contains(inputs.reports-runs-on, 'runs-on') && github.repository == 'hibernate/hibernate-search' }}
+        uses: runs-on/action@17b59092eb37ebfdbb034460892887c09100eaa3 # v2.5.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
         with:
           persist-credentials: false
@@ -336,13 +404,13 @@ jobs:
           java-version: 25
           distribution: temurin
 
-      - name: Cache local Maven repository
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
           path: ~/.m2/repository
-          key: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ (github.event_name == 'push' || github.event_name == 'schedule') && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
+            maven-${{ runner.os }}-
 
       - name: Download coverage reports
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # 8.0.1
@@ -359,10 +427,7 @@ jobs:
         run: |
           read -ra mvn_args <<< "$MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" package \
-              -Pskip-checks -Pci-build -DskipTests -DskipITs -Pcoverage-report
-        env:
-          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
-          DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
+              -Pskip-checks -DskipTests -DskipITs -Pcoverage-report
 
       - name: Store build info for Sonar scanning
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1

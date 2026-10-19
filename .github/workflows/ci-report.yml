@@ -2,7 +2,7 @@ name: GH Actions CI reporting
 
 on:
   workflow_run:
-    workflows: [ "GH Actions CI", "CI Nightly" ]
+    workflows: [ "GH Actions CI", "Nightly" ]
     types: [ completed ]
 
 permissions: { }

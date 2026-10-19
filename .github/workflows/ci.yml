@@ -41,18 +41,29 @@ permissions: { }
 
 jobs:
   build-and-test:
-    uses: ./.github/workflows/ci-build-and-test.yml
+    uses: ./.github/workflows/build.yml
     permissions:
       contents: read
     with:
+      initial-build-runs-on: "runs-on/fleet=linux-standard/env=ibm"
+      reports-runs-on: "runs-on/fleet=linux-standard/env=ibm"
+      # We can't start Linux containers on GitHub Actions' Windows VMs,
+      # so we skip Elasticsearch tests on Windows.
+      # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
       matrix-json: >-
         [
-          { "name": "Default" },
-          { "name": "Linux JDK 17", "java-test-version": 17, "maven-args": "-f integrationtest -Dgib.buildAll=true" },
+          { "name": "Default - Linux JDK 25 / Elasticsearch / h2" },
+          { "name": "Linux JDK", "java-test-version": 17,
+            "maven-args": "-f integrationtest -Dgib.buildAll=true",
+            "runs-on": "runs-on/fleet=linux-standard/env=commonhaus" },
           { "name": "PostgreSQL", "db-profile": "ci-postgresql" },
-          { "name": "Oracle", "runs-on": "runs-on/fleet=linux-standard/env=ibm", "db-profile": "ci-oracle" },
-          { "name": "OpenSearch 3.7", "runs-on": "runs-on/fleet=linux-standard/env=commonhaus", "maven-args": "-Dtest.elasticsearch.distribution=opensearch -Dtest.elasticsearch.version=3.7.0 -Dtest.lucene.skip=true" },
-          { "name": "Windows JDK 25", "runs-on": "windows-latest", "full-build": true, "maven-args": "-Dtest.elasticsearch.skip=true", "coverage": false },
-          { "name": "Eclipse compiler", "eclipse": true, "coverage": false }
+          { "name": "Oracle", "db-profile": "ci-oracle",
+            "runs-on": "runs-on/fleet=linux-standard/env=ibm" },
+          { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "3.7.0",
+            "runs-on": "runs-on/fleet=linux-standard/env=commonhaus" },
+          { "name": "Windows JDK 25", "full-build": true, "coverage": false,
+            "maven-args": "-Dtest.elasticsearch.skip=true",
+            "runs-on": "windows-latest" },
+          { "name": "Eclipse compiler", "full-build": true, "eclipse": true, "coverage": false }
         ]
     secrets: inherit

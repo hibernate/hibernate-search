@@ -10,45 +10,56 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## <a id="ci"></a> Continuous integration
 
-Continuous integration happens on a self-hosted Jenkins instance at https://ci.hibernate.org,
-and to a smaller extent on GitHub Actions.
+Continuous integration happens on GitHub Actions,
+using [RunsOn Fleet](https://runs-on.com/) for self-hosted runners.
 
 Below is a list of all notable workflows/jobs.
 
 ### Main pipeline
 
-https://ci.hibernate.org/job/hibernate-search/
+https://github.com/hibernate/hibernate-search/actions/workflows/ci.yml
 
-This job takes care of:
+This workflow takes care of:
 
 * Primary branch builds
 * Pull request builds
 
-It is generally triggered on push,
-but can also be triggered manually,
-which is particularly useful to test more environments on a pull request.
+It is generally triggered on push or pull request.
 
-See [Jenkinsfile](Jenkinsfile) for the job definition.
+See [.github/workflows/ci.yml](.github/workflows/ci.yml)
+and [.github/workflows/build.yml](.github/workflows/build.yml) for the workflow definitions.
 
-This job executes the build in a default environment, at the very least.
+This workflow executes the build in a default environment, at the very least.
 For primary branches, it may also re-execute the same build in different environments:
 
 * Newer JDKs
 * Different database vendors (PostgreSQL, Oracle, ...)
 * Different versions of Elasticsearch/OpenSearch
-* AWS Elasticsearch/OpenSearch Service
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#building-from-source)
 for information about how to execute similar builds from the commandline.
 
-### GitHub Actions workflow
+### Nightly pipeline
 
-A GitHub Actions workflow is set up, mainly to build/test on Windows,
-and to help contributors build Hibernate Search from their own GitHub fork.
+https://github.com/hibernate/hibernate-search/actions/workflows/nightly.yml
 
-See [.github/workflows](.github/workflows) for the workflow definition.
+This workflow runs additional environments that are too expensive for every push/PR,
+plus a reproducible build check across maintained branches.
 
-See https://docs.github.com/en/actions for more information about GitHub actions.
+See [.github/workflows/nightly.yml](.github/workflows/nightly.yml)
+and [.github/workflows/build.yml](.github/workflows/build.yml) for the workflow definitions.
+
+### AWS Elasticsearch/OpenSearch Service tests
+
+https://ci.hibernate.org/job/hibernate-search/
+
+Integration tests against real AWS Elasticsearch/OpenSearch Service endpoints
+still run on Jenkins, because they require locked AWS resources and credentials
+managed by the Jenkins infrastructure.
+
+These tests run after merge to primary branches only (not on pull requests).
+
+See [Jenkinsfile](Jenkinsfile) for the job definition.
 
 ### Snapshot publishing pipeline
 
@@ -126,8 +137,8 @@ In any case:
 
 * Check that everything has been pushed to the upstream repository.
 * Check that the CI jobs for the branch you want to release are green:
-  * Check the [main build CI job](https://ci.hibernate.org/view/Search/job/hibernate-search/).
-  * Check the [nightly CI job](https://ci.hibernate.org/view/Search/job/hibernate-search-nightly/).
+  * Check the [main CI workflow](https://github.com/hibernate/hibernate-search/actions/workflows/ci.yml).
+  * Check the [nightly CI workflow](https://github.com/hibernate/hibernate-search/actions/workflows/nightly.yml).
   In particular to make sure that the build is reproducible.
   * Check the [dependency update CI job](https://ci.hibernate.org/view/Search/job/hibernate-search-dependency-update/).
   Not as important as the previous two jobs, but it's always good to double-check that there are no issues with ORM updates. 
