@@ -78,7 +78,7 @@ Local builds of Hibernate Search will:
 * not publish any build scans.
 
 To opt out from build caches for a particular build (e.g. to debug flaky tests),
-pass `-Dno-build-cache` to Maven.
+pass `-Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false` to Maven.
 
 To publish build scans for your local builds,
 [reach out to the team](https://hibernate.org/community/#contribute) to set up an account,
@@ -89,7 +89,7 @@ and once you have one, run this from the root of your local clone of Hibernate S
 ```
 
 To opt out from build scans for a particular build (e.g. when working on a security vulnerability),
-pass `-Dscan=false` to Maven.
+pass `-Ddevelocity.scan.disabled=true` to Maven.
 
 ### <a id="setup-ide"></a> IDE
 

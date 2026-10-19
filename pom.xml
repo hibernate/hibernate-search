@@ -1735,10 +1735,10 @@
                 This profile set some properties to make running repro build easier.
                 Instead of
                     mvn clean package -Pskip-checks -DskipTests -Dmaven.javadoc.skip -Dgpg.skip \
-                        -Dno-build-cache -Dbuildinfo.detect.skip=false \
+                        -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Dbuildinfo.detect.skip=false \
                         -Dbuildinfo.skipModules='**/**internal**,**/**integrationtest**,**/**parent**,**/**documentation**,**/**reports**,**/**build**'
                 We can run
-                    mvn clean package -Pskip-checks -Preproducibility-check -Dno-build-cache
+                    mvn clean package -Pskip-checks -Preproducibility-check -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
             -->
             <id>reproducibility-check</id>
             <properties>
