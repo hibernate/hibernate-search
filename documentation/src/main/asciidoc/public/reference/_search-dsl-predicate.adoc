@@ -949,14 +949,12 @@ with a call to `.boost(...)`.
 The `disjunctionMax` predicate matches documents that match **any** of its inner predicates,
 called "disjuncts" -- exactly like <<search-dsl-predicate-or,`or`>>.
 The difference is in the <<search-dsl-predicate-common-score,score>>:
-where `or` *sums* the scores of every matching disjunct,
-`disjunctionMax` takes the *highest* score among them.
+By default, only the highest score among matching disjuncts is taken into account
+during <<search-dsl-predicate-common-score,score>> computation.
+In contrast, `or` sums the scores of all matching clauses.
 
-This is what you want when the disjuncts are alternative expressions of the *same* user intent --
-most commonly the same text matched against several fields.
-With `or`, a document that happens to repeat the search terms in many fields
-outranks a document that matches one field very well;
-with `disjunctionMax`, the best-matching field decides.
+This predicate can be useful when matching the same text against several fields:
+matching multiple fields does not increase the overall score by default.
 
 .Matching any of multiple predicates, scoring on the best match
 ====
@@ -987,7 +985,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 <1> Each matching disjunct that is not the best-scoring one contributes 30% of its score.
 ====
 
-Values between `0` and `1` are the useful range; anything outside it is for experts only.
+The tie breaker must be between 0 and 1, inclusive.
 It defaults to `0`, meaning only the best-scoring disjunct counts.
 A value of `1` makes every matching disjunct contribute its full score,
 which is the same scoring as <<search-dsl-predicate-or,`or`>>.

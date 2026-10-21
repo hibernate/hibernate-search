@@ -18,8 +18,8 @@ public interface DisjunctionMaxPredicateOptionsStep<S extends DisjunctionMaxPred
 	 * Values in between let documents matching several disjuncts rank slightly higher than documents
 	 * matching only one, without letting the number of matches dominate the score.
 	 *
-	 * @param tieBreaker The tie breaker. Values between {@code 0} and {@code 1} are the useful range;
-	 * anything outside it is for experts only.
+	 * @param tieBreaker The multiplier applied to the scores of matching disjuncts other than the
+	 * highest-scoring one. Must be between {@code 0} and {@code 1}, inclusive. Defaults to {@code 0}.
 	 * @return {@code this}, for method chaining.
 	 */
 	S tieBreaker(float tieBreaker);
