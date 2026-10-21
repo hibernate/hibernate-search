@@ -1,4 +1,4 @@
-name: GH Actions CI reporting
+name: CI Reporting
 
 on:
   workflow_run:
