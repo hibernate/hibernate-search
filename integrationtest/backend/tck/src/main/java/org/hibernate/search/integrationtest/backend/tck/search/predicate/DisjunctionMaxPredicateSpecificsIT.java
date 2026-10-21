@@ -55,16 +55,6 @@ class DisjunctionMaxPredicateSpecificsIT {
 	}
 
 	@Test
-	void score_orSumsDisjuncts() {
-		assertThatQuery( index.query()
-				.where( f -> f.or()
-						.add( f.match().field( "title" ).matching( MATCHING_TERM ).boost( TITLE_BOOST ) )
-						.add( f.match().field( "description" ).matching( MATCHING_TERM ) )
-						.add( f.match().field( "summary" ).matching( MATCHING_TERM ) ) ) )
-				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
-	}
-
-	@Test
 	void score_bestDisjunctOnly() {
 		assertThatQuery( index.query()
 				.where( f -> f.disjunctionMax()
@@ -82,6 +72,16 @@ class DisjunctionMaxPredicateSpecificsIT {
 						.add( f.match().field( "description" ).matching( MATCHING_TERM ) )
 						.add( f.match().field( "summary" ).matching( MATCHING_TERM ) )
 						.tieBreaker( 1.0f ) ) )
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
+	}
+
+	@Test
+	void score_orSumsDisjuncts() {
+		assertThatQuery( index.query()
+				.where( f -> f.or()
+						.add( f.match().field( "title" ).matching( MATCHING_TERM ).boost( TITLE_BOOST ) )
+						.add( f.match().field( "description" ).matching( MATCHING_TERM ) )
+						.add( f.match().field( "summary" ).matching( MATCHING_TERM ) ) ) )
 				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
 	}
 

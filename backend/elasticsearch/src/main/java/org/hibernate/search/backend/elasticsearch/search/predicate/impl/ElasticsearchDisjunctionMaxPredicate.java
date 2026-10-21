@@ -82,6 +82,9 @@ class ElasticsearchDisjunctionMaxPredicate extends AbstractElasticsearchPredicat
 
 		@Override
 		public SearchPredicate build() {
+			if ( !hasClause() ) {
+				return new ElasticsearchMatchNonePredicate( this );
+			}
 			return new ElasticsearchDisjunctionMaxPredicate( this );
 		}
 	}
