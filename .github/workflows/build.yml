@@ -22,7 +22,7 @@ on:
         description: 'Runner label for reporting jobs (e.g. Sonar bundle)'
         type: string
         required: false
-        default: 'ubuntu-latest-slim'
+        default: 'ubuntu-slim'
       matrix-json:
         description: 'JSON array of test matrix entries'
         type: string
@@ -385,7 +385,7 @@ jobs:
       ${{
         github.repository == 'hibernate/hibernate-search' && inputs.reports-runs-on
         || !contains(inputs.reports-runs-on, 'runs-on') && inputs.reports-runs-on
-        || 'ubuntu-latest-slim'
+        || 'ubuntu-slim'
       }}
     timeout-minutes: 30
     permissions:
