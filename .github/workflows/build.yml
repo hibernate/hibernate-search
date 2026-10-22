@@ -286,10 +286,10 @@ jobs:
       - name: Capture test JDK home
         if: ${{ matrix.java-test-version && matrix.java-test-version != env.MAVEN_JAVA_VERSION }}
         run: echo "TEST_JDK_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-      - name: Set up Java ${{ matrix.java-version || env.MAVEN_JAVA_VERSION }}
+      - name: Set up Java ${{ env.MAVEN_JAVA_VERSION }}
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
-          java-version: ${{ matrix.java-version || env.MAVEN_JAVA_VERSION }}
+          java-version: ${{ env.MAVEN_JAVA_VERSION }}
           distribution: temurin
 
       # --- Caching ---
