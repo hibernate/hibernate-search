@@ -1,4 +1,14 @@
 # See MAINTAINERS.md for details about all available CI jobs.
+#
+# Main CI pipeline for push and pull request builds.
+# Delegates to the reusable build.yml workflow, which:
+# 1. Compiles sources, runs unit tests, and builds docs (initial build)
+# 2. Runs static checks in parallel (checkstyle, jqassistant, enforcer, etc.)
+# 3. Runs the integration test matrix (databases, JDK versions, Elasticsearch/OpenSearch)
+# 4. Prepares a Sonar coverage bundle from all test results
+#
+# Label-triggered entries: adding an 'elasticsearch' or 'opensearch' label to a PR
+# includes additional version-compatibility tests from the nightly matrix.
 
 name: CI
 
@@ -46,10 +56,20 @@ jobs:
       contents: read
     with:
       initial-build-runs-on: "runs-on/fleet=linux-standard/env=ibm"
-      reports-runs-on: "runs-on/fleet=linux-standard/env=ibm"
+      run-sonar: true
+      # --- Databases ---
+      #
+      # --- JDK versions ---
+      # We build with JDK 25 but our baseline is Java 17, so we test with JDK 17.
+      #
+      # --- Search backends ---
       # We can't start Linux containers on GitHub Actions' Windows VMs,
       # so we skip Elasticsearch tests on Windows.
       # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
+      #
+      # --- Label-triggered entries (PR only) ---
+      # Additional Elasticsearch/OpenSearch versions are included when the PR has
+      # the 'elasticsearch' or 'opensearch' label, matching the nightly matrix.
       matrix-json: >-
         [
           { "name": "Elasticsearch / h2" },
@@ -65,5 +85,7 @@ jobs:
             "maven-args": "-Dtest.elasticsearch.skip=true",
             "runs-on": "windows-latest" },
           { "name": "Eclipse compiler", "full-build": true, "eclipse": true, "coverage": false }
+          ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'elasticsearch') && ', { "name": "Elasticsearch", "es-distribution": "elastic", "es-version": "7.10.2" }, { "name": "Elasticsearch", "es-distribution": "elastic", "es-version": "7.17.29" }, { "name": "Elasticsearch", "es-distribution": "elastic", "es-version": "8.19.19" }' || '' }}
+          ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'opensearch') && ', { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "1.3.20" }, { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "2.19.4" }, { "name": "Amazon OpenSearch Serverless", "es-distribution": "amazon-opensearch-serverless" }' || '' }}
         ]
     secrets: inherit
