@@ -17,7 +17,6 @@ bin
 
 # IntelliJ specific files/directories
 /out
-.idea
 *.ipr
 *.iws
 *.iml
