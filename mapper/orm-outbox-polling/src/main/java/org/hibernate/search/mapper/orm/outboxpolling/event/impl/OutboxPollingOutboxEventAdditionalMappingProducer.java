@@ -34,7 +34,7 @@ public final class OutboxPollingOutboxEventAdditionalMappingProducer
 	// because our override actually matches the default for the native entity name.
 	public static final String ENTITY_NAME = CLASS_NAME;
 
-	public static final String ENTITY_DEFINITION = "<entity-mappings xmlns=\"http://www.hibernate.org/xsd/orm/mapping\">\n"
+	public static final String ENTITY_DEFINITION = "<entity-mappings xmlns=\"https://www.hibernate.org/xsd/orm/mapping\">\n"
 			+ "    <entity name=\"org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent\" class=\"org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent\" access=\"FIELD\">\n"
 			+ "        <table name=\"HSEARCH_OUTBOX_EVENT\" catalog=\"\" schema=\"\">\n"
 			+ "            <index name=\"entityIdHash\" column-list=\"entityIdHash\"/>\n"

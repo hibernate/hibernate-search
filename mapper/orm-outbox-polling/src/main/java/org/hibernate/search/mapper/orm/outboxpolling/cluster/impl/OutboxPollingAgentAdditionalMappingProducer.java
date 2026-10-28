@@ -32,7 +32,7 @@ public class OutboxPollingAgentAdditionalMappingProducer implements HibernateSea
 	// because our override actually matches the default for the native entity name.
 	public static final String ENTITY_NAME = CLASS_NAME;
 
-	public static final String ENTITY_DEFINITION = "<entity-mappings xmlns=\"http://www.hibernate.org/xsd/orm/mapping\">\n"
+	public static final String ENTITY_DEFINITION = "<entity-mappings xmlns=\"https://www.hibernate.org/xsd/orm/mapping\">\n"
 			+ "    <entity name=\"org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent\" class=\"org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent\" access=\"FIELD\">\n"
 			+ "        <table name=\"HSEARCH_AGENT\" catalog=\"\" schema=\"\"/>\n"
 			+ "        <attributes>\n"
