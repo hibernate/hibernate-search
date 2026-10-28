@@ -4,6 +4,7 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -94,6 +95,7 @@ class AutomaticIndexingBooleanArrayIT
 		@Id
 		private Integer id;
 
+		@Column(length = 256)
 		@GenericField
 		@JdbcTypeCode(Types.VARBINARY)
 		private boolean[] serializedArray;
