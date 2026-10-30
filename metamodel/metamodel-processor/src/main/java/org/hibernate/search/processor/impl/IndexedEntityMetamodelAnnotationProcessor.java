@@ -61,6 +61,8 @@ public class IndexedEntityMetamodelAnnotationProcessor implements MetamodelAnnot
 		Set<? extends Element> indexedEntities = roundEnv.getElementsAnnotatedWith( indexedAnnotation );
 
 		try ( StandalonePojoPartialMapping partialMapping = StandalonePojoIntegrationBooter.builder()
+				// The host's TCCL may contain a separate copy of Search, e.g. during Quarkus hot reload.
+				.classLoader( IndexedEntityMetamodelAnnotationProcessor.class.getClassLoader() )
 				.introspectorCustomizer( this::wrapIntrospector )
 				.property( "hibernate.search.backend.directory.type", "local-heap" )
 				.property( "hibernate.search.backend.version_check.enabled", "false" )
