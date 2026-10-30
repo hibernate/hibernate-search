@@ -12,6 +12,9 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
+
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A classloader which keeps an ordered list of aggregated classloaders.
@@ -46,14 +49,29 @@ public final class AggregatedClassLoader extends ClassLoader {
 		}
 
 		// now build the aggregated class loader...
-		return new AggregatedClassLoader(
-				orderedClassLoaderSet.toArray( new ClassLoader[0] )
-		);
+		return new AggregatedClassLoader( orderedClassLoaderSet );
 	}
 
-	private AggregatedClassLoader(ClassLoader... classLoaders) {
+	/**
+	 * Creates an aggregate using only the supplied classloaders, in order.
+	 * Neither the thread context classloader nor the system classloader is added implicitly.
+	 *
+	 * @param classLoaders The classloaders to use; neither the array nor its entries may be null.
+	 * @return The aggregated classloader.
+	 */
+	@Incubating
+	public static AggregatedClassLoader createFrom(ClassLoader... classLoaders) {
+		Objects.requireNonNull( classLoaders );
+		LinkedHashSet<ClassLoader> orderedClassLoaders = new LinkedHashSet<>();
+		for ( ClassLoader classLoader : classLoaders ) {
+			orderedClassLoaders.add( Objects.requireNonNull( classLoader ) );
+		}
+		return new AggregatedClassLoader( orderedClassLoaders );
+	}
+
+	private AggregatedClassLoader(Collection<ClassLoader> classLoaders) {
 		super( null );
-		individualClassLoaders = classLoaders;
+		individualClassLoaders = classLoaders.toArray( new ClassLoader[0] );
 	}
 
 	@Override
