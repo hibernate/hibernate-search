@@ -23,6 +23,17 @@ public interface StandalonePojoIntegrationBooter {
 	}
 
 	interface Builder {
+		/**
+		 * Overrides class, resource and service resolution with the given classloader.
+		 * The thread context and system classloaders are not added implicitly.
+		 * Backend implementations and bootstrap services must be accessible through this loader.
+		 *
+		 * @param classLoader The classloader to use, never null.
+		 * @return This builder.
+		 */
+		@Incubating
+		Builder classLoader(ClassLoader classLoader);
+
 		Builder annotatedTypeSource(AnnotatedTypeSource source);
 
 		Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory);
