@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -22,6 +23,10 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotatedTypeSource;
 import org.hibernate.search.mapper.pojo.model.spi.AccessorFactoriesContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -51,9 +56,11 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	private final AccessorFactoriesContext accessorFactories;
 	private final Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer;
 	private final ConfigurationPropertySource propertySource;
+	private final ClassLoader classLoader;
 
 	private StandalonePojoIntegrationBooterImpl(BuilderImpl builder) {
 		annotatedTypeSources = builder.annotatedTypeSources;
+		classLoader = builder.classLoader;
 		propertyChecker = ConfigurationPropertyChecker.create();
 		final AccessorConfiguration accessorConfiguration =
 				new AccessorConfiguration( new StandalonePojoAccessContext(), Map.of() );
@@ -132,6 +139,12 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 	private SearchIntegrationEnvironment createEnvironment() {
 		SearchIntegrationEnvironment.Builder environmentBuilder =
 				SearchIntegrationEnvironment.builder( propertySource, propertyChecker );
+		if ( classLoader != null ) {
+			AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createFrom( classLoader );
+			environmentBuilder.classResolver( DefaultClassResolver.create( aggregatedClassLoader ) );
+			environmentBuilder.resourceResolver( DefaultResourceResolver.create( aggregatedClassLoader ) );
+			environmentBuilder.serviceResolver( DefaultServiceResolver.create( aggregatedClassLoader ) );
+		}
 		BEAN_PROVIDER.get( propertySource ).ifPresent( environmentBuilder::beanProvider );
 		return environmentBuilder.build();
 	}
@@ -160,9 +173,16 @@ public class StandalonePojoIntegrationBooterImpl implements StandalonePojoIntegr
 		private final Map<String, Object> properties = new HashMap<>();
 		private AccessorFactory accessorFactory;
 		private AccessorFactory annotationAccessorFactory;
+		private ClassLoader classLoader;
 		private Function<PojoBootstrapIntrospector, PojoBootstrapIntrospector> introspectorCustomizer = Function.identity();
 
 		public BuilderImpl() {
+		}
+
+		@Override
+		public BuilderImpl classLoader(ClassLoader classLoader) {
+			this.classLoader = Objects.requireNonNull( classLoader );
+			return this;
 		}
 
 		@Override
