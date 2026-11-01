@@ -77,7 +77,7 @@ jobs:
           # can find the base commit.
           fetch-depth: 0
       - name: Set up Java ${{ env.MAVEN_JAVA_VERSION }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ env.MAVEN_JAVA_VERSION }}
           distribution: temurin
@@ -127,7 +127,7 @@ jobs:
       # Upload build scan data so that ci-report.yml can publish it.
       # Only on PRs: push/schedule builds publish scans directly via DEVELOCITY_ACCESS_KEY.
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-initial-build
@@ -149,14 +149,14 @@ jobs:
             tar -czf m2-build-result.tgz -C ~ .m2/repository/org/hibernate/search
           fi
       - name: Upload build result
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: m2-build-result
           path: m2-build-result.tgz
           retention-days: 1
       - name: Store coverage report
         if: "${{ !cancelled() }}"
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-coverage-data-Initial build
           retention-days: 1
@@ -183,7 +183,7 @@ jobs:
       - name: Check that no license header was reintroduced
         run: ./ci/check-no-license-headers.sh
       - name: Set up Java ${{ env.MAVEN_JAVA_VERSION }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ env.MAVEN_JAVA_VERSION }}
           distribution: temurin
@@ -218,7 +218,7 @@ jobs:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-static-checks
@@ -279,7 +279,7 @@ jobs:
           release: ${{ matrix.java-test-version }}
       - name: Set up test JDK ${{ matrix.java-test-version }}
         if: ${{ matrix.java-test-version && matrix.java-test-version != env.MAVEN_JAVA_VERSION && matrix.java-test-from != 'jdk.java.net' }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ matrix.java-test-version }}
           distribution: temurin
@@ -287,7 +287,7 @@ jobs:
         if: ${{ matrix.java-test-version && matrix.java-test-version != env.MAVEN_JAVA_VERSION }}
         run: echo "TEST_JDK_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
       - name: Set up Java ${{ env.MAVEN_JAVA_VERSION }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ env.MAVEN_JAVA_VERSION }}
           distribution: temurin
@@ -306,7 +306,7 @@ jobs:
             maven-${{ runner.os }}-
       - name: Download build result
         if: ${{ !matrix.full-build }}
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: m2-build-result
           path: .
@@ -430,14 +430,14 @@ jobs:
       # Upload build scan data so that ci-report.yml can publish it.
       # Only on PRs: push/schedule builds publish scans directly via DEVELOCITY_ACCESS_KEY.
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-${{ env.ENTRY_LABEL }}
           path: ~/.m2/.develocity/build-scan-data
       - name: Store coverage report
         if: ${{ !cancelled() && matrix.coverage != false }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-coverage-data-${{ env.ENTRY_LABEL }}
           retention-days: 1
@@ -468,7 +468,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Java ${{ env.MAVEN_JAVA_VERSION }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ env.MAVEN_JAVA_VERSION }}
           distribution: temurin
@@ -484,7 +484,7 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Download coverage reports
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: build-coverage-data*
           path: .
@@ -501,7 +501,7 @@ jobs:
               -Pskip-checks -DskipTests -DskipITs -Pcoverage-report
 
       - name: Store build info for Sonar scanning
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-results-data
           retention-days: 1
