@@ -1,5 +1,22 @@
 # Hibernate Search Changelog
 
+## 8.4.1.Final (2026-11-02)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39375)
+
+
+### Bug
+* [HSEARCH-5715](https://hibernate.atlassian.net/browse/HSEARCH-5715) - Static metamodel processor fails in Quarkus dev mode due to TCCL bootstrap
+
+### Improvement
+* [HSEARCH-5638](https://hibernate.atlassian.net/browse/HSEARCH-5638) - Update to Hibernate ORM 7.4.1.Final
+* [HSEARCH-5634](https://hibernate.atlassian.net/browse/HSEARCH-5634) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.4.2
+* [HSEARCH-5633](https://hibernate.atlassian.net/browse/HSEARCH-5633) - Update Elasticsearch client (elasticsearch-rest-client) to 9.4.2
+
+### Task
+* [HSEARCH-5682](https://hibernate.atlassian.net/browse/HSEARCH-5682) - Tune the content of javadoc jars to reduce the size of files published to Maven Central
+* [HSEARCH-5631](https://hibernate.atlassian.net/browse/HSEARCH-5631) - Test against latest Elasticsearch 9.4.2
+
 ## 8.4.0.Final (2026-05-27)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39072)
