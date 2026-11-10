@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.json.spi.JsonBody;
 import org.hibernate.search.util.json.spi.JsonWriteCursor;
@@ -25,6 +26,7 @@ public class JsonHttpEntityContentProvider implements ContentProducer {
 	private volatile boolean cancelled;
 	private final Set<InputStream> streams = new HashSet<>();
 
+
 	public JsonHttpEntityContentProvider(JsonBody body) {
 		this.body = Objects.requireNonNull( body );
 	}
@@ -35,7 +37,7 @@ public class JsonHttpEntityContentProvider implements ContentProducer {
 
 	public synchronized InputStream getContent() {
 		if ( cancelled ) {
-			throw new IllegalStateException( "Request cancelled" );
+			throw ElasticsearchClientLog.INSTANCE.requestCancelled();
 		}
 		InputStream stream = new FilterInputStream( body.openStream() ) {
 			@Override
@@ -114,9 +116,10 @@ public class JsonHttpEntityContentProvider implements ContentProducer {
 
 	public synchronized void produceContent(ContentEncoder encoder) throws IOException {
 		if ( cancelled ) {
-			throw new IOException( "Request cancelled" );
+			throw ElasticsearchClientLog.INSTANCE.requestOutputCancelled();
 		}
 		if ( outputComplete ) {
+			encoder.complete();
 			return;
 		}
 		if ( cursor == null ) {
@@ -126,12 +129,12 @@ public class JsonHttpEntityContentProvider implements ContentProducer {
 		}
 		while ( true ) {
 			if ( cancelled ) {
-				throw new IOException( "Request cancelled" );
+				throw ElasticsearchClientLog.INSTANCE.requestOutputCancelled();
 			}
 			if ( pending.hasRemaining() ) {
 				int accepted = encoder.write( pending.slice() );
 				if ( accepted < 0 || accepted > pending.remaining() ) {
-					throw new IOException( "Invalid encoded byte count: " + accepted );
+					throw ElasticsearchClientLog.INSTANCE.invalidEncodedByteCount( accepted );
 				}
 				pending.position( pending.position() + accepted );
 				if ( pending.hasRemaining() ) {

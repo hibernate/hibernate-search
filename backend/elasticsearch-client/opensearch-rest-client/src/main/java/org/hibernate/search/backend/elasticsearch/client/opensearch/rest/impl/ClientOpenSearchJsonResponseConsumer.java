@@ -11,6 +11,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonGzipDecoder;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonResponseConsumerScope;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
+import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.json.spi.JsonResponseConsumer;
 import org.hibernate.search.util.json.spi.JsonResponseConsumerFactory;
 
@@ -73,7 +74,7 @@ final class ClientOpenSearchJsonResponseConsumer<T> implements AsyncResponseCons
 		if ( incoming.getLocale() != null ) {
 			response.setLocale( incoming.getLocale() );
 		}
-		if ( details == null ) {
+		if ( details == null || incoming.getCode() == 204 || incoming.getCode() == 304 ) {
 			terminated = true;
 			callback.completed( response );
 			return;
@@ -130,7 +131,7 @@ final class ClientOpenSearchJsonResponseConsumer<T> implements AsyncResponseCons
 
 	private void checkLimit(long count) throws ContentTooLongException {
 		if ( limit > 0 && count > limit ) {
-			throw new ContentTooLongException( "Response input exceeds byte limit " + limit );
+			throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit );
 		}
 	}
 

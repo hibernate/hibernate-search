@@ -8,6 +8,7 @@ import java.util.concurrent.Flow;
 
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonHttpEntityContentProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.util.json.spi.JsonBody;
 import org.hibernate.search.util.json.spi.JsonWriteCursor;
 
@@ -66,7 +67,7 @@ public class ClientJdkJsonHttpEntity extends JsonHttpEntityContentProvider imple
 					return;
 				}
 				if ( n <= 0 ) {
-					failure = new IllegalArgumentException( "Non-positive subscription demand: " + n );
+					failure = ElasticsearchClientLog.INSTANCE.nonPositiveSubscriptionDemand( n );
 				}
 				else {
 					long sum = demand + n;
@@ -79,8 +80,8 @@ public class ClientJdkJsonHttpEntity extends JsonHttpEntityContentProvider imple
 			}
 			try {
 				while ( true ) {
-					ByteBuffer bytes;
-					boolean complete;
+					ByteBuffer bytes = null;
+					boolean complete = false;
 					RuntimeException cause;
 					synchronized (this) {
 						if ( terminated || ( demand == 0 && failure == null ) ) {
@@ -94,16 +95,22 @@ public class ClientJdkJsonHttpEntity extends JsonHttpEntityContentProvider imple
 							complete = false;
 						}
 						else {
-							if ( cursor == null ) {
-								cursor = openCursor();
+							try {
+								if ( cursor == null ) {
+									cursor = openCursor();
+								}
+								// Recipients can retain storage indefinitely. Never recycle emitted storage.
+								bytes = ByteBuffer.allocate( JsonTransportSupport.DEFAULT_BUFFER_SIZE );
+								cursor.write( bytes );
+								bytes.flip();
+								complete = cursor.isComplete();
+								if ( bytes.hasRemaining() ) {
+									--demand;
+								}
 							}
-							// Recipients can retain storage indefinitely. Never recycle emitted storage.
-							bytes = ByteBuffer.allocate( JsonTransportSupport.DEFAULT_BUFFER_SIZE );
-							cursor.write( bytes );
-							bytes.flip();
-							complete = cursor.isComplete();
-							if ( bytes.hasRemaining() ) {
-								--demand;
+							catch (RuntimeException e) {
+								cause = e;
+								cancel();
 							}
 						}
 					}

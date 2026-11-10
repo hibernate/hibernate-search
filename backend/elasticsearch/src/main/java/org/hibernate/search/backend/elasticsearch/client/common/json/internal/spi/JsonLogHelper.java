@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
 import tools.jackson.databind.node.ObjectNode;
 
@@ -15,10 +16,14 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @Incubating
 public final class JsonLogHelper {
-
+	private static final class Holder {
+		// Context-free exception formatting must not impose a JVM policy on a configured Search context.
+		private static final JsonLogHelper INSTANCE =
+				JsonProviderHelper.create( true, JsonValidation.of( false ) ).getLogHelper();
+	}
 
 	public static JsonLogHelper get() {
-		return JsonProviderHelper.create( true ).getLogHelper();
+		return Holder.INSTANCE;
 	}
 
 	public static JsonLogHelper create(JsonCodecService codec, boolean prettyPrinting) {

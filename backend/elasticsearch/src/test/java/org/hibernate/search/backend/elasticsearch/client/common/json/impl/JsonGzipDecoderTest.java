@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.CRC32;
+import java.util.zip.DataFormatException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -28,6 +29,19 @@ class JsonGzipDecoderTest {
 	private static final int ALL_OPTIONAL_FIELDS = FHCRC | FEXTRA | FNAME | FCOMMENT;
 	private static final int FIXED_HEADER_LENGTH = 10;
 	private static final int FLAGS_OFFSET = 3;
+
+	@Test
+	void invalidDeflateContentKeepsCauseAndAddsSearchMessageId() {
+		// A valid gzip header followed by a reserved DEFLATE block type.
+		byte[] invalid = { 0x1f, (byte) 0x8b, 8, 0, 0, 0, 0, 0, 0, 0, 7 };
+		try ( var body = new JsonResponseBody( StandardCharsets.UTF_8, 0 );
+				var decoder = new JsonGzipDecoder( body ) ) {
+			assertThatThrownBy( () -> decoder.feed( ByteBuffer.wrap( invalid ) ) )
+					.isInstanceOf( JsonParseException.class )
+					.hasMessageStartingWith( "HSEARCH400707: Invalid gzip content" )
+					.hasCauseInstanceOf( DataFormatException.class );
+		}
+	}
 
 	@ParameterizedTest
 	@ValueSource(ints = { 1, 2, 5, 8192 })

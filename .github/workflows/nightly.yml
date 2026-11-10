@@ -64,6 +64,8 @@ jobs:
       # See https://hibernate.atlassian.net/browse/HSEARCH-4919
       matrix-json: >-
         [
+          { "name": "JSON internal validation", "coverage": false,
+            "maven-args": "-Pjson-internal-validation -pl util/json,backend/elasticsearch,backend/elasticsearch-aws,backend/elasticsearch-client/elasticsearch-rest4-client,backend/elasticsearch-client/elasticsearch-rest5-client,backend/elasticsearch-client/opensearch-rest-client,integrationtest/backend/elasticsearch" },
           { "name": "MySQL", "db-profile": "ci-mysql" },
           { "name": "MariaDB", "db-profile": "ci-mariadb" },
           { "name": "Db2", "db-profile": "ci-db2" },

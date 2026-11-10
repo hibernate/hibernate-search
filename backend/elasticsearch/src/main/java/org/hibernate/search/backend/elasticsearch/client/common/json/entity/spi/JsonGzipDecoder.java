@@ -7,7 +7,7 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 
-import org.hibernate.search.util.json.spi.JsonParseException;
+import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 
 /**
  * Incremental gzip framing for clients whose response consumer precedes decompression.
@@ -67,7 +67,7 @@ public final class JsonGzipDecoder implements AutoCloseable {
 							break;
 						}
 						if ( count == 0 && !inflater.needsInput() ) {
-							throw new JsonParseException( "Invalid gzip deflate stream" );
+							throw ElasticsearchClientLog.INSTANCE.invalidGzipDeflateStream();
 						}
 					}
 					continue;
@@ -80,7 +80,7 @@ public final class JsonGzipDecoder implements AutoCloseable {
 								|| ( offset == 1 && value != ( GZIPInputStream.GZIP_MAGIC >>> Byte.SIZE ) )
 								|| ( offset == COMPRESSION_METHOD_OFFSET && value != Deflater.DEFLATED )
 								|| ( offset == FLAGS_OFFSET && ( value & RESERVED_FLAGS ) != 0 ) ) {
-							throw new JsonParseException( "Invalid gzip header" );
+							throw ElasticsearchClientLog.INSTANCE.invalidGzipHeader();
 						}
 						if ( offset == FLAGS_OFFSET ) {
 							flags = value;
@@ -117,7 +117,7 @@ public final class JsonGzipDecoder implements AutoCloseable {
 						fieldValue |= (long) value << ( Byte.SIZE * offset++ );
 						if ( offset == Short.BYTES ) {
 							if ( fieldValue != ( headerCrc.getValue() & HEADER_CRC_MASK ) ) {
-								throw new JsonParseException( "Invalid gzip header checksum" );
+								throw ElasticsearchClientLog.INSTANCE.invalidGzipHeaderChecksum();
 							}
 							state = State.DEFLATE;
 						}
@@ -127,13 +127,13 @@ public final class JsonGzipDecoder implements AutoCloseable {
 						fieldValue |= (long) value << ( Byte.SIZE * ( offset++ % Integer.BYTES ) );
 						if ( offset == Integer.BYTES ) {
 							if ( fieldValue != crc.getValue() ) {
-								throw new JsonParseException( "Invalid gzip checksum" );
+								throw ElasticsearchClientLog.INSTANCE.invalidGzipChecksum();
 							}
 							fieldValue = 0;
 						}
 						if ( offset == TRAILER_LENGTH ) {
 							if ( fieldValue != ( inflater.getBytesWritten() & UNSIGNED_INT_MASK ) ) {
-								throw new JsonParseException( "Invalid gzip size" );
+								throw ElasticsearchClientLog.INSTANCE.invalidGzipSize();
 							}
 							memberCompleted = true;
 							// Concatenated members continue with a fresh header and independent checksums.
@@ -145,12 +145,12 @@ public final class JsonGzipDecoder implements AutoCloseable {
 						}
 						break;
 					default:
-						throw new IllegalStateException();
+						throw ElasticsearchClientLog.INSTANCE.unexpectedGzipState();
 				}
 			}
 		}
 		catch (DataFormatException e) {
-			throw new JsonParseException( "Invalid gzip content", e );
+			throw ElasticsearchClientLog.INSTANCE.invalidGzipContent( e );
 		}
 	}
 
@@ -178,7 +178,7 @@ public final class JsonGzipDecoder implements AutoCloseable {
 
 	public void endOfInput() {
 		if ( !memberCompleted || state != State.HEADER || offset != 0 ) {
-			throw new JsonParseException( "Truncated gzip response" );
+			throw ElasticsearchClientLog.INSTANCE.truncatedGzipResponse();
 		}
 	}
 

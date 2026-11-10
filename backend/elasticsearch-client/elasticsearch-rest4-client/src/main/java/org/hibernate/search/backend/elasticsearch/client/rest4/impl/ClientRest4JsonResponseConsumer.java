@@ -11,6 +11,7 @@ import java.util.concurrent.CancellationException;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonGzipDecoder;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonResponseConsumerScope;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
+import org.hibernate.search.backend.elasticsearch.client.rest4.logging.impl.ElasticsearchClientLog;
 import org.hibernate.search.util.json.spi.JsonResponseConsumer;
 import org.hibernate.search.util.json.spi.JsonResponseConsumerFactory;
 
@@ -111,7 +112,7 @@ final class ClientRest4JsonResponseConsumer<T> extends AbstractAsyncResponseCons
 
 	private void checkLimit(long count) throws ContentTooLongException {
 		if ( limit > 0 && count > limit ) {
-			throw new ContentTooLongException( "Response input exceeds byte limit " + limit );
+			throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit );
 		}
 	}
 

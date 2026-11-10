@@ -3,6 +3,7 @@ package org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -13,7 +14,10 @@ public final class HttpAsyncContentProducerInputStream extends InputStream {
 	private final ContentEncoder contentEncoder;
 
 	public HttpAsyncContentProducerInputStream(ContentProducer contentProducer, int bufferSize) {
-		this.contentProducer = contentProducer;
+		if ( bufferSize <= 0 ) {
+			throw new IllegalArgumentException( "Buffer size must be positive" );
+		}
+		this.contentProducer = Objects.requireNonNull( contentProducer );
 		this.buffer = ByteBuffer.allocate( bufferSize );
 		this.buffer.limit( 0 );
 		this.contentEncoder = new ByteBufferContentEncoder( buffer );
@@ -31,6 +35,10 @@ public final class HttpAsyncContentProducerInputStream extends InputStream {
 
 	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
+		Objects.checkFromIndexSize( off, len, b.length );
+		if ( len == 0 ) {
+			return 0;
+		}
 		int offset = off;
 		int length = len;
 		while ( length > 0 && ( buffer.remaining() > 0 || !contentEncoder.isCompleted() ) ) {
@@ -57,11 +65,14 @@ public final class HttpAsyncContentProducerInputStream extends InputStream {
 		buffer.clear();
 		contentProducer.produceContent( contentEncoder );
 		buffer.flip();
+		if ( !buffer.hasRemaining() && !contentEncoder.isCompleted() ) {
+			throw new IOException( "Content producer made no progress" );
+		}
 	}
 
 	private int readFromBuffer() {
 		if ( buffer.hasRemaining() ) {
-			return buffer.get();
+			return Byte.toUnsignedInt( buffer.get() );
 		}
 		else {
 			return -1;
