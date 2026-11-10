@@ -1031,9 +1031,20 @@ by taking advantage of the "native" field type.
 Using this field type, the Elasticsearch "mapping" can be defined as JSON directly,
 giving access to everything Elasticsearch can offer.
 
-Below is an example of how to use the Elasticearch "native" type.
+Defining a native field involves two independent choices:
 
-.Using the Elasticearch "native" type
+* `asNative(valueHandler)` selects the Java representation of the field's JSON values.
+  When using a `ValueBridge<V, T>`, the <<backend-elasticsearch-json,JSON handler>> must handle `T`:
+  the bridge converts entity values of type `V` to and from JSON values of type `T`.
+* `mapping(...)` defines the Elasticsearch field type and its options, such as `{"type":"ip"}`.
+  Pass JSON text to `mapping(jsonString)`, or a JSON object with its own handler to
+  `mapping(mappingHandler, mappingObject)`. This mapping handler only reads the schema definition;
+  it does not change the field value type or the bridge.
+
+Below is an example of how to use the Elasticsearch "native" type
+with `JacksonJsonHandlers.value()` and Jackson 3 `JsonNode` values.
+
+.Using the Elasticsearch "native" type
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
@@ -1048,17 +1059,28 @@ or a <<binding-propertybridge,property binder>>
 would work as well.
 <2> Get the context's type factory.
 <3> Apply the Elasticsearch extension to the type factory.
-<4> Call `asNative` to start defining a native type.
-<5> Pass the Elasticsearch mapping as JSON.
-<6> Values of native fields are represented as a `JsonElement` in Hibernate Search.
-`JsonElement` is a type from the link:{gsonUrl}[Gson] library.
-Do not forget to format them correctly before you pass them to the backend.
-Here we are creating a `JsonPrimitive` (a subtype of `JsonElement`) from a `String`
-because we just need a JSON string,
-but it's completely possible to handle more complex objects,
-or even to convert directly from POJOs to JSON using Gson.
-<7> For nicer projections, you can also implement this method to convert
-from `JsonElement` to the mapped type (here, `String`).
+<4> Select the field value handler. Here, `JacksonJsonHandlers.value()` selects Jackson 3 `JsonNode` values,
+so the bridge implements `ValueBridge<String, JsonNode>`: `String` is the entity property type,
+and `JsonNode` is the index-side value type.
+<5> Define the Elasticsearch field as an `ip` field using mapping JSON text.
+This overload does not need a mapping handler and does not change the `JsonNode` value type selected above.
+<6> Convert the entity's IP address string to a JSON string value by wrapping it in a `StringNode`,
+a subtype of `JsonNode`. The value handler handles this JSON representation for indexing;
+the Elasticsearch `ip` mapping determines how Elasticsearch interprets the string.
+<7> For a field projection back to the entity property type, the value handler supplies a `JsonNode`
+to the bridge, which extracts the Java `String`.
+A missing or JSON-null field reaches this bridge as Java null; nested nulls remain in non-null trees.
+
+Keeping the deprecated no-argument `asNative()` requires a bridge with Gson `JsonElement`
+as its index-side type, such as `ValueBridge<String, JsonElement>`.
+Selecting `GsonJsonHandlers.value()` explicitly also uses that bridge type.
+Changing only the mapping handler never requires changing the bridge.
+
+Native fields split root arrays into field values by default, with both Gson and Jackson handlers.
+Use `.mapping(...).arrayAsValue()` to preserve each indexed array as one JSON value, including empty arrays.
+The deprecated `asNative()` convenience has the same splitting default as explicit `GsonJsonHandlers.value()`.
+Different array modes are incompatible across indexes.
+
 
 [source, java, indent=0, subs="+callouts"]
 ----
@@ -1700,3 +1722,5 @@ Use the following configuration property at the backend level to change the defa
 hibernate.search.backend.query.shard_failure.ignore = true
 ----
 The default for this property is `false`.
+
+include::_backend-elasticsearch-json.adoc[]

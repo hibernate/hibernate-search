@@ -51,6 +51,12 @@ class ElasticsearchNativeTypeIT {
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );
+			List<String> ipAddresses = searchSession.search( CompanyServer.class )
+					.extension( ElasticsearchExtension.get() )
+					.select( f -> f.field( "ipAddress", String.class ) )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			assertThat( ipAddresses ).containsExactly( "192.168.10.2" );
 		} );
 	}
 

@@ -37,6 +37,22 @@ regardless of the coordination strategy.
 See link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#limitations-stateless-session[limitations]
 for details.
 
+[[incremental-elasticsearch-json]]
+=== Incremental Elasticsearch JSON
+
+Application JSON inputs and results can select their representation through typed `JsonHandler<T>` overloads,
+using a built-in handler or a custom implementation.
+Built-in handlers support Jackson 3 and Gson. Deprecated Gson conveniences retain their result types.
+Typed native fields keep the handler's Java type for indexing, projection and runtime metadata.
+The Elasticsearch/OpenSearch HTTP clients support incremental JSON input and output.
+The `hibernate-search-util-json` artifact exposes JSON handler and library-neutral streaming contracts.
+See the link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/migration/html_single/#elasticsearch-json[migration guide]
+for handler APIs and custom-client SPI changes,
+and the link:https://docs.hibernate.org/search/{hibernateSearchVersionShort}/reference/en-US/html_single/#backend-elasticsearch-json[reference]
+for ownership, numeric constraints and remaining execution/client limits.
+Incremental input and output do not bound the memory needed for JSON values or guarantee event-loop latency.
+Signing and interceptors remain synchronous.
+
 == Removals
 
 [[v5migrationhelper-removal]]

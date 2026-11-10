@@ -1,0 +1,21 @@
+[[backend-elasticsearch-json]]
+== JSON handlers and streaming
+
+include::../components/_incubating-warning.adoc[]
+
+Application-facing Elasticsearch JSON APIs select a representation through
+`org.hibernate.search.util.json.JsonHandler<T>`.
+Pass a handler for the JSON representation you want to use, either one of the built-in handlers below
+or your own implementation.
+`T` is a JSON library's tree/value type, not an entity or application DTO.
+A handler supplies a stable `Class<T> javaType()`, `toJson(T)` and `fromJson(String)`.
+Implementations must support concurrent use, preserve arbitrary members and nested nulls,
+and parse one strict JSON value into an independent representation.
+There is no automatic reflective object mapper or handler inference from a runtime class.
+
+Two factory pairs are provided:
+
+* `org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers.object()`
+  and `.value()` handle Jackson 3 `ObjectNode` and `JsonNode` respectively.
+* `org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers.object()`
+  and `.value()` handle Gson `JsonObject` and `JsonElement` respectively.

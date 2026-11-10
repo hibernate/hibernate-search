@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -18,8 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchSortDslIT {
 
@@ -46,20 +46,18 @@ class ElasticsearchSortDslIT {
 	void fromJson() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-fromJson-jsonObject[]
-			JsonObject jsonObject =
+			ObjectNode jsonObject =
 					// end::elasticsearch-fromJson-jsonObject[]
-					new Gson().fromJson(
+					JacksonJsonHandlers.object().fromJson(
 							"{"
 									+ "    \"title_sort\": \"asc\""
-									+ "}",
-							JsonObject.class
-					)
+									+ "}" )
 			// tag::elasticsearch-fromJson-jsonObject[]
 			/* ... */;
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.where( f -> f.matchAll() )
-					.sort( f -> f.fromJson( jsonObject ) )
+					.sort( f -> f.fromJson( JacksonJsonHandlers.object(), jsonObject ) )
 					.fetchHits( 20 );
 			// end::elasticsearch-fromJson-jsonObject[]
 			assertThat( hits )

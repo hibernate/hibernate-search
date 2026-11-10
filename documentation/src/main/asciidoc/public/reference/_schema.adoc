@@ -330,7 +330,9 @@ To access backend-specific functionality, an extension to `SchemaExport` can be 
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/ElasticsearchHibernateOrmSchemaManagerIT.java[tags=walking-the-schema-extension]
 ----
 <1> Extend the `SchemaExport` with the Elasticsearch extension.
-<2> Access an HTTP body of a request that is needed to create an index in an Elasticsearch cluster.
+<2> Pass a <<backend-elasticsearch-json,JSON handler>> to select the representation of the request body parts.
+Here, `JacksonJsonHandlers.object()` selects Jackson 3 `ObjectNode` values.
+The deprecated no-argument `bodyParts()` retains Gson object results.
 =====
 ====
 

@@ -324,10 +324,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDs
 === Elasticsearch: `fromJson`
 
 `.fromJson(...)` turns JSON representing an Elasticsearch sort into a Hibernate Search sort.
+Pass a <<backend-elasticsearch-json,JSON handler>> with a JSON object, or pass a JSON-formatted string.
+The object example below uses `JacksonJsonHandlers.object()` with a Jackson 3 `ObjectNode`.
 
 include::../components/_elasticsearch-json-warning.adoc[]
 
-.Sorting by a native Elasticsearch JSON sort provided as a `JsonObject`
+.Sorting by a native Elasticsearch JSON sort provided as an `ObjectNode`
 ====
 [source, java, indent=0, subs="+callouts"]
 ----

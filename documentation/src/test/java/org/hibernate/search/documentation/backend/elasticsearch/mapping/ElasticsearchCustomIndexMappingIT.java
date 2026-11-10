@@ -5,13 +5,12 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.List;
 
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.documentation.backend.elasticsearch.layout.Book;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
@@ -22,7 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.exte
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.JsonParser;
+import tools.jackson.databind.JsonNode;
 
 class ElasticsearchCustomIndexMappingIT {
 
@@ -66,8 +65,8 @@ class ElasticsearchCustomIndexMappingIT {
 		try ( InputStream in = ElasticsearchCustomIndexMappingIT.class.getClassLoader()
 				.getResourceAsStream( "custom/index-mapping-merged.json" ) ) {
 
-			Reader reader = new InputStreamReader( in, "UTF-8" );
-			return JsonParser.parseReader( reader ).toString();
+			return JsonProviderHelper.createUserFacingCodec()
+					.decode( in, JsonNode.class ).toString();
 		}
 	}
 }
