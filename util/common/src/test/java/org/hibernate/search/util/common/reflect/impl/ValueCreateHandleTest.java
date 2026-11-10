@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.accessor.AccessorException;
 import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.accessor.Instantiator;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -147,9 +146,8 @@ class ValueCreateHandleTest {
 		Instantiator<?> instantiator = factory.instantiator( constructor );
 
 		assertThatThrownBy( () -> instantiator.create( "someValue", 42 ) )
-				.isExactlyInstanceOf( AccessorException.class )
-				.hasMessageContaining( "runtimeExceptionThrowingConstructor" )
-				.hasCauseInstanceOf( SimulatedRuntimeException.class );
+				.isExactlyInstanceOf( SimulatedRuntimeException.class )
+				.hasMessageContaining( "runtimeExceptionThrowingConstructor" );
 	}
 
 	public static class RuntimeExceptionConstructorClass {
