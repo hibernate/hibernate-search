@@ -2,12 +2,12 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
-import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonName;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonSerializable;
+import org.hibernate.search.backend.elasticsearch.json.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 
-import com.google.gson.JsonElement;
-import com.google.gson.annotations.SerializedName;
+import tools.jackson.databind.JsonNode;
 
 /**
  * An object representing an Elasticsearch dynamic template.
@@ -15,19 +15,19 @@ import com.google.gson.annotations.SerializedName;
  * This is the inner object in the array of templates, wrapped in a {@link NamedDynamicTemplate}.
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html
  */
-@GsonSerializable
+@JsonSerializable
 public class DynamicTemplate {
 
-	@SerializedName("match_mapping_type")
+	@JsonName("match_mapping_type")
 	private String matchMappingType;
 
-	@SerializedName("path_match")
+	@JsonName("path_match")
 	private String pathMatch;
 
 	private PropertyMapping mapping;
 
 	@SerializeExtraProperties
-	private Map<String, JsonElement> extraAttributes;
+	private Map<String, JsonNode> extraAttributes;
 
 	public String getMatchMappingType() {
 		return matchMappingType;
@@ -53,16 +53,16 @@ public class DynamicTemplate {
 		this.mapping = mapping;
 	}
 
-	public Map<String, JsonElement> getExtraAttributes() {
+	public Map<String, JsonNode> getExtraAttributes() {
 		return extraAttributes;
 	}
 
-	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
+	public void setExtraAttributes(Map<String, JsonNode> extraAttributes) {
 		this.extraAttributes = extraAttributes;
 	}
 
 	@Override
 	public String toString() {
-		return GsonProviderHelper.toPrettyJson( this );
+		return JsonProviderHelper.toPrettyJson( this );
 	}
 }

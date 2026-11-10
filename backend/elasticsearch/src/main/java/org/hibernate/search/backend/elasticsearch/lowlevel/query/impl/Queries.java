@@ -2,81 +2,71 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.query.impl;
 
 import java.util.Collection;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public final class Queries {
 
 	private Queries() {
 	}
 
-	public static JsonObject matchAll() {
-		JsonObject matchAll = new JsonObject();
-		matchAll.add( "match_all", new JsonObject() );
+	public static ObjectNode matchAll() {
+		ObjectNode matchAll = new ObjectNode( JsonNodeFactory.instance );
+		matchAll.set( "match_all", new ObjectNode( JsonNodeFactory.instance ) );
 		return matchAll;
 	}
 
-	public static JsonObject term(String absoluteFieldPath, String value) {
-		JsonObject predicate = new JsonObject();
-
-		JsonObject innerObject = new JsonObject();
-		predicate.add( "term", innerObject );
-
-		innerObject.addProperty( absoluteFieldPath, value );
-
+	public static ObjectNode term(String absoluteFieldPath, String value) {
+		ObjectNode predicate = new ObjectNode( JsonNodeFactory.instance );
+		ObjectNode innerObject = new ObjectNode( JsonNodeFactory.instance );
+		predicate.set( "term", innerObject );
+		innerObject.put( absoluteFieldPath, value );
 		return predicate;
 	}
 
-	public static JsonObject anyTerm(String absoluteFieldPath, Collection<String> values) {
-		JsonObject predicate = new JsonObject();
-
-		JsonObject innerObject = new JsonObject();
-		predicate.add( "terms", innerObject );
-
-		JsonArray terms = new JsonArray();
-		innerObject.add( absoluteFieldPath, terms );
+	public static ObjectNode anyTerm(String absoluteFieldPath, Collection<String> values) {
+		ObjectNode predicate = new ObjectNode( JsonNodeFactory.instance );
+		ObjectNode innerObject = new ObjectNode( JsonNodeFactory.instance );
+		predicate.set( "terms", innerObject );
+		ArrayNode terms = new ArrayNode( JsonNodeFactory.instance );
+		innerObject.set( absoluteFieldPath, terms );
 		for ( String value : values ) {
 			terms.add( value );
 		}
-
 		return predicate;
 	}
 
-	public static JsonObject boolFilter(JsonObject must, JsonArray filters) {
+	public static ObjectNode boolFilter(ObjectNode must, ArrayNode filters) {
 		if ( filters == null || filters.isEmpty() ) {
 			return must;
 		}
-
-		JsonObject predicate = new JsonObject();
-		JsonObject innerObject = new JsonObject();
-		predicate.add( "bool", innerObject );
-
+		ObjectNode predicate = new ObjectNode( JsonNodeFactory.instance );
+		ObjectNode innerObject = new ObjectNode( JsonNodeFactory.instance );
+		predicate.set( "bool", innerObject );
 		if ( must != null ) {
-			innerObject.add( "must", must );
+			innerObject.set( "must", must );
 		}
-		innerObject.add( "filter", filters );
-
+		innerObject.set( "filter", filters );
 		return predicate;
 	}
 
-	public static JsonObject boolCombineMust(JsonObject must, JsonArray otherMustClauses) {
+	public static ObjectNode boolCombineMust(ObjectNode must, ArrayNode otherMustClauses) {
 		if ( otherMustClauses == null || otherMustClauses.isEmpty() ) {
 			return must;
 		}
 		if ( must == null && otherMustClauses.size() == 1 ) {
-			return otherMustClauses.get( 0 ).getAsJsonObject();
+			return ( (ObjectNode) otherMustClauses.get( 0 ) );
 		}
-
-		JsonObject predicate = new JsonObject();
-		JsonObject innerObject = new JsonObject();
-		predicate.add( "bool", innerObject );
-		JsonArray mustClauses = new JsonArray();
+		ObjectNode predicate = new ObjectNode( JsonNodeFactory.instance );
+		ObjectNode innerObject = new ObjectNode( JsonNodeFactory.instance );
+		predicate.set( "bool", innerObject );
+		ArrayNode mustClauses = new ArrayNode( JsonNodeFactory.instance );
 		if ( must != null ) {
 			mustClauses.add( must );
 		}
 		mustClauses.addAll( otherMustClauses );
-		innerObject.add( "must", mustClauses );
-
+		innerObject.set( "must", mustClauses );
 		return predicate;
 	}
 }

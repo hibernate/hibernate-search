@@ -6,17 +6,17 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.common.ValueModel;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 public interface ElasticsearchSearchEncodingContext<F> {
 
-	<T> Function<T, JsonElement> encoder(ElasticsearchSearchIndexScope<?> scope,
+	<T> Function<T, JsonNode> encoder(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<F> field, Class<T> expectedType, ValueModel valueModel);
 
-	JsonElement convertAndEncode(ElasticsearchSearchIndexScope<?> scope,
+	JsonNode convertAndEncode(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<F> field,
 			Object value, ValueModel valueModel,
-			BiFunction<ElasticsearchFieldCodec<F>, F, JsonElement> encodeFunction);
+			BiFunction<ElasticsearchFieldCodec<F>, F, JsonNode> encodeFunction);
 
 	boolean isCompatibleWith(ElasticsearchSearchEncodingContext<?> other);
 }

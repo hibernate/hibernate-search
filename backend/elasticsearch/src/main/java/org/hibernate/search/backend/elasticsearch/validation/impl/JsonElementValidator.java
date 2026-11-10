@@ -2,9 +2,9 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
-class JsonElementValidator implements Validator<JsonElement> {
+class JsonElementValidator implements Validator<JsonNode> {
 
 	private final JsonElementEquivalenceProvider equivalenceProvider;
 
@@ -17,7 +17,7 @@ class JsonElementValidator implements Validator<JsonElement> {
 	}
 
 	@Override
-	public void validate(ValidationErrorCollector theErrorCollector, JsonElement expected, JsonElement actual) {
+	public void validate(ValidationErrorCollector theErrorCollector, JsonNode expected, JsonNode actual) {
 		JsonElementEquivalence parameterEquivalence = equivalenceProvider.get( theErrorCollector.getCurrentName() );
 		if ( !parameterEquivalence.isEquivalent( expected, actual ) ) {
 			theErrorCollector.addError(

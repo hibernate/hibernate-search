@@ -5,12 +5,12 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import com.google.gson.Gson;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 
 public class ElasticsearchInstantFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<Instant> {
 
-	public ElasticsearchInstantFieldCodec(Gson gson, DateTimeFormatter delegate) {
-		super( gson, delegate );
+	public ElasticsearchInstantFieldCodec(JsonCodecService json, DateTimeFormatter delegate) {
+		super( json, delegate );
 	}
 
 	@Override

@@ -1,24 +1,23 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonLogHelper;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
- * to display {@link JsonObject}s in log messages.
- *
+ * to display {@link ObjectNode}s in log messages.
  */
 public final class ElasticsearchJsonObjectFormatter {
 
-	private final JsonObject object;
+	private final Object object;
 
-	public ElasticsearchJsonObjectFormatter(JsonObject object) {
+	public ElasticsearchJsonObjectFormatter(Object object) {
 		this.object = object;
 	}
 
 	@Override
 	public String toString() {
-		return JsonLogHelper.get().toString( object );
+		return object instanceof ObjectNode node ? JsonLogHelper.get().toString( node ) : String.valueOf( object );
 	}
 }

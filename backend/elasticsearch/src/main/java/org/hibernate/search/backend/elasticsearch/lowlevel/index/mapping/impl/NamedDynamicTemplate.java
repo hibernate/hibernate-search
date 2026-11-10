@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 
 /**
  * An object representing an Elasticsearch dynamic template with a name.
@@ -29,6 +29,6 @@ public class NamedDynamicTemplate {
 
 	@Override
 	public String toString() {
-		return GsonProviderHelper.toPrettyJson( this );
+		return JsonProviderHelper.toPrettyJson( this );
 	}
 }

@@ -1,5 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonHandlerBridge;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.DisjunctionMaxPredicateBuilder;
@@ -10,8 +11,9 @@ import org.hibernate.search.engine.search.predicate.spi.QueryStringPredicateBuil
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
+import org.hibernate.search.util.json.JsonHandler;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredicateBuilderFactory {
 
@@ -61,11 +63,15 @@ public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredica
 		return new ElasticsearchWithParametersPredicate.Builder( scope );
 	}
 
-	public ElasticsearchSearchPredicate fromJson(JsonObject jsonObject) {
+	public <T> ElasticsearchSearchPredicate fromJson(JsonHandler<T> handler, T jsonObject) {
+		return fromJson( JsonHandlerBridge.importObject( handler, jsonObject, "predicate import" ) );
+	}
+
+	private ElasticsearchSearchPredicate fromJson(ObjectNode jsonObject) {
 		return new ElasticsearchUserProvidedJsonPredicate( scope, jsonObject );
 	}
 
 	public ElasticsearchSearchPredicate fromJson(String jsonString) {
-		return fromJson( scope.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+		return fromJson( JsonHandlerBridge.parseObject( jsonString, "predicate import" ) );
 	}
 }

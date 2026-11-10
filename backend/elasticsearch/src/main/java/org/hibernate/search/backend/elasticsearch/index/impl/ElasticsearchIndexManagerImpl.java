@@ -42,27 +42,27 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchIndexManagerImpl
-		implements IndexManagerImplementor,
-		ElasticsearchIndexManager, WorkExecutionIndexManagerContext {
+		implements IndexManagerImplementor, ElasticsearchIndexManager, WorkExecutionIndexManagerContext {
 
 	private static final OptionalConfigurationProperty<String> OBSOLETE_LIFECYCLE_STRATEGY =
-			ConfigurationProperty.forKey( "lifecycle.strategy" )
-					.asString()
-					.build();
+			ConfigurationProperty.forKey( "lifecycle.strategy" ).asString().build();
 
 	private final IndexManagerBackendContext backendContext;
+
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
+
 	private final ElasticsearchBatchingWorkOrchestrator indexingOrchestrator;
+
 	private final ElasticsearchIndexModel model;
 
 	private ElasticsearchIndexSchemaManager schemaManager;
+
 	private ElasticsearchAnalysisPerformer analysisPerformer;
 
-	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
-			ElasticsearchIndexModel model,
+	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext, ElasticsearchIndexModel model,
 			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
 		this.model = model;
@@ -72,12 +72,8 @@ class ElasticsearchIndexManagerImpl
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "hibernateSearchName=" )
-				.append( model.hibernateSearchIndexName() )
-				.append( "]" )
-				.toString();
+		return new StringBuilder( getClass().getSimpleName() ).append( "[" ).append( "hibernateSearchName=" )
+				.append( model.hibernateSearchIndexName() ).append( "]" ).toString();
 	}
 
 	@Override
@@ -89,28 +85,17 @@ class ElasticsearchIndexManagerImpl
 			 * based on runtime data such as runtime user configuration or the detected ES version.
 			 * Useful for compile-time boot.
 			 */
-
 			model.onStart( backendContext );
-
-			schemaManager = backendContext.createSchemaManager(
-					model, context.configurationPropertySource()
-			);
-
+			schemaManager = backendContext.createSchemaManager( model, context.configurationPropertySource() );
 			// HSEARCH-3759: the lifecycle strategy is now the schema management strategy, at the mapper level
-			OBSOLETE_LIFECYCLE_STRATEGY.getAndMap(
-					context.configurationPropertySource(),
-					ignored -> {
-						throw DeprecationLog.INSTANCE.lifecycleStrategyMovedToMapper();
-					}
-			);
-
+			OBSOLETE_LIFECYCLE_STRATEGY.getAndMap( context.configurationPropertySource(), ignored -> {
+				throw DeprecationLog.INSTANCE.lifecycleStrategyMovedToMapper();
+			} );
 			indexingOrchestrator.start( context.configurationPropertySource() );
-
 			analysisPerformer = backendContext.createAnalysisPerformer( model );
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
+			new SuppressingCloser( e ).push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
 			throw e;
 		}
 	}
@@ -144,16 +129,13 @@ class ElasticsearchIndexManagerImpl
 	}
 
 	@Override
-	public JsonObject createDocument(String tenantId, String id,
-			DocumentContributor documentContributor) {
+	public ObjectNode createDocument(String tenantId, String id, DocumentContributor documentContributor) {
 		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder( model );
 		documentContributor.contribute( builder );
-		JsonObject document = builder.build();
-
+		ObjectNode document = builder.build();
 		for ( DocumentMetadataContributor contributor : documentMetadataContributors ) {
 			contributor.contribute( document, tenantId, id );
 		}
-
 		return document;
 	}
 
@@ -167,22 +149,15 @@ class ElasticsearchIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
-		return backendContext.createIndexingPlan(
-				indexingOrchestrator,
-				this,
-				sessionContext,
-				refreshStrategy
-		);
+		return backendContext.createIndexingPlan( indexingOrchestrator, this, sessionContext, refreshStrategy );
 	}
 
 	@Override
 	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
-		return backendContext.createIndexer(
-				indexingOrchestrator, this, sessionContext
-		);
+		return backendContext.createIndexer( indexingOrchestrator, this, sessionContext );
 	}
 
 	@Override
@@ -192,9 +167,7 @@ class ElasticsearchIndexManagerImpl
 
 	@Override
 	public <SR> IndexScopeBuilder<SR> createScopeBuilder(BackendMappingContext mappingContext, Class<SR> rootScopeType) {
-		return new ElasticsearchIndexScopeBuilder<>(
-				backendContext, mappingContext, rootScopeType, this
-		);
+		return new ElasticsearchIndexScopeBuilder<>( backendContext, mappingContext, rootScopeType, this );
 	}
 
 	@Override
@@ -203,9 +176,7 @@ class ElasticsearchIndexManagerImpl
 			esBuilder.add( backendContext, this );
 		}
 		else {
-			throw QueryLog.INSTANCE.cannotMixElasticsearchScopeWithOtherType(
-					builder, this, backendContext.getEventContext()
-			);
+			throw QueryLog.INSTANCE.cannotMixElasticsearchScopeWithOtherType( builder, this, backendContext.getEventContext() );
 		}
 	}
 
@@ -249,20 +220,17 @@ class ElasticsearchIndexManagerImpl
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Checked using reflection
+	// Checked using reflection
+	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> clazz) {
 		if ( clazz.isAssignableFrom( ElasticsearchIndexManager.class ) ) {
 			return (T) this;
 		}
-		throw ElasticsearchMiscLog.INSTANCE.indexManagerUnwrappingWithUnknownType(
-				clazz, ElasticsearchIndexManager.class, getBackendAndIndexEventContext()
-		);
+		throw ElasticsearchMiscLog.INSTANCE.indexManagerUnwrappingWithUnknownType( clazz, ElasticsearchIndexManager.class,
+				getBackendAndIndexEventContext() );
 	}
 
 	private EventContext getBackendAndIndexEventContext() {
-		return backendContext.getEventContext().append(
-				EventContexts.fromIndexName( model.hibernateSearchName() )
-		);
+		return backendContext.getEventContext().append( EventContexts.fromIndexName( model.hibernateSearchName() ) );
 	}
-
 }

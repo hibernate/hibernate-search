@@ -2,16 +2,17 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 
@@ -20,26 +21,23 @@ public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
 		return null;
 	}
 
-	public static class Builder
-			extends AbstractBuilder<Builder> {
-		private final JsonObject payload;
+	public static class Builder extends AbstractBuilder<Builder> {
 
-		public Builder(GsonProvider gsonProvider, URLEncodedString indexName,
-				Map<String, IndexAliasDefinition> aliases) {
+		private final ObjectNode payload;
+
+		public Builder(JsonProvider jsonProvider, URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
 			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
-			this.payload = createPayload( gsonProvider, indexName.original, aliases );
+			this.payload = createPayload( jsonProvider, indexName.original, aliases );
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.post()
-							.pathComponent( Paths._ALIASES )
-							.body( payload );
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder =
+					ElasticsearchJsonRequest.post().pathComponent( Paths._ALIASES ).bodyJsonFromInternal( payload );
 			return builder.build();
 		}
 
@@ -48,28 +46,24 @@ public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 			return new PutIndexAliasesWork( this );
 		}
 
-		private static JsonObject createPayload(GsonProvider gsonProvider, String indexName,
+		private static ObjectNode createPayload(JsonProvider jsonProvider, String indexName,
 				Map<String, IndexAliasDefinition> aliases) {
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
 			 */
-			Gson gson = gsonProvider.getGsonNoSerializeNulls();
-
-			JsonObject payload = new JsonObject();
-			JsonArray actions = new JsonArray();
-			payload.add( "actions", actions );
-
+			JsonCodecService json = jsonProvider.getCodecNoSerializeNulls();
+			ObjectNode payload = new ObjectNode( JsonNodeFactory.instance );
+			ArrayNode actions = new ArrayNode( JsonNodeFactory.instance );
+			payload.set( "actions", actions );
 			for ( Map.Entry<String, IndexAliasDefinition> entry : aliases.entrySet() ) {
-				JsonObject action = new JsonObject();
-				JsonObject aliasDefinition = gson.toJsonTree( entry.getValue() ).getAsJsonObject();
-				action.add( "add", aliasDefinition );
-				aliasDefinition.addProperty( "index", indexName );
-				aliasDefinition.addProperty( "alias", entry.getKey() );
-
+				ObjectNode action = new ObjectNode( JsonNodeFactory.instance );
+				ObjectNode aliasDefinition = ( (ObjectNode) json.encode( entry.getValue() ) );
+				action.set( "add", aliasDefinition );
+				aliasDefinition.put( "index", indexName );
+				aliasDefinition.put( "alias", entry.getKey() );
 				actions.add( action );
 			}
-
 			return payload;
 		}
 	}

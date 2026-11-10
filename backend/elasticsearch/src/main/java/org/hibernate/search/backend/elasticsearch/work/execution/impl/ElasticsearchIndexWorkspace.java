@@ -12,20 +12,24 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	private final ElasticsearchWorkFactory workFactory;
+
 	private final MultiTenancyStrategy multiTenancyStrategy;
+
 	private final ElasticsearchParallelWorkOrchestrator orchestrator;
+
 	private final URLEncodedString indexName;
+
 	private final Set<String> tenantIds;
 
-	public ElasticsearchIndexWorkspace(ElasticsearchWorkFactory workFactory,
-			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchParallelWorkOrchestrator orchestrator,
-			WorkExecutionIndexManagerContext indexManagerContext,
+	public ElasticsearchIndexWorkspace(ElasticsearchWorkFactory workFactory, MultiTenancyStrategy multiTenancyStrategy,
+			ElasticsearchParallelWorkOrchestrator orchestrator, WorkExecutionIndexManagerContext indexManagerContext,
 			Set<String> tenantIds) {
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -51,35 +55,24 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 				&& UnsupportedOperationBehavior.IGNORE.equals( unsupportedOperationBehavior ) ) {
 			return CompletableFuture.completedFuture( null );
 		}
-
-		JsonArray filters = new JsonArray();
-		JsonObject filter = multiTenancyStrategy.filterOrNull( tenantIds );
+		ArrayNode filters = new ArrayNode( JsonNodeFactory.instance );
+		ObjectNode filter = multiTenancyStrategy.filterOrNull( tenantIds );
 		if ( filter != null ) {
 			filters.add( filter );
 		}
 		if ( !routingKeys.isEmpty() ) {
 			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
 		}
-
-		JsonObject payload = new JsonObject();
-		payload.add(
-				"query",
-				Queries.boolFilter( Queries.matchAll(), filters )
-		);
-
-		return orchestrator.submit(
-				workFactory.deleteByQuery( indexName, payload )
-						.routingKeys( routingKeys )
-						.build(),
-				operationSubmitter
-		);
+		ObjectNode payload = new ObjectNode( JsonNodeFactory.instance );
+		payload.set( "query", Queries.boolFilter( Queries.matchAll(), filters ) );
+		return orchestrator.submit( workFactory.deleteByQuery( indexName, payload ).routingKeys( routingKeys ).build(),
+				operationSubmitter );
 	}
 
 	@Override
 	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter,
 			UnsupportedOperationBehavior unsupportedOperationBehavior) {
-		if ( !workFactory.isFlushSupported()
-				&& UnsupportedOperationBehavior.IGNORE.equals( unsupportedOperationBehavior ) ) {
+		if ( !workFactory.isFlushSupported() && UnsupportedOperationBehavior.IGNORE.equals( unsupportedOperationBehavior ) ) {
 			return CompletableFuture.completedFuture( null );
 		}
 		return orchestrator.submit( workFactory.flush().index( indexName ).build(), operationSubmitter );
@@ -88,8 +81,7 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	@Override
 	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter,
 			UnsupportedOperationBehavior unsupportedOperationBehavior) {
-		if ( !workFactory.isRefreshSupported()
-				&& UnsupportedOperationBehavior.IGNORE.equals( unsupportedOperationBehavior ) ) {
+		if ( !workFactory.isRefreshSupported() && UnsupportedOperationBehavior.IGNORE.equals( unsupportedOperationBehavior ) ) {
 			return CompletableFuture.completedFuture( null );
 		}
 		return orchestrator.submit( workFactory.refresh().index( indexName ).build(), operationSubmitter );

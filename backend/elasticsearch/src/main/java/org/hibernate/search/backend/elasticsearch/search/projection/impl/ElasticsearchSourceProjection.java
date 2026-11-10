@@ -1,23 +1,34 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
+import java.util.Objects;
+
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonArrayAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonHandlerBridge;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchSearchHints;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.util.json.JsonHandler;
+import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
-class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<JsonObject>
-		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
+class ElasticsearchSourceProjection<T> extends AbstractElasticsearchProjection<T>
+		implements ElasticsearchSearchProjection.Extractor<ObjectNode, T> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
-	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
+	private static final JsonNode WILDCARD_ALL = JsonScalarConversions.toNode( "*" );
 
-	ElasticsearchSourceProjection(ElasticsearchSearchIndexScope<?> scope) {
+	private final JsonHandler<T> handler;
+	private final JsonValidation validation;
+
+	ElasticsearchSourceProjection(ElasticsearchSearchIndexScope<?> scope, JsonHandler<T> handler) {
 		super( scope );
+		this.handler = Objects.requireNonNull( handler );
+		this.validation = scope.userFacingCodec().validation();
 	}
 
 	@Override
@@ -26,7 +37,7 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	}
 
 	@Override
-	public Extractor<?, JsonObject> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, T> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		context.checkNotNested(
 				ElasticsearchProjectionTypeKeys.SOURCE,
 				ElasticsearchSearchHints.INSTANCE.sourceProjectionNestingNotSupportedHint()
@@ -36,14 +47,15 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	}
 
 	@Override
-	public JsonObject extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
-			JsonObject source, ProjectionExtractContext context) {
-		return source;
+	public ObjectNode extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit,
+			ObjectNode source, ProjectionExtractContext context) {
+		JsonNode present = hit.get( "_source" );
+		return present == null || present.isNull() ? null : JsonHandlerBridge.requireObject( present, "source projection" );
 	}
 
 	@Override
-	public JsonObject transform(LoadingResult<?> loadingResult, JsonObject extractedData,
+	public T transform(LoadingResult<?> loadingResult, ObjectNode extractedData,
 			ProjectionTransformContext context) {
-		return extractedData;
+		return JsonHandlerBridge.exportObject( handler, extractedData, "source projection", validation );
 	}
 }

@@ -1,7 +1,9 @@
 package org.hibernate.search.backend.elasticsearch.search.query;
 
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.json.JsonHandler;
 
 import com.google.gson.JsonObject;
 
@@ -19,6 +21,11 @@ public interface ElasticsearchSearchResult<H> extends SearchResult<H> {
 	 * Use this at your own risk.
 	 */
 	@Incubating
-	JsonObject responseBody();
+	@Deprecated
+	default JsonObject responseBody() {
+		return responseBody( GsonJsonHandlers.object() );
+	}
+
+	<T> T responseBody(JsonHandler<T> handler);
 
 }

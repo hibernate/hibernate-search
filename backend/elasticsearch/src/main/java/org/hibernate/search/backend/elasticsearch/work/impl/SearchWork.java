@@ -4,19 +4,21 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.engine.common.timing.Deadline;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
+
 	private final Deadline deadline;
+
 	private final boolean failOnDeadline;
 
 	protected SearchWork(Builder<R> builder) {
@@ -28,44 +30,51 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 	@Override
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
-			ElasticsearchRequest request) {
-		QueryLog.INSTANCE.executingElasticsearchQuery(
-				request.path(),
-				request.parameters(),
-				executionContext.getGsonProvider().getLogHelper().toString( request.bodyParts() )
-		);
+			ElasticsearchJsonRequest request) {
+		QueryLog.INSTANCE.executingElasticsearchQuery( request.path(), request.parameters(),
+				executionContext.getJsonProvider().getLogHelper().toString( request.bodyPartsJson() ) );
 		return super.beforeExecute( executionContext, request );
 	}
 
 	@Override
-	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject body = response.body();
+	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
+		ObjectNode body = response.bodyJson();
 		return resultExtractor.extract( body, failOnDeadline ? deadline : null );
 	}
 
-	public static class Builder<R>
-			extends AbstractBuilder<Builder<R>> {
+	public static class Builder<R> extends AbstractBuilder<Builder<R>> {
 
-		public static <T> Builder<T> create(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+		public static <T> Builder<T> create(ObjectNode payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			return new Builder<>( payload, resultExtractor, true, false );
 		}
 
-		private final JsonObject payload;
+		private final ObjectNode payload;
+
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
+
 		private final boolean allowPartialSearchResultsSupported;
+
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
 		private Boolean trackTotalHits;
+
 		private Long totalHitCountThreshold;
+
 		private Integer from;
+
 		private Integer size;
+
 		private Integer scrollSize;
+
 		private String scrollTimeout;
+
 		private Set<String> routingKeys;
+
 		private Deadline deadline;
+
 		private boolean failOnDeadline;
 
-		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
+		private Builder(ObjectNode payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
 				boolean allowPartialSearchResultsSupported) {
 			super( ElasticsearchRequestSuccessAssessor.SHARD_FAILURE_CHECKED_INSTANCE );
 			this.payload = payload;
@@ -126,30 +135,22 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.post()
-							.multiValuedPathComponent( indexes )
-							.pathComponent( Paths._SEARCH )
-							.body( payload );
-
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.post().multiValuedPathComponent( indexes )
+					.pathComponent( Paths._SEARCH ).bodyJsonFromInternal( payload );
 			if ( from != null ) {
 				builder.param( "from", from );
 			}
-
 			if ( size != null ) {
 				builder.param( "size", size );
 			}
-
 			if ( scrollSize != null && scrollTimeout != null ) {
 				builder.param( "size", scrollSize );
 				builder.param( "scroll", scrollTimeout );
 			}
-
 			if ( routingKeys != null && !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
-
 			if ( trackTotalHits != null ) {
 				if ( trackTotalHits && totalHitCountThreshold != null ) {
 					// total hits is tracked but a with a limited precision
@@ -159,9 +160,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 					builder.param( "track_total_hits", trackTotalHits );
 				}
 			}
-
 			handleDeadline( builder );
-
 			return builder.build();
 		}
 
@@ -170,17 +169,15 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			return new SearchWork<>( this );
 		}
 
-		private void handleDeadline(ElasticsearchRequest.Builder builder) {
+		private void handleDeadline(ElasticsearchJsonRequest.Builder builder) {
 			if ( deadline == null ) {
 				return;
 			}
-
 			// Client-side timeout: the search will fail on timeout.
 			// This is necessary to address network problems: the server-side timeout would not detect that.
 			if ( failOnDeadline ) {
 				builder.deadline( deadline );
 			}
-
 			// Server-side timeout
 			builder.param( "timeout", deadline.checkRemainingTimeMillis() + "ms" );
 			if ( allowPartialSearchResultsSupported ) {

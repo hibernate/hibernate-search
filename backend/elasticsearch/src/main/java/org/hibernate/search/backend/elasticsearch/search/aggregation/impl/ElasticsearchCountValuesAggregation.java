@@ -2,8 +2,8 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -13,22 +13,23 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.spi.CountValuesAggregationBuilder;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchCountValuesAggregation extends AbstractElasticsearchNestableAggregation<Long> {
 
-	private static final JsonAccessor<JsonObject> COUNT_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "value_count" ).asObject();
+	private static final JsonAccessor<ObjectNode> COUNT_PROPERTY_ACCESSOR =
+			JsonAccessor.root().property( "value_count" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonObject> COUNT_DISTINCT_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "cardinality" ).asObject();
+	private static final JsonAccessor<ObjectNode> COUNT_DISTINCT_PROPERTY_ACCESSOR =
+			JsonAccessor.root().property( "cardinality" ).unwrapSingletonArrays().asObject();
 
 	private static final JsonAccessor<String> FIELD_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "field" ).asString();
+			JsonAccessor.root().property( "field" ).unwrapSingletonArrays().asString();
 
 	private final String absoluteFieldPath;
-	private final JsonAccessor<JsonObject> operation;
+	private final JsonAccessor<ObjectNode> operation;
 
 	private ElasticsearchCountValuesAggregation(Builder builder) {
 		super( builder );
@@ -78,9 +79,9 @@ public class ElasticsearchCountValuesAggregation extends AbstractElasticsearchNe
 	}
 
 	@Override
-	protected final JsonObject doRequest(AggregationRequestBuildingContextContext context) {
-		JsonObject outerObject = new JsonObject();
-		JsonObject innerObject = new JsonObject();
+	protected final ObjectNode doRequest(AggregationRequestBuildingContextContext context) {
+		ObjectNode outerObject = JsonNodeFactory.instance.objectNode();
+		ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 
 		operation.set( outerObject, innerObject );
 		FIELD_PROPERTY_ACCESSOR.set( innerObject, absoluteFieldPath );
@@ -101,15 +102,15 @@ public class ElasticsearchCountValuesAggregation extends AbstractElasticsearchNe
 		}
 
 		@Override
-		protected Long doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
-			JsonElement value = aggregationResult.get( "value" );
+		protected Long doExtract(ObjectNode aggregationResult, AggregationExtractContext context) {
+			JsonNode value = aggregationResult.get( "value" );
 			return JsonElementTypes.LONG.fromElement( value );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder<Long>
 			implements CountValuesAggregationBuilder {
-		private JsonAccessor<JsonObject> operation;
+		private JsonAccessor<ObjectNode> operation;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
 			super( scope, field );

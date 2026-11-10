@@ -1,18 +1,18 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonLogHelper;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
- * to display {@link ElasticsearchResponse}s in log messages.
+ * to display {@link ElasticsearchJsonResponse}s in log messages.
  *
  */
 public final class ElasticsearchResponseFormatter {
 
-	private final ElasticsearchResponse response;
+	private final ElasticsearchJsonResponse response;
 
-	public ElasticsearchResponseFormatter(ElasticsearchResponse response) {
+	public ElasticsearchResponseFormatter(ElasticsearchJsonResponse response) {
 		this.response = response;
 	}
 
@@ -21,7 +21,7 @@ public final class ElasticsearchResponseFormatter {
 		return formatResponse( response );
 	}
 
-	private static String formatResponse(ElasticsearchResponse response) {
+	private static String formatResponse(ElasticsearchJsonResponse response) {
 		if ( response == null ) {
 			return "(no response)";
 		}
@@ -37,7 +37,7 @@ public final class ElasticsearchResponseFormatter {
 				.append( "' from '" )
 				.append( response.hostAndPort() )
 				.append( "' with body " )
-				.append( helper.toString( response.body() ) );
+				.append( helper.toString( response.bodyJson() ) );
 
 		return sb.toString();
 	}

@@ -2,32 +2,35 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 
-	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
+	private static final JsonAccessor<ArrayNode> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
 
 	protected BulkWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected BulkResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject parsedResponseBody = response.body();
-		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
+	protected BulkResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
+		ObjectNode parsedResponseBody = response.bodyJson();
+		ArrayNode resultItems =
+				BULK_ITEMS.get( parsedResponseBody ).orElseGet( () -> new ArrayNode( JsonNodeFactory.instance ) );
 		return new BulkResultImpl( resultItems );
 	}
 
 	public static class Builder extends AbstractNonBulkableWork.AbstractBuilder<Builder> {
+
 		private final List<? extends BulkableWork<?>> bulkableWorks;
 
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
@@ -43,10 +46,8 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.post()
-							.pathComponent( Paths._BULK );
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.post().pathComponent( Paths._BULK );
 			switch ( refreshStrategy ) {
 				case FORCE:
 					builder.param( "refresh", true );
@@ -54,15 +55,13 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 				case NONE:
 					break;
 			}
-
 			for ( BulkableWork<?> work : bulkableWorks ) {
-				builder.body( work.getBulkableActionMetadata() );
-				JsonObject actionBody = work.getBulkableActionBody();
+				builder.bodyJsonFromInternal( work.getBulkableActionMetadata() );
+				ObjectNode actionBody = work.getBulkableActionBody();
 				if ( actionBody != null ) {
-					builder.body( actionBody );
+					builder.bodyJsonFromInternal( actionBody );
 				}
 			}
-
 			return builder.build();
 		}
 
@@ -73,18 +72,18 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 	}
 
 	private static class BulkResultImpl implements BulkResult {
-		private final JsonArray results;
 
-		public BulkResultImpl(JsonArray results) {
+		private final ArrayNode results;
+
+		public BulkResultImpl(ArrayNode results) {
 			super();
 			this.results = results;
 		}
 
 		@Override
 		public <T> T extract(ElasticsearchWorkExecutionContext context, BulkableWork<T> work, int index) {
-			JsonObject bulkItemResponse = results.get( index ).getAsJsonObject();
+			ObjectNode bulkItemResponse = ( (ObjectNode) results.get( index ) );
 			return work.handleBulkResult( context, bulkItemResponse );
 		}
 	}
-
 }

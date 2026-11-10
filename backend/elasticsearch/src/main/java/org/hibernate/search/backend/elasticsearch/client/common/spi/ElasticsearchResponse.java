@@ -1,18 +1,23 @@
 package org.hibernate.search.backend.elasticsearch.client.common.spi;
 
-import com.google.gson.JsonObject;
-
-public final class ElasticsearchResponse {
+/**
+ * HTTP metadata and the exact opaque result produced by the supplied response consumer.
+ * A client constructs this response without inspecting or converting the result.
+ * JSON consumer results can implement {@link ElasticsearchResponseBody}; access their JSON with
+ * {@code response.result().body(handler)}.
+ * @param <T> The supplied consumer's result type.
+ */
+public class ElasticsearchResponse<T> {
 	private final String hostAndPort;
 	private final int statusCode;
 	private final String statusMessage;
-	private final JsonObject body;
+	private final T result;
 
-	public ElasticsearchResponse(String hostAndPort, int statusCode, String statusMessage, JsonObject body) {
+	public ElasticsearchResponse(String hostAndPort, int statusCode, String statusMessage, T result) {
 		this.hostAndPort = hostAndPort;
 		this.statusCode = statusCode;
 		this.statusMessage = statusMessage;
-		this.body = body;
+		this.result = result;
 	}
 
 	public String hostAndPort() {
@@ -27,7 +32,7 @@ public final class ElasticsearchResponse {
 		return statusMessage;
 	}
 
-	public JsonObject body() {
-		return body;
+	public T result() {
+		return result;
 	}
 }

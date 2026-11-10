@@ -1,7 +1,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -14,16 +14,18 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
+	private static final JsonAccessor<JsonNode> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
 
-	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
+	private static final JsonObjectAccessor MATCH_ACCESSOR =
+			JsonAccessor.root().property( "match" ).unwrapSingletonArrays().asObject();
 
-	private final JsonElement value;
+	private final JsonNode value;
 
 	ElasticsearchStandardMatchPredicate(Builder<?> builder) {
 		super( builder );
@@ -31,19 +33,16 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		QUERY_ACCESSOR.set( innerObject, value );
-
-		JsonObject middleObject = new JsonObject();
-		middleObject.add( absoluteFieldPath, innerObject );
-
+		ObjectNode middleObject = new ObjectNode( JsonNodeFactory.instance );
+		middleObject.set( absoluteFieldPath, innerObject );
 		MATCH_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
 	}
 
-	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<MatchPredicateBuilder, F> {
+	public static class Factory<F> extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<MatchPredicateBuilder, F> {
+
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -58,9 +57,10 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 	static class Builder<F> extends AbstractBuilder implements MatchPredicateBuilder {
 
 		protected final ElasticsearchSearchIndexValueFieldContext<F> field;
+
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private JsonElement value;
+		private JsonNode value;
 
 		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {

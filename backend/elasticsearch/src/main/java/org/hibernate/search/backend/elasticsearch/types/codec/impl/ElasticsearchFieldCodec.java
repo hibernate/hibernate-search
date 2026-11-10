@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Defines how a given value will be encoded as JSON and decoded from JSON.
@@ -16,9 +16,9 @@ import com.google.gson.JsonElement;
  */
 public interface ElasticsearchFieldCodec<F> {
 
-	JsonElement encode(F value);
+	JsonNode encode(F value);
 
-	default JsonElement encodeForMissing(F value) {
+	default JsonNode encodeForMissing(F value) {
 		return encode( value );
 	}
 
@@ -30,11 +30,11 @@ public interface ElasticsearchFieldCodec<F> {
 	 * @param value The value to encode.
 	 * @return The encoded value.
 	 */
-	default JsonElement encodeForAggregation(ElasticsearchSearchSyntax searchSyntax, F value) {
+	default JsonNode encodeForAggregation(ElasticsearchSearchSyntax searchSyntax, F value) {
 		return encode( value );
 	}
 
-	F decode(JsonElement element);
+	F decode(JsonNode element);
 
 	default F decode(Double element) {
 		throw new AssertionFailure( this + " codec is not expected to handle decoding metric aggregation values." );
@@ -45,14 +45,14 @@ public interface ElasticsearchFieldCodec<F> {
 	 * @param key The "key" property  returned by the aggregation.
 	 * May be a number, a string, ... depending on the field type.
 	 * @param keyAsString The "key_as_string" property returned by the term aggregation.
-	 * Either null or a {@link com.google.gson.JsonPrimitive} containing a string.
+	 * Either null or a {@link tools.jackson.databind.JsonNode} containing a string.
 	 * @return The decoded term.
 	 */
-	default F decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
+	default F decodeAggregationKey(JsonNode key, JsonNode keyAsString) {
 		return decode( key );
 	}
 
-	default F decodeAggregationValue(Optional<Double> value, JsonElement valueAsString) {
+	default F decodeAggregationValue(Optional<Double> value, JsonNode valueAsString) {
 		if ( valueAsString != null ) {
 			return decode( valueAsString );
 		}
@@ -70,13 +70,14 @@ public interface ElasticsearchFieldCodec<F> {
 	boolean isCompatibleWith(ElasticsearchFieldCodec<?> other);
 
 	/**
-	 * Whether this codec can extract data from JsonArrays when decoding.
+	 * Whether a JSON array can represent one field value, rather than a collection of field values.
+	 * When indexing a multi-valued field with such a codec, an outer array separates its field values.
 	 */
 	default boolean canDecodeArrays() {
 		return false;
 	}
 
-	JsonElement fromJsonStringToElement(String value);
+	JsonNode fromJsonStringToElement(String value);
 
-	String fromJsonElementToString(JsonElement value);
+	String fromJsonElementToString(JsonNode value);
 }

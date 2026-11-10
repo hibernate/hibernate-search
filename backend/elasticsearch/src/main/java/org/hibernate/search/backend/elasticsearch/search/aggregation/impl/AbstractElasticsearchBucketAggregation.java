@@ -3,14 +3,15 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @param <K> The type of keys in the returned map.
@@ -19,18 +20,19 @@ import com.google.gson.JsonObject;
 public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		extends AbstractElasticsearchNestableAggregation<Map<K, V>> {
 
-	protected static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_ACCESSOR =
-			JsonAccessor.root().property( "aggregations" ).asObject();
+	protected static final JsonAccessor<ObjectNode> REQUEST_AGGREGATIONS_ACCESSOR =
+			JsonAccessor.root().property( "aggregations" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_ACCESSOR =
-			JsonAccessor.root().property( "reverse_nested" ).asObject();
+	private static final JsonAccessor<ObjectNode> REQUEST_REVERSE_NESTED_ACCESSOR =
+			JsonAccessor.root().property( "reverse_nested" ).unwrapSingletonArrays().asObject();
 
-	protected static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR =
-			JsonAccessor.root().property( "reverse_nested_wrapper" ).asObject();
+	protected static final JsonAccessor<ObjectNode> REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR =
+			JsonAccessor.root().property( "reverse_nested_wrapper" ).unwrapSingletonArrays().asObject();
 
 	private static final String ROOT_DOC_COUNT_NAME = "root_doc_count";
-	private static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR =
-			JsonAccessor.root().property( "aggregations" ).property( ROOT_DOC_COUNT_NAME ).asObject();
+	private static final JsonAccessor<ObjectNode> REQUEST_AGGREGATIONS_ROOT_DOC_COUNT_ACCESSOR =
+			JsonAccessor.root().property( "aggregations" ).unwrapSingletonArrays().property( ROOT_DOC_COUNT_NAME )
+					.unwrapSingletonArrays().asObject();
 
 	protected static final String INNER_EXTRACTOR = "innerExtractor";
 
@@ -39,9 +41,9 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	}
 
 	@Override
-	protected final JsonObject doRequest(AggregationRequestBuildingContextContext context) {
-		JsonObject outerObject = new JsonObject();
-		JsonObject innerObject = new JsonObject();
+	protected final ObjectNode doRequest(AggregationRequestBuildingContextContext context) {
+		ObjectNode outerObject = JsonNodeFactory.instance.objectNode();
+		ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 
 		doRequest( outerObject, innerObject, context );
 
@@ -49,17 +51,17 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 			// if we are looking at a nested composite/non-document-count sub-aggregation
 			//  we have to wrap it in a single aggregation with `reverse_nested` in it.
 			if ( !innerObject.isEmpty() ) {
-				JsonObject aggregations = new JsonObject();
-				JsonObject wrapper = new JsonObject();
+				ObjectNode aggregations = JsonNodeFactory.instance.objectNode();
+				ObjectNode wrapper = JsonNodeFactory.instance.objectNode();
 				REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR.set( aggregations, wrapper );
-				REQUEST_REVERSE_NESTED_ACCESSOR.set( wrapper, new JsonObject() );
+				REQUEST_REVERSE_NESTED_ACCESSOR.set( wrapper, JsonNodeFactory.instance.objectNode() );
 				REQUEST_AGGREGATIONS_ACCESSOR.set( wrapper, innerObject );
 				REQUEST_AGGREGATIONS_ACCESSOR.set( outerObject, aggregations );
 			}
 			else {
 				// we are looking at the "default" "just give me the counts" aggregation here:
-				JsonObject rootDocCountSubAggregationOuterObject = new JsonObject();
-				JsonObject rootDocCountSubAggregationInnerObject = new JsonObject();
+				ObjectNode rootDocCountSubAggregationOuterObject = JsonNodeFactory.instance.objectNode();
+				ObjectNode rootDocCountSubAggregationInnerObject = JsonNodeFactory.instance.objectNode();
 
 				REQUEST_REVERSE_NESTED_ACCESSOR.set(
 						rootDocCountSubAggregationOuterObject,
@@ -76,7 +78,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		return outerObject;
 	}
 
-	protected abstract void doRequest(JsonObject outerObject, JsonObject innerObject,
+	protected abstract void doRequest(ObjectNode outerObject, ObjectNode innerObject,
 			AggregationRequestBuildingContextContext context);
 
 	protected abstract class AbstractBucketExtractor<A, B> extends AbstractExtractor<Map<A, B>> {
@@ -87,13 +89,13 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 		}
 
 		@Override
-		protected final Map<A, B> doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
-			JsonElement buckets = aggregationResult.get( "buckets" );
+		protected final Map<A, B> doExtract(ObjectNode aggregationResult, AggregationExtractContext context) {
+			JsonNode buckets = aggregationResult.get( "buckets" );
 
 			return doExtract( context, buckets );
 		}
 
-		protected abstract Map<A, B> doExtract(AggregationExtractContext context, JsonElement buckets);
+		protected abstract Map<A, B> doExtract(AggregationExtractContext context, JsonNode buckets);
 	}
 
 	public abstract static class AbstractBuilder<K, V>

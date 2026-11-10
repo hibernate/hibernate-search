@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
@@ -43,8 +44,6 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
-
-import com.google.gson.JsonPrimitive;
 
 class ElasticsearchStringIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<ElasticsearchStringIndexFieldTypeOptionsStep, String>
@@ -192,10 +191,10 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		mapping.setNorms( resolveNorms() );
 
 		if ( indexNullAs != null ) {
-			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
+			mapping.setNullValue( JsonScalarConversions.toNode( indexNullAs ) );
 		}
 
-		ElasticsearchStringFieldCodec codec = new ElasticsearchStringFieldCodec( buildContext.getUserFacingGson() );
+		ElasticsearchStringFieldCodec codec = new ElasticsearchStringFieldCodec( buildContext.getUserFacingCodec() );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {

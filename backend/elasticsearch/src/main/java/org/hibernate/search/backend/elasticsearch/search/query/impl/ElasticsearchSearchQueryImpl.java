@@ -7,7 +7,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonHandlerBridge;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
@@ -33,9 +34,11 @@ import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.json.JsonHandler;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, ElasticsearchSearchResult<H>>
 		implements ElasticsearchSearchQuery<H> {
@@ -46,7 +49,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?> loadingContext;
 	private final Set<String> routingKeys;
-	private final JsonObject payload;
+	private final ObjectNode payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final Integer scrollTimeout;
@@ -65,7 +68,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?> loadingContext,
 			Set<String> routingKeys,
-			JsonObject payload,
+			ObjectNode payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
 			TimeoutManager timeoutManager, Integer scrollTimeout, Long totalHitCountThreshold) {
@@ -161,10 +164,11 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public long fetchTotalHitCount() {
 		timeoutManager.start();
 
-		JsonObject filteredPayload = new JsonObject();
-		Optional<JsonObject> querySubTree = JsonAccessor.root().property( "query" ).asObject().get( payload );
+		ObjectNode filteredPayload = JsonNodeFactory.instance.objectNode();
+		Optional<ObjectNode> querySubTree =
+				JsonAccessor.root().property( "query" ).unwrapSingletonArrays().asObject().get( payload );
 		if ( querySubTree.isPresent() ) {
-			filteredPayload.add( "query", querySubTree.get() );
+			filteredPayload.set( "query", querySubTree.get() );
 		}
 
 		CountWork.Builder builder = workFactory.count();
@@ -176,7 +180,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				// soft timeout has no meaning for a count work
 				.deadline( timeoutManager.hardDeadlineOrNull() )
 				.requestTransformer(
-						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer,
+								scope.userFacingCodec().validation() )
 				);
 		NonBulkableWork<Long> work = builder.build();
 		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.blocking() ) );
@@ -196,7 +201,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public JsonObject explain(Object id) {
+	public <T> T explain(JsonHandler<T> handler, Object id) {
+		Contracts.assertNotNull( handler, "handler" );
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
@@ -205,11 +211,13 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			throw QueryLog.INSTANCE.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
-		return doExplain( mappedTypeNameToIndex.values().iterator().next(), id );
+		return JsonHandlerBridge.exportObject( handler, doExplain( mappedTypeNameToIndex.values().iterator().next(), id ),
+				"explain result", scope.userFacingCodec().validation() );
 	}
 
 	@Override
-	public JsonObject explain(String typeName, Object id) {
+	public <T> T explain(JsonHandler<T> handler, String typeName, Object id) {
+		Contracts.assertNotNull( handler, "handler" );
 		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
@@ -220,7 +228,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			throw QueryLog.INSTANCE.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
 		}
 
-		return doExplain( index, id );
+		return JsonHandlerBridge.exportObject( handler, doExplain( index, id ), "explain result",
+				scope.userFacingCodec().validation() );
 	}
 
 	private SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> searchWorkBuilder() {
@@ -233,7 +242,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.routingKeys( routingKeys )
 				.deadline( timeoutManager.deadlineOrNull(), timeoutManager.hasHardTimeout() )
 				.requestTransformer(
-						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer,
+								scope.userFacingCodec().validation() )
 				);
 		return builder;
 	}
@@ -256,11 +266,11 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 	}
 
-	private JsonObject doExplain(ElasticsearchSearchIndexContext index, Object id) {
-		JsonObject queryOnlyPayload = new JsonObject();
-		JsonElement query = payload.get( "query" );
+	private ObjectNode doExplain(ElasticsearchSearchIndexContext index, Object id) {
+		ObjectNode queryOnlyPayload = JsonNodeFactory.instance.objectNode();
+		JsonNode query = payload.get( "query" );
 		if ( query != null ) {
-			queryOnlyPayload.add( "query", query );
+			queryOnlyPayload.set( "query", query );
 		}
 
 		URLEncodedString elasticsearchId = toElasticsearchId( index, id );
@@ -269,7 +279,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		NonBulkableWork<ExplainResult> work = workFactory.explain( indexName, elasticsearchId, queryOnlyPayload )
 				.routingKeys( routingKeys )
 				.requestTransformer(
-						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer,
+								scope.userFacingCodec().validation() )
 				)
 				.build();
 

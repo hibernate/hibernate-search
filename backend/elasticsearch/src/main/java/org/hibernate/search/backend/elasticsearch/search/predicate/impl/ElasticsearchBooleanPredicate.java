@@ -7,13 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonUtils;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
@@ -23,7 +24,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	private static final String FILTER_PROPERTY_NAME = "filter";
 
 	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
-			JsonAccessor.root().property( "minimum_should_match" ).asString();
+			JsonAccessor.root().property( "minimum_should_match" ).unwrapSingletonArrays().asString();
 
 	private final List<ElasticsearchSearchPredicate> mustClauses;
 	private final List<ElasticsearchSearchPredicate> mustNotClauses;
@@ -59,8 +60,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context,
-			JsonObject outerObject, JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context,
+			ObjectNode outerObject, ObjectNode innerObject) {
 		contributeClauses( context, innerObject, MUST_PROPERTY_NAME, mustClauses );
 		contributeClauses( context, innerObject, MUST_NOT_PROPERTY_NAME, mustNotClauses );
 		contributeClauses( context, innerObject, SHOULD_PROPERTY_NAME, shouldClauses );
@@ -73,9 +74,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 
 		if ( isOnlyMustNot( innerObject ) && !super.hasNoModifiers() ) {
-			JsonObject matchAllClause = new JsonObject();
-			MATCH_ALL_ACCESSOR.set( matchAllClause, new JsonObject() );
-			GsonUtils.setOrAppendToArray( innerObject, MUST_PROPERTY_NAME, matchAllClause );
+			ObjectNode matchAllClause = JsonNodeFactory.instance.objectNode();
+			MATCH_ALL_ACCESSOR.set( matchAllClause, JsonNodeFactory.instance.objectNode() );
+			JsonUtils.setOrAppendToArray( innerObject, MUST_PROPERTY_NAME, matchAllClause );
 		}
 
 		if ( !minimumShouldMatchConstraints.isEmpty() ) {
@@ -85,19 +86,19 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			);
 		}
 
-		outerObject.add( "bool", innerObject );
+		outerObject.set( "bool", innerObject );
 
 		return outerObject;
 	}
 
-	private void contributeClauses(PredicateRequestContext context, JsonObject innerObject,
+	private void contributeClauses(PredicateRequestContext context, ObjectNode innerObject,
 			String occurProperty, List<ElasticsearchSearchPredicate> clauses) {
 		if ( clauses == null ) {
 			return;
 		}
 
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
-			GsonUtils.setOrAppendToArray( innerObject, occurProperty, clause.toJsonQuery( context ) );
+			JsonUtils.setOrAppendToArray( innerObject, occurProperty, clause.toJsonQuery( context ) );
 		}
 	}
 
@@ -110,14 +111,14 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 	}
 
-	private boolean isOnlyMustNot(JsonObject innerObject) {
+	private boolean isOnlyMustNot(ObjectNode innerObject) {
 		return innerObject.has( MUST_NOT_PROPERTY_NAME )
 				&& !innerObject.has( MUST_PROPERTY_NAME )
 				&& !innerObject.has( SHOULD_PROPERTY_NAME )
 				&& !innerObject.has( FILTER_PROPERTY_NAME );
 	}
 
-	private boolean hasAnyClauses(JsonObject innerObject) {
+	private boolean hasAnyClauses(ObjectNode innerObject) {
 		return innerObject.has( MUST_NOT_PROPERTY_NAME )
 				|| innerObject.has( MUST_PROPERTY_NAME )
 				|| innerObject.has( SHOULD_PROPERTY_NAME )

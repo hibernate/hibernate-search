@@ -9,7 +9,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.A
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 public class IndexSettingsValidator implements Validator<IndexSettings> {
 
@@ -21,7 +21,7 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 			AnalysisComponentDefinitionValidators.tokenizerDefinitionValidator();
 	private final Validator<TokenFilterDefinition> tokenFilterDefinitionValidator =
 			AnalysisComponentDefinitionValidators.tokenFilterDefinitionValidator();
-	private final Validator<JsonElement> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
+	private final Validator<JsonNode> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
 
 	@Override
 	public void validate(ValidationErrorCollector errorCollector, IndexSettings expected, IndexSettings actual) {

@@ -5,7 +5,8 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
@@ -17,7 +18,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test the property types defined on Elasticsearch server
@@ -37,22 +39,19 @@ class ElasticsearchFieldTypesIT {
 	@Test
 	void test() {
 		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
-			clientSpy.expectNext(
-					ElasticsearchRequest.get().build(),
+			clientSpy.expectNext( ElasticsearchJsonRequest.get().build(),
 					ElasticsearchRequestAssertionMode.STRICT
 			);
 		}
-		clientSpy.expectNext(
-				ElasticsearchRequest.get()
-						.multiValuedPathComponent( defaultAliases( index.name() ) )
-						.build(),
+		clientSpy.expectNext( ElasticsearchJsonRequest.get()
+				.multiValuedPathComponent( defaultAliases( index.name() ) )
+				.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		clientSpy.expectNext(
-				ElasticsearchRequest.put()
-						.pathComponent( defaultPrimaryName( index.name() ) )
-						.body( indexCreationPayload() )
-						.build(),
+		clientSpy.expectNext( ElasticsearchJsonRequest.put()
+				.pathComponent( defaultPrimaryName( index.name() ) )
+				.bodyJson( indexCreationPayload() )
+				.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
@@ -66,32 +65,30 @@ class ElasticsearchFieldTypesIT {
 		clientSpy.verifyExpectationsMet();
 	}
 
-	private JsonObject indexCreationPayload() {
-		JsonObject payload = new JsonObject();
+	private ObjectNode indexCreationPayload() {
+		ObjectNode payload = new ObjectNode( JsonNodeFactory.instance );
+		ObjectNode mappings = new ObjectNode( JsonNodeFactory.instance );
+		payload.set( "mappings", mappings );
+		ObjectNode properties = new ObjectNode( JsonNodeFactory.instance );
+		mappings.set( "properties", properties );
 
-		JsonObject mappings = new JsonObject();
-		payload.add( "mappings", mappings );
-
-		JsonObject properties = new JsonObject();
-		mappings.add( "properties", properties );
-
-		properties.add( "keyword", type( "keyword" ) );
-		properties.add( "text", type( "text" ) );
-		properties.add( "integer", type( "integer" ) );
-		properties.add( "long", type( "long" ) );
-		properties.add( "boolean", type( "boolean" ) );
-		properties.add( "byte", type( "byte" ) );
-		properties.add( "short", type( "short" ) );
-		properties.add( "float", type( "float" ) );
-		properties.add( "double", type( "double" ) );
-		properties.add( "unsupportedType", type( "half_float" ) );
+		properties.set( "keyword", type( "keyword" ) );
+		properties.set( "text", type( "text" ) );
+		properties.set( "integer", type( "integer" ) );
+		properties.set( "long", type( "long" ) );
+		properties.set( "boolean", type( "boolean" ) );
+		properties.set( "byte", type( "byte" ) );
+		properties.set( "short", type( "short" ) );
+		properties.set( "float", type( "float" ) );
+		properties.set( "double", type( "double" ) );
+		properties.set( "unsupportedType", type( "half_float" ) );
 
 		return payload;
 	}
 
-	private static JsonObject type(String type) {
-		JsonObject field = new JsonObject();
-		field.addProperty( "type", type );
+	private static ObjectNode type(String type) {
+		ObjectNode field = new ObjectNode( JsonNodeFactory.instance );
+		field.put( "type", type );
 		return field;
 	}
 
@@ -113,7 +110,7 @@ class ElasticsearchFieldTypesIT {
 			root.field(
 					"unsupportedType",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative().mapping( "{\"type\": \"half_float\"}" )
+							.asNative( JacksonJsonHandlers.value() ).mapping( "{\"type\": \"half_float\"}" )
 			)
 					.toReference();
 		}

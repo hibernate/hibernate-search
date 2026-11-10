@@ -2,7 +2,8 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonSerializable;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
@@ -10,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 /**
  * An object representing metadata of an Elasticsearch index: aliases, mapping, settings, ...
  */
+@JsonSerializable
 public class IndexMetadata {
 
 	private Map<String, IndexAliasDefinition> aliases;
@@ -44,6 +46,6 @@ public class IndexMetadata {
 
 	@Override
 	public String toString() {
-		return GsonProviderHelper.toPrettyJson( this );
+		return JsonProviderHelper.toPrettyJson( this );
 	}
 }

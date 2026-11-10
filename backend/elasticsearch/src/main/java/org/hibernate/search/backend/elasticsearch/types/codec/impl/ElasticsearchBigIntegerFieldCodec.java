@@ -5,15 +5,16 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.logging.impl.IndexingLog;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
+import org.hibernate.search.util.json.internal.spi.JsonNumbers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
 public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFieldCodec<BigInteger> {
 
@@ -22,8 +23,8 @@ public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFiel
 	private final BigDecimal minScaledValue;
 	private final BigDecimal maxScaledValue;
 
-	public ElasticsearchBigIntegerFieldCodec(Gson gson, int decimalScale) {
-		super( gson );
+	public ElasticsearchBigIntegerFieldCodec(JsonCodecService json, int decimalScale) {
+		super( json );
 		this.decimalScale = decimalScale;
 		scalingFactor = BigDecimal.TEN.pow( decimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
 		minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
@@ -38,9 +39,9 @@ public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFiel
 	}
 
 	@Override
-	public JsonElement encode(BigInteger value) {
+	public JsonNode encode(BigInteger value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			return NullNode.instance;
 		}
 
 		BigDecimal decimal = new BigDecimal( value );
@@ -48,12 +49,12 @@ public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFiel
 			throw IndexingLog.INSTANCE.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
 		}
 
-		return new JsonPrimitive( value );
+		return JsonScalarConversions.toNode( value );
 	}
 
 	@Override
-	public BigInteger decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public BigInteger decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
 
@@ -66,13 +67,14 @@ public class ElasticsearchBigIntegerFieldCodec extends AbstractElasticsearchFiel
 	}
 
 	@Override
-	public BigInteger decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
-		if ( key == null || key.isJsonNull() ) {
+	public BigInteger decodeAggregationKey(JsonNode key, JsonNode keyAsString) {
+		if ( key == null || key.isNull() ) {
 			return null;
 		}
 
 		// scaled_float aggregations format keys in double format, e.g. 1.514843E8
-		return JsonElementTypes.BIG_DECIMAL.fromElement( key ).toBigInteger();
+		return JsonNumbers
+				.truncateToBigInteger( JsonElementTypes.BIG_DECIMAL.fromElement( key ) );
 	}
 
 	@Override

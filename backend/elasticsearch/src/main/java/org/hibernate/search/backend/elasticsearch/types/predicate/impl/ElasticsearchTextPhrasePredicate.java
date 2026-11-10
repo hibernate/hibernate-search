@@ -1,7 +1,8 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -11,20 +12,27 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor MATCH_PHRASE_ACCESSOR = JsonAccessor.root().property( "match_phrase" ).asObject();
+	private static final JsonObjectAccessor MATCH_PHRASE_ACCESSOR =
+			JsonAccessor.root().property( "match_phrase" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<Integer> SLOP_ACCESSOR = JsonAccessor.root().property( "slop" ).asInteger();
-	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
-	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+	private static final JsonAccessor<Integer> SLOP_ACCESSOR =
+			JsonAccessor.root().property( "slop" ).unwrapSingletonArrays().asInteger();
+
+	private static final JsonAccessor<JsonNode> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
+
+	private static final JsonAccessor<String> ANALYZER_ACCESSOR =
+			JsonAccessor.root().property( "analyzer" ).unwrapSingletonArrays().asString();
 
 	private final Integer slop;
-	private final JsonElement phrase;
+
+	private final JsonNode phrase;
+
 	private final String analyzer;
 
 	private ElasticsearchTextPhrasePredicate(Builder builder) {
@@ -35,8 +43,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		QUERY_ACCESSOR.set( innerObject, phrase );
 		if ( slop != null ) {
 			SLOP_ACCESSOR.set( innerObject, slop );
@@ -44,16 +51,15 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 		if ( analyzer != null ) {
 			ANALYZER_ACCESSOR.set( innerObject, analyzer );
 		}
-
-		JsonObject middleObject = new JsonObject();
-		middleObject.add( absoluteFieldPath, innerObject );
-
+		ObjectNode middleObject = new ObjectNode( JsonNodeFactory.instance );
+		middleObject.set( absoluteFieldPath, innerObject );
 		MATCH_PHRASE_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
 	}
 
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<PhrasePredicateBuilder, String> {
+
 		@Override
 		public PhrasePredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
@@ -62,13 +68,16 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	}
 
 	private static class Builder extends AbstractBuilder implements PhrasePredicateBuilder {
+
 		private final ElasticsearchSearchIndexValueFieldContext<String> field;
+
 		private Integer slop;
-		private JsonElement phrase;
+
+		private JsonNode phrase;
+
 		private String analyzer;
 
-		private Builder(ElasticsearchSearchIndexScope<?> scope,
-				ElasticsearchSearchIndexValueFieldContext<String> field) {
+		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 			this.field = field;
 		}
@@ -80,7 +89,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 
 		@Override
 		public void phrase(String phrase) {
-			this.phrase = new JsonPrimitive( phrase );
+			this.phrase = JsonScalarConversions.toNode( phrase );
 		}
 
 		@Override

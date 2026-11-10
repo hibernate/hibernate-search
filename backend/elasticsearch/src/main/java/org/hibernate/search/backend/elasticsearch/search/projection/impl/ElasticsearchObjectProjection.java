@@ -2,6 +2,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
@@ -13,9 +14,8 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A projection that yields one composite value per object in a given object field.
@@ -59,7 +59,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 	}
 
 	@Override
-	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, P> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
 		if ( requiredContextAbsoluteFieldPath != null
 				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
@@ -67,7 +67,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
 		String[] extractorFieldPathComponents = innerContext.relativeCurrentFieldPathComponents();
-		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
+		JsonNode fieldPathJson = JsonScalarConversions.toNode( absoluteFieldPath );
 		AccumulatingSourceExtractor.REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, fieldPathJson );
 		Extractor<?, ?>[] innerExtractors = new Extractor[inners.length];
 		for ( int i = 0; i < inners.length; i++ ) {
@@ -98,12 +98,12 @@ public class ElasticsearchObjectProjection<E, V, P>
 		}
 
 		@Override
-		protected E extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
+		protected E extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit, JsonNode sourceElement,
 				ProjectionExtractContext context) {
-			if ( sourceElement == null || sourceElement.isJsonNull() ) {
+			if ( sourceElement == null || sourceElement.isNull() ) {
 				return null;
 			}
-			JsonObject sourceObject = sourceElement.getAsJsonObject();
+			ObjectNode sourceObject = ( (ObjectNode) sourceElement );
 			E components = compositor.createInitial();
 			for ( int i = 0; i < inners.length; i++ ) {
 				Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, sourceObject, context );
@@ -113,7 +113,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		}
 
 		@Override
-		protected boolean canDecodeArrays() {
+		protected boolean canDecodeArrays(ObjectNode hit, ProjectionExtractContext context) {
 			return false;
 		}
 

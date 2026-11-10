@@ -2,6 +2,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -16,9 +17,8 @@ import org.hibernate.search.engine.search.projection.ProjectionCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A projection on the values of an index field.
@@ -33,8 +33,9 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 	private final String[] absoluteFieldPathComponents;
 	private final String requiredContextAbsoluteFieldPath;
 
-	private final Function<JsonElement, T> decodeFunction;
+	private final Function<JsonNode, T> decodeFunction;
 	private final boolean canDecodeArrays;
+	private final ProjectionExtractionHelper<Boolean> multiValuedHelper;
 	private final ProjectionConverter<? super T, ? extends V> converter;
 	private final ProjectionCollector.Provider<V, P> collectorProvider;
 
@@ -47,7 +48,7 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 
 	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchIndexValueFieldContext<?> field,
-			Function<JsonElement, T> decodeFunction, boolean canDecodeArrays,
+			Function<JsonNode, T> decodeFunction, boolean canDecodeArrays,
 			ProjectionConverter<? super T, ? extends V> converter,
 			ProjectionCollector.Provider<V, P> collectorProvider) {
 		super( scope );
@@ -58,6 +59,9 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 				: null;
 		this.decodeFunction = decodeFunction;
 		this.canDecodeArrays = canDecodeArrays;
+		this.multiValuedHelper = canDecodeArrays && field.multiValued()
+				? scope.fieldMultiValuedExtractionHelper( absoluteFieldPath )
+				: null;
 		this.converter = converter;
 		this.collectorProvider = collectorProvider;
 	}
@@ -71,14 +75,17 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 	}
 
 	@Override
-	public ValueFieldExtractor<?> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public ValueFieldExtractor<?> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
 		if ( !context.projectionCardinalityCorrectlyAddressed( requiredContextAbsoluteFieldPath ) ) {
 			throw QueryLog.INSTANCE.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
-		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
+		JsonNode fieldPathJson = JsonScalarConversions.toNode( absoluteFieldPath );
 		AccumulatingSourceExtractor.REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, fieldPathJson );
+		if ( multiValuedHelper != null ) {
+			multiValuedHelper.request( requestBody, context );
+		}
 		return new ValueFieldExtractor<>( innerContext.relativeCurrentFieldPathComponents(), collectorProvider.get() );
 	}
 
@@ -99,14 +106,14 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 		}
 
 		@Override
-		protected T extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
+		protected T extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit, JsonNode sourceElement,
 				ProjectionExtractContext context) {
 			return decodeFunction.apply( sourceElement );
 		}
 
 		@Override
-		protected boolean canDecodeArrays() {
-			return canDecodeArrays;
+		protected boolean canDecodeArrays(ObjectNode hit, ProjectionExtractContext context) {
+			return canDecodeArrays && ( multiValuedHelper == null || !multiValuedHelper.extract( hit, context ) );
 		}
 
 		@Override
@@ -151,8 +158,8 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 			if ( ValueModel.RAW.equals( valueModel ) ) {
 				return new Builder<>( Function.identity(), codec.canDecodeArrays(), scope, field,
 						// unchecked cast to make eclipse-compiler happy
-						// we know that Elasticsearch projection converters work with the JsonElement
-						( (ProjectionConverter<JsonElement, ?>) field.type().rawProjectionConverter() )
+						// we know that Elasticsearch projection converters work with the JsonNode
+						( (ProjectionConverter<JsonNode, ?>) field.type().rawProjectionConverter() )
 								.withConvertedType( expectedType, field )
 				);
 			}
@@ -166,13 +173,13 @@ public class ElasticsearchFieldProjection<F, V, P, T> extends AbstractElasticsea
 
 	public static class Builder<F, V, T> implements FieldProjectionBuilder<V> {
 
-		private final Function<JsonElement, T> decodeFunction;
+		private final Function<JsonNode, T> decodeFunction;
 		private final boolean canDecodeArrays;
 		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ProjectionConverter<T, ? extends V> converter;
 
-		private Builder(Function<JsonElement, T> decodeFunction, boolean canDecodeArrays,
+		private Builder(Function<JsonNode, T> decodeFunction, boolean canDecodeArrays,
 				ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field, ProjectionConverter<T, ? extends V> converter) {
 			this.decodeFunction = decodeFunction;

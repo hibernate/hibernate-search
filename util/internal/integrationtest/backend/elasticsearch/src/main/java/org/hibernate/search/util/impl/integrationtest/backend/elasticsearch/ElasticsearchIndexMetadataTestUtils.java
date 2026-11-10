@@ -4,10 +4,11 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchIndexMetadataTestUtils {
 
@@ -31,85 +32,74 @@ public class ElasticsearchIndexMetadataTestUtils {
 	}
 
 	public static Set<URLEncodedString> defaultAliases(String hibernateSearchIndexName) {
-		return CollectionHelper.asImmutableSet(
-				defaultWriteAlias( hibernateSearchIndexName ),
-				defaultReadAlias( hibernateSearchIndexName )
-		);
+		return CollectionHelper.asImmutableSet( defaultWriteAlias( hibernateSearchIndexName ),
+				defaultReadAlias( hibernateSearchIndexName ) );
 	}
 
-	public static JsonObject defaultAliasDefinitions(String hibernateSearchIndexName) {
-		return aliasDefinitions(
-				defaultWriteAlias( hibernateSearchIndexName ).original,
-				defaultReadAlias( hibernateSearchIndexName ).original
-		);
+	public static ObjectNode defaultAliasDefinitions(String hibernateSearchIndexName) {
+		return aliasDefinitions( defaultWriteAlias( hibernateSearchIndexName ).original,
+				defaultReadAlias( hibernateSearchIndexName ).original );
 	}
 
-	public static JsonObject aliasDefinitions(String writeAlias, String readAlias) {
-		JsonObject aliases = new JsonObject();
-
+	public static ObjectNode aliasDefinitions(String writeAlias, String readAlias) {
+		ObjectNode aliases = new ObjectNode( JsonNodeFactory.instance );
 		if ( writeAlias != null ) {
-			aliases.add( writeAlias, writeAliasDefinition() );
+			aliases.set( writeAlias, writeAliasDefinition() );
 		}
-
 		if ( readAlias != null ) {
-			aliases.add( readAlias, readAliasDefinition() );
+			aliases.set( readAlias, readAliasDefinition() );
 		}
-
 		return aliases;
 	}
 
-	public static JsonObject writeAliasDefinition() {
+	public static ObjectNode writeAliasDefinition() {
 		return aliasDefinition( true, null );
 	}
 
-	public static JsonObject readAliasDefinition() {
+	public static ObjectNode readAliasDefinition() {
 		return aliasDefinition( false, null );
 	}
 
-	public static JsonObject aliasDefinition(boolean isWriteIndex, String otherAttributes) {
-		JsonObject result;
+	public static ObjectNode aliasDefinition(boolean isWriteIndex, String otherAttributes) {
+		ObjectNode result;
 		if ( otherAttributes == null || otherAttributes.isEmpty() ) {
-			result = new JsonObject();
+			result = new ObjectNode( JsonNodeFactory.instance );
 		}
 		else {
-			result = new Gson().fromJson( "{" + otherAttributes + "}", JsonObject.class );
+			result = JsonProviderHelper.create( false ).getCodec()
+					.decode( "{" + otherAttributes + "}", ObjectNode.class );
 		}
-
-		result.addProperty( "is_write_index", isWriteIndex );
-
+		result.put( "is_write_index", isWriteIndex );
 		return result;
 	}
 
-	public static JsonObject mappingWithoutAnyProperty() {
-		JsonObject result = new JsonObject();
-		result.addProperty( "dynamic", "strict" );
+	public static ObjectNode mappingWithoutAnyProperty() {
+		ObjectNode result = new ObjectNode( JsonNodeFactory.instance );
+		result.put( "dynamic", "strict" );
 		return result;
 	}
 
-	public static JsonObject mappingWithDiscriminatorProperty(String propertyName) {
-		JsonObject result = new JsonObject();
-		result.addProperty( "dynamic", "strict" );
-
-		JsonObject properties = new JsonObject();
-		result.add( "properties", properties );
-
-		properties.add( propertyName, discriminatorMappingComplete() );
-
+	public static ObjectNode mappingWithDiscriminatorProperty(String propertyName) {
+		ObjectNode result = new ObjectNode( JsonNodeFactory.instance );
+		result.put( "dynamic", "strict" );
+		ObjectNode properties = new ObjectNode( JsonNodeFactory.instance );
+		result.set( "properties", properties );
+		properties.set( propertyName, discriminatorMappingComplete() );
 		return result;
 	}
 
-	public static JsonObject discriminatorMappingComplete() {
-		JsonObject discriminatorMapping = new JsonObject();
-		discriminatorMapping.addProperty( "type", "keyword" );
-		discriminatorMapping.addProperty( "index", false );
-		discriminatorMapping.addProperty( "doc_values", true );
+	public static ObjectNode discriminatorMappingComplete() {
+		ObjectNode discriminatorMapping = new ObjectNode( JsonNodeFactory.instance );
+		discriminatorMapping.put( "type", "keyword" );
+		discriminatorMapping.put( "index", false );
+		discriminatorMapping.put( "doc_values", true );
 		return discriminatorMapping;
 	}
 
-	public static JsonObject discriminatorMappingOmitDefaults() {
-		JsonObject discriminatorMapping = new JsonObject();
-		discriminatorMapping.addProperty( "type", "keyword" );
-		discriminatorMapping.addProperty( "index", false );
+	public static ObjectNode discriminatorMappingOmitDefaults() {
+		ObjectNode discriminatorMapping = new ObjectNode( JsonNodeFactory.instance );
+		discriminatorMapping.put( "type", "keyword" );
+		discriminatorMapping.put( "index", false );
 		// "doc_values" has the default value: omit it.
 		return discriminatorMapping;
 	}

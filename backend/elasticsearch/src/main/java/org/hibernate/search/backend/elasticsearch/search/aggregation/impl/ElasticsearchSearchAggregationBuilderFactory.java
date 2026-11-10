@@ -1,12 +1,12 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonHandlerBridge;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.CompositeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
-
-import com.google.gson.JsonObject;
+import org.hibernate.search.util.json.JsonHandler;
 
 public class ElasticsearchSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory {
@@ -17,12 +17,14 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		this.scope = scope;
 	}
 
-	public SearchAggregationBuilder<JsonObject> fromJson(JsonObject jsonObject) {
-		return new ElasticsearchUserProvidedJsonAggregation.Builder( scope, jsonObject );
+	public <T> SearchAggregationBuilder<T> fromJson(JsonHandler<T> handler, T jsonObject) {
+		return new ElasticsearchUserProvidedJsonAggregation.Builder<>( scope,
+				JsonHandlerBridge.importObject( handler, jsonObject, "aggregation import" ), handler );
 	}
 
-	public SearchAggregationBuilder<JsonObject> fromJson(String jsonString) {
-		return fromJson( scope.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+	public <T> SearchAggregationBuilder<T> fromJson(String jsonString, JsonHandler<T> resultHandler) {
+		return new ElasticsearchUserProvidedJsonAggregation.Builder<>( scope,
+				JsonHandlerBridge.parseObject( jsonString, "aggregation import" ), resultHandler );
 	}
 
 	@Override

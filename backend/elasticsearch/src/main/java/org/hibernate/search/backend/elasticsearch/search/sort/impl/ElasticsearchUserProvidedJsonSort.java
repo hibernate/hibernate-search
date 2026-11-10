@@ -2,13 +2,13 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchUserProvidedJsonSort extends AbstractElasticsearchSort {
 
-	private final JsonObject json;
+	private final ObjectNode json;
 
-	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchIndexScope<?> scope, JsonObject json) {
+	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchIndexScope<?> scope, ObjectNode json) {
 		super( scope );
 		this.json = json;
 	}

@@ -92,7 +92,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 		return new ElasticsearchSearchResultImpl<>(
 				extractContext.getResponseBody(),
 				resultTotal, loadedHits, extractedAggregations,
-				took, timedOut, scrollId );
+				took, timedOut, scrollId, extractContext.validation() );
 	}
 
 	boolean hasHits() {

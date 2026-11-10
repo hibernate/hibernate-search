@@ -4,7 +4,7 @@ import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchSe
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchEntityCompositeProjection<E> extends AbstractElasticsearchProjection<E> {
 	private final ElasticsearchSearchProjection<E> delegate;
@@ -16,7 +16,7 @@ public class ElasticsearchEntityCompositeProjection<E> extends AbstractElasticse
 	}
 
 	@Override
-	public Extractor<?, E> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, E> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		context.checkNotNested(
 				ProjectionTypeKeys.ENTITY,
 				ElasticsearchSearchHints.INSTANCE.entityProjectionNestingNotSupportedHint()

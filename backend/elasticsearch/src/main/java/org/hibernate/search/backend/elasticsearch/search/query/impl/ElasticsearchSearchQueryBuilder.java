@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
@@ -41,15 +42,15 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.Contracts;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H>, ElasticsearchSearchSortCollector {
 
-	private static final JsonAccessor<JsonElement> REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" );
+	private static final JsonAccessor<JsonNode> REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" );
 
 	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
@@ -64,7 +65,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final Integer scrollTimeout;
 	private final Set<String> routingKeys;
 	private ElasticsearchSearchPredicate elasticsearchPredicate;
-	private JsonArray jsonSort;
+	private ArrayNode jsonSort;
 	private List<ElasticsearchSearchSort> elasticsearchSearchSorts;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
@@ -186,15 +187,15 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void collectSort(JsonElement sort) {
+	public void collectSort(JsonNode sort) {
 		if ( jsonSort == null ) {
-			jsonSort = new JsonArray();
+			jsonSort = JsonNodeFactory.instance.arrayNode();
 		}
 		this.jsonSort.add( sort );
 	}
 
 	@Override
-	public void collectDistanceSort(JsonElement sort, String absoluteFieldPath, GeoPoint center) {
+	public void collectDistanceSort(JsonNode sort, String absoluteFieldPath, GeoPoint center) {
 		collectSort( sort );
 
 		int index = jsonSort.size() - 1;
@@ -212,7 +213,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public ElasticsearchSearchQuery<H> build() {
-		JsonObject payload = new JsonObject();
+		ObjectNode payload = JsonNodeFactory.instance.objectNode();
 
 		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
@@ -221,13 +222,13 @@ public class ElasticsearchSearchQueryBuilder<H>
 				namedHighlighters, queryHighlighter, parameters
 		);
 
-		JsonArray filters = rootPredicateContext.tenantAndRoutingFilters();
+		ArrayNode filters = rootPredicateContext.tenantAndRoutingFilters();
 
-		JsonObject jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
+		ObjectNode jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
 
-		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
+		ObjectNode jsonQuery = Queries.boolFilter( jsonPredicate, filters );
 		if ( jsonQuery != null ) {
-			payload.add( "query", jsonQuery );
+			payload.set( "query", jsonQuery );
 		}
 
 		if ( elasticsearchSearchSorts != null ) {
@@ -237,7 +238,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		}
 
 		if ( jsonSort != null ) {
-			payload.add( "sort", jsonSort );
+			payload.set( "sort", jsonSort );
 		}
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
@@ -245,13 +246,13 @@ public class ElasticsearchSearchQueryBuilder<H>
 		List<ElasticsearchSearchAggregation.Extractor<?>> aggregationExtractors;
 		if ( aggregations != null ) {
 			aggregationExtractors = new ArrayList<>();
-			JsonObject jsonAggregations = new JsonObject();
+			ObjectNode jsonAggregations = JsonNodeFactory.instance.objectNode();
 
 			for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
 				aggregationExtractors.add( entry.getValue().request( requestContext, entry.getKey(), jsonAggregations ) );
 			}
 
-			payload.add( "aggregations", jsonAggregations );
+			payload.set( "aggregations", jsonAggregations );
 		}
 		else {
 			aggregationExtractors = List.of();
@@ -262,7 +263,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		}
 
 		if ( !REQUEST_SOURCE_ACCESSOR.get( payload ).isPresent() ) {
-			REQUEST_SOURCE_ACCESSOR.set( payload, new JsonPrimitive( Boolean.FALSE ) );
+			REQUEST_SOURCE_ACCESSOR.set( payload, JsonScalarConversions.toNode( Boolean.FALSE ) );
 		}
 
 		TimeoutManager timeoutManager = scope.createTimeoutManager(

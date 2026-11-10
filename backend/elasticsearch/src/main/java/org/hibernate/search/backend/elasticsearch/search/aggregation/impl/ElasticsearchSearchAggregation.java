@@ -10,19 +10,19 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface ElasticsearchSearchAggregation<A> extends SearchAggregation<A> {
 	/**
 	 * Contribute to the request, making sure that the requirements for this aggregation are met.
 	 *
 	 * @param context The request context, to access context information
-	 * or store information that will be made available later to the {@link Extractor#extract(JsonObject, AggregationExtractContext)}
+	 * or store information that will be made available later to the {@link Extractor#extract(ObjectNode, AggregationExtractContext)}
 	 * method.
 	 * @param key
 	 * @return The JSON object representing the aggregation.
 	 */
-	Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations);
+	Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, ObjectNode jsonAggregations);
 
 	Set<String> indexNames();
 
@@ -32,14 +32,14 @@ public interface ElasticsearchSearchAggregation<A> extends SearchAggregation<A> 
 		 *
 		 * @param aggregationResult The part of the response body relevant to the aggregation to extract.
 		 * @param context The extract context, to extract information from the response's JSON body
-		 * or retrieve information that was stored earlier in the {@link #request(AggregationRequestContext, AggregationKey, JsonObject)}
+		 * or retrieve information that was stored earlier in the {@link #request(AggregationRequestContext, AggregationKey, ObjectNode)}
 		 * method.
 		 * @return The aggregation result extracted from the response.
 		 */
-		T extract(JsonObject aggregationResult, AggregationExtractContext context);
+		T extract(ObjectNode aggregationResult, AggregationExtractContext context);
 
 		/**
-		 * @return The aggregation key, the one that this extractor was requested for by {@link ElasticsearchSearchAggregation#request(AggregationRequestContext, AggregationKey, JsonObject)}.
+		 * @return The aggregation key, the one that this extractor was requested for by {@link ElasticsearchSearchAggregation#request(AggregationRequestContext, AggregationKey, ObjectNode)}.
 		 */
 		AggregationKey<?> key();
 	}

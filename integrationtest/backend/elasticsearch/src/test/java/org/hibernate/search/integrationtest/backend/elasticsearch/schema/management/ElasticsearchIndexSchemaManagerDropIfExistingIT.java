@@ -38,10 +38,10 @@ class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'keyword'"
 								+ "},"
-								+ "'NOTmyField': {"
+								+ "\"NOTmyField\": {"
 								+ "  'type': 'date'"
 								+ "}"
 				)

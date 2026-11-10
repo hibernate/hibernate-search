@@ -3,14 +3,14 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonUtils;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.DisjunctionMaxPredicateBuilder;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchDisjunctionMaxPredicate extends AbstractElasticsearchPredicate {
 
@@ -40,10 +40,10 @@ class ElasticsearchDisjunctionMaxPredicate extends AbstractElasticsearchPredicat
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context,
-			JsonObject outerObject, JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context,
+			ObjectNode outerObject, ObjectNode innerObject) {
 		for ( ElasticsearchSearchPredicate disjunct : disjuncts ) {
-			GsonUtils.setOrAppendToArray( innerObject, QUERIES_PROPERTY_NAME, disjunct.toJsonQuery( context ) );
+			JsonUtils.setOrAppendToArray( innerObject, QUERIES_PROPERTY_NAME, disjunct.toJsonQuery( context ) );
 		}
 
 		if ( tieBreaker != null ) {

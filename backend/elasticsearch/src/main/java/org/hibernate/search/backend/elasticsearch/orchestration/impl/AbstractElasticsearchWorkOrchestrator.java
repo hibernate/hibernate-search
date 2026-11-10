@@ -15,6 +15,6 @@ abstract class AbstractElasticsearchWorkOrchestrator<W>
 	}
 
 	protected final ElasticsearchWorkExecutionContext createWorkExecutionContext() {
-		return new ElasticsearchWorkExecutionContextImpl( link.getClient(), link.getGsonProvider() );
+		return new ElasticsearchWorkExecutionContextImpl( link.getClient(), link.getJsonProvider() );
 	}
 }

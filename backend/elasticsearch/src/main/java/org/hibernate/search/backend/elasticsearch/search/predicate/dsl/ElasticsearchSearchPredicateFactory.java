@@ -1,7 +1,9 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.dsl;
 
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
 import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.util.json.JsonHandler;
 
 import com.google.gson.JsonObject;
 
@@ -31,6 +33,12 @@ public interface ElasticsearchSearchPredicateFactory<SR>
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">the Elasticsearch documentation</a>.
 	 * @return The final step of the predicate DSL.
 	 */
-	PredicateFinalStep fromJson(JsonObject jsonObject);
+	@Deprecated
+	default PredicateFinalStep fromJson(JsonObject jsonObject) {
+		return fromJson( GsonJsonHandlers.object(), jsonObject );
+	}
+
+	/** Import one object through an explicit JSON-library handler. Keep the input stable while Search uses it. */
+	<T> PredicateFinalStep fromJson(JsonHandler<T> handler, T jsonObject);
 
 }

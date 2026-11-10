@@ -3,11 +3,10 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchZonedDateTimeFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
-
-import com.google.gson.Gson;
 
 class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 		extends
@@ -19,8 +18,8 @@ class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<ZonedDateTime> createCodec(Gson gson, DateTimeFormatter formatter) {
-		return new ElasticsearchZonedDateTimeFieldCodec( gson, formatter );
+	protected ElasticsearchFieldCodec<ZonedDateTime> createCodec(JsonCodecService json, DateTimeFormatter formatter) {
+		return new ElasticsearchZonedDateTimeFieldCodec( json, formatter );
 	}
 
 	@Override

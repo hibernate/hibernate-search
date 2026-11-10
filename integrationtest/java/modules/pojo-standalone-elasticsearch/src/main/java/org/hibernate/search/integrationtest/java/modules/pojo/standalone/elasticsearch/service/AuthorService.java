@@ -32,14 +32,16 @@ public class AuthorService implements AutoCloseable {
 				.build();
 	}
 
-	public void add(String name) {
+	public int add(String name) {
 		try ( SearchSession session = mapping.createSessionWithOptions()
 				.indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy.sync() )
 				.build() ) {
 
-			Author author = new Author( ID_PROVIDER.getAndIncrement(), name );
+			int id = ID_PROVIDER.getAndIncrement();
+			Author author = new Author( id, name );
 			session.indexingPlan().add( author );
 			SimulatedDatastore.put( author );
+			return id;
 		}
 	}
 
@@ -50,6 +52,14 @@ public class AuthorService implements AutoCloseable {
 					.toQuery();
 
 			return query.fetchAllHits();
+		}
+	}
+
+	public <T> T source(org.hibernate.search.util.json.JsonHandler<T> handler, int id) {
+		try ( SearchSession session = mapping.createSession() ) {
+			return session.search( Author.class )
+					.extension( org.hibernate.search.backend.elasticsearch.ElasticsearchExtension.get() )
+					.select( f -> f.source( handler ) ).where( f -> f.id().matching( id ) ).fetchSingleHit().orElseThrow();
 		}
 	}
 

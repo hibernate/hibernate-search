@@ -1,30 +1,30 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
 public final class ElasticsearchShortFieldCodec extends AbstractElasticsearchFieldCodec<Short> {
 
-	public ElasticsearchShortFieldCodec(Gson gson) {
-		super( gson );
+	public ElasticsearchShortFieldCodec(JsonCodecService json) {
+		super( json );
 	}
 
 	@Override
-	public JsonElement encode(Short value) {
+	public JsonNode encode(Short value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			return NullNode.instance;
 		}
-		return new JsonPrimitive( value );
+		return JsonScalarConversions.toNode( value );
 	}
 
 	@Override
-	public Short decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public Short decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
 		return JsonElementTypes.SHORT.fromElement( element );

@@ -1,7 +1,7 @@
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -14,13 +14,16 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValueSort {
 
-	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "_geo_distance" ).asObject();
+	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR =
+			JsonAccessor.root().property( "_geo_distance" ).unwrapSingletonArrays().asObject();
 
 	private final GeoPoint center;
+
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	private ElasticsearchDistanceSort(Builder builder) {
@@ -30,21 +33,21 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	}
 
 	@Override
-	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
-		innerObject.add( absoluteFieldPath, codec.encode( center ) );
+	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, ObjectNode innerObject) {
+		innerObject.set( absoluteFieldPath, codec.encode( center ) );
 		// If there are multiple target indexes, or if the field is dynamic,
 		// some target indexes may not have this field in their mapping (yet),
 		// and in that case Elasticsearch would raise an exception.
 		// Instruct ES to behave as if the field had no value in that case.
 		searchSyntax.requestGeoDistanceSortIgnoreUnmapped( innerObject );
-
-		JsonObject outerObject = new JsonObject();
+		ObjectNode outerObject = new ObjectNode( JsonNodeFactory.instance );
 		GEO_DISTANCE_ACCESSOR.set( outerObject, innerObject );
 		collector.collectDistanceSort( outerObject, absoluteFieldPath, center );
 	}
 
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<DistanceSortBuilder, GeoPoint> {
+
 		@Override
 		public DistanceSortBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
@@ -53,9 +56,11 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	}
 
 	private static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
+
 		private GeoPoint center;
 
 		private boolean missingFirst = false;
+
 		private boolean missingLast = false;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
@@ -117,7 +122,6 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 			if ( missingLast && SortOrder.DESC.equals( order ) ) {
 				throw QueryLog.INSTANCE.missingLastOnDescSortNotSupported( field.eventContext() );
 			}
-
 			return new ElasticsearchDistanceSort( this );
 		}
 	}

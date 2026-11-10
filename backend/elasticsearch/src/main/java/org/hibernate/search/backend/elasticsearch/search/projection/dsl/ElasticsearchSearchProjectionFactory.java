@@ -1,8 +1,10 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.dsl;
 
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
 import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.TypedSearchProjectionFactory;
+import org.hibernate.search.util.json.JsonHandler;
 
 import com.google.gson.JsonObject;
 
@@ -22,7 +24,12 @@ public interface ElasticsearchSearchProjectionFactory<SR, R, E>
 	 *
 	 * @return The final step of the projection DSL.
 	 */
-	ProjectionFinalStep<JsonObject> source();
+	@Deprecated
+	default ProjectionFinalStep<JsonObject> source() {
+		return source( GsonJsonHandlers.object() );
+	}
+
+	<T> ProjectionFinalStep<T> source(JsonHandler<T> handler);
 
 	/**
 	 * Project to a {@link JsonObject} describing the score computation for the hit.
@@ -32,13 +39,23 @@ public interface ElasticsearchSearchProjectionFactory<SR, R, E>
 	 *
 	 * @return The final step of the projection DSL.
 	 */
-	ProjectionFinalStep<JsonObject> explanation();
+	@Deprecated
+	default ProjectionFinalStep<JsonObject> explanation() {
+		return explanation( GsonJsonHandlers.object() );
+	}
+
+	<T> ProjectionFinalStep<T> explanation(JsonHandler<T> handler);
 
 	/**
 	 * Project to a {@link JsonObject} representing the hit as returned by Elasticsearch.
 	 *
 	 * @return The final step of the projection DSL.
 	 */
-	ProjectionFinalStep<JsonObject> jsonHit();
+	@Deprecated
+	default ProjectionFinalStep<JsonObject> jsonHit() {
+		return jsonHit( GsonJsonHandlers.object() );
+	}
+
+	<T> ProjectionFinalStep<T> jsonHit(JsonHandler<T> handler);
 
 }

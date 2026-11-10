@@ -6,14 +6,14 @@ import java.time.Month;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import com.google.gson.Gson;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 
 public class ElasticsearchLocalTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<LocalTime> {
 
 	private static final LocalDate EPOCH_DAY = LocalDate.of( 1970, Month.JANUARY, 1 );
 
-	public ElasticsearchLocalTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
-		super( gson, delegate );
+	public ElasticsearchLocalTimeFieldCodec(JsonCodecService json, DateTimeFormatter delegate) {
+		super( json, delegate );
 	}
 
 	@Override

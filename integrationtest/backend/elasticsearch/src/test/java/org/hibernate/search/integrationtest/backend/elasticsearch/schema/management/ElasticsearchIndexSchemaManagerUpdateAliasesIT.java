@@ -51,7 +51,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 								.simpleReadAliasDefinition()
 						+ ", "
-						+ "  'somePreExistingAlias': {"
+						+ "  \"somePreExistingAlias\": {"
 						+ "  }"
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
@@ -70,7 +70,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 
 		assertJsonEquals(
 				"{"
-						+ "  'somePreExistingAlias': {"
+						+ "  \"somePreExistingAlias\": {"
 						+ "  }"
 						+ "}",
 				elasticsearchClient.indexNoAlias( index.name() ).aliases().get()
@@ -95,7 +95,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 								.simpleReadAliasDefinition()
 						+ ", "
-						+ "  'somePreExistingAlias': {"
+						+ "  \"somePreExistingAlias\": {"
 						+ "  }"
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
@@ -110,7 +110,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 		elasticsearchClient.index( index.name() ).aliases()
-				.put( defaultWriteAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
+				.put( defaultWriteAlias( index.name() ).original, "{\"filter\": {\"term\": {\"user_id\": 12}}}" );
 
 		setupAndUpdateIndex();
 
@@ -122,7 +122,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 								.simpleReadAliasDefinition()
 						+ ", "
-						+ "  'somePreExistingAlias': {}"
+						+ "  \"somePreExistingAlias\": {}"
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
@@ -149,7 +149,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 								.simpleReadAliasDefinition()
 						+ ", "
-						+ "  'somePreExistingAlias': {}"
+						+ "  \"somePreExistingAlias\": {}"
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
@@ -173,7 +173,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 								.simpleReadAliasDefinition()
 						+ ", "
-						+ "  'somePreExistingAlias': {}"
+						+ "  \"somePreExistingAlias\": {}"
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
@@ -187,7 +187,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 		elasticsearchClient.index( index.name() ).aliases()
-				.put( defaultReadAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
+				.put( defaultReadAlias( index.name() ).original, "{\"filter\": {\"term\": {\"user_id\": 12}}}" );
 
 		setupAndUpdateIndex();
 
@@ -199,7 +199,7 @@ class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 								.simpleReadAliasDefinition()
 						+ ", "
-						+ "  'somePreExistingAlias': {}"
+						+ "  \"somePreExistingAlias\": {}"
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);

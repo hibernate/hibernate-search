@@ -1,21 +1,23 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 public class ElasticsearchByteVectorFieldCodec extends AbstractElasticsearchVectorFieldCodec<byte[]> {
 
-	public ElasticsearchByteVectorFieldCodec(Gson gson, VectorSimilarity similarity, int dimension, Integer m,
+	public ElasticsearchByteVectorFieldCodec(JsonCodecService json, VectorSimilarity similarity, int dimension, Integer m,
 			Integer efConstruction, byte[] indexNullAs) {
-		super( gson, similarity, dimension, m, efConstruction, indexNullAs );
+		super( json, similarity, dimension, m, efConstruction, indexNullAs );
 	}
 
 	@Override
-	protected JsonArray toJsonArray(byte[] value) {
-		JsonArray array = new JsonArray( value.length );
+	protected ArrayNode toJsonArray(byte[] value) {
+		ArrayNode array = JsonNodeFactory.instance.arrayNode( value.length );
 		for ( byte element : value ) {
 			array.add( element );
 		}
@@ -23,11 +25,11 @@ public class ElasticsearchByteVectorFieldCodec extends AbstractElasticsearchVect
 	}
 
 	@Override
-	protected byte[] fromJsonArray(JsonArray jsonElements) {
+	protected byte[] fromJsonArray(ArrayNode jsonElements) {
 		int size = jsonElements.size();
 		byte[] result = new byte[size];
 		for ( int i = 0; i < size; i++ ) {
-			result[i] = jsonElements.get( i ).getAsByte();
+			result[i] = JsonScalarConversions.asByte( jsonElements.get( i ) );
 		}
 		return result;
 	}

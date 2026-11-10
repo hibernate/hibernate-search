@@ -13,9 +13,11 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeMappingStep;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeTypedMappingStep;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.backend.elasticsearch.types.mapping.impl.ElasticsearchVectorFieldTypeMappingContributor;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
@@ -27,27 +29,26 @@ import org.hibernate.search.engine.backend.types.dsl.VectorFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import com.google.gson.Gson;
+import org.hibernate.search.util.json.JsonHandler;
 
 public class ElasticsearchIndexFieldTypeFactoryImpl
 		implements ElasticsearchIndexFieldTypeFactory, ElasticsearchIndexFieldTypeBuildContext {
 
 	private final EventContext eventContext;
 	private final BackendMapperContext backendMapperContext;
-	private final Gson userFacingGson;
+	private final JsonCodecService userFacingCodec;
 	private final ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider;
 	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 	private final ElasticsearchVectorFieldTypeMappingContributor vectorFieldTypeMappingContributor;
 
 	public ElasticsearchIndexFieldTypeFactoryImpl(EventContext eventContext, BackendMapperContext backendMapperContext,
-			Gson userFacingGson,
+			JsonCodecService userFacingCodec,
 			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider,
 			IndexFieldTypeDefaultsProvider typeDefaultsProvider,
 			ElasticsearchVectorFieldTypeMappingContributor vectorFieldTypeMappingContributor) {
 		this.eventContext = eventContext;
 		this.backendMapperContext = backendMapperContext;
-		this.userFacingGson = userFacingGson;
+		this.userFacingCodec = userFacingCodec;
 		this.defaultFieldFormatProvider = defaultFieldFormatProvider;
 		this.typeDefaultsProvider = typeDefaultsProvider;
 		this.vectorFieldTypeMappingContributor = vectorFieldTypeMappingContributor;
@@ -254,8 +255,14 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	}
 
 	@Override
+	@Deprecated
 	public ElasticsearchNativeIndexFieldTypeMappingStep asNative() {
-		return new ElasticsearchNativeIndexFieldTypeMappingStepImpl( this );
+		return new ElasticsearchNativeIndexFieldTypeLegacyMappingStep( this );
+	}
+
+	@Override
+	public <T> ElasticsearchNativeIndexFieldTypeTypedMappingStep<T> asNative(JsonHandler<T> handler) {
+		return new ElasticsearchNativeIndexFieldTypeHandlerMappingStep<>( this, handler );
 	}
 
 	@Override
@@ -264,8 +271,8 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	}
 
 	@Override
-	public Gson getUserFacingGson() {
-		return userFacingGson;
+	public JsonCodecService getUserFacingCodec() {
+		return userFacingCodec;
 	}
 
 	@Override

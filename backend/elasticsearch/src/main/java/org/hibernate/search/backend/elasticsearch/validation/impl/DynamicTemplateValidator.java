@@ -4,11 +4,11 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Dy
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 class DynamicTemplateValidator implements Validator<DynamicTemplate> {
 
-	private final Validator<JsonElement> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
+	private final Validator<JsonNode> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
 	private final Validator<PropertyMapping> propertyMappingValidator;
 
 	public DynamicTemplateValidator(Validator<PropertyMapping> propertyMappingValidator) {

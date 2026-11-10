@@ -27,7 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test the base functionality of type name mapping strategies.
@@ -62,7 +62,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void singleIndexScope(String strategyName, JsonObject expectedMappingContent,
+	void singleIndexScope(String strategyName, ObjectNode expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, strategyName );
 		assertThatQuery(
@@ -76,7 +76,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void multiIndexScope(String strategyName, JsonObject expectedMappingContent,
+	void multiIndexScope(String strategyName, ObjectNode expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, strategyName );
 
@@ -94,7 +94,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_singleIndexScope(String strategyName,
-			JsonObject expectedMappingContent,
+			ObjectNode expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
 		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases( expectedMappingContent );
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
@@ -114,7 +114,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_multiIndexScope(String strategyName,
-			JsonObject expectedMappingContent,
+			ObjectNode expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
 		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases( expectedMappingContent );
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
@@ -140,8 +140,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void irregularIndexName_incorrectNamingScheme_singleIndexScope(String strategyName,
-			JsonObject expectedMappingContent,
+	void irregularIndexName_incorrectNamingScheme_singleIndexScope(String strategyName, ObjectNode expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
 		createIndexesWithIncorrectNamingSchemeAndCorrectAliases( expectedMappingContent );
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
@@ -160,7 +159,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void irregularIndexName_incorrectNamingScheme_multiIndexScope(String strategyName, JsonObject expectedMappingContent,
+	void irregularIndexName_incorrectNamingScheme_multiIndexScope(String strategyName, ObjectNode expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
 		createIndexesWithIncorrectNamingSchemeAndCorrectAliases( expectedMappingContent );
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
@@ -184,8 +183,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 		}
 	}
 
-	private void createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases(
-			JsonObject expectedMappingContent) {
+	private void createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases(ObjectNode expectedMappingContent) {
 		URLEncodedString index1PrimaryName = IndexNames.encodeName( index1.name() + "-000001-somesuffix-000001" );
 		URLEncodedString index1WriteAlias = defaultWriteAlias( index1.name() );
 		URLEncodedString index1ReadAlias = defaultReadAlias( index1.name() );
@@ -200,7 +198,7 @@ class ElasticsearchTypeNameMappingBaseIT {
 				.type().putMapping( expectedMappingContent );
 	}
 
-	private void createIndexesWithIncorrectNamingSchemeAndCorrectAliases(JsonObject expectedMappingContent) {
+	private void createIndexesWithIncorrectNamingSchemeAndCorrectAliases(ObjectNode expectedMappingContent) {
 		URLEncodedString index1PrimaryName = IndexNames.encodeName( index1.name() + "-somesuffix" );
 		URLEncodedString index1WriteAlias = defaultWriteAlias( index1.name() );
 		URLEncodedString index1ReadAlias = defaultReadAlias( index1.name() );
@@ -227,7 +225,8 @@ class ElasticsearchTypeNameMappingBaseIT {
 		initData();
 	}
 
-	@SuppressWarnings("unused") // For EJC and lambda arg
+	// For EJC and lambda arg
+	@SuppressWarnings("unused")
 	private void initData() {
 		BulkIndexer indexer1 = index1.bulkIndexer()
 				.add( ID_1, document -> {} )

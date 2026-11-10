@@ -3,56 +3,56 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
 public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends TemporalAccessor>
 		extends AbstractElasticsearchFieldCodec<T> {
 
 	protected final DateTimeFormatter formatter;
 
-	public AbstractElasticsearchJavaTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
-		super( gson );
+	public AbstractElasticsearchJavaTimeFieldCodec(JsonCodecService json, DateTimeFormatter delegate) {
+		super( json );
 		this.formatter = delegate;
 	}
 
 	@Override
-	public JsonElement encode(T value) {
+	public JsonNode encode(T value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			return NullNode.instance;
 		}
-		return new JsonPrimitive( nullUnsafeFormat( value ) );
+		return JsonScalarConversions.toNode( nullUnsafeFormat( value ) );
 	}
 
 	/**
 	 * A different encoding is required for provided missing Java time values. See HSEARCH-3255.
 	 *
 	 * @param value to encode
-	 * @return a {@link JsonElement} containing the long scalar value, if {@code value} is not null.
+	 * @return a {@link JsonNode} containing the long scalar value, if {@code value} is not null.
 	 */
 	@Override
-	public JsonElement encodeForMissing(T value) {
+	public JsonNode encodeForMissing(T value) {
 		if ( value == null ) {
 			return null;
 		}
 
-		return new JsonPrimitive( nullUnsafeScalar( value ) );
+		return JsonScalarConversions.toNode( nullUnsafeScalar( value ) );
 	}
 
 	@Override
-	public T decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public T decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
 		return nullUnsafeParse( JsonElementTypes.STRING.fromElement( element ) );
 	}
 
 	@Override
-	public T decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
+	public T decodeAggregationKey(JsonNode key, JsonNode keyAsString) {
 		return decode( keyAsString );
 	}
 

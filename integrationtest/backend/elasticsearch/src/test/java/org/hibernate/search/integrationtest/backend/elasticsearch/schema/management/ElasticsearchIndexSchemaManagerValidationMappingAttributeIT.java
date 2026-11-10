@@ -59,9 +59,9 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-						+ " 'properties': {"
+						+ " \"properties\": {"
 						+ defaultMetadataMappingAndCommaForInitialization()
-						+ "   'myField': {"
+						+ "   \"myField\": {"
 						+ "     'type': 'integer',"
 						+ "     'index': true"
 						+ "   }"
@@ -87,9 +87,9 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 						+ " 'dynamic': false,"
-						+ " 'properties': {"
+						+ " \"properties\": {"
 						+ defaultMetadataMappingAndCommaForInitialization()
-						+ "   'myField': {"
+						+ "   \"myField\": {"
 						+ "     'type': 'integer',"
 						+ "     'index': true"
 						+ "   }"
@@ -139,7 +139,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 						+ " 'dynamic': 'strict',"
-						+ " 'properties': {"
+						+ " \"properties\": {"
 						+ " }"
 						+ "}"
 		);
@@ -163,7 +163,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword',"
 								+ "  'index': true"
 								+ "}"
@@ -188,7 +188,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer'"
 								+ "}"
 				)
@@ -208,7 +208,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'index': true"
 								+ "}"
@@ -229,7 +229,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'index': false"
 								+ "}"
@@ -255,7 +255,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'index': false"
 								+ "}"
@@ -277,7 +277,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'keyword',"
 								+ "  'index': false"
@@ -300,7 +300,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'date'"
 								+ "}"
 				)
@@ -330,7 +330,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'date',"
 								+ "  'format': '" + allFormats + "'"
 								+ "}"
@@ -352,7 +352,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'date',"
 								+ "  'format': '" + allFormats + "||yyyy" + "'"
 								+ "}"
@@ -380,7 +380,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'date',"
 								+ "  'format': 'epoch_millis||strict_date_time'"
 								+ "}"
@@ -409,7 +409,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true"
 								+ "}"
@@ -434,7 +434,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword'"
@@ -455,7 +455,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword'"
@@ -482,7 +482,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword'"
@@ -509,7 +509,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword',"
@@ -532,7 +532,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword',"
@@ -562,7 +562,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword',"
@@ -586,7 +586,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'keyword',"
@@ -613,7 +613,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'norms': false"
 								+ "}"
@@ -633,7 +633,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'norms': false"
 								+ "}"
@@ -659,7 +659,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text'"
 								+ "}"
 				)
@@ -678,7 +678,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword'"
 								+ "}"
 				)
@@ -700,7 +700,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'english',"
 								+ "  'term_vector': 'with_positions_offsets'"
@@ -722,7 +722,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'english'"
 								+ "}"
@@ -743,7 +743,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'english',"
 								+ "  'term_vector': 'with_offsets'"
@@ -769,7 +769,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'null_value': 739"
 								+ "}"
@@ -789,7 +789,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer'"
 								+ "}"
 				)
@@ -813,7 +813,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'null_value': 777"
 								+ "}"
@@ -838,7 +838,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'doc_values': true"
 								+ "}"
@@ -858,7 +858,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer'"
 								+ "}"
 				)
@@ -877,7 +877,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'doc_values': false"
 								+ "}"
@@ -903,7 +903,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'integer',"
 								+ "  'doc_values': false"
 								+ "}"
@@ -924,7 +924,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': true"
 								+ "}"
@@ -944,7 +944,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'scaled_float',"
 								+ "  'scaling_factor': 100"
 								+ "}"
@@ -964,7 +964,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'scaled_float',"
 								+ "  'scaling_factor': 2"
 								+ "}"
@@ -989,7 +989,7 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword',"
 								+ "  'index': true"
 								+ "}"
@@ -1014,29 +1014,29 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
-						+ " 'normalizer': {"
-						+ "   'custom-normalizer': {"
-						+ "     'char_filter': ['custom-char-mapping'],"
-						+ "     'filter': ['custom-elision']"
+						+ " \"normalizer\": {"
+						+ "   \"custom-normalizer\": {"
+						+ "     \"char_filter\": [\"custom-char-mapping\"],"
+						+ "     \"filter\": [\"custom-elision\"]"
 						+ "   }"
 						+ " },"
-						+ " 'char_filter': {"
-						+ "   'custom-char-mapping': {"
+						+ " \"char_filter\": {"
+						+ "   \"custom-char-mapping\": {"
 						+ "     'type': 'mapping',"
-						+ "     'mappings': ['foo => bar']"
+						+ "     \"mappings\": [\"foo => bar\"]"
 						+ "   }"
 						+ " },"
-						+ " 'filter': {"
-						+ "   'custom-elision': {"
+						+ " \"filter\": {"
+						+ "   \"custom-elision\": {"
 						+ "     'type': 'elision',"
-						+ "     'articles': ['l', 'd']"
+						+ "     \"articles\": [\"l\", \"d\"]"
 						+ "   }"
 						+ " }"
 						+ "}"
 		);
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword',"
 								+ "  'index': true,"
 								+ "  'normalizer': 'custom-normalizer'"
@@ -1057,29 +1057,29 @@ class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
-						+ " 'normalizer': {"
-						+ "   'custom-normalizer': {"
-						+ "     'char_filter': ['custom-char-mapping'],"
-						+ "     'filter': ['custom-elision']"
+						+ " \"normalizer\": {"
+						+ "   \"custom-normalizer\": {"
+						+ "     \"char_filter\": [\"custom-char-mapping\"],"
+						+ "     \"filter\": [\"custom-elision\"]"
 						+ "   }"
 						+ " },"
-						+ " 'char_filter': {"
-						+ "   'custom-char-mapping': {"
+						+ " \"char_filter\": {"
+						+ "   \"custom-char-mapping\": {"
 						+ "     'type': 'mapping',"
-						+ "     'mappings': ['foo => bar']"
+						+ "     \"mappings\": [\"foo => bar\"]"
 						+ "   }"
 						+ " },"
-						+ " 'filter': {"
-						+ "   'custom-elision': {"
+						+ " \"filter\": {"
+						+ "   \"custom-elision\": {"
 						+ "     'type': 'elision',"
-						+ "     'articles': ['l', 'd']"
+						+ "     \"articles\": [\"l\", \"d\"]"
 						+ "   }"
 						+ " }"
 						+ " }"
 		);
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword',"
 								+ "  'index': true,"
 								+ "  'normalizer': 'custom-normalizer'"

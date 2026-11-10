@@ -16,7 +16,7 @@ public final class SearchProjectionBackendContext {
 		this.idProjectionExtractionHelper = idProjectionExtractionHelper;
 	}
 
-	ProjectionExtractionHelper<String> createMappedTypeNameExtractionHelper(ElasticsearchSearchIndexScope<?> scope) {
+	public ProjectionExtractionHelper<String> createMappedTypeNameExtractionHelper(ElasticsearchSearchIndexScope<?> scope) {
 		Set<String> mappedTypeNames = scope.mappedTypeNameToIndex().keySet();
 		if ( mappedTypeNames.size() == 1 ) {
 			// Only one type targeted by the search: use a simpler implementation that will always work.

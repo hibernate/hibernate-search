@@ -1,43 +1,44 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public final class ElasticsearchGeoPointFieldCodec extends AbstractElasticsearchFieldCodec<GeoPoint> {
 
 	private static final JsonAccessor<Double> LATITUDE_ACCESSOR =
-			JsonAccessor.root().property( "lat" ).asDouble();
+			JsonAccessor.root().property( "lat" ).unwrapSingletonArrays().asDouble();
 	private static final JsonAccessor<Double> LONGITUDE_ACCESSOR =
-			JsonAccessor.root().property( "lon" ).asDouble();
+			JsonAccessor.root().property( "lon" ).unwrapSingletonArrays().asDouble();
 
-	public ElasticsearchGeoPointFieldCodec(Gson gson) {
-		super( gson );
+	public ElasticsearchGeoPointFieldCodec(JsonCodecService json) {
+		super( json );
 	}
 
 	@Override
-	public JsonElement encode(GeoPoint value) {
+	public JsonNode encode(GeoPoint value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			return NullNode.instance;
 		}
-		JsonObject result = new JsonObject();
+		ObjectNode result = JsonNodeFactory.instance.objectNode();
 		LATITUDE_ACCESSOR.set( result, value.latitude() );
 		LONGITUDE_ACCESSOR.set( result, value.longitude() );
 		return result;
 	}
 
 	@Override
-	public GeoPoint decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public GeoPoint decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
-		JsonObject object = JsonElementTypes.OBJECT.fromElement( element );
+		ObjectNode object = JsonElementTypes.OBJECT.fromElement( element );
 		double latitude =
 				LATITUDE_ACCESSOR.get( object )
 						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );

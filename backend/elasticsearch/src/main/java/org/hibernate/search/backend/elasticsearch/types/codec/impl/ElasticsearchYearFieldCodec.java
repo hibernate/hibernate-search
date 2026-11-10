@@ -4,12 +4,12 @@ import java.time.Year;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import com.google.gson.Gson;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 
 public class ElasticsearchYearFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<Year> {
 
-	public ElasticsearchYearFieldCodec(Gson gson, DateTimeFormatter delegate) {
-		super( gson, delegate );
+	public ElasticsearchYearFieldCodec(JsonCodecService json, DateTimeFormatter delegate) {
+		super( json, delegate );
 	}
 
 	@Override

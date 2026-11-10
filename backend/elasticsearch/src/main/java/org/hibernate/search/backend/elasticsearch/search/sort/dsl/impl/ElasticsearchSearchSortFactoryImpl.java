@@ -8,8 +8,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
-
-import com.google.gson.JsonObject;
+import org.hibernate.search.util.json.JsonHandler;
 
 public class ElasticsearchSearchSortFactoryImpl<SR>
 		extends AbstractSearchSortFactory<
@@ -34,8 +33,8 @@ public class ElasticsearchSearchSortFactoryImpl<SR>
 	}
 
 	@Override
-	public SortThenStep<SR> fromJson(JsonObject jsonObject) {
-		return staticThenStep( dslContext.scope().sortBuilders().fromJson( jsonObject ) );
+	public <T> SortThenStep<SR> fromJson(JsonHandler<T> handler, T jsonObject) {
+		return staticThenStep( dslContext.scope().sortBuilders().fromJson( handler, jsonObject ) );
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
@@ -13,20 +13,28 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicate {
 
-	private static final JsonAccessor<Integer> FUZZINESS_ACCESSOR = JsonAccessor.root().property( "fuzziness" ).asInteger();
+	private static final JsonAccessor<Integer> FUZZINESS_ACCESSOR =
+			JsonAccessor.root().property( "fuzziness" ).unwrapSingletonArrays().asInteger();
+
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR =
-			JsonAccessor.root().property( "prefix_length" ).asInteger();
-	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
-	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR = JsonAccessor.root()
-			.property( "minimum_should_match" ).asString();
+			JsonAccessor.root().property( "prefix_length" ).unwrapSingletonArrays().asInteger();
+
+	private static final JsonAccessor<String> ANALYZER_ACCESSOR =
+			JsonAccessor.root().property( "analyzer" ).unwrapSingletonArrays().asString();
+
+	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
+			JsonAccessor.root().property( "minimum_should_match" ).unwrapSingletonArrays().asString();
 
 	private final Integer fuzziness;
+
 	private final Integer prefixLength;
+
 	private final String analyzer;
+
 	private final ElasticsearchCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 	private ElasticsearchTextMatchPredicate(Builder builder) {
@@ -39,8 +47,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		if ( fuzziness != null ) {
 			FUZZINESS_ACCESSOR.set( innerObject, fuzziness );
 		}
@@ -51,16 +58,15 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 			PREFIX_LENGTH_ACCESSOR.set( innerObject, prefixLength );
 		}
 		if ( !minimumShouldMatchConstraints.isEmpty() ) {
-			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
-					innerObject,
-					minimumShouldMatchConstraints.formatMinimumShouldMatchConstraints()
-			);
+			MINIMUM_SHOULD_MATCH_ACCESSOR.set( innerObject,
+					minimumShouldMatchConstraints.formatMinimumShouldMatchConstraints() );
 		}
 		return super.doToJsonQuery( context, outerObject, innerObject );
 	}
 
 	public static class Factory
 			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<MatchPredicateBuilder, String> {
+
 		public Factory(ElasticsearchFieldCodec<String> codec) {
 			super( codec );
 		}
@@ -73,9 +79,13 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 	}
 
 	private static class Builder extends ElasticsearchStandardMatchPredicate.Builder<String> {
+
 		private Integer fuzziness;
+
 		private Integer prefixLength;
+
 		private String analyzer;
+
 		private ElasticsearchCommonMinimumShouldMatchConstraints minimumShouldMatchConstraints;
 
 		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope<?> scope,
@@ -101,7 +111,6 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 				throw AnalysisLog.INSTANCE.skipAnalysisOnNormalizedField( absoluteFieldPath,
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 			}
-
 			analyzer( AnalyzerConstants.KEYWORD_ANALYZER );
 		}
 
@@ -122,7 +131,6 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 				field.type().searchAnalyzerName();
 				field.type().normalizerName();
 			}
-
 			return new ElasticsearchTextMatchPredicate( this );
 		}
 	}

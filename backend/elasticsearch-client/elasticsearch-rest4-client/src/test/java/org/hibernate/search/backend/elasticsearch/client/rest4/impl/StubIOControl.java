@@ -22,7 +22,7 @@ public final class StubIOControl implements IOControl {
 
 	@Override
 	public void requestOutput() {
-		throw unsupported();
+		// Nothing to do: synchronous callers explicitly resume output.
 	}
 
 	@Override

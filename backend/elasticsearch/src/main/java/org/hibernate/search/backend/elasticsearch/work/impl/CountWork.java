@@ -4,34 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.engine.common.timing.Deadline;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class CountWork extends AbstractNonBulkableWork<Long> {
 
-	private static final JsonAccessor<Long> COUNT_ACCESSOR = JsonAccessor.root().property( "count" ).asLong();
+	private static final JsonAccessor<Long> COUNT_ACCESSOR =
+			JsonAccessor.root().property( "count" ).unwrapSingletonArrays().asLong();
 
 	protected CountWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Long generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject body = response.body();
+	protected Long generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
+		ObjectNode body = response.bodyJson();
 		return COUNT_ACCESSOR.get( body ).get();
 	}
 
 	public static class Builder extends AbstractBuilder<Builder> {
 
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
-		private JsonObject query;
+
+		private ObjectNode query;
+
 		private Set<String> routingKeys;
+
 		private Deadline deadline;
 
 		public Builder() {
@@ -43,7 +47,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 			return this;
 		}
 
-		public Builder query(JsonObject query) {
+		public Builder query(ObjectNode query) {
 			this.query = query;
 			return this;
 		}
@@ -59,25 +63,18 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.get()
-							.multiValuedPathComponent( indexNames );
-
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.get().multiValuedPathComponent( indexNames );
 			builder.pathComponent( Paths._COUNT );
-
 			if ( query != null ) {
-				builder.body( query );
+				builder.bodyJsonFromInternal( query );
 			}
-
 			if ( !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
-
 			if ( deadline != null ) {
 				builder.deadline( deadline );
 			}
-
 			return builder.build();
 		}
 

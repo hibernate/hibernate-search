@@ -1,9 +1,8 @@
 package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface ExplainResult {
 
-	JsonObject getJsonObject();
-
+	ObjectNode getJsonObject();
 }

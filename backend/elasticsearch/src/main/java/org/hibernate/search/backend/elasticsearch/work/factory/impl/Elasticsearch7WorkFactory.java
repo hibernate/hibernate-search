@@ -3,7 +3,7 @@ package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
@@ -34,34 +34,34 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWork;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A work builder factory for ES7.0+.
  */
 public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 
-	protected final GsonProvider gsonProvider;
+	protected final JsonProvider jsonProvider;
+
 	private final Boolean ignoreShardFailures;
 
-	public Elasticsearch7WorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
-		this.gsonProvider = gsonProvider;
+	public Elasticsearch7WorkFactory(JsonProvider jsonProvider, Boolean ignoreShardFailures) {
+		this.jsonProvider = jsonProvider;
 		this.ignoreShardFailures = ignoreShardFailures;
 	}
 
 	@Override
-	public IndexWork.Builder index(String entityTypeName, Object entityIdentifier,
-			URLEncodedString elasticsearchIndexName,
-			String documentIdentifier, String routingKey, JsonObject document) {
-		return IndexWork.Builder.create( entityTypeName, entityIdentifier,
-				elasticsearchIndexName, documentIdentifier, routingKey, document );
+	public IndexWork.Builder index(String entityTypeName, Object entityIdentifier, URLEncodedString elasticsearchIndexName,
+			String documentIdentifier, String routingKey, ObjectNode document) {
+		return IndexWork.Builder.create( entityTypeName, entityIdentifier, elasticsearchIndexName, documentIdentifier,
+				routingKey, document );
 	}
 
 	@Override
-	public DeleteWork.Builder delete(String entityTypeName, Object entityIdentifier,
-			URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey) {
-		return DeleteWork.Builder.create( entityTypeName, entityIdentifier,
-				elasticsearchIndexName, documentIdentifier, routingKey );
+	public DeleteWork.Builder delete(String entityTypeName, Object entityIdentifier, URLEncodedString elasticsearchIndexName,
+			String documentIdentifier, String routingKey) {
+		return DeleteWork.Builder.create( entityTypeName, entityIdentifier, elasticsearchIndexName, documentIdentifier,
+				routingKey );
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
+	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, ObjectNode payload) {
 		return new DeleteByQueryWork.Builder( indexName, payload, this );
 	}
 
@@ -110,7 +110,7 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public <T> SearchWork.Builder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+	public <T> SearchWork.Builder<T> search(ObjectNode payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		SearchWork.Builder<T> builder = SearchWork.Builder.create( payload, searchResultExtractor );
 		if ( ignoreShardFailures ) {
 			builder.ignoreShardFailures();
@@ -124,7 +124,7 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ExplainWork.Builder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
+	public ExplainWork.Builder explain(URLEncodedString indexName, URLEncodedString id, ObjectNode payload) {
 		return ExplainWork.Builder.create( indexName, id, payload );
 	}
 
@@ -141,7 +141,7 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public CreateIndexWork.Builder createIndex(URLEncodedString indexName) {
-		return CreateIndexWork.Builder.create( gsonProvider, indexName );
+		return CreateIndexWork.Builder.create( jsonProvider, indexName );
 	}
 
 	@Override
@@ -166,12 +166,12 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public PutIndexSettingsWork.Builder putIndexSettings(URLEncodedString indexName, IndexSettings settings) {
-		return new PutIndexSettingsWork.Builder( gsonProvider, indexName, settings );
+		return new PutIndexSettingsWork.Builder( jsonProvider, indexName, settings );
 	}
 
 	@Override
 	public PutIndexMappingWork.Builder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
-		return PutIndexMappingWork.Builder.create( gsonProvider, indexName, mapping );
+		return PutIndexMappingWork.Builder.create( jsonProvider, indexName, mapping );
 	}
 
 	@Override
@@ -186,9 +186,8 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public PutIndexAliasesWork.Builder putIndexAliases(URLEncodedString indexName,
-			Map<String, IndexAliasDefinition> aliases) {
-		return new PutIndexAliasesWork.Builder( gsonProvider, indexName, aliases );
+	public PutIndexAliasesWork.Builder putIndexAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
+		return new PutIndexAliasesWork.Builder( jsonProvider, indexName, aliases );
 	}
 
 	@Override

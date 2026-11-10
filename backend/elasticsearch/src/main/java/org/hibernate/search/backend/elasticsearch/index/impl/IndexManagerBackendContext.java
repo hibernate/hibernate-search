@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
@@ -47,8 +48,6 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.Gson;
-
 public class IndexManagerBackendContext implements SearchBackendContext, WorkExecutionBackendContext {
 
 	private static final OptionalConfigurationProperty<IndexStatus> LIFECYCLE_MINIMAL_REQUIRED_STATUS =
@@ -66,7 +65,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final EventContext eventContext;
 	private final BackendThreads threads;
 	private final ElasticsearchLink link;
-	private final Gson userFacingGson;
+	private final JsonCodecService userFacingCodec;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final FailureHandler failureHandler;
 	private final TimingSource timingSource;
@@ -75,7 +74,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	public IndexManagerBackendContext(ElasticsearchBackend backendAPI,
 			EventContext eventContext,
-			BackendThreads threads, ElasticsearchLink link, Gson userFacingGson,
+			BackendThreads threads, ElasticsearchLink link, JsonCodecService userFacingCodec,
 			MultiTenancyStrategy multiTenancyStrategy,
 			FailureHandler failureHandler,
 			TimingSource timingSource,
@@ -85,7 +84,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.eventContext = eventContext;
 		this.threads = threads;
 		this.link = link;
-		this.userFacingGson = userFacingGson;
+		this.userFacingCodec = userFacingCodec;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.failureHandler = failureHandler;
 		this.timingSource = timingSource;
@@ -149,7 +148,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				mappingContext,
 				rootScopeType,
 				this,
-				userFacingGson, link.getSearchSyntax(),
+				userFacingCodec, link.getSearchSyntax(),
 				multiTenancyStrategy,
 				timingSource,
 				indexModels
@@ -182,7 +181,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	ElasticsearchIndexSchemaManager createSchemaManager(ElasticsearchIndexModel model,
 			ConfigurationPropertySource indexPropertySource) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
-				link.getGsonProvider(),
+				link.getJsonProvider(),
 				link.getIndexMetadataSyntax(),
 				model.names()
 		);
@@ -210,7 +209,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 		return new ElasticsearchIndexSchemaManager(
 				backendAPI.name(),
-				userFacingGson,
+				userFacingCodec,
 				link.getWorkFactory(), generalPurposeOrchestrator,
 				link.getIndexLayoutStrategy(), model.names(), expectedMetadata,
 				executionOptions,

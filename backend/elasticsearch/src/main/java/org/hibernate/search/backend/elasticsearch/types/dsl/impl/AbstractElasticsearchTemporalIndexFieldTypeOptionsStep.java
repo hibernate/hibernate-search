@@ -3,6 +3,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchCountValuesAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchMetricFieldAggregation;
@@ -24,8 +25,6 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
-import com.google.gson.Gson;
-
 abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 		S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<?, F>,
 		F extends TemporalAccessor>
@@ -46,7 +45,7 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 
 		DateTimeFormatter formatter = defaultFieldFormatProvider.getDefaultDateTimeFormatter( builder.valueClass() );
 
-		ElasticsearchFieldCodec<F> codec = createCodec( buildContext.getUserFacingGson(), formatter );
+		ElasticsearchFieldCodec<F> codec = createCodec( buildContext.getUserFacingCodec(), formatter );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {
@@ -88,7 +87,7 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 		}
 	}
 
-	protected abstract ElasticsearchFieldCodec<F> createCodec(Gson gson, DateTimeFormatter formatter);
+	protected abstract ElasticsearchFieldCodec<F> createCodec(JsonCodecService json, DateTimeFormatter formatter);
 
 	protected boolean sumAggregationSupported() {
 		return true;

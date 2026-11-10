@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.util.common.SearchException;
 
@@ -43,7 +43,7 @@ class NodeProviderTest {
 	@ParameterizedTest
 	@ValueSource(strings = { "a/b", "a%b", "café", "a?#&=b" })
 	void encodedDocumentId(String id) {
-		ElasticsearchRequest request = ElasticsearchRequest.get()
+		ElasticsearchJsonRequest request = ElasticsearchJsonRequest.get()
 				.pathComponent( URLEncodedString.fromString( "index" ) )
 				.pathComponent( URLEncodedString.fromString( "_doc" ) )
 				.pathComponent( URLEncodedString.fromString( id ) ).build();
@@ -58,7 +58,7 @@ class NodeProviderTest {
 
 	@Test
 	void queryParametersEncodedOnce() {
-		ElasticsearchRequest request = ElasticsearchRequest.get().wholeEncodedPath( "/_search" )
+		ElasticsearchJsonRequest request = ElasticsearchJsonRequest.get().wholeEncodedPath( "/_search" )
 				.param( "routing", "a/b%?#&=+ café" )
 				.multiValuedParam( "fields", List.of( "first", "second" ) )
 				.param( "key&=", "value" ).build();

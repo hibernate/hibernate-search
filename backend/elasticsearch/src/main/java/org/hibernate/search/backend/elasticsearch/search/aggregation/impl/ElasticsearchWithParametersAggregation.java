@@ -9,7 +9,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.spi.WithParametersAggregationBuilder;
 import org.hibernate.search.engine.search.common.NamedValues;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchWithParametersAggregation<A> extends AbstractElasticsearchAggregation<A> {
 	private final ElasticsearchSearchIndexScope<?> scope;
@@ -21,7 +21,7 @@ public class ElasticsearchWithParametersAggregation<A> extends AbstractElasticse
 		aggregationCreator = builder.aggregationCreator;
 	}
 
-	public Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
+	public Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, ObjectNode jsonAggregations) {
 		SearchAggregation<A> aggregation =
 				aggregationCreator.apply( context.getRootPredicateContext().queryParameters() ).toAggregation();
 		return ElasticsearchSearchAggregation.from( scope, aggregation )

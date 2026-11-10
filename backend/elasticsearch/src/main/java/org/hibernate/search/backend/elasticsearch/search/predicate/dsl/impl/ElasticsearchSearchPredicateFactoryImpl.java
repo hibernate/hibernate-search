@@ -8,8 +8,7 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinalStep;
-
-import com.google.gson.JsonObject;
+import org.hibernate.search.util.json.JsonHandler;
 
 public class ElasticsearchSearchPredicateFactoryImpl<SR>
 		extends AbstractSearchPredicateFactory<
@@ -55,7 +54,7 @@ public class ElasticsearchSearchPredicateFactoryImpl<SR>
 	}
 
 	@Override
-	public PredicateFinalStep fromJson(JsonObject jsonObject) {
-		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( jsonObject ) );
+	public <T> PredicateFinalStep fromJson(JsonHandler<T> handler, T jsonObject) {
+		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( handler, jsonObject ) );
 	}
 }

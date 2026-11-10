@@ -1,11 +1,10 @@
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.OpenSearch2IndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
 import org.hibernate.search.backend.elasticsearch.validation.impl.OpenSearch2PropertyMappingValidatorProvider;
-
-import com.google.gson.Gson;
 
 /**
  * The model dialect for OpenSearch 2.x.
@@ -13,8 +12,8 @@ import com.google.gson.Gson;
 public class OpenSearch29ModelDialect implements ElasticsearchModelDialect {
 
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson) {
-		return new OpenSearch2IndexFieldTypeFactoryProvider( userFacingGson );
+	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(JsonCodecService userFacingCodec) {
+		return new OpenSearch2IndexFieldTypeFactoryProvider( userFacingCodec );
 	}
 
 	@Override

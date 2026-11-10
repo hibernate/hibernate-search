@@ -12,19 +12,19 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClient;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.google.gson.JsonObject;
-
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
@@ -47,7 +47,7 @@ class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 	}
 
 	@Mock
-	private ElasticsearchClient clientMock;
+	private ElasticsearchJsonClient clientMock;
 
 
 	@ParameterizedTest(name = "{0} - {1}")
@@ -110,22 +110,22 @@ class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 		// This should only happen on Amazon OpenSearch Service,
 		// which doesn't allow retrieving the version.
 		when( clientMock.submit( any() ) )
-				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
+				.thenReturn( CompletableFuture.completedFuture( ElasticsearchJsonResponse.withJsonBody(
 						"mockHost:9200", 404, "", null ) ) );
 		ElasticsearchVersion version = ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock );
 		assertThat( version ).isNull();
 	}
 
 	private void doMock(String theDistributionString, String theVersionString) {
-		JsonObject versionObject = new JsonObject();
+		ObjectNode versionObject = JsonNodeFactory.instance.objectNode();
 		if ( theDistributionString != null ) {
-			versionObject.addProperty( "distribution", theDistributionString );
+			versionObject.put( "distribution", theDistributionString );
 		}
-		versionObject.addProperty( "number", theVersionString );
-		JsonObject responseBody = new JsonObject();
-		responseBody.add( "version", versionObject );
+		versionObject.put( "number", theVersionString );
+		ObjectNode responseBody = JsonNodeFactory.instance.objectNode();
+		responseBody.set( "version", versionObject );
 		when( clientMock.submit( any() ) )
-				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
+				.thenReturn( CompletableFuture.completedFuture( ElasticsearchJsonResponse.withJsonBody(
 						"mockHost:9200", 200, "", responseBody ) ) );
 	}
 }

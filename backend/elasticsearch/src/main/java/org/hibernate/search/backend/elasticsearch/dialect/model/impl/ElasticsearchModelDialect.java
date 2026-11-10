@@ -1,9 +1,8 @@
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
-
-import com.google.gson.Gson;
 
 /**
  * An entry point to all operations that may be implemented differently depending
@@ -22,7 +21,7 @@ import com.google.gson.Gson;
  */
 public interface ElasticsearchModelDialect {
 
-	ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson);
+	ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(JsonCodecService userFacingCodec);
 
 	ElasticsearchPropertyMappingValidatorProvider createElasticsearchPropertyMappingValidatorProvider();
 

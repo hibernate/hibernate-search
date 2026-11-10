@@ -20,9 +20,10 @@ import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilde
 import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @param <F> The type of field values.
@@ -35,11 +36,11 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	private final String absoluteFieldPath;
 
 	private final ProjectionConverter<T, ? extends K> fromFieldValueConverter;
-	private final BiFunction<JsonElement, JsonElement, T> decodeFunction;
+	private final BiFunction<JsonNode, JsonNode, T> decodeFunction;
 
 	private final ElasticsearchSearchAggregation<V> aggregation;
 
-	private final JsonObject order;
+	private final ObjectNode order;
 	private final int size;
 	private final int minDocCount;
 
@@ -55,15 +56,15 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
-		JsonObject termsDefinition = new JsonObject();
-		outerObject.add( "terms", termsDefinition );
-		termsDefinition.addProperty( "field", absoluteFieldPath );
+	protected void doRequest(ObjectNode outerObject, ObjectNode innerObject, AggregationRequestBuildingContextContext context) {
+		ObjectNode termsDefinition = JsonNodeFactory.instance.objectNode();
+		outerObject.set( "terms", termsDefinition );
+		termsDefinition.put( "field", absoluteFieldPath );
 		if ( order != null ) {
-			termsDefinition.add( "order", order );
+			termsDefinition.set( "order", order );
 		}
-		termsDefinition.addProperty( "size", size );
-		termsDefinition.addProperty( "min_doc_count", minDocCount );
+		termsDefinition.put( "size", size );
+		termsDefinition.put( "min_doc_count", minDocCount );
 
 		context.add( buildingContextKey( INNER_EXTRACTOR ),
 				aggregation.request( context, compositeKeyFor( isNested() ), innerObject ) );
@@ -107,10 +108,10 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 			if ( ValueModel.RAW.equals( valueModel ) ) {
 				return new CountBuilder<>(
 						scope, field,
-						(key, string) -> string != null && !string.isJsonNull() ? string : key,
+						(key, string) -> string != null && !string.isNull() ? string : key,
 						// unchecked cast to make eclipse-compiler happy
 						// we know that Elasticsearch projection converters work with the String
-						( (ProjectionConverter<JsonElement, ?>) field.type().rawProjectionConverter() )
+						( (ProjectionConverter<JsonNode, ?>) field.type().rawProjectionConverter() )
 								.withConvertedType( expectedType, field )
 				);
 			}
@@ -131,14 +132,14 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 		}
 
 		@Override
-		protected Map<K, V> doExtract(AggregationExtractContext context, JsonElement buckets) {
-			JsonArray bucketArray = buckets.getAsJsonArray();
+		protected Map<K, V> doExtract(AggregationExtractContext context, JsonNode buckets) {
+			ArrayNode bucketArray = ( (ArrayNode) buckets );
 			Map<K, V> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-			for ( JsonElement bucketElement : bucketArray ) {
-				JsonObject bucket = bucketElement.getAsJsonObject();
-				JsonElement keyJson = bucket.get( "key" );
-				JsonElement keyAsStringJson = bucket.get( "key_as_string" );
+			for ( JsonNode bucketElement : bucketArray ) {
+				ObjectNode bucket = ( (ObjectNode) bucketElement );
+				JsonNode keyJson = bucket.get( "key" );
+				JsonNode keyAsStringJson = bucket.get( "key_as_string" );
 				K key = fromFieldValueConverter.fromDocumentValue(
 						decodeFunction.apply( keyJson, keyAsStringJson ),
 						convertContext
@@ -153,7 +154,7 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 
 		protected CountBuilder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
-				BiFunction<JsonElement, JsonElement, T> decodeFunction,
+				BiFunction<JsonNode, JsonNode, T> decodeFunction,
 				ProjectionConverter<T, ? extends K> fromFieldValueConverter) {
 			super( scope, field, decodeFunction, fromFieldValueConverter,
 					ElasticsearchSearchAggregation.from( scope,
@@ -164,27 +165,27 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 	private static class Builder<F, K, T, V> extends AbstractBuilder<K, V>
 			implements TermsAggregationBuilder<K, V> {
 
-		private final BiFunction<JsonElement, JsonElement, T> decodeFunction;
+		private final BiFunction<JsonNode, JsonNode, T> decodeFunction;
 		private final ProjectionConverter<T, ? extends K> fromFieldValueConverter;
 		private final ElasticsearchSearchAggregation<V> aggregation;
 
-		private JsonObject order;
+		private ObjectNode order;
 		private int minDocCount;
 		private int size;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
-				BiFunction<JsonElement, JsonElement, T> decodeFunction,
+				BiFunction<JsonNode, JsonNode, T> decodeFunction,
 				ProjectionConverter<T, ? extends K> fromFieldValueConverter,
 				ElasticsearchSearchAggregation<V> aggregation) {
 			this( scope, field, decodeFunction, fromFieldValueConverter, aggregation, null, 1, 100 );
 		}
 
 		public Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<?> field,
-				BiFunction<JsonElement, JsonElement, T> decodeFunction,
+				BiFunction<JsonNode, JsonNode, T> decodeFunction,
 				ProjectionConverter<T, ? extends K> fromFieldValueConverter,
 				ElasticsearchSearchAggregation<V> aggregation,
-				JsonObject order, int minDocCount, int size) {
+				ObjectNode order, int minDocCount, int size) {
 			super( scope, field );
 			this.order = order;
 			this.decodeFunction = decodeFunction;
@@ -236,8 +237,8 @@ public class ElasticsearchTermsAggregation<F, K, T, V>
 		}
 
 		protected final void order(String key, String order) {
-			JsonObject orderObject = new JsonObject();
-			orderObject.addProperty( key, order );
+			ObjectNode orderObject = JsonNodeFactory.instance.objectNode();
+			orderObject.put( key, order );
 			this.order = orderObject;
 		}
 	}

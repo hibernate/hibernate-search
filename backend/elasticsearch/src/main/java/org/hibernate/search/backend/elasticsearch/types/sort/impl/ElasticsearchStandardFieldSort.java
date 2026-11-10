@@ -2,7 +2,8 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import java.time.temporal.TemporalAccessor;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
@@ -16,21 +17,27 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumentValueSort {
 
-	private static final JsonAccessor<JsonElement> MISSING_ACCESSOR = JsonAccessor.root().property( "missing" );
-	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
-	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
-	private static final JsonPrimitive MISSING_HIGHEST_KEYWORD_JSON = new JsonPrimitive( "_highest_wont_work" );
-	private static final JsonPrimitive MISSING_LOWEST_KEYWORD_JSON = new JsonPrimitive( "_lowest_wont_work" );
-	private static final JsonAccessor<JsonElement> UNMAPPED_TYPE = JsonAccessor.root().property( "unmapped_type" );
+	private static final JsonAccessor<JsonNode> MISSING_ACCESSOR = JsonAccessor.root().property( "missing" );
 
-	private final JsonElement missing;
-	private final JsonPrimitive unmappedType;
+	private static final JsonNode MISSING_FIRST_KEYWORD_JSON = JsonScalarConversions.toNode( "_first" );
+
+	private static final JsonNode MISSING_LAST_KEYWORD_JSON = JsonScalarConversions.toNode( "_last" );
+
+	private static final JsonNode MISSING_HIGHEST_KEYWORD_JSON = JsonScalarConversions.toNode( "_highest_wont_work" );
+
+	private static final JsonNode MISSING_LOWEST_KEYWORD_JSON = JsonScalarConversions.toNode( "_lowest_wont_work" );
+
+	private static final JsonAccessor<JsonNode> UNMAPPED_TYPE = JsonAccessor.root().property( "unmapped_type" );
+
+	private final JsonNode missing;
+
+	private final JsonNode unmappedType;
 
 	private ElasticsearchStandardFieldSort(Builder<?> builder) {
 		super( builder );
@@ -39,34 +46,32 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	@Override
-	public void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+	public void doToJsonSorts(ElasticsearchSearchSortCollector collector, ObjectNode innerObject) {
 		if ( missing != null ) {
 			MISSING_ACCESSOR.set( innerObject, missing );
 		}
-
 		// We cannot use unmapped_type for scaled floats:
 		// Elasticsearch complains it needs a scaling factor, but we don't have any way to provide it.
 		// See https://hibernate.atlassian.net/browse/HSEARCH-4176
-		if ( unmappedType != null && !DataTypes.SCALED_FLOAT.equals( unmappedType.getAsString() ) ) {
+		if ( unmappedType != null && !DataTypes.SCALED_FLOAT.equals( JsonScalarConversions.asString( unmappedType ) ) ) {
 			// If there are multiple target indexes, or if the field is dynamic,
 			// some target indexes may not have this field in their mapping (yet),
 			// and in that case Elasticsearch would raise an exception.
 			// Instruct ES to behave as if the field had no value in that case.
 			UNMAPPED_TYPE.set( innerObject, unmappedType );
 		}
-
 		if ( innerObject.size() == 0 ) {
-			collector.collectSort( new JsonPrimitive( absoluteFieldPath ) );
+			collector.collectSort( JsonScalarConversions.toNode( absoluteFieldPath ) );
 		}
 		else {
-			JsonObject outerObject = new JsonObject();
-			outerObject.add( absoluteFieldPath, innerObject );
+			ObjectNode outerObject = new ObjectNode( JsonNodeFactory.instance );
+			outerObject.set( absoluteFieldPath, innerObject );
 			collector.collectSort( outerObject );
 		}
 	}
 
-	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<FieldSortBuilder, F> {
+	public static class Factory<F> extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<FieldSortBuilder, F> {
+
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -78,9 +83,10 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements FieldSortBuilder {
+
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private JsonElement missing;
+		private JsonNode missing;
 
 		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
@@ -131,6 +137,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	public static class TemporalFieldFactory<F extends TemporalAccessor> extends Factory<F> {
+
 		public TemporalFieldFactory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -143,6 +150,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	private static class TemporalFieldBuilder<F extends TemporalAccessor> extends Builder<F> {
+
 		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( codec, scope, field );
@@ -165,6 +173,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	public static class TextFieldFactory extends Factory<String> {
+
 		public TextFieldFactory(ElasticsearchFieldCodec<String> codec) {
 			super( codec );
 		}
@@ -177,6 +186,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	private static class TextFieldBuilder extends Builder<String> {
+
 		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( codec, scope, field );

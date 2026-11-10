@@ -47,50 +47,50 @@ class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
 						"    'dynamic':'strict', " +
-						"    '_source':{ " +
+						"    \"_source\":{ " +
 						"       'enabled':false " +
 						"    }, " +
-						"    'properties':{ " +
-						"       '_entity_type':{ " +
+						"    \"properties\":{ " +
+						"       \"_entity_type\":{ " +
 						"          'type':'keyword', " +
 						"          'index':false " +
 						"       }, " +
-						"       'bothField':{ " +
+						"       \"bothField\":{ " +
 						"          'type':'keyword', " +
 						"          'doc_values':false " +
 						"       }, " +
-						"       'bothObject':{ " +
-						"          'properties':{ " +
-						"             'bothNested':{ " +
+						"       \"bothObject\":{ " +
+						"          \"properties\":{ " +
+						"             \"bothNested\":{ " +
 						"                'type':'keyword', " +
 						"                'doc_values':false " +
 						"             }, " +
-						"             'bothNestedObject':{ " +
-						"                'properties':{ " +
-						"                   'bothNestedNested':{ " +
+						"             \"bothNestedObject\":{ " +
+						"                \"properties\":{ " +
+						"                   \"bothNestedNested\":{ " +
 						"                      'type':'keyword', " +
 						"                      'doc_values':false " +
 						"                   }, " +
-						"                   'searchNestedNested':{ " +
+						"                   \"searchNestedNested\":{ " +
 						"                      'type':'keyword', " +
 						"                      'doc_values':false " +
 						"                   } " +
 						"                } " +
 						"             }, " +
-						"             'searchNested':{ " +
+						"             \"searchNested\":{ " +
 						"                'type':'keyword', " +
 						"                'doc_values':false " +
 						"             }, " +
-						"             'searchNestedObject':{ " +
+						"             \"searchNestedObject\":{ " +
 						"                'type':'object' " +
 						"             } " +
 						"          } " +
 						"       }, " +
-						"       'searchField':{ " +
+						"       \"searchField\":{ " +
 						"          'type':'keyword', " +
 						"          'doc_values':false " +
 						"       }, " +
-						"       'searchObject':{ " +
+						"       \"searchObject\":{ " +
 						"          'type':'object' " +
 						"       } " +
 						"    } " +
@@ -165,7 +165,7 @@ class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-						"    '_source':{ " +
+						"    \"_source\":{ " +
 						"       'enabled': false " +
 						"    } " +
 						" } "

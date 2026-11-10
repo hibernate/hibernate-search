@@ -1,8 +1,10 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.dsl;
 
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
+import org.hibernate.search.util.json.JsonHandler;
 
 import com.google.gson.JsonObject;
 
@@ -33,6 +35,12 @@ public interface ElasticsearchSearchSortFactory<SR>
 	 * @return A {@link SortThenStep} allowing the retrieval of the sort
 	 * or the chaining of other sorts.
 	 */
-	SortThenStep<SR> fromJson(JsonObject jsonObject);
+	@Deprecated
+	default SortThenStep<SR> fromJson(JsonObject jsonObject) {
+		return fromJson( GsonJsonHandlers.object(), jsonObject );
+	}
+
+	/** Import one object through an explicit JSON-library handler. Keep the input stable while Search uses it. */
+	<T> SortThenStep<SR> fromJson(JsonHandler<T> handler, T jsonObject);
 
 }

@@ -1,17 +1,17 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
- * to display {@link ElasticsearchRequest}s in log messages.
+ * to display {@link ElasticsearchJsonRequest}s in log messages.
  *
  */
 public final class ElasticsearchRequestFormatter {
 
-	private final ElasticsearchRequest request;
+	private final ElasticsearchJsonRequest request;
 
-	public ElasticsearchRequestFormatter(ElasticsearchRequest request) {
+	public ElasticsearchRequestFormatter(ElasticsearchJsonRequest request) {
 		this.request = request;
 	}
 
@@ -20,7 +20,7 @@ public final class ElasticsearchRequestFormatter {
 		return formatRequest( request );
 	}
 
-	private static String formatRequest(ElasticsearchRequest request) {
+	private static String formatRequest(ElasticsearchJsonRequest request) {
 		if ( request == null ) {
 			return "(no request)";
 		}

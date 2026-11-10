@@ -5,11 +5,11 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -77,7 +77,7 @@ public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCall
 				new SpyingElasticsearchClientFactory( getDiscoveredClientFactory( beanResolver ).get() ) );
 	}
 
-	public void expectNext(ElasticsearchRequest request, ElasticsearchRequestAssertionMode assertionMode) {
+	public void expectNext(ElasticsearchJsonRequest request, ElasticsearchRequestAssertionMode assertionMode) {
 		expectations.expectInOrder( new ElasticsearchClientSubmitCall(
 				request,
 				assertionMode
@@ -93,22 +93,22 @@ public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCall
 		}
 
 		@Override
-		public ElasticsearchClientImplementor create(BeanResolver beanResolver,
+		public ElasticsearchJsonClientImplementor create(BeanResolver beanResolver,
 				ConfigurationPropertySource propertySource,
 				ThreadProvider threadProvider, String threadNamePrefix, SimpleScheduledExecutor timeoutExecutorService,
-				GsonProvider gsonProvider) {
+				JsonProvider jsonProvider) {
 			createdClientCount.incrementAndGet();
 			return new SpyingElasticsearchClient( delegate.create(
 					beanResolver, propertySource, threadProvider, threadNamePrefix,
-					timeoutExecutorService, gsonProvider
+					timeoutExecutorService, jsonProvider
 			) );
 		}
 	}
 
-	private class SpyingElasticsearchClient implements ElasticsearchClientImplementor {
-		private final ElasticsearchClientImplementor delegate;
+	private class SpyingElasticsearchClient implements ElasticsearchJsonClientImplementor {
+		private final ElasticsearchJsonClientImplementor delegate;
 
-		private SpyingElasticsearchClient(ElasticsearchClientImplementor delegate) {
+		private SpyingElasticsearchClient(ElasticsearchJsonClientImplementor delegate) {
 			this.delegate = delegate;
 		}
 
@@ -119,7 +119,7 @@ public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCall
 
 		@SuppressWarnings("unused") // For EJC and lambda arg
 		@Override
-		public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
+		public CompletableFuture<ElasticsearchJsonResponse> submit(ElasticsearchJsonRequest request) {
 			requestCount.incrementAndGet();
 			return expectations.verify(
 					new ElasticsearchClientSubmitCall( request ),

@@ -47,23 +47,23 @@ class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-						"   'properties':{ " +
-						"     '_entity_type':{ " +
+						"   \"properties\":{ " +
+						"     \"_entity_type\":{ " +
 						"        'type':'keyword', " +
 						"        'index':false " +
 						"     }, " +
-						"     'userField':{ " +
+						"     \"userField\":{ " +
 						"       'type':'keyword', " +
 						"       'index':true, " +
 						"       'norms':true, " +
 						"       'doc_values':true " +
 						"     }, " +
-						"     'userObject':{ " +
+						"     \"userObject\":{ " +
 						"       'dynamic':'true', " +
 						"       'type':'object' " +
 						"     } " +
 						"   }, " +
-						"   '_source': { " +
+						"   \"_source\": { " +
 						"     'enabled': false " +
 						"   }, " +
 						"   'dynamic':'strict' " +
@@ -79,23 +79,23 @@ class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-						"   'properties':{ " +
-						"     '_entity_type':{ " +
+						"   \"properties\":{ " +
+						"     \"_entity_type\":{ " +
 						"        'type':'keyword', " +
 						"        'index':false " +
 						"     }, " +
-						"     'userField':{ " +
+						"     \"userField\":{ " +
 						"       'type':'keyword', " +
 						"       'index':true, " +
 						"       'norms':true, " +
 						"       'doc_values':true " +
 						"     }, " +
-						"     'userObject':{ " +
+						"     \"userObject\":{ " +
 						"       'dynamic':'true', " +
 						"       'type':'object' " +
 						"     } " +
 						"   }, " +
-						"   '_source': { " +
+						"   \"_source\": { " +
 						"     'enabled': true " +
 						"   }, " +
 						"   'dynamic':'strict' " +
@@ -116,18 +116,18 @@ class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-						"   'properties':{ " +
-						"     '_entity_type':{ " +
+						"   \"properties\":{ " +
+						"     \"_entity_type\":{ " +
 						"        'type':'keyword', " +
 						"        'index':false " +
 						"     }, " +
-						"     'userField':{ " +
+						"     \"userField\":{ " +
 						"       'type':'keyword', " +
 						"       'index':true, " +
 						"       'norms':true, " +
 						"       'doc_values':true " +
 						"     }, " +
-						"     'userObject':{ " +
+						"     \"userObject\":{ " +
 						"       'dynamic':'true', " +
 						"       'type':'object' " +
 						"     } " +
@@ -149,22 +149,22 @@ class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-						"   'properties':{ " +
-						"     '_entity_type':{ " +
+						"   \"properties\":{ " +
+						"     \"_entity_type\":{ " +
 						"        'type':'keyword', " +
 						"        'index':false " +
 						"     }, " +
-						"     'userField':{ " +
+						"     \"userField\":{ " +
 						"       'type':'integer', " +
 						"       'index':false, " +
 						"       'doc_values':false " +
 						"     }, " +
-						"     'userObject':{ " +
+						"     \"userObject\":{ " +
 						"       'dynamic':'true', " +
 						"       'type':'object' " +
 						"     } " +
 						"   }, " +
-						"   '_source': { " +
+						"   \"_source\": { " +
 						"     'enabled': false " +
 						"   }, " +
 						"   'dynamic':'strict' " +
@@ -191,17 +191,17 @@ class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-						"   'properties':{ " +
-						"     '_entity_type':{ " +
+						"   \"properties\":{ " +
+						"     \"_entity_type\":{ " +
 						"        'type':'keyword', " +
 						"        'index':false " +
 						"     }, " +
-						"     'userObject':{ " +
+						"     \"userObject\":{ " +
 						"       'dynamic':'true', " +
 						"       'type':'object' " +
 						"     } " +
 						"   }, " +
-						"   '_source': { " +
+						"   \"_source\": { " +
 						"     'enabled': false " +
 						"   }, " +
 						"   'dynamic':'strict' " +

@@ -263,12 +263,12 @@ class ElasticsearchAnalysisConfigurerIT {
 
 		assertJsonEquals(
 				"{"
-						+ " 'analyzer': {"
-						+ "   'analyzer1': {"
+						+ " \"analyzer\": {"
+						+ "   \"analyzer1\": {"
 						+ "     'type': 'custom',"
 						+ "     'tokenizer': 'whitespace'"
 						+ "   },"
-						+ "   'analyzer2': {"
+						+ "   \"analyzer2\": {"
 						+ "     'type': 'custom',"
 						+ "     'tokenizer': 'whitespace'"
 						+ "   }"

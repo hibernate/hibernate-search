@@ -1,8 +1,10 @@
 package org.hibernate.search.backend.elasticsearch.search.query;
 
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.json.JsonHandler;
 
 import com.google.gson.JsonObject;
 
@@ -41,6 +43,17 @@ public interface ElasticsearchSearchRequestTransformerContext {
 	/**
 	 * @return A (mutable) representation of the HTTP request body for this search, as a {@link JsonObject}.
 	 */
+	@Deprecated
 	JsonObject body();
+
+	/**
+	 * Transform an independent representation of the current staged JSON object body.
+	 * The returned tree is installed after success, with no second defensive copy.
+	 * Do not mutate it afterward. Mixing this with {@link #body()} is rejected.
+	 * @param handler The JSON-library representation to use.
+	 * @param transform A callback returning a non-null JSON object.
+	 * @param <T> The library's JSON tree/value type.
+	 */
+	<T> void transformBody(JsonHandler<T> handler, UnaryOperator<T> transform);
 
 }
