@@ -202,4 +202,7 @@ public interface ElasticsearchClientLog {
 	@Message(id = ID_OFFSET + 214, value = "Request method is empty")
 	IllegalArgumentException emptyRequestMethod();
 
+	@Message(id = ID_OFFSET + 224, value = "Response body size limit must be non-negative: %s")
+	IllegalArgumentException negativeResponseBodySizeLimit(long limit);
+
 }

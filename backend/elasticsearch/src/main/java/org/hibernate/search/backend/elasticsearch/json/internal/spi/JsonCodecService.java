@@ -46,13 +46,19 @@ public final class JsonCodecService {
 	private final JsonValidation validation;
 	private final boolean serializeNulls;
 	private final boolean pretty;
-	private final JsonParsing parsing = new JsonParsing();
+	private final JsonParsing parsing;
 
 	public JsonCodecService(JsonCodecRegistry registry, boolean serializeNulls, boolean pretty) {
 		this( registry, serializeNulls, pretty, JsonValidation.systemDefault() );
 	}
 
 	public JsonCodecService(JsonCodecRegistry registry, boolean serializeNulls, boolean pretty, JsonValidation validation) {
+		this( registry, serializeNulls, pretty, validation, new JsonParsing() );
+	}
+
+	public JsonCodecService(JsonCodecRegistry registry, boolean serializeNulls, boolean pretty, JsonValidation validation,
+			JsonParsing parsing) {
+		this.parsing = Objects.requireNonNull( parsing );
 		this.validation = Objects.requireNonNull( validation );
 		this.registry = registry;
 		this.serializeNulls = serializeNulls;
@@ -61,6 +67,10 @@ public final class JsonCodecService {
 
 	public JsonValidation validation() {
 		return validation;
+	}
+
+	public JsonParsing parsing() {
+		return parsing;
 	}
 
 	public <T> JsonCodec<T> getCodec(Class<T> type) {

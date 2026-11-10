@@ -34,7 +34,9 @@ public class ElasticsearchJsonHandlerFieldCodec<T> implements ElasticsearchField
 
 	@Override
 	public JsonNode encode(T value) {
-		return value == null ? NullNode.instance : JsonHandlerBridge.importValue( handler, value, "native field indexing" );
+		return value == null
+				? NullNode.instance
+				: JsonHandlerBridge.importValue( handler, value, "native field indexing", json.parsing() );
 	}
 
 	@Override

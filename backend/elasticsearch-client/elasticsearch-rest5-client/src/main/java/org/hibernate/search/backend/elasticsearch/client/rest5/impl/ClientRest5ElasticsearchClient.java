@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonHttpEntityContentProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonResponseConsumerScope;
-import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
@@ -44,10 +43,12 @@ public class ClientRest5ElasticsearchClient implements ElasticsearchClientImplem
 
 	private final Optional<Integer> requestTimeoutMs;
 
+	private final long responseBodySizeLimit;
+
 
 	ClientRest5ElasticsearchClient(BeanHolder<? extends Rest5Client> restClientHolder, Sniffer sniffer,
-			SimpleScheduledExecutor timeoutExecutorService,
-			Optional<Integer> requestTimeoutMs) {
+			SimpleScheduledExecutor timeoutExecutorService, Optional<Integer> requestTimeoutMs, long responseBodySizeLimit) {
+		this.responseBodySizeLimit = responseBodySizeLimit;
 		this.restClientHolder = restClientHolder;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = timeoutExecutorService;
@@ -172,7 +173,7 @@ public class ClientRest5ElasticsearchClient implements ElasticsearchClientImplem
 		setPerRequestSocketTimeout( elasticsearchRequest, request );
 		RequestOptions.Builder options = request.getOptions().toBuilder();
 		options.setHttpAsyncResponseConsumerFactory(
-				() -> new ClientRest5JsonResponseConsumer<T>( JsonTransportSupport.DEFAULT_LIMIT, responseScope,
+				() -> new ClientRest5JsonResponseConsumer<T>( responseBodySizeLimit, responseScope,
 						responseFactory ) );
 		request.setOptions( options );
 

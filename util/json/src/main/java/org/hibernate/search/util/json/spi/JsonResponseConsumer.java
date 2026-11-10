@@ -24,6 +24,10 @@ public interface JsonResponseConsumer<T> extends AutoCloseable {
 
 	InputStream openDiagnosticStream();
 
+	/**
+	 * Cumulative bytes delivered after content decoding and before charset conversion,
+	 * including a batch rejected for exceeding the configured limit.
+	 */
 	long inputBytes();
 
 	@Override

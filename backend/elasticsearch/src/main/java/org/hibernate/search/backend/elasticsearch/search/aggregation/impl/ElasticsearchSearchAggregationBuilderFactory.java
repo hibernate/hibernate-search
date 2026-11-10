@@ -19,12 +19,14 @@ public class ElasticsearchSearchAggregationBuilderFactory
 
 	public <T> SearchAggregationBuilder<T> fromJson(JsonHandler<T> handler, T jsonObject) {
 		return new ElasticsearchUserProvidedJsonAggregation.Builder<>( scope,
-				JsonHandlerBridge.importObject( handler, jsonObject, "aggregation import" ), handler );
+				JsonHandlerBridge.importObject( handler, jsonObject, "aggregation import", scope.userFacingCodec().parsing() ),
+				handler );
 	}
 
 	public <T> SearchAggregationBuilder<T> fromJson(String jsonString, JsonHandler<T> resultHandler) {
 		return new ElasticsearchUserProvidedJsonAggregation.Builder<>( scope,
-				JsonHandlerBridge.parseObject( jsonString, "aggregation import" ), resultHandler );
+				JsonHandlerBridge.parseObject( jsonString, "aggregation import", scope.userFacingCodec().parsing() ),
+				resultHandler );
 	}
 
 	@Override

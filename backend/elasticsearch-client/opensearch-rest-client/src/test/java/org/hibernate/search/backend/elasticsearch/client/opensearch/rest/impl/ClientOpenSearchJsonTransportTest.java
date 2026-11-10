@@ -34,7 +34,6 @@ import org.apache.hc.client5.http.async.methods.SimpleRequestProducer;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentTooLongException;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
@@ -50,6 +49,88 @@ import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 
 class ClientOpenSearchJsonTransportTest {
+
+	@Test
+	void malformedGzipStillFailsImmediatelyWhenDecodedLimitIsExceeded() throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( '<' );
+		}
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( "remaining error response".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		var consumer = consumer( 3 );
+		try ( var details = new ByteArrayEntity( compressed.toByteArray(), ContentType.APPLICATION_JSON, "gzip" ) ) {
+			consumer.consumeResponse( new BasicHttpResponse( 503 ), details, HttpCoreContext.create(), new Result() );
+		}
+		assertThatThrownBy( () -> {
+			for ( byte value : compressed.toByteArray() ) {
+				consumer.consume( ByteBuffer.wrap( new byte[] { value } ) );
+			}
+		} ).hasMessageContaining( "byte limit" );
+		consumer.releaseResources();
+	}
+
+
+	@Test
+	void decodedLimitIgnoresGzipFramingAndZeroIsUnlimited() throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( "{}".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		byte[] bytes = compressed.toByteArray();
+		assertThat( bytes.length ).isGreaterThan( 2 );
+		for ( int limit : new int[] { 0, 2 } ) {
+			var consumer = consumer( limit );
+			Result result = new Result();
+			try ( var metadata = new ByteArrayEntity( bytes, ContentType.APPLICATION_JSON, "gzip" ) ) {
+				consumer.consumeResponse( new BasicHttpResponse( 200 ), metadata, HttpCoreContext.create(), result );
+			}
+			consumer.consume( ByteBuffer.wrap( bytes ) );
+			consumer.streamEnd( List.of() );
+			var entity =
+					(ClientOpenSearchJsonResponseConsumer.Entity<tools.jackson.databind.JsonNode>) result.response.getEntity();
+			assertThat( entity.body().result().isEmpty() ).isTrue();
+			consumer.releaseResources();
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(longs = { 0, 1, 2 })
+	void clientFactoryAppliesConfiguredDecodedResponseLimit(long limit) throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( "{}".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		try ( var server = new StreamingHttpServer( exchange -> {
+			exchange.headers( 200, "application/json", "Content-Encoding: gzip\r\n" );
+			exchange.chunk( compressed.toByteArray() );
+			exchange.end();
+		} ) ) {
+			var resolver = Mockito.mock( org.hibernate.search.engine.environment.bean.BeanResolver.class );
+			Mockito.when( resolver.resolve( List.of() ) ).thenReturn(
+					org.hibernate.search.engine.environment.bean.BeanHolder.of( List.of() ) );
+			var properties = new org.hibernate.search.engine.cfg.impl.MapConfigurationPropertySource(
+					java.util.Map.of( "uris", server.uri(), "response_body_size_limit", limit ) );
+			var client = new ClientOpenSearchElasticsearchClientFactory().create( resolver, properties,
+					new org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider( "test" ), "test", null );
+			try {
+				var request = new org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest(
+						"GET", "/", java.util.Map.of(), null, null );
+				var result = client.submit( request, JsonClientTestSupport.responseFactory( JacksonJsonHandlers.value() ) );
+				if ( limit == 1 ) {
+					assertThatThrownBy( () -> result.get( 10, TimeUnit.SECONDS ) ).hasStackTraceContaining( "byte limit" );
+				}
+				else {
+					assertThat( result.get( 10, TimeUnit.SECONDS ).result().isEmpty() ).isTrue();
+				}
+			}
+			finally {
+				client.close();
+			}
+		}
+	}
+
 	@Test
 	void bodylessStatusesIgnoreGzipMetadata() throws Exception {
 		for ( int status : new int[] { 204, 304 } ) {
@@ -125,16 +206,20 @@ class ClientOpenSearchJsonTransportTest {
 				ContentType.create( "application/json", StandardCharsets.UTF_16LE ), "gzip" ) ) {
 			consumer.consumeResponse( new BasicHttpResponse( 200 ), details, HttpCoreContext.create(), result );
 		}
+		if ( exceedsLimit ) {
+			assertThatThrownBy( () -> {
+				for ( byte value : bytes ) {
+					consumer.consume( ByteBuffer.wrap( new byte[] { value } ) );
+				}
+			} ).hasMessageContaining( "byte limit" );
+			consumer.releaseResources();
+			return;
+		}
 		for ( byte value : bytes ) {
 			consumer.consume( ByteBuffer.wrap( new byte[] { value } ) );
 		}
 		consumer.streamEnd( List.of() );
 		var entity = (ClientOpenSearchJsonResponseConsumer.Entity<tools.jackson.databind.JsonNode>) result.response.getEntity();
-		if ( exceedsLimit ) {
-			assertThatThrownBy( () -> entity.body().result() ).isInstanceOf( JsonParseException.class )
-					.hasMessageContaining( "byte limit" );
-			return;
-		}
 		assertThat( entity.body().result().asObject().get( "value" ).asString() )
 				.isEqualTo( "é😀".repeat( 5000 ) );
 		assertThat( entity.getContentEncoding() ).isNull();
@@ -283,7 +368,7 @@ class ClientOpenSearchJsonTransportTest {
 				HttpCoreContext.create(), new Result() );
 		consumer.consume( ByteBuffer.wrap( new byte[] { 60 } ) );
 		assertThatThrownBy( () -> consumer.consume( ByteBuffer.wrap( new byte[3] ) ) )
-				.isInstanceOf( ContentTooLongException.class );
+				.isInstanceOf( RuntimeException.class ).hasMessageContaining( "byte limit" );
 		consumer.failed( new IOException() );
 		consumer.releaseResources();
 	}

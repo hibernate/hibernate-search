@@ -1,13 +1,17 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLContext;
 
@@ -27,6 +31,41 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class ClientJdkElasticsearchClientFactoryTest {
+	@ParameterizedTest
+	@ValueSource(longs = { 0, 1, 2 })
+	void clientFactoryAppliesConfiguredDecodedResponseLimit(long limit) throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new GZIPOutputStream( compressed ) ) {
+			gzip.write( "{}".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		try ( var server = new StreamingHttpServer( exchange -> {
+			exchange.headers( 200, "application/json", "Content-Encoding: gzip\r\n" );
+			exchange.chunk( compressed.toByteArray() );
+			exchange.end();
+		} ) ) {
+			BeanResolver resolver = mock( BeanResolver.class );
+			when( resolver.resolve( List.of() ) ).thenReturn( BeanHolder.of( List.of() ) );
+			var client = new org.hibernate.search.backend.elasticsearch.client.common.impl.JsonTransportClient(
+					new ClientJdkElasticsearchClientFactory().create( resolver,
+							new MapConfigurationPropertySource( Map.of( ElasticsearchBackendSettings.URIS, server.uri(),
+									ElasticsearchBackendSettings.RESPONSE_BODY_SIZE_LIMIT, limit ) ),
+							new EmbeddedThreadProvider( "test" ), "test", null ),
+					JsonProviderHelper.create( false ) );
+			try {
+				var result = client.submit( ElasticsearchJsonRequest.get().build() );
+				if ( limit == 1 ) {
+					assertThatThrownBy( () -> result.get( 10, TimeUnit.SECONDS ) ).hasStackTraceContaining( "byte limit" );
+				}
+				else {
+					assertThat( result.get( 10, TimeUnit.SECONDS ).bodyJson().isEmpty() ).isTrue();
+				}
+			}
+			finally {
+				client.close();
+			}
+		}
+	}
+
 	@Test
 	void headResponseWithGzipMetadataHasNoBodyToDecode() throws Exception {
 		try ( var server = new StreamingHttpServer( exchange -> {

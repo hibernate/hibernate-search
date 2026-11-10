@@ -21,10 +21,8 @@ final class ClientJdkJsonBodySubscriber<T> implements HttpResponse.BodySubscribe
 	private final JsonResponseConsumer<T> body;
 	private JsonGzipDecoder gzip;
 	private final int statusCode;
-	private final long limit;
 	private Flow.Subscription subscription;
 	private boolean terminated;
-	private long inputBytes;
 
 
 	ClientJdkJsonBodySubscriber(JsonResponseConsumerFactory<T> factory,
@@ -35,8 +33,7 @@ final class ClientJdkJsonBodySubscriber<T> implements HttpResponse.BodySubscribe
 	ClientJdkJsonBodySubscriber(JsonResponseConsumerFactory<T> factory,
 			Charset charset, int statusCode, boolean compressed, long limit) {
 		this.statusCode = statusCode;
-		this.limit = limit;
-		// Bound both transport bytes below and decoded bytes in the response body.
+		// The supplied consumer counts decoded bytes consistently across HTTP clients.
 		body = factory.create( charset, limit );
 		if ( compressed && statusCode != 204 && statusCode != 304 ) {
 			gzip = new JsonGzipDecoder( body );
@@ -70,10 +67,6 @@ final class ClientJdkJsonBodySubscriber<T> implements HttpResponse.BodySubscribe
 		}
 		try {
 			for ( ByteBuffer buffer : buffers ) {
-				inputBytes += buffer.remaining();
-				if ( limit > 0 && inputBytes > limit ) {
-					throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit );
-				}
 				if ( gzip == null ) {
 					body.feed( buffer );
 				}

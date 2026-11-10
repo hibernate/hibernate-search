@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.client.rest4.logging.impl.Elas
 import org.hibernate.search.util.json.spi.JsonResponseConsumer;
 import org.hibernate.search.util.json.spi.JsonResponseConsumerFactory;
 
-import org.apache.http.ContentTooLongException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.AbstractHttpEntity;
@@ -34,7 +33,6 @@ final class ClientRest4JsonResponseConsumer<T> extends AbstractAsyncResponseCons
 	private JsonResponseConsumer<T> body;
 	private JsonGzipDecoder gzip;
 	private boolean gzipFailed;
-	private long inputBytes;
 	private ByteBuffer input = ByteBuffer.allocate( JsonTransportSupport.DEFAULT_INPUT_CAPACITY );
 
 
@@ -61,7 +59,7 @@ final class ClientRest4JsonResponseConsumer<T> extends AbstractAsyncResponseCons
 			cancel();
 			return;
 		}
-		checkLimit( entity.getContentLength() );
+
 		Charset charset = contentType == null || contentType.getCharset() == null
 				? StandardCharsets.UTF_8
 				: contentType.getCharset();
@@ -88,14 +86,17 @@ final class ClientRest4JsonResponseConsumer<T> extends AbstractAsyncResponseCons
 			input.clear();
 			count = decoder.read( input );
 			if ( count > 0 ) {
-				inputBytes += count;
-				checkLimit( inputBytes );
+
 				input.flip();
 				if ( gzip != null ) {
 					try {
 						gzip.feed( input );
 					}
 					catch (RuntimeException e) {
+						// Size failures are terminal, even after an earlier deferred syntax failure.
+						if ( limit > 0 && body.inputBytes() > limit ) {
+							throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit, e );
+						}
 						body.failedParsing( e );
 						gzip.close();
 						gzip = null;
@@ -110,11 +111,6 @@ final class ClientRest4JsonResponseConsumer<T> extends AbstractAsyncResponseCons
 		while ( count > 0 );
 	}
 
-	private void checkLimit(long count) throws ContentTooLongException {
-		if ( limit > 0 && count > limit ) {
-			throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit );
-		}
-	}
 
 	@Override
 	protected synchronized HttpResponse buildResult(HttpContext context) {

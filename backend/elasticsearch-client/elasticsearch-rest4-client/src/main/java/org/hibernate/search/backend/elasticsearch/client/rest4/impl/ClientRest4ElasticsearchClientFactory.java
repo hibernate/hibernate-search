@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
@@ -135,6 +136,7 @@ public class ClientRest4ElasticsearchClientFactory implements ElasticsearchClien
 			ThreadProvider threadProvider, String threadNamePrefix,
 			SimpleScheduledExecutor timeoutExecutorService) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
+		long responseBodySizeLimit = JsonTransportSupport.responseBodySizeLimit( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
 		Optional<BeanHolder<? extends RestClient>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
@@ -156,7 +158,7 @@ public class ClientRest4ElasticsearchClientFactory implements ElasticsearchClien
 
 		return new ClientRest4ElasticsearchClient(
 				restClientHolder, sniffer, timeoutExecutorService,
-				requestTimeoutMs, connectionTimeoutMs
+				requestTimeoutMs, connectionTimeoutMs, responseBodySizeLimit
 		);
 	}
 

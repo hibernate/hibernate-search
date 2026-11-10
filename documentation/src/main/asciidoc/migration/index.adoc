@@ -198,6 +198,20 @@ Update embedded JSON, configuration files and test data to use double quotes for
 remove comments and trailing content, and use finite numeric values.
 Custom `JsonHandler` implementations must also read and write one strict JSON value as required by their contract.
 
+[[elasticsearch-json-limits]]
+=== Elasticsearch JSON parsing and response limits
+
+The built-in Elasticsearch clients no longer impose the inherited 100 MiB response-body limit by default.
+Set `hibernate.search.backend.response_body_size_limit=104857600` to retain a 100 MiB limit,
+or select another non-negative byte count; `0` means unlimited.
+The limit counts response bytes after decompression and before charset conversion consistently across clients.
+
+Backend parser constraints are configurable through `hibernate.search.backend.json.max_nesting_depth`,
+`json.max_string_length`, `json.max_name_length` and `json.max_number_length` under the same backend prefix.
+Their defaults remain 1000, 20,000,000, 50,000 and 1000 respectively.
+For a named backend, use `hibernate.search.backends.<backend-name>.` as the prefix.
+These settings configure parsing performed by Search; custom handlers retain responsibility for their own parser configuration.
+
 [[spi]]
 == SPI
 

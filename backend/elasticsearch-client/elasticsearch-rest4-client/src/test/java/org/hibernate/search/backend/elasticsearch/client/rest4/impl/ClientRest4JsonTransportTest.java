@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import org.apache.http.ContentTooLongException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpVersion;
 import org.apache.http.entity.BasicHttpEntity;
@@ -46,6 +45,90 @@ import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 
 class ClientRest4JsonTransportTest {
+
+	@Test
+	void malformedGzipStillFailsImmediatelyWhenDecodedLimitIsExceeded() throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( '<' );
+		}
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( "remaining error response".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		var consumer = consumer( 3 );
+		var response = response( 503, "application/json" );
+		( (BasicHttpEntity) response.getEntity() ).setContentEncoding( "gzip" );
+		consumer.responseReceived( response );
+		assertThatThrownBy( () -> {
+			for ( byte value : compressed.toByteArray() ) {
+				consumer.consumeContent( new Decoder( ByteBuffer.wrap( new byte[] { value } ) ), StubIOControl.INSTANCE );
+			}
+		} ).hasMessageContaining( "byte limit" );
+		consumer.close();
+	}
+
+
+	@Test
+	void decodedLimitIgnoresGzipFramingAndZeroIsUnlimited() throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( "{}".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		byte[] bytes = compressed.toByteArray();
+		assertThat( bytes.length ).isGreaterThan( 2 );
+		for ( int limit : new int[] { 0, 2 } ) {
+			var consumer = consumer( limit );
+			var response = response( 200, "application/json" );
+			var metadata = (BasicHttpEntity) response.getEntity();
+			metadata.setContentEncoding( "gzip" );
+			metadata.setContentLength( bytes.length );
+			consumer.responseReceived( response );
+			consumer.consumeContent( new Decoder( ByteBuffer.wrap( bytes ) ), StubIOControl.INSTANCE );
+			consumer.responseCompleted( new BasicHttpContext() );
+			assertThat( consumer.getException() ).isNull();
+			var entity =
+					(ClientRest4JsonResponseConsumer.Entity<tools.jackson.databind.JsonNode>) consumer.getResult().getEntity();
+			assertThat( entity.body().result().isEmpty() ).isTrue();
+			consumer.close();
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(longs = { 0, 1, 2 })
+	void clientFactoryAppliesConfiguredDecodedResponseLimit(long limit) throws Exception {
+		var compressed = new ByteArrayOutputStream();
+		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
+			gzip.write( "{}".getBytes( StandardCharsets.UTF_8 ) );
+		}
+		try ( var server = new StreamingHttpServer( exchange -> {
+			exchange.headers( 200, "application/json", "Content-Encoding: gzip\r\n" );
+			exchange.chunk( compressed.toByteArray() );
+			exchange.end();
+		} ) ) {
+			var resolver = Mockito.mock( org.hibernate.search.engine.environment.bean.BeanResolver.class );
+			Mockito.when( resolver.resolve( List.of() ) ).thenReturn(
+					org.hibernate.search.engine.environment.bean.BeanHolder.of( List.of() ) );
+			var properties = new org.hibernate.search.engine.cfg.impl.MapConfigurationPropertySource(
+					java.util.Map.of( "uris", server.uri(), "response_body_size_limit", limit ) );
+			var client = new ClientRest4ElasticsearchClientFactory().create( resolver, properties,
+					new org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider( "test" ), "test", null );
+			try {
+				var request = new org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest(
+						"GET", "/", java.util.Map.of(), null, null );
+				var result = client.submit( request, JsonClientTestSupport.responseFactory( JacksonJsonHandlers.value() ) );
+				if ( limit == 1 ) {
+					assertThatThrownBy( () -> result.get( 10, TimeUnit.SECONDS ) ).hasStackTraceContaining( "byte limit" );
+				}
+				else {
+					assertThat( result.get( 10, TimeUnit.SECONDS ).result().isEmpty() ).isTrue();
+				}
+			}
+			finally {
+				client.close();
+			}
+		}
+	}
+
 	@ParameterizedTest
 	@ValueSource(ints = { 1, 8192 })
 	void gzipExpansionExceedsDecodedLimit(int fragmentSize) throws Exception {
@@ -60,14 +143,13 @@ class ClientRest4JsonTransportTest {
 		var response = response( 200, "application/json" );
 		( (BasicHttpEntity) response.getEntity() ).setContentEncoding( "gzip" );
 		consumer.responseReceived( response );
-		for ( int offset = 0; offset < bytes.length; offset += fragmentSize ) {
-			consumer.consumeContent( new Decoder( ByteBuffer.wrap( bytes, offset,
-					Math.min( fragmentSize, bytes.length - offset ) ) ), StubIOControl.INSTANCE );
-		}
-		consumer.responseCompleted( new BasicHttpContext() );
-		var entity = (ClientRest4JsonResponseConsumer.Entity<tools.jackson.databind.JsonNode>) consumer.getResult().getEntity();
-		assertThatThrownBy( () -> entity.body().result() ).isInstanceOf( JsonParseException.class )
-				.hasMessageContaining( "byte limit" );
+		assertThatThrownBy( () -> {
+			for ( int offset = 0; offset < bytes.length; offset += fragmentSize ) {
+				consumer.consumeContent( new Decoder( ByteBuffer.wrap( bytes, offset,
+						Math.min( fragmentSize, bytes.length - offset ) ) ), StubIOControl.INSTANCE );
+			}
+		} ).hasMessageContaining( "byte limit" );
+		consumer.close();
 	}
 
 	@Test
@@ -318,7 +400,7 @@ class ClientRest4JsonTransportTest {
 		consumer.consumeContent( new Decoder( ByteBuffer.wrap( new byte[] { 60 } ) ), StubIOControl.INSTANCE );
 		assertThatThrownBy(
 				() -> consumer.consumeContent( new Decoder( ByteBuffer.wrap( new byte[3] ) ), StubIOControl.INSTANCE ) )
-				.isInstanceOf( ContentTooLongException.class );
+				.isInstanceOf( RuntimeException.class ).hasMessageContaining( "byte limit" );
 		consumer.cancel();
 		consumer.close();
 	}

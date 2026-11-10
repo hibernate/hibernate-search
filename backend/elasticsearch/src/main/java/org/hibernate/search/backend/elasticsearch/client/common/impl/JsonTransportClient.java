@@ -72,7 +72,8 @@ public final class JsonTransportClient implements ElasticsearchJsonClientImpleme
 	}
 
 	private JsonResponseConsumer<ElasticsearchJsonResponseBody> createResponseConsumer(Charset charset, long limit) {
-		return new MappingJsonResponseConsumer<>( new JsonResponseBody( charset, limit, json.validation() ), responseDecoder );
+		return new MappingJsonResponseConsumer<>( new JsonResponseBody( charset, limit, json.validation(), json.parsing() ),
+				responseDecoder );
 	}
 
 	private ElasticsearchJsonResponseBody decodeResponse(JsonNode tree) {

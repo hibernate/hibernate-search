@@ -40,7 +40,8 @@ public class ElasticsearchSearchSortBuilderFactory implements SearchSortBuilderF
 	}
 
 	public <T> ElasticsearchSearchSort fromJson(JsonHandler<T> handler, T jsonObject) {
-		return fromJson( JsonHandlerBridge.importObject( handler, jsonObject, "sort import" ) );
+		return fromJson(
+				JsonHandlerBridge.importObject( handler, jsonObject, "sort import", scope.userFacingCodec().parsing() ) );
 	}
 
 	private ElasticsearchSearchSort fromJson(ObjectNode jsonObject) {
@@ -48,6 +49,6 @@ public class ElasticsearchSearchSortBuilderFactory implements SearchSortBuilderF
 	}
 
 	public ElasticsearchSearchSort fromJson(String jsonString) {
-		return fromJson( JsonHandlerBridge.parseObject( jsonString, "sort import" ) );
+		return fromJson( JsonHandlerBridge.parseObject( jsonString, "sort import", scope.userFacingCodec().parsing() ) );
 	}
 }

@@ -17,7 +17,6 @@ import org.hibernate.search.util.json.spi.JsonResponseConsumerFactory;
 
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentTooLongException;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.EntityDetails;
 import org.apache.hc.core5.http.Header;
@@ -38,7 +37,6 @@ final class ClientRest5JsonResponseConsumer<T> implements AsyncResponseConsumer<
 	private JsonGzipDecoder gzip;
 	private boolean gzipFailed;
 	private boolean terminated;
-	private long inputBytes;
 	private int capacity = JsonTransportSupport.DEFAULT_INPUT_CAPACITY;
 	private FutureCallback<ClassicHttpResponse> callback;
 
@@ -65,7 +63,6 @@ final class ClientRest5JsonResponseConsumer<T> implements AsyncResponseConsumer<
 		releaseResources();
 		terminated = false;
 		gzipFailed = false;
-		inputBytes = 0;
 		capacity = JsonTransportSupport.DEFAULT_INPUT_CAPACITY;
 		this.callback = callback;
 		response = new BasicClassicHttpResponse( incoming.getCode(), incoming.getReasonPhrase() );
@@ -79,7 +76,7 @@ final class ClientRest5JsonResponseConsumer<T> implements AsyncResponseConsumer<
 			callback.completed( response );
 			return;
 		}
-		checkLimit( details.getContentLength() );
+
 		ContentType contentType = ContentType.parse( details.getContentType() );
 		Charset charset = contentType == null || contentType.getCharset() == null
 				? StandardCharsets.UTF_8
@@ -110,13 +107,16 @@ final class ClientRest5JsonResponseConsumer<T> implements AsyncResponseConsumer<
 		// HC5 can deliver more than the declared window to drain its socket buffer.
 		// Repay that entire batch on the next capacity update, avoiding a negative-window stall.
 		capacity = Math.max( JsonTransportSupport.DEFAULT_INPUT_CAPACITY, input.remaining() );
-		inputBytes += input.remaining();
-		checkLimit( inputBytes );
+
 		if ( gzip != null ) {
 			try {
 				gzip.feed( input );
 			}
 			catch (RuntimeException e) {
+				// Size failures are terminal, even after an earlier deferred syntax failure.
+				if ( limit > 0 && body.inputBytes() > limit ) {
+					throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit, e );
+				}
 				body.failedParsing( e );
 				gzip.close();
 				gzip = null;
@@ -129,11 +129,6 @@ final class ClientRest5JsonResponseConsumer<T> implements AsyncResponseConsumer<
 		input.position( input.limit() );
 	}
 
-	private void checkLimit(long count) throws ContentTooLongException {
-		if ( limit > 0 && count > limit ) {
-			throw ElasticsearchClientLog.INSTANCE.responseInputLimitExceeded( limit );
-		}
-	}
 
 	@Override
 	public synchronized void streamEnd(List<? extends Header> trailers) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
@@ -44,6 +45,8 @@ class GsonInputBridgeTest {
 	@Test
 	void concretePredicateBuilderConvertsGsonAtTheBoundaryAndRetainsTrustedJacksonInput() {
 		var scope = mock( ElasticsearchSearchIndexScope.class );
+		when( scope.userFacingCodec() ).thenReturn(
+				org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper.createUserFacingCodec() );
 		var builder = new ElasticsearchSearchPredicateBuilderFactory( scope );
 		var input = GsonJsonHandlers.object().fromJson( "{\"field\":{\"number\":9007199254740993,\"nested\":null}}" );
 		var converted = builder.fromJson( GsonJsonHandlers.object(), input ).toJsonQuery( null );

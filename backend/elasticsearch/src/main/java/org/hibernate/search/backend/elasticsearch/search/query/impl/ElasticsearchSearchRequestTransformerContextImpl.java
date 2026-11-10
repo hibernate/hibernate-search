@@ -17,6 +17,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.json.JsonHandler;
+import org.hibernate.search.util.json.internal.spi.JsonParsing;
 import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
 import com.google.gson.JsonObject;
@@ -33,15 +34,22 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 
 	static Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> createTransformerFunction(
 			ElasticsearchSearchRequestTransformer transformer, JsonValidation validation) {
+		return createTransformerFunction( transformer, validation, new JsonParsing() );
+	}
+
+	static Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> createTransformerFunction(
+			ElasticsearchSearchRequestTransformer transformer, JsonValidation validation, JsonParsing parsing) {
 		if ( transformer == null ) {
 			return null;
 		}
-		return request -> new ElasticsearchSearchRequestTransformerContextImpl( request, validation ).apply( transformer );
+		return request -> new ElasticsearchSearchRequestTransformerContextImpl( request, validation, parsing )
+				.apply( transformer );
 	}
 
 	private final ElasticsearchJsonRequest originalRequest;
 	private final ObjectNode originalBody;
 	private final JsonValidation validation;
+	private final JsonParsing parsing;
 
 	private String path;
 	private ObjectNode potentiallyTransformedBody;
@@ -50,9 +58,10 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 	private Map<String, String> potentiallyTransformedParametersMap;
 
 	private ElasticsearchSearchRequestTransformerContextImpl(ElasticsearchJsonRequest originalRequest,
-			JsonValidation validation) {
+			JsonValidation validation, JsonParsing parsing) {
 		this.originalRequest = originalRequest;
 		this.validation = validation;
+		this.parsing = parsing;
 		List<ObjectNode> originalBodyParts = originalRequest.bodyPartsJson();
 		if ( originalBodyParts.size() != 1 ) {
 			throw new AssertionFailure(
@@ -117,7 +126,8 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 			catch (RuntimeException e) {
 				throw QueryLog.INSTANCE.jsonHandlerOperationFailed( "request body transformation", e );
 			}
-			ObjectNode replacement = JsonHandlerBridge.importObject( handler, returned, "request body transformation" );
+			ObjectNode replacement =
+					JsonHandlerBridge.importObject( handler, returned, "request body transformation", parsing );
 			potentiallyTransformedBody = replacement;
 		}
 		catch (SearchException e) {
@@ -141,7 +151,8 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 		parameters.forEach( builder::param );
 
 		ObjectNode body = legacyBody != null
-				? JsonHandlerBridge.importObject( GsonJsonHandlers.object(), legacyBody, "legacy request body editing" )
+				? JsonHandlerBridge.importObject( GsonJsonHandlers.object(), legacyBody, "legacy request body editing",
+						parsing )
 				: potentiallyTransformedBody != null ? potentiallyTransformedBody
 				: originalBody;
 		if ( body != null ) {

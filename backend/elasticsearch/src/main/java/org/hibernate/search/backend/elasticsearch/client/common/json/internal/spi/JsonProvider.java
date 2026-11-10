@@ -3,9 +3,10 @@ package org.hibernate.search.backend.elasticsearch.client.common.json.internal.s
 import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.json.internal.spi.JsonCodecRegistry;
+import org.hibernate.search.util.json.internal.spi.JsonParsing;
 import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
-/** Fixed Jackson parsing, bounded output and generated-codec services supplied to client extensions. */
+/** Backend-owned parsing, bounded output and generated-codec services. */
 @Incubating
 public final class JsonProvider {
 	private final JsonCodecService codec, codecNoSerializeNulls;
@@ -16,9 +17,13 @@ public final class JsonProvider {
 	}
 
 	public JsonProvider(JsonCodecRegistry registry, boolean logPrettyPrinting, JsonValidation validation) {
-		codec = new JsonCodecService( registry, true, false, validation );
-		codecNoSerializeNulls = new JsonCodecService( registry, false, false, validation );
-		logHelper = JsonLogHelper.create( new JsonCodecService( registry, false, logPrettyPrinting, validation ),
+		this( registry, logPrettyPrinting, validation, new JsonParsing() );
+	}
+
+	public JsonProvider(JsonCodecRegistry registry, boolean logPrettyPrinting, JsonValidation validation, JsonParsing parsing) {
+		codec = new JsonCodecService( registry, true, false, validation, parsing );
+		codecNoSerializeNulls = new JsonCodecService( registry, false, false, validation, parsing );
+		logHelper = JsonLogHelper.create( new JsonCodecService( registry, false, logPrettyPrinting, validation, parsing ),
 				logPrettyPrinting );
 	}
 

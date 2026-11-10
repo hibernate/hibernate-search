@@ -64,7 +64,8 @@ public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredica
 	}
 
 	public <T> ElasticsearchSearchPredicate fromJson(JsonHandler<T> handler, T jsonObject) {
-		return fromJson( JsonHandlerBridge.importObject( handler, jsonObject, "predicate import" ) );
+		return fromJson(
+				JsonHandlerBridge.importObject( handler, jsonObject, "predicate import", scope.userFacingCodec().parsing() ) );
 	}
 
 	private ElasticsearchSearchPredicate fromJson(ObjectNode jsonObject) {
@@ -72,6 +73,6 @@ public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredica
 	}
 
 	public ElasticsearchSearchPredicate fromJson(String jsonString) {
-		return fromJson( JsonHandlerBridge.parseObject( jsonString, "predicate import" ) );
+		return fromJson( JsonHandlerBridge.parseObject( jsonString, "predicate import", scope.userFacingCodec().parsing() ) );
 	}
 }

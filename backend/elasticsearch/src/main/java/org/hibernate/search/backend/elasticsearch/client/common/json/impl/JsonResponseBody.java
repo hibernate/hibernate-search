@@ -24,7 +24,7 @@ public final class JsonResponseBody implements org.hibernate.search.util.json.sp
 
 	private static final int DIAGNOSTIC_PREFIX_LIMIT = 8192;
 
-	public static final long DEFAULT_LIMIT = 100L * 1024 * 1024;
+	public static final long DEFAULT_LIMIT = 0;
 	private JsonParserSession parser;
 	private final Charset charset;
 	private final JsonValidation validation;
@@ -41,10 +41,17 @@ public final class JsonResponseBody implements org.hibernate.search.util.json.sp
 	}
 
 	public JsonResponseBody(Charset charset, long limit, JsonValidation validation) {
+		this( charset, limit, validation, new JsonParsing() );
+	}
+
+	public JsonResponseBody(Charset charset, long limit, JsonValidation validation, JsonParsing parsing) {
+		if ( limit < 0 ) {
+			throw ElasticsearchClientLog.INSTANCE.negativeResponseBodySizeLimit( limit );
+		}
 		this.validation = Objects.requireNonNull( validation );
 		this.charset = charset;
 		this.limit = limit;
-		parser = new JsonParsing().createParser( charset );
+		parser = parsing.createParser( charset );
 	}
 
 	public void feed(ByteBuffer input) {

@@ -22,14 +22,17 @@ class ElasticsearchNativeIndexFieldTypeHandlerMappingStep<T> implements Elastics
 	@Override
 	public ElasticsearchNativeIndexFieldTypeTypedOptionsStep<?, T> mapping(String json) {
 		PropertyMapping mapping = buildContext.getUserFacingCodec().decode(
-				JsonHandlerBridge.parseObject( json, "native field mapping" ), PropertyMapping.class );
+				JsonHandlerBridge.parseObject( json, "native field mapping", buildContext.getUserFacingCodec().parsing() ),
+				PropertyMapping.class );
 		return new ElasticsearchNativeIndexFieldTypeHandlerOptionsStep<>( buildContext, mapping, handler );
 	}
 
 	@Override
 	public <M> ElasticsearchNativeIndexFieldTypeTypedOptionsStep<?, T> mapping(JsonHandler<M> mappingHandler, M json) {
 		PropertyMapping mapping = buildContext.getUserFacingCodec().decode(
-				JsonHandlerBridge.importObject( mappingHandler, json, "native field mapping" ), PropertyMapping.class );
+				JsonHandlerBridge.importObject( mappingHandler, json, "native field mapping",
+						buildContext.getUserFacingCodec().parsing() ),
+				PropertyMapping.class );
 		return new ElasticsearchNativeIndexFieldTypeHandlerOptionsStep<>( buildContext, mapping, handler );
 	}
 }

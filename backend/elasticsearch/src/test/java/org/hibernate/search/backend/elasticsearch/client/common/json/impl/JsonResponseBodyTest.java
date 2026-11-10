@@ -19,6 +19,21 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class JsonResponseBodyTest {
 	@Test
+	void unlimitedDefaultAcceptsMoreThanTheFormerHundredMiBLimitWithoutBufferingTheBody() {
+		byte[] whitespace = new byte[8192];
+		Arrays.fill( whitespace, (byte) ' ' );
+		try ( var body = new JsonResponseBody( StandardCharsets.UTF_8, JsonResponseBody.DEFAULT_LIMIT ) ) {
+			body.feed( StandardCharsets.UTF_8.encode( "{}" ) );
+			for ( int i = 0; i < 100 * 1024 * 1024 / whitespace.length + 1; i++ ) {
+				body.feed( ByteBuffer.wrap( whitespace ) );
+			}
+			body.complete();
+			assertThat( body.inputBytes() ).isGreaterThan( 100L * 1024 * 1024 );
+			assertThat( body.result().isEmpty() ).isTrue();
+		}
+	}
+
+	@Test
 	void cancellationPreservesFailureAndDiagnosticReplayIsSafe() throws Exception {
 		var original = new JsonParseException( "Original parse failure" );
 		var body = new JsonResponseBody( StandardCharsets.UTF_8, 0 );

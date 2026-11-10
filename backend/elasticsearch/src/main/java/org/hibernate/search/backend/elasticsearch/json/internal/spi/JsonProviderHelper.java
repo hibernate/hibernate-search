@@ -43,6 +43,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.json.internal.spi.JsonCodec;
 import org.hibernate.search.util.json.internal.spi.JsonCodecRegistry;
+import org.hibernate.search.util.json.internal.spi.JsonParsing;
 import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
 /** Explicit registrations for the backend's known schema model types. */
@@ -101,8 +102,16 @@ public final class JsonProviderHelper {
 		return new JsonProvider( REGISTRY, logPrettyPrinting, validation );
 	}
 
+	public static JsonProvider create(boolean logPrettyPrinting, JsonValidation validation, JsonParsing parsing) {
+		return new JsonProvider( REGISTRY, logPrettyPrinting, validation, parsing );
+	}
+
 	public static JsonCodecService createUserFacingCodec(JsonValidation validation) {
 		return new JsonCodecService( REGISTRY, false, true, validation );
+	}
+
+	public static JsonCodecService createUserFacingCodec(JsonValidation validation, JsonParsing parsing) {
+		return new JsonCodecService( REGISTRY, false, true, validation, parsing );
 	}
 
 	public static JsonCodecService createUserFacingCodec() {

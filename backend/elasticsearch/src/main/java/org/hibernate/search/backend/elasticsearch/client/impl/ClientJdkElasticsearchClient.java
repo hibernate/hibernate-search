@@ -37,15 +37,15 @@ public class ClientJdkElasticsearchClient implements ElasticsearchClientImplemen
 	private final SimpleScheduledExecutor timeoutExecutorService;
 
 	private final Optional<Integer> requestTimeoutMs;
+	private final long responseBodySizeLimit;
 
 
 	private final List<HttpRequestInterceptor> requestInterceptors;
 
 	ClientJdkElasticsearchClient(BeanHolder<? extends RestJdkClient> restClientHolder,
-			SimpleScheduledExecutor timeoutExecutorService,
-			Optional<Integer> requestTimeoutMs,
-			List<HttpRequestInterceptor> requestInterceptors
-	) {
+			SimpleScheduledExecutor timeoutExecutorService, Optional<Integer> requestTimeoutMs,
+			List<HttpRequestInterceptor> requestInterceptors, long responseBodySizeLimit) {
+		this.responseBodySizeLimit = responseBodySizeLimit;
 		this.restClientHolder = restClientHolder;
 		this.timeoutExecutorService = timeoutExecutorService;
 		this.requestTimeoutMs = requestTimeoutMs;
@@ -256,7 +256,8 @@ public class ClientJdkElasticsearchClient implements ElasticsearchClientImplemen
 								!head
 										&& responseInfo.headers().firstValue( "Content-Encoding" )
 												.map( "gzip"::equalsIgnoreCase )
-												.orElse( false ) );
+												.orElse( false ),
+								responseBodySizeLimit );
 				if ( cancelled ) {
 					subscriber.getBody().toCompletableFuture().cancel( true );
 				}

@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
@@ -91,6 +92,7 @@ public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientF
 			ThreadProvider threadProvider, String threadNamePrefix,
 			SimpleScheduledExecutor timeoutExecutorService) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
+		long responseBodySizeLimit = JsonTransportSupport.responseBodySizeLimit( propertySource );
 
 		NodeProvider nodeProvider = NodeProvider.fromOptionalStrings( PROTOCOL.get( propertySource ),
 				HOSTS.get( propertySource ), URIS.get( propertySource ), PATH_PREFIX.get( propertySource ) );
@@ -99,7 +101,7 @@ public class ClientJdkElasticsearchClientFactory implements ElasticsearchClientF
 
 		return new ClientJdkElasticsearchClient(
 				restClientHolder, timeoutExecutorService, requestTimeoutMs,
-				createRequestInterceptors( beanResolver, propertySource )
+				createRequestInterceptors( beanResolver, propertySource ), responseBodySizeLimit
 		);
 	}
 

@@ -6,6 +6,7 @@ import org.hibernate.search.util.common.logging.CategorizedLogger;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
@@ -29,5 +30,5 @@ public interface ElasticsearchClientLog {
 	ElasticsearchClientLog INSTANCE = LoggerFactory.make( ElasticsearchClientLog.class, CATEGORY_NAME, MethodHandles.lookup() );
 
 	@Message(id = MessageConstants.BACKEND_ES_CLIENT_ID_RANGE_MIN + 0, value = "Response input exceeds byte limit %s")
-	ContentTooLongException responseInputLimitExceeded(long limit);
+	ContentTooLongException responseInputLimitExceeded(long limit, @Cause RuntimeException cause);
 }

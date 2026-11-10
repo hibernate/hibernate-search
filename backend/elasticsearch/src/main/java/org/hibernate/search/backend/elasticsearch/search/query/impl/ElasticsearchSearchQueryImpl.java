@@ -181,7 +181,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.deadline( timeoutManager.hardDeadlineOrNull() )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer,
-								scope.userFacingCodec().validation() )
+								scope.userFacingCodec().validation(), scope.userFacingCodec().parsing() )
 				);
 		NonBulkableWork<Long> work = builder.build();
 		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.blocking() ) );
@@ -243,7 +243,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.deadline( timeoutManager.deadlineOrNull(), timeoutManager.hasHardTimeout() )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer,
-								scope.userFacingCodec().validation() )
+								scope.userFacingCodec().validation(), scope.userFacingCodec().parsing() )
 				);
 		return builder;
 	}
@@ -280,7 +280,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.routingKeys( routingKeys )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer,
-								scope.userFacingCodec().validation() )
+								scope.userFacingCodec().validation(), scope.userFacingCodec().parsing() )
 				)
 				.build();
 

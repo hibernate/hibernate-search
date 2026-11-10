@@ -122,7 +122,7 @@ class ClientJdkJsonTransportTest {
 	}
 
 	@Test
-	void responseLimitCountsInputAcrossBatchesAndCancelsImmediately() throws Exception {
+	void responseLimitCountsDecodedInputAcrossBatchesAndCancelsImmediately() throws Exception {
 		for ( boolean compressed : List.of( false, true ) ) {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			if ( compressed ) {
@@ -134,14 +134,14 @@ class ClientJdkJsonTransportTest {
 				output.writeBytes( "{}".getBytes( StandardCharsets.UTF_8 ) );
 			}
 			byte[] bytes = output.toByteArray();
-			for ( int limit : new int[] { bytes.length - 1, bytes.length } ) {
+			for ( int limit : new int[] { 1, 2 } ) {
 				var subscriber = subscriber( json,
 						StandardCharsets.UTF_8, 200, compressed, limit );
 				var demand = new Demand();
 				subscriber.onSubscribe( demand );
 				subscriber.onNext( List.of( ByteBuffer.wrap( bytes, 0, bytes.length - 1 ) ) );
 				subscriber.onNext( List.of( ByteBuffer.wrap( bytes, bytes.length - 1, 1 ) ) );
-				if ( limit < bytes.length ) {
+				if ( limit < 2 ) {
 					assertThat( subscriber.getBody().toCompletableFuture() ).isCompletedExceptionally();
 					assertThatThrownBy( () -> subscriber.getBody().toCompletableFuture().join() )
 							.hasStackTraceContaining( "byte limit" );

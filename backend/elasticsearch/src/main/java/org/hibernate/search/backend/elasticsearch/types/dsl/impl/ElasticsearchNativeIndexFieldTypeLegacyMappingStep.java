@@ -17,14 +17,17 @@ class ElasticsearchNativeIndexFieldTypeLegacyMappingStep implements Elasticsearc
 	@Override
 	public ElasticsearchNativeIndexFieldTypeOptionsStep<?> mapping(String json) {
 		PropertyMapping mapping = buildContext.getUserFacingCodec().decode(
-				JsonHandlerBridge.parseObject( json, "native field mapping" ), PropertyMapping.class );
+				JsonHandlerBridge.parseObject( json, "native field mapping", buildContext.getUserFacingCodec().parsing() ),
+				PropertyMapping.class );
 		return new ElasticsearchNativeIndexFieldTypeLegacyOptionsStep( buildContext, mapping );
 	}
 
 	@Override
 	public <M> ElasticsearchNativeIndexFieldTypeOptionsStep<?> mapping(JsonHandler<M> handler, M json) {
 		PropertyMapping mapping = buildContext.getUserFacingCodec().decode(
-				JsonHandlerBridge.importObject( handler, json, "native field mapping" ), PropertyMapping.class );
+				JsonHandlerBridge.importObject( handler, json, "native field mapping",
+						buildContext.getUserFacingCodec().parsing() ),
+				PropertyMapping.class );
 		return new ElasticsearchNativeIndexFieldTypeLegacyOptionsStep( buildContext, mapping );
 	}
 }

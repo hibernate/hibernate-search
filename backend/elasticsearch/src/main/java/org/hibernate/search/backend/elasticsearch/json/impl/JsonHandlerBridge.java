@@ -30,6 +30,10 @@ public final class JsonHandlerBridge {
 	}
 
 	public static <T> JsonNode importValue(JsonHandler<T> handler, T value, String operation) {
+		return importValue( handler, value, operation, PARSING );
+	}
+
+	public static <T> JsonNode importValue(JsonHandler<T> handler, T value, String operation, JsonParsing parsing) {
 		try {
 			Class<T> javaType = Objects.requireNonNull( Objects.requireNonNull( handler ).javaType() );
 			javaType.cast( Objects.requireNonNull( value ) );
@@ -38,7 +42,7 @@ public final class JsonHandlerBridge {
 				JsonTreeValidation.validateExternal( node );
 				return node;
 			}
-			return PARSING.parse( Objects.requireNonNull( handler.toJson( value ) ) );
+			return parsing.parse( Objects.requireNonNull( handler.toJson( value ) ) );
 		}
 		catch (RuntimeException e) {
 			throw QueryLog.INSTANCE.jsonHandlerOperationFailed( operation, e );
@@ -47,6 +51,10 @@ public final class JsonHandlerBridge {
 
 	public static <T> ObjectNode importObject(JsonHandler<T> handler, T value, String operation) {
 		return requireObject( importValue( handler, value, operation ), operation );
+	}
+
+	public static <T> ObjectNode importObject(JsonHandler<T> handler, T value, String operation, JsonParsing parsing) {
+		return requireObject( importValue( handler, value, operation, parsing ), operation );
 	}
 
 	/** Export only stable internal or externally validated trees; arbitrary inputs must use importValue first. */
@@ -87,8 +95,12 @@ public final class JsonHandlerBridge {
 	}
 
 	public static ObjectNode parseObject(String json, String operation) {
+		return parseObject( json, operation, PARSING );
+	}
+
+	public static ObjectNode parseObject(String json, String operation, JsonParsing parsing) {
 		try {
-			return requireObject( PARSING.parse( Objects.requireNonNull( json ) ), operation );
+			return requireObject( parsing.parse( Objects.requireNonNull( json ) ), operation );
 		}
 		catch (SearchException e) {
 			throw e;

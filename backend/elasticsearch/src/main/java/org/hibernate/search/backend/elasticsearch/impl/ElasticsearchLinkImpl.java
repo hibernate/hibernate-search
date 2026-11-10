@@ -211,7 +211,8 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			elasticsearchVersion = initVersion( propertySource );
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
-			jsonProvider = JsonProviderHelper.create( logPrettyPrinting, defaultJsonProvider.getCodec().validation() );
+			jsonProvider = JsonProviderHelper.create( logPrettyPrinting, defaultJsonProvider.getCodec().validation(),
+					defaultJsonProvider.getCodec().parsing() );
 			indexMetadataSyntax = protocolDialect.createIndexMetadataSyntax();
 			searchSyntax = protocolDialect.createSearchSyntax();
 			workFactory = protocolDialect.createWorkFactory( jsonProvider, QUERY_SHARD_FAILURE_IGNORE.get( propertySource ) );

@@ -21,6 +21,23 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchSearchRequestTransformerCharacterizationTest {
+	@Test
+	void fallbackTransformerUsesBackendParserConstraintsAndKeepsOriginalOnFailure() {
+		var original = request( JacksonJsonHandlers.object().fromJson( "{\"ok\":1}" ) );
+		var defaults = org.hibernate.search.util.json.internal.spi.JsonParsingOptions.DEFAULT;
+		var parsing = new org.hibernate.search.util.json.internal.spi.JsonParsing(
+				new org.hibernate.search.util.json.internal.spi.JsonParsingOptions( defaults.maxDepth(),
+						defaults.maxStringLength(),
+						3, defaults.maxNumberLength(), defaults.maxInputChunkSize(), 0 ) );
+		var transform = ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction(
+				context -> context.transformBody( GsonJsonHandlers.object(), body -> {
+					body.addProperty( "longname", true );
+					return body;
+				} ), org.hibernate.search.util.json.internal.spi.JsonValidation.of( false ), parsing );
+		assertThatThrownBy( () -> transform.apply( original ) ).isInstanceOf( SearchException.class );
+		assertThat( original.bodyPartsJson().get( 0 ).has( "longname" ) ).isFalse();
+	}
+
 	private static ObjectNode body() {
 		return JacksonJsonHandlers.object()
 				.fromJson( "{\"query\":{\"term\":{\"name\":\"original\"}},\"unknown\":[null,true]}" );
