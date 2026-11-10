@@ -170,7 +170,7 @@
         <version.mysql.mysql-connector-j>26.10.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>12.1.5.0</version.com.ibm.db2.jcc>
         <version.com.oracle.database.jdbc>23.26.4.0.0</version.com.oracle.database.jdbc>
-        <version.com.microsoft.sqlserver.mssql-jdbc>13.6.1.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
+        <version.com.microsoft.sqlserver.mssql-jdbc>13.6.2.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
@@ -190,7 +190,7 @@
         <version.dev.snowdrop>4.1.1</version.dev.snowdrop>
         <version.io.agroal>3.2.1</version.io.agroal>
 
-        <version.jsoup>1.23.2</version.jsoup>
+        <version.jsoup>1.24.1</version.jsoup>
         <version.snakeyaml>2.7</version.snakeyaml>
 
         <!-- Whether javadoc warnings should fail the build -->
