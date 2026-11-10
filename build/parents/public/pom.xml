@@ -82,7 +82,7 @@
                         <failOnError>true</failOnError>
                         <release>${maven.compiler.release}</release>
                         <!-- Exclude implementation classes from the javadoc -->
-                        <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
+                        <excludePackageNames>*.impl,*.impl.*,*.internal,*.internal.*</excludePackageNames>
                         <!--
                             This feature tries to set up links between javadoc of different modules.
                             We don't need that since we merge everything together in the end,
@@ -366,7 +366,7 @@
                                      -->
                                     <outputDirectory>${project.build.directory}/javadoc-jar</outputDirectory>
                                     <!-- SPI pages add bulk; SPI is for integrators who read the source -->
-                                    <excludePackageNames>*.impl,*.impl.*,*.spi,*.spi.*</excludePackageNames>
+                                    <excludePackageNames>*.impl,*.impl.*,*.internal,*.internal.*,*.spi,*.spi.*</excludePackageNames>
                                     <additionalOptions>
                                         <additionalOption>-html5</additionalOption>
                                         <additionalOption>-Xdoclint:all,-missing</additionalOption>

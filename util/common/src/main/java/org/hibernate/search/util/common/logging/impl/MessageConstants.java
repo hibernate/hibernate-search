@@ -73,6 +73,9 @@ public final class MessageConstants {
 	public static final int UTIL_ID_RANGE_MIN = 900000;
 	public static final int UTIL_ID_RANGE_MAX = 909999;
 
+	public static final int UTIL_JSON_ID_RANGE_MIN = 910000;
+	public static final int UTIL_JSON_ID_RANGE_MAX = 919999;
+
 	public static final int PROCESSOR_ID_RANGE_MIN = 1000000;
 	public static final int PROCESSOR_ID_RANGE_MAX = 1009999;
 

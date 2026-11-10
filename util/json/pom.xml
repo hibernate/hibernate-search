@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-public</artifactId>
+        <version>9.0.0-SNAPSHOT</version>
+        <relativePath>../../build/parents/public</relativePath>
+    </parent>
+    <artifactId>hibernate-search-util-json</artifactId>
+
+    <name>Hibernate Search Utils - JSON</name>
+    <description>Hibernate Search Jackson JSON streaming and codec infrastructure</description>
+
+    <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+        <java.module.name>org.hibernate.search.util.json</java.module.name>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-test-common</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-json-dependency-boundaries</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>com.google.code.gson:gson</exclude>
+                                        <exclude>com.fasterxml.jackson.core:jackson-core</exclude>
+                                        <exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <exports combine.self="override">
+                                        org.hibernate.search.util.json.logging.impl to org.jboss.logging;
+                                        org.hibernate.search.util.json.internal.* to org.hibernate.search.backend.elasticsearch;
+                                        org.hibernate.search.util.json.impl to org.hibernate.search.engine;
+                                        *;
+                                    </exports>
+                                    <requires combine.self="override">
+                                        tools.jackson.databind;
+                                        org.hibernate.*.impl;
+                                        org.hibernate.*.internal;
+                                        org.hibernate.*.impl.*;
+                                        org.hibernate.*.internal.*;
+                                        transitive org.hibernate.*;
+                                        *;
+                                    </requires>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
