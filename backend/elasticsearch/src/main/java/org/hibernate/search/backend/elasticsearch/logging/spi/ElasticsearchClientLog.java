@@ -9,8 +9,10 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchJsonObjectFormatter;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
@@ -126,7 +128,7 @@ public interface ElasticsearchClientLog {
 
 	@Message(id = ID_OFFSET + 90, value = "Request execution exceeded the timeout of %1$s. Request was %2$s")
 	SearchTimeoutException requestTimedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
-			org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest request);
+			@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request);
 
 	@Message(id = ID_OFFSET + 93,
 			value = "Invalid Elasticsearch index layout:"

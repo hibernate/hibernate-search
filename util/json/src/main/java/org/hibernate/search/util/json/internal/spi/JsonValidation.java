@@ -17,7 +17,10 @@ public final class JsonValidation {
 
 	/** Snapshot the standalone utility default when creating a service, body or cursor. */
 	public static JsonValidation systemDefault() {
-		return of( Boolean.getBoolean( JsonTreeValidation.INTERNAL_VALIDATION_PROPERTY ) );
+		String utilityDefault = System.getProperty( JsonTreeValidation.INTERNAL_VALIDATION_SYSTEM_PROPERTY );
+		return of( utilityDefault == null
+				? Boolean.getBoolean( JsonTreeValidation.INTERNAL_VALIDATION_PROPERTY )
+				: Boolean.parseBoolean( utilityDefault ) );
 	}
 
 	private final boolean enabled;

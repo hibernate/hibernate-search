@@ -11,6 +11,9 @@ public final class JsonTreeValidation {
 	/** Opt-in internal invariant checks; standalone utilities default to false. */
 	public static final String INTERNAL_VALIDATION_PROPERTY = "hibernate.search.json.internal_validation";
 
+	/** Utility JVM default outside Search configuration, so unrelated backends do not see an unused property. */
+	public static final String INTERNAL_VALIDATION_SYSTEM_PROPERTY = "org.hibernate.search.util.json.internal_validation";
+
 	/** Current JVM fallback for standalone utility calls; configured services retain their own policy. */
 	public static boolean isInternalValidationEnabled() {
 		return JsonValidation.systemDefault().enabled();

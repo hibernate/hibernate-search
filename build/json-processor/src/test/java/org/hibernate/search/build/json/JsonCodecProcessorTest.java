@@ -105,17 +105,17 @@ class JsonCodecProcessorTest {
 			var parsing = new JsonParsing();
 			Object value = codec.decode( parsing.parse(
 					"""
-					{ "z": null, "old": "parent", "custom": "a;b",
-					  "children": [null, { "renamed": "child", "extra": { "null": null } }],
-					  "raw": { "omitted": null, "items": [null, { "omitted": null }] }, "a": 1 }
-					""" ) );
+							{ "z": null, "old": "parent", "custom": "a;b",
+							"children": [null, { "renamed": "child", "extra": { "null": null } }],
+							"raw": { "omitted": null, "items": [null, { "omitted": null }] }, "a": 1 }
+							""" ) );
 			var encoded = (ObjectNode) codec.encode( value, false );
 			assertThat( encoded.propertyNames() ).containsExactly( "children", "custom", "renamed", "raw", "a" );
 			assertThat( encoded ).isEqualTo( parsing.parse(
 					"""
-					{ "children": [null, { "renamed": "child", "extra": {} }], "custom": "a;b",
-					  "raw": { "items": [null, {}] }, "renamed": "parent", "a": 1 }
-					""" ) );
+							{ "children": [null, { "renamed": "child", "extra": {} }], "custom": "a;b",
+							"raw": { "items": [null, {}] }, "renamed": "parent", "a": 1 }
+							""" ) );
 			assertThat( codec.encode( value, true ).get( "z" ).isNull() ).isTrue();
 		}
 	}
@@ -125,7 +125,8 @@ class JsonCodecProcessorTest {
 		var sources = annotations();
 		sources.add( source( "first.Value", "package first; public class Value {}" ) );
 		sources.add( source( "second.Value", "package second; public class Value {}" ) );
-		sources.add( source( "other.GeneratedJsonNodeJsonCodec", "package other; public class GeneratedJsonNodeJsonCodec {}" ) );
+		sources.add(
+				source( "other.GeneratedJsonNodeJsonCodec", "package other; public class GeneratedJsonNodeJsonCodec {}" ) );
 		sources.add( source( "fixture.JsonNode", """
 				package fixture;
 				@org.hibernate.search.backend.elasticsearch.json.impl.JsonSerializable
@@ -150,7 +151,8 @@ class JsonCodecProcessorTest {
 				.contains( "import first.Value;", "import tools.jackson.databind.JsonNode;",
 						"JsonCodec<fixture.JsonNode>", "JsonCodec<Value> firstCodec", "JsonCodec<second.Value> secondCodec",
 						"JsonCodec<other.GeneratedJsonNodeJsonCodec> generatedCodec" )
-				.doesNotContain( "import fixture.JsonNode;", "import second.Value;", "import other.GeneratedJsonNodeJsonCodec;" );
+				.doesNotContain( "import fixture.JsonNode;", "import second.Value;",
+						"import other.GeneratedJsonNodeJsonCodec;" );
 	}
 
 	@ParameterizedTest

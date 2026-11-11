@@ -104,8 +104,11 @@ to enable internal invariant validation and writer cycle tracking for that Searc
 An explicitly configured value (including `false`) takes precedence over the JVM
 property of the same name; the final default is `false`. Services, bodies and
 cursors capture an immutable policy, so independent Search contexts can use different
-modes in the same JVM. Standalone utility entry points snapshot the JVM property
-when a service, body or cursor is created. Repository Surefire/Failsafe tests leave
+modes in the same JVM. Standalone utility entry points snapshot the JVM default
+when a service, body or cursor is created. The separate utility JVM property
+`org.hibernate.search.util.json.internal_validation` overrides the standalone default
+without becoming a Search configuration property; explicit Search configuration still takes precedence.
+Repository Surefire/Failsafe tests use this utility property and leave
 it disabled by default, matching production. Enable it locally with `-Pjson-internal-validation` (or
 `-Dtest.json.internal_validation=true`). The nightly JSON validation matrix entry
 uses that profile for utility/backend unit tests and the existing Elasticsearch

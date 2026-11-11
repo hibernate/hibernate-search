@@ -753,7 +753,7 @@
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <systemPropertyVariables>
-                            <hibernate.search.json.internal_validation>${test.json.internal_validation}</hibernate.search.json.internal_validation>
+                            <org.hibernate.search.util.json.internal_validation>${test.json.internal_validation}</org.hibernate.search.util.json.internal_validation>
                         </systemPropertyVariables>
                         <!--
                             Better test names in test reports.
@@ -807,7 +807,7 @@
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <systemPropertyVariables>
-                            <hibernate.search.json.internal_validation>${test.json.internal_validation}</hibernate.search.json.internal_validation>
+                            <org.hibernate.search.util.json.internal_validation>${test.json.internal_validation}</org.hibernate.search.util.json.internal_validation>
                         </systemPropertyVariables>
                         <!-- Catch configuration problems that could cause the plugin
                              to not detect any tests.

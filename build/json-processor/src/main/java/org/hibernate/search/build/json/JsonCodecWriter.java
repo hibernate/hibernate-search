@@ -17,10 +17,14 @@ final class JsonCodecWriter {
 		SourceImports imports = new SourceImports( m.packageName, element );
 		imports.add( m.codecQualifiedName );
 		for ( String type : new String[] {
-				"tools.jackson.databind.JsonNode", "tools.jackson.databind.node.ObjectNode",
-				"tools.jackson.databind.node.NullNode", "org.hibernate.search.util.json.internal.spi.JsonNodes",
-				"org.hibernate.search.util.json.internal.spi.JsonCodec", "org.hibernate.search.util.json.internal.spi.JsonCodecs",
-				"org.hibernate.search.util.json.internal.spi.JsonCodecRegistry", "javax.annotation.processing.Generated",
+				"tools.jackson.databind.JsonNode",
+				"tools.jackson.databind.node.ObjectNode",
+				"tools.jackson.databind.node.NullNode",
+				"org.hibernate.search.util.json.internal.spi.JsonNodes",
+				"org.hibernate.search.util.json.internal.spi.JsonCodec",
+				"org.hibernate.search.util.json.internal.spi.JsonCodecs",
+				"org.hibernate.search.util.json.internal.spi.JsonCodecRegistry",
+				"javax.annotation.processing.Generated",
 				"java.lang.Override" } ) {
 			imports.add( type );
 		}
@@ -50,9 +54,11 @@ final class JsonCodecWriter {
 			}
 			w.println();
 			line( w, 0, "@Generated(\"" + processorClassName + "\")" );
-			line( w, 0, "public final class " + m.codecSimpleName + " implements JsonCodec<" + imports.shorten( m.qualifiedName ) + "> {" );
+			line( w, 0, "public final class " + m.codecSimpleName + " implements JsonCodec<"
+					+ imports.shorten( m.qualifiedName ) + "> {" );
 			for ( FieldModel f : m.fields ) {
-				line( w, 1, "private final JsonCodec<" + imports.shorten( f.typeMirror.toString() ) + "> " + f.javaName + "Codec;" );
+				line( w, 1, "private final JsonCodec<" + imports.shorten( f.typeMirror.toString() ) + "> " + f.javaName
+						+ "Codec;" );
 			}
 			w.println();
 			line( w, 1, "public " + m.codecSimpleName + "(JsonCodecRegistry registry) {" );
@@ -91,19 +97,22 @@ final class JsonCodecWriter {
 			line( w, 1, "}" );
 			w.println();
 			line( w, 1, "@Override" );
-			line( w, 1, "public JsonNode encode(" + imports.shorten( m.qualifiedName ) + " instance, boolean serializeNulls) {" );
+			line( w, 1,
+					"public JsonNode encode(" + imports.shorten( m.qualifiedName ) + " instance, boolean serializeNulls) {" );
 			line( w, 2, "if ( instance == null ) {" );
 			line( w, 3, "return NullNode.instance;" );
 			line( w, 2, "}" );
 			line( w, 2, "ObjectNode result = JsonNodes.objectNode();" );
 			for ( FieldModel f : m.fields ) {
-				line( w, 2, "JsonCodecs.put( result, \"" + f.jsonName + "\", " + f.javaName + "Codec.encode( instance." + f.getter
-						+ "(), serializeNulls ), serializeNulls );" );
+				line( w, 2,
+						"JsonCodecs.put( result, \"" + f.jsonName + "\", " + f.javaName + "Codec.encode( instance." + f.getter
+								+ "(), serializeNulls ), serializeNulls );" );
 			}
 			if ( m.hasExtraProperties() ) {
 				line( w, 2, "if ( instance." + m.extraPropsGetter + "() != null ) {" );
 				line( w, 3, "for ( var entry : instance." + m.extraPropsGetter + "().entrySet() ) {" );
-				line( w, 4, "JsonCodecs.put( result, entry.getKey(), JsonCodecs.copy( entry.getValue(), serializeNulls ), serializeNulls );" );
+				line( w, 4,
+						"JsonCodecs.put( result, entry.getKey(), JsonCodecs.copy( entry.getValue(), serializeNulls ), serializeNulls );" );
 				line( w, 3, "}" );
 				line( w, 2, "}" );
 			}

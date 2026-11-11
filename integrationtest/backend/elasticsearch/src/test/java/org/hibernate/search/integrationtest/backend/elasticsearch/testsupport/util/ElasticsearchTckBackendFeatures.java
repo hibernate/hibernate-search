@@ -1,5 +1,6 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import static org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions.*;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 
 import java.lang.reflect.Array;
@@ -478,7 +479,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public Optional<Comparator<? super Object>> rawValueEqualsComparator(FieldTypeDescriptor<?, ?> fieldType) {
-		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
+		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType )
+				|| Number.class.isAssignableFrom( fieldType.getJavaType() ) ) {
 			return Optional.of( (Comparator<Object>) (o1, o2) -> {
 				// we have exact string match or both are null
 				if ( Objects.equals( o1, o2 ) ) {
@@ -488,9 +490,10 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				if ( o1 == null || o2 == null ) {
 					return -1;
 				}
-				// compare parsed JSONs to address possible attribute order change:
-				return json.decode( (String) o1, JsonNode.class )
-						.equals( json.decode( (String) o2, JsonNode.class ) ) ? 0 : -1;
+				// Compare JSON values independently of object member order and numeric spelling.
+				return equivalent( json.decode( (String) o1, JsonNode.class ), json.decode( (String) o2, JsonNode.class ) )
+						? 0
+						: -1;
 			} );
 		}
 		return super.rawValueEqualsComparator( fieldType );

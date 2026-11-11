@@ -1,6 +1,7 @@
 package org.hibernate.search.build.json;
 
 import java.util.List;
+
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 

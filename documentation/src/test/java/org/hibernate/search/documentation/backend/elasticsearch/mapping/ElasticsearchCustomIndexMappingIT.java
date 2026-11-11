@@ -5,6 +5,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -65,8 +66,10 @@ class ElasticsearchCustomIndexMappingIT {
 		try ( InputStream in = ElasticsearchCustomIndexMappingIT.class.getClassLoader()
 				.getResourceAsStream( "custom/index-mapping-merged.json" ) ) {
 
-			return JsonProviderHelper.createUserFacingCodec()
-					.decode( in, JsonNode.class ).toString();
+			// The reference snippet includes AsciiDoc callouts, which are markup rather than JSON.
+			String json = new String( in.readAllBytes(), StandardCharsets.UTF_8 )
+					.replaceAll( "(?m)\\h*// <\\d+>\\h*$", "" );
+			return JsonProviderHelper.createUserFacingCodec().decode( json, JsonNode.class ).toString();
 		}
 	}
 }

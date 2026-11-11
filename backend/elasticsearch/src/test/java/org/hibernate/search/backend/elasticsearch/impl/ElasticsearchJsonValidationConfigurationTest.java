@@ -20,9 +20,12 @@ class ElasticsearchJsonValidationConfigurationTest {
 	@Test
 	void configuredValuePrecedesSystemPropertyAndDefault() {
 		String key = JsonTreeValidation.INTERNAL_VALIDATION_PROPERTY;
+		String utilityKey = JsonTreeValidation.INTERNAL_VALIDATION_SYSTEM_PROPERTY;
 		String previous = System.getProperty( key );
+		String previousUtility = System.getProperty( utilityKey );
 		try {
 			System.clearProperty( key );
+			System.clearProperty( utilityKey );
 			assertThat( resolve( Map.of() ).enabled() ).isFalse();
 			assertThat( resolve( Map.of( "hibernate.search.backend.json.internal_validation", true ) ).enabled() )
 					.isFalse();
@@ -34,14 +37,18 @@ class ElasticsearchJsonValidationConfigurationTest {
 			System.setProperty( key, "false" );
 			assertThat( resolve( Map.of() ).enabled() ).isFalse();
 			assertThat( resolve( Map.of( key, "true" ) ).enabled() ).isTrue();
+			System.clearProperty( key );
+			System.setProperty( utilityKey, "true" );
+			assertThat( resolve( Map.of() ).enabled() ).isTrue();
+			assertThat( JsonValidation.systemDefault().enabled() ).isTrue();
+			assertThat( resolve( Map.of( key, false ) ).enabled() ).isFalse();
+			System.setProperty( utilityKey, "false" );
+			assertThat( resolve( Map.of() ).enabled() ).isFalse();
+			assertThat( resolve( Map.of( key, true ) ).enabled() ).isTrue();
 		}
 		finally {
-			if ( previous == null ) {
-				System.clearProperty( key );
-			}
-			else {
-				System.setProperty( key, previous );
-			}
+			restoreProperty( key, previous );
+			restoreProperty( utilityKey, previousUtility );
 		}
 	}
 
@@ -70,5 +77,14 @@ class ElasticsearchJsonValidationConfigurationTest {
 	private static JsonValidation resolve(Map<String, ?> properties) {
 		return ElasticsearchBackendFactory.resolveJsonValidation(
 				AllAwareConfigurationPropertySource.fromMap( properties ).withMask( "hibernate.search" ) );
+	}
+
+	private static void restoreProperty(String key, String previous) {
+		if ( previous == null ) {
+			System.clearProperty( key );
+		}
+		else {
+			System.setProperty( key, previous );
+		}
 	}
 }

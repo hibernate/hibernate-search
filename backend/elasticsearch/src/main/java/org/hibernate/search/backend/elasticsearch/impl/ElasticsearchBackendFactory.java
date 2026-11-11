@@ -70,7 +70,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 	private static final ConfigurationProperty<Boolean> JSON_INTERNAL_VALIDATION =
 			ConfigurationProperty.forKey( "json.internal_validation" )
-					.asBoolean().withDefault( false ).build();
+					.asBoolean().withDefault( () -> JsonValidation.systemDefault().enabled() ).build();
 
 	static JsonValidation resolveJsonValidation(ConfigurationPropertySource searchPropertySource) {
 		return JsonValidation.of( JSON_INTERNAL_VALIDATION.get( searchPropertySource.withFallback(
