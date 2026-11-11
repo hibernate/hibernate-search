@@ -767,7 +767,8 @@
                             <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>
                         </statelessTestsetReporter>
                         <consoleOutputReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5ConsoleOutputReporter">
-                            <usePhrasedFileName>true</usePhrasedFileName>
+                            <!-- Some test-set events lack a display name; Surefire 3.6.1 cannot use it as an output-file key. -->
+                            <usePhrasedFileName>false</usePhrasedFileName>
                         </consoleOutputReporter>
                         <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoReporter">
                             <usePhrasedFileName>true</usePhrasedFileName>
@@ -831,7 +832,8 @@
                             <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>
                         </statelessTestsetReporter>
                         <consoleOutputReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5ConsoleOutputReporter">
-                            <usePhrasedFileName>true</usePhrasedFileName>
+                            <!-- Some test-set events lack a display name; Surefire 3.6.1 cannot use it as an output-file key. -->
+                            <usePhrasedFileName>false</usePhrasedFileName>
                         </consoleOutputReporter>
                         <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoReporter">
                             <usePhrasedFileName>true</usePhrasedFileName>
