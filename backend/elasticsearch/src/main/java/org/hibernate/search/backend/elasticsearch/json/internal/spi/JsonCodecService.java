@@ -73,7 +73,7 @@ public final class JsonCodecService {
 		return parsing;
 	}
 
-	public <T> JsonCodec<T> getCodec(Class<T> type) {
+	public <T> JsonCodec<T> codec(Class<T> type) {
 		return registry.get( type );
 	}
 

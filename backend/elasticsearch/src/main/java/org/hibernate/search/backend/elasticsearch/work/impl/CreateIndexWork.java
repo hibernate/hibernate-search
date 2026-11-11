@@ -62,7 +62,7 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			 */
 			JsonCodecService json = jsonProvider.getCodecNoSerializeNulls();
 			payload.set( "aliases", JsonCodecs
-					.map( json.getCodec( IndexAliasDefinition.class ) ).encode( aliases, false ) );
+					.map( json.codec( IndexAliasDefinition.class ) ).encode( aliases, false ) );
 			return this;
 		}
 

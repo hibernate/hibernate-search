@@ -73,7 +73,7 @@ class JsonCodecCharacterizationTest {
 	@ParameterizedTest(name = "{0}: {1}")
 	@MethodSource("codecs")
 	void roundTrip(Class<?> type, String json) {
-		assertThat( codec.getCodec( type ).getClass().getName() ).doesNotContain( "ReflectiveTypeAdapter" );
+		assertThat( codec.codec( type ).getClass().getName() ).doesNotContain( "ReflectiveTypeAdapter" );
 		Object value = codec.decode( json, type );
 		assertThat( JsonScalarConversions.equivalent( codec.encode( value ), new JsonParsing().parse( json ) ) ).isTrue();
 		assertThat( codec.decode( "null", type ) ).isNull();
