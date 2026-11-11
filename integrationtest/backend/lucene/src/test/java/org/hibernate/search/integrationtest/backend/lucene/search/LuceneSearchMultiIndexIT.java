@@ -47,7 +47,7 @@ class LuceneSearchMultiIndexIT {
 	private final SimpleMappedIndex<IndexBinding1> index1 =
 			SimpleMappedIndex.of( IndexBinding1::new ).name( "index1" );
 	private final SimpleMappedIndex<IndexBinding2> index2 =
-			SimpleMappedIndex.of( IndexBinding2::new ).name( "index2" );;
+			SimpleMappedIndex.of( IndexBinding2::new ).name( "index2" );
 
 	public static List<? extends Arguments> params() {
 		return Arrays.asList( Arguments.of( "local-heap" ), Arguments.of( "local-filesystem" ) );

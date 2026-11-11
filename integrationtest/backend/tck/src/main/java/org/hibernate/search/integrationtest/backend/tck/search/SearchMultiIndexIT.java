@@ -64,9 +64,9 @@ class SearchMultiIndexIT {
 	private final SimpleMappedIndex<IndexBinding_1_1> index_1_1 =
 			SimpleMappedIndex.of( IndexBinding_1_1::new ).backendName( BACKEND_1 ).name( "index_1_1" );
 	private final SimpleMappedIndex<IndexBinding_1_2> index_1_2 =
-			SimpleMappedIndex.of( IndexBinding_1_2::new ).backendName( BACKEND_1 ).name( "index_1_2" );;
+			SimpleMappedIndex.of( IndexBinding_1_2::new ).backendName( BACKEND_1 ).name( "index_1_2" );
 	private final SimpleMappedIndex<IndexBinding_2_1> index_2_1 =
-			SimpleMappedIndex.of( IndexBinding_2_1::new ).backendName( BACKEND_2 ).name( "index_2_1" );;
+			SimpleMappedIndex.of( IndexBinding_2_1::new ).backendName( BACKEND_2 ).name( "index_2_1" );
 
 	@BeforeEach
 	void setup() {
