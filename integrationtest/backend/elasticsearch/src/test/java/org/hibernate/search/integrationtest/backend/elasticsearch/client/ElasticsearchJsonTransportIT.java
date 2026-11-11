@@ -241,7 +241,7 @@ class ElasticsearchJsonTransportIT {
 	}
 
 	@Test
-	void originalByteCap() throws Exception {
+	void configuredByteCapBeforeCharsetConversion() throws Exception {
 		try ( var server = new StreamingHttpServer( exchange -> {
 			exchange.headers( 200, "application/json; charset=UTF-16LE", "" );
 			byte[] whitespace = new byte[8192];
@@ -253,13 +253,15 @@ class ElasticsearchJsonTransportIT {
 			}
 			exchange.end();
 		} );
-				var client = client( List.of( server.uri() ), Map.of() ) ) {
+				var client = client( List.of( server.uri() ),
+						Map.of( ElasticsearchBackendSettings.RESPONSE_BODY_SIZE_LIMIT, 104857600L ) ) ) {
 			CompletableFuture<ElasticsearchJsonResponse> response = client.submit( request( "limit" ) );
 			assertThatThrownBy( () -> response.get( 30, TimeUnit.SECONDS ) ).hasMessageContaining( "byte limit 104857600" );
 		}
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void slowUploadAndEarlyRejection() throws Exception {
 		ObjectNode document = new ObjectNode( JsonNodeFactory.instance );
 		document.put( "value", "é😀".repeat( 1_000_000 ) );

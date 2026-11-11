@@ -23,6 +23,7 @@ import tools.jackson.databind.node.ObjectNode;
 
 class JsonTransportClientTest {
 	@Test
+	@SuppressWarnings("unused")
 	void absentTransportResultStillSupportsNativeAndHandlerAccess() {
 		var transport = mock( ElasticsearchClientImplementor.class );
 		when( transport.submit( any(), any() ) )

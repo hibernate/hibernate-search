@@ -73,6 +73,7 @@ class ClientOpenSearchJsonTransportTest {
 
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void decodedLimitIgnoresGzipFramingAndZeroIsUnlimited() throws Exception {
 		var compressed = new ByteArrayOutputStream();
 		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
@@ -147,6 +148,7 @@ class ClientOpenSearchJsonTransportTest {
 
 	@ParameterizedTest
 	@ValueSource(ints = { 1, 2, 5, 8192 })
+	@SuppressWarnings("unchecked")
 	void responseFragmentationCharsetHeadersAndReplay(int size) throws Exception {
 		String text = "{\"é😀\":\"" + "é😀".repeat( 5000 ) + "\"}";
 		byte[] bytes = text.getBytes( StandardCharsets.UTF_16LE );
@@ -191,6 +193,7 @@ class ClientOpenSearchJsonTransportTest {
 
 	@ParameterizedTest
 	@ValueSource(booleans = { false, true })
+	@SuppressWarnings("unchecked")
 	void explicitGzipLayerWhenClientDecompressionIsDisabled(boolean exceedsLimit) throws Exception {
 		String text = "{\"value\":\"" + "é😀".repeat( 5000 ) + "\"}";
 		var compressed = new ByteArrayOutputStream();
@@ -243,6 +246,7 @@ class ClientOpenSearchJsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void hc5InternalRetryStartsFreshSessionOnNewResponseHead() throws Exception {
 		var consumer = consumer( 10 );
 		Result first = new Result();
@@ -345,6 +349,7 @@ class ClientOpenSearchJsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void malformedResponsesDeferredUntilStatusDecisionAndLimitsStillApply() throws Exception {
 		for ( String text : List.of( "<proxy>unavailable", "{", "{}{}" ) ) {
 			var consumer = consumer( 100 );
@@ -374,6 +379,7 @@ class ClientOpenSearchJsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void absentEmptyJsonNullAndCancellation() throws Exception {
 		for ( String text : List.of( "", " \n\t", "null" ) ) {
 			var consumer = consumer( 100 );

@@ -20,6 +20,7 @@ class StreamingHttpServerTest {
 			"POST / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n2\r\nxx\r\n",
 			"POST / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n"
 	})
+	@SuppressWarnings("unused") // Request body contents are irrelevant to disconnect handling.
 	void disconnectDuringRequestIsAnExpectedOutcome(String request) throws Exception {
 		try ( var server = new StreamingHttpServer( exchange -> exchange.readBody( (bytes, count) -> {} ) ) ) {
 			URI uri = URI.create( server.uri() );

@@ -173,6 +173,7 @@ class ClientJdkJsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void localHttpParsesBeforeResponseCompletion() throws Exception {
 		CountDownLatch sent = new CountDownLatch( 1 );
 		CountDownLatch finish = new CountDownLatch( 1 );

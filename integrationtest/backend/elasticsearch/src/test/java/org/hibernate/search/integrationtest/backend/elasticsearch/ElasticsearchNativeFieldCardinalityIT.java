@@ -43,6 +43,7 @@ class ElasticsearchNativeFieldCardinalityIT {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void multipleObjectsProjectIndependentlyWithObjectAndGeneralHandlers() {
 		ObjectNode first = JacksonJsonHandlers.object().fromJson( "{\"value\":1,\"nested\":null}" );
 		ObjectNode second = JacksonJsonHandlers.object().fromJson( "{\"value\":2}" );

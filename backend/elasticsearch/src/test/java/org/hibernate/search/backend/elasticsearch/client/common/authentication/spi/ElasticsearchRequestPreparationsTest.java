@@ -83,6 +83,7 @@ class ElasticsearchRequestPreparationsTest {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void compositionWaitsForEachProviderAndPropagatesHeadersWithoutChangingDestination() {
 		var request = new ElasticsearchRequestPreparation.Request( URI.create( "https://host/" ), null );
 		var gate = new CompletableFuture<ElasticsearchRequestPreparation.Result>();
@@ -104,6 +105,7 @@ class ElasticsearchRequestPreparationsTest {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void synchronousProviderFailureAndCancellationPreventLaterPreparation() {
 		var request = new ElasticsearchRequestPreparation.Request( URI.create( "https://host/" ), null );
 		ElasticsearchRequestPreparation fail = (snapshot, execution) -> {
@@ -152,6 +154,7 @@ class ElasticsearchRequestPreparationsTest {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void setupFailureClosesAlreadyCreatedPreparationsAndProviderBeans() {
 		BeanResolver resolver = mock( BeanResolver.class );
 		var reference = BeanReference.of( ElasticsearchRequestPreparationProvider.class, "test" );

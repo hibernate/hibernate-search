@@ -84,6 +84,7 @@ class ElasticsearchSearchRequestTransformerCharacterizationTest {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void chainedTypedEditsSeeStagedChangesAndDifferentReturnedTreeIsRetained() {
 		ObjectNode replacement = JacksonJsonHandlers.object().fromJson( "{\"replacement\":true}" );
 		AtomicReference<ObjectNode> captured = new AtomicReference<>();
@@ -187,6 +188,7 @@ class ElasticsearchSearchRequestTransformerCharacterizationTest {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	void pathOnlySharesOriginalTreeAndBodyPartCountIsChecked() {
 		ObjectNode body = body();
 		ElasticsearchJsonRequest original = request( body );

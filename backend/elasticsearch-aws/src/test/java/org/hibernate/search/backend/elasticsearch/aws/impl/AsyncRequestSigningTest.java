@@ -156,7 +156,7 @@ class AsyncRequestSigningTest {
 
 	@ParameterizedTest
 	@ValueSource(strings = { "opensearch", "amazon-opensearch-serverless" })
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	void configurationSelectsServiceAndOwnsCreatedCredentialsUntilShutdown(String distribution) {
 		var resolver = mock( BeanResolver.class );
 		var credentials = new CloseableCredentials();

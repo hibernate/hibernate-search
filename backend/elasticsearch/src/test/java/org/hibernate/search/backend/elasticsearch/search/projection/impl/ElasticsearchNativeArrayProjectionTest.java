@@ -44,6 +44,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchNativeArrayProjectionTest {
+	@SuppressWarnings("unchecked")
 	private final ProjectionExtractionHelper<String> typeNameHelper = mock( ProjectionExtractionHelper.class );
 
 	@Test

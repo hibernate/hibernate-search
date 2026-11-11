@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 /** A transport integration using external contracts, with no JSON library or Search internal imports. */
 class ElasticsearchCustomJsonClientTest {
 	@Test
+	@SuppressWarnings("unused")
 	void customTransportPassesDistinctResultTypesAndReplaysBody() {
 		ElasticsearchClientFactory factory = (resolver, properties, threads, prefix, timeout) -> new Client();
 		try ( var client = factory.create( null, null, null, "custom", null ) ) {
@@ -83,6 +84,7 @@ class ElasticsearchCustomJsonClientTest {
 		};
 	}
 
+	@SuppressWarnings("unused")
 	private static <T> JsonResponseConsumerFactory<T> consumerFactory(Function<String, T> mapper, AtomicBoolean closed) {
 		return (charset, limit) -> new JsonResponseConsumer<>() {
 			private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();

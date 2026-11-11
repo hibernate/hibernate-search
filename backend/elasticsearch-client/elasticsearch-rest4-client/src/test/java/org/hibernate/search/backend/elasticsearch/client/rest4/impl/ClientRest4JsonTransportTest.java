@@ -69,6 +69,7 @@ class ClientRest4JsonTransportTest {
 
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void decodedLimitIgnoresGzipFramingAndZeroIsUnlimited() throws Exception {
 		var compressed = new ByteArrayOutputStream();
 		try ( var gzip = new java.util.zip.GZIPOutputStream( compressed ) ) {
@@ -153,6 +154,7 @@ class ClientRest4JsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void bodylessStatusesDoNotRequireGzipFraming() throws Exception {
 		for ( int status : new int[] { 204, 304 } ) {
 			var consumer = consumer( 100 );
@@ -192,6 +194,7 @@ class ClientRest4JsonTransportTest {
 
 	@ParameterizedTest
 	@ValueSource(ints = { 1, 2, 5, 8192 })
+	@SuppressWarnings("unchecked")
 	void responseFragmentationCharsetHeadersGzipAndReplay(int capacity) throws Exception {
 		String text = "{\"é😀\":\"" + "é😀".repeat( 5000 ) + "\"}";
 		byte[] bytes = text.getBytes( StandardCharsets.UTF_16LE );
@@ -379,6 +382,7 @@ class ClientRest4JsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void malformedResponsesDeferFailureButEnforceLimits() throws Exception {
 		for ( String text : List.of( "<proxy>unavailable", "{", "{}{}" ) ) {
 			var consumer = consumer( 100 );
@@ -406,6 +410,7 @@ class ClientRest4JsonTransportTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void emptyAbsentNullAndCancellation() throws Exception {
 		for ( String text : List.of( "", " \n\t", "null" ) ) {
 			var consumer = consumer( 100 );
