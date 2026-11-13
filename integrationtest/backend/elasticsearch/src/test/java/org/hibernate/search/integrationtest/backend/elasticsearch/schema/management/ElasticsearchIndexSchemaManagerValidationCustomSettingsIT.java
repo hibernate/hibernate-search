@@ -50,19 +50,19 @@ class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 				" { " +
 						"   'number_of_shards': '3', " +
 						"   'number_of_replicas': '3', " +
-						"   'analysis': { " +
-						"     'analyzer': { " +
-						"       'my_standard-english': { " +
+						"   \"analysis\": { " +
+						"     \"analyzer\": { " +
+						"       \"my_standard-english\": { " +
 						"         'type': 'standard', " +
 						"         'stopwords': '_english_' " +
 						"       }, " +
-						"       'my_analyzer_ngram': { " +
+						"       \"my_analyzer_ngram\": { " +
 						"         'type': 'custom', " +
 						"         'tokenizer': 'my_analyzer_ngram_tokenizer' " +
 						"       } " +
 						"     }, " +
-						"     'tokenizer': { " +
-						"       'my_analyzer_ngram_tokenizer': { " +
+						"     \"tokenizer\": { " +
+						"       \"my_analyzer_ngram_tokenizer\": { " +
 						"         'type': 'ngram', " +
 						"         'min_gram': '5', " +
 						"         'max_gram': '6' " +
@@ -88,19 +88,19 @@ class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 				" { " +
 						"   'number_of_shards': '3', " +
 						"   'number_of_replicas': '3', " +
-						"   'analysis': { " +
-						"     'analyzer': { " +
-						"       'my_standard-english': { " +
+						"   \"analysis\": { " +
+						"     \"analyzer\": { " +
+						"       \"my_standard-english\": { " +
 						"         'type': 'standard', " +
 						"         'stopwords': '_english_' " +
 						"       }, " +
-						"       'my_analyzer_ngram': { " +
+						"       \"my_analyzer_ngram\": { " +
 						"         'type': 'custom', " +
 						"         'tokenizer': 'my_analyzer_ngram_tokenizer' " +
 						"       } " +
 						"     }, " +
-						"     'tokenizer': { " +
-						"       'my_analyzer_ngram_tokenizer': { " +
+						"     \"tokenizer\": { " +
+						"       \"my_analyzer_ngram_tokenizer\": { " +
 						"         'type': 'ngram', " +
 						"         'min_gram': '2', " +
 						"         'max_gram': '3' " +
@@ -136,19 +136,19 @@ class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 				" { " +
 						"   'number_of_shards': '7', " +
 						"   'number_of_replicas': '3', " +
-						"   'analysis': { " +
-						"     'analyzer': { " +
-						"       'my_standard-english': { " +
+						"   \"analysis\": { " +
+						"     \"analyzer\": { " +
+						"       \"my_standard-english\": { " +
 						"         'type': 'standard', " +
 						"         'stopwords': '_english_' " +
 						"       }, " +
-						"       'my_analyzer_ngram': { " +
+						"       \"my_analyzer_ngram\": { " +
 						"         'type': 'custom', " +
 						"         'tokenizer': 'my_analyzer_ngram_tokenizer' " +
 						"       } " +
 						"     }, " +
-						"     'tokenizer': { " +
-						"       'my_analyzer_ngram_tokenizer': { " +
+						"     \"tokenizer\": { " +
+						"       \"my_analyzer_ngram_tokenizer\": { " +
 						"         'type': 'ngram', " +
 						"         'min_gram': '5', " +
 						"         'max_gram': '6' " +
@@ -175,7 +175,7 @@ class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void invalid_maxResultWindow(ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '20000' }" );
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ \"max_result_window\": \"20000\" }" );
 
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization( "" )
@@ -193,7 +193,7 @@ class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	void default_maxResultWindow(ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '10000' }" );
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ \"max_result_window\": \"10000\" }" );
 
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization( "" )

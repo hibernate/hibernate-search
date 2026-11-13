@@ -1,7 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
-
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -9,12 +8,13 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.CompositeAggregationBuilder;
 import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchAggregation<A> {
 	private static final String REVERSE_NESTED_WRAPPER_NAME = "reverse_nested_wrapper";
-	private static final JsonAccessor<JsonObject> REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR =
-			JsonAccessor.root().property( REVERSE_NESTED_WRAPPER_NAME ).asObject();
+	private static final JsonAccessor<ObjectNode> REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR =
+			JsonAccessor.root().property( REVERSE_NESTED_WRAPPER_NAME ).unwrapSingletonArrays().asObject();
 
 	private static final AggregationKey<?> REVERSE_NESTED_WRAPPER_KEY = AggregationKey.of( REVERSE_NESTED_WRAPPER_NAME );
 	private static final AggregationKey<?> REGULAR_KEY = AggregationKey.of( "regular_aggregation" );
@@ -28,15 +28,15 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 		compositor = builder.compositor;
 	}
 
-	public Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
+	public Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, ObjectNode jsonAggregations) {
 		Extractor<?>[] extractors = new Extractor[aggregations.length];
 		AggregationKey<?>[] keys = new AggregationKey[aggregations.length];
 		for ( int i = 0; i < aggregations.length; i++ ) {
 			keys[i] = AggregationKey.of( key.name() + "_composite_" + i );
-			JsonObject innerObject = new JsonObject();
+			ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 			extractors[i] = aggregations[i].request( context, keys[i], innerObject );
 			if ( !innerObject.isEmpty() ) {
-				jsonAggregations.add( keys[i].name(), innerObject.get( keys[i].name() ) );
+				jsonAggregations.set( keys[i].name(), innerObject.get( keys[i].name() ) );
 			}
 		}
 		return new CompositeExtractor<>( key, compositor, extractors, keys );
@@ -84,7 +84,7 @@ public class ElasticsearchCompositeAggregation<A> extends AbstractElasticsearchA
 			implements Extractor<A> {
 
 		@Override
-		public A extract(JsonObject aggregationResult, AggregationExtractContext context) {
+		public A extract(ObjectNode aggregationResult, AggregationExtractContext context) {
 			if ( REVERSE_NESTED_WRAPPER_KEY.equals( key ) ) {
 				aggregationResult = REQUEST_REVERSE_NESTED_WRAPPER_ACCESSOR.get( aggregationResult )
 						.orElseThrow( ElasticsearchClientLog.INSTANCE::elasticsearchResponseMissingData );

@@ -29,6 +29,7 @@ import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
@@ -333,4 +334,7 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 193, value = "Current factory cannot be resocped to '%1$s' as it is scoped to '%2$s'.")
 	SearchException incompatibleScopeRootType(@FormatWith(ClassFormatter.class) Class<?> requested,
 			@FormatWith(ClassFormatter.class) Class<?> actual);
+
+	@Message(id = ID_OFFSET + 196, value = "JSON handler operation failed: %1$s.")
+	SearchException jsonHandlerOperationFailed(String operation, @Cause RuntimeException cause);
 }

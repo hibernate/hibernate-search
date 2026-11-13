@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 
@@ -24,7 +24,7 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 
 	@Override
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
-			ElasticsearchRequest request) {
+			ElasticsearchJsonRequest request) {
 		if ( refreshWork != null ) {
 			// Refresh the index in order to minimize the risk of version conflict.
 			return refreshWork.execute( executionContext );
@@ -36,21 +36,23 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
 		return null;
 	}
 
-	public static class Builder
-			extends AbstractBuilder<Builder> {
+	public static class Builder extends AbstractBuilder<Builder> {
+
 		private final URLEncodedString indexName;
-		private final JsonObject payload;
+
+		private final ObjectNode payload;
+
 		private final Set<URLEncodedString> typeNames = new HashSet<>();
 
 		private Collection<String> routingKeys;
 
 		private final RefreshWork.Builder refreshWorkBuilder;
 
-		public Builder(URLEncodedString indexName, JsonObject payload, ElasticsearchWorkFactory workFactory) {
+		public Builder(URLEncodedString indexName, ObjectNode payload, ElasticsearchWorkFactory workFactory) {
 			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 			this.payload = payload;
@@ -63,27 +65,19 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.post()
-							.pathComponent( indexName )
-							/*
-							 * Ignore conflicts: if we wrote to a document concurrently,
-							 * we just want to keep it as is.
-							 */
-							.param( "conflicts", "proceed" );
-
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.post().pathComponent( indexName )./*
+																													* Ignore conflicts: if we wrote to a document concurrently,
+																													* we just want to keep it as is.
+																													*/
+					param( "conflicts", "proceed" );
 			if ( !typeNames.isEmpty() ) {
 				builder.multiValuedPathComponent( typeNames );
 			}
-
 			if ( routingKeys != null && !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
-
-			builder.pathComponent( Paths._DELETE_BY_QUERY )
-					.body( payload );
-
+			builder.pathComponent( Paths._DELETE_BY_QUERY ).bodyJsonFromInternal( payload );
 			return builder.build();
 		}
 

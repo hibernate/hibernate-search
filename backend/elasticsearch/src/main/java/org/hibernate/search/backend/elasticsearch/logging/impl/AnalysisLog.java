@@ -16,13 +16,12 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
-@CategorizedLogger(
-		category = AnalysisLog.CATEGORY_NAME
-)
+@CategorizedLogger(category = AnalysisLog.CATEGORY_NAME)
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 public interface AnalysisLog {
+
 	String CATEGORY_NAME = "org.hibernate.search.analysis.elasticsearch";
 
 	AnalysisLog INSTANCE = LoggerFactory.make( AnalysisLog.class, CATEGORY_NAME, MethodHandles.lookup() );
@@ -31,9 +30,7 @@ public interface AnalysisLog {
 	// Pre-existing messages from Search 5 (engine module)
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
-
-	@Message(id = ID_OFFSET_LEGACY_ES + 55,
-			value = "Duplicate tokenizer definitions: '%1$s'. Tokenizer names must be unique.")
+	@Message(id = ID_OFFSET_LEGACY_ES + 55, value = "Duplicate tokenizer definitions: '%1$s'. Tokenizer names must be unique.")
 	SearchException tokenizerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 56,
@@ -44,8 +41,7 @@ public interface AnalysisLog {
 			value = "Duplicate token filter definitions: '%1$s'. Token filter names must be unique.")
 	SearchException tokenFilterNamingConflict(String remoteName);
 
-	@Message(id = ID_OFFSET_LEGACY_ES + 75,
-			value = "Unable to apply analysis configuration: %1$s")
+	@Message(id = ID_OFFSET_LEGACY_ES + 75, value = "Unable to apply analysis configuration: %1$s")
 	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e,
 			@Param EventContext eventContext);
 
@@ -68,7 +64,6 @@ public interface AnalysisLog {
 	// -----------------------------------
 	// New messages from Search 6 onwards
 	// -----------------------------------
-
 	@Message(id = ID_OFFSET + 34,
 			value = "Invalid typed analyzer definition for name '%1$s'. Typed analyzer definitions must at least define the analyzer type.")
 	SearchException invalidElasticsearchTypedAnalyzerDefinition(String name);
@@ -89,16 +84,14 @@ public interface AnalysisLog {
 
 	@Message(id = ID_OFFSET + 37,
 			value = "Ambiguous value for parameter '%1$s': this parameter is set to two different values '%2$s' and '%3$s'.")
-	SearchException analysisComponentParameterConflict(String name, JsonElement value1, JsonElement value2);
+	SearchException analysisComponentParameterConflict(String name, JsonNode value1, JsonNode value2);
 
 	@Message(id = ID_OFFSET + 60, value = "Cannot skip analysis on field '%1$s':"
 			+ " the Elasticsearch backend will always normalize arguments before attempting matches on normalized fields.")
 	SearchException skipAnalysisOnNormalizedField(String absoluteFieldPath, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 62,
-			value = "Invalid index field type: both null token '%2$s' ('indexNullAs')"
-					+ " and analyzer '%1$s' are assigned to this type."
-					+ " 'indexNullAs' is not supported on analyzed fields.")
+	@Message(id = ID_OFFSET + 62, value = "Invalid index field type: both null token '%2$s' ('indexNullAs')"
+			+ " and analyzer '%1$s' are assigned to this type." + " 'indexNullAs' is not supported on analyzed fields.")
 	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 76,
@@ -115,5 +108,4 @@ public interface AnalysisLog {
 					+ " but the indexing analyzer is missing."
 					+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
-
 }

@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -21,8 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchQueryDslIT {
 
@@ -55,8 +57,8 @@ class ElasticsearchQueryDslIT {
 							.matching( "robot" ) )
 					.toQuery(); // <2>
 
-			JsonObject explanation1 = query.explain( 1 ); // <3>
-			JsonObject explanation2 = query.explain( "Book", 1 ); // <4>
+			ObjectNode explanation1 = query.explain( JacksonJsonHandlers.object(), 1 ); // <3>
+			ObjectNode explanation2 = query.explain( JacksonJsonHandlers.object(), "Book", 1 ); // <4>
 
 			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <5>
 			// end::explain-elasticsearch[]
@@ -81,8 +83,10 @@ class ElasticsearchQueryDslIT {
 						Map<String, String> parameters = context.parametersMap(); // <3>
 						parameters.put( "search_type", "dfs_query_then_fetch" );
 
-						JsonObject body = context.body(); // <4>
-						body.addProperty( "min_score", 0.2f );
+						context.transformBody( JacksonJsonHandlers.object(), body -> { // <4>
+							body.put( "min_score", 0.2f );
+							return body;
+						} );
 					} )
 					.fetchHits( 20 ); // <5>
 			// end::elasticsearch-requestTransformer[]
@@ -100,38 +104,39 @@ class ElasticsearchQueryDslIT {
 							.field( "title" )
 							.matching( "robt" ) )
 					.requestTransformer( context -> { // <2>
-						JsonObject body = context.body();
-						body.add( "suggest", jsonObject( suggest -> { // <3>
-							suggest.add( "my-suggest", jsonObject( mySuggest -> {
-								mySuggest.addProperty( "text", "robt" );
-								mySuggest.add( "term", jsonObject( term -> {
-									term.addProperty( "field", "title" );
+						context.transformBody( JacksonJsonHandlers.object(), body -> {
+							body.set( "suggest", jsonObject( suggest -> { // <3>
+								suggest.set( "my-suggest", jsonObject( mySuggest -> {
+									mySuggest.put( "text", "robt" );
+									mySuggest.set( "term", jsonObject( term -> {
+										term.put( "field", "title" );
+									} ) );
 								} ) );
 							} ) );
-						} ) );
+							return body;
+						} );
 					} )
 					.fetch( 20 ); // <4>
 
-			JsonObject responseBody = result.responseBody(); // <5>
-			JsonArray mySuggestResults = responseBody.getAsJsonObject( "suggest" ) // <6>
-					.getAsJsonArray( "my-suggest" );
+			ObjectNode responseBody = result.responseBody( JacksonJsonHandlers.object() ); // <5>
+			JsonNode mySuggestResults = responseBody.path( "suggest" ) // <6>
+					.path( "my-suggest" );
 			// end::elasticsearch-responseBody[]
 
 			assertThat( mySuggestResults.size() ).isGreaterThanOrEqualTo( 1 );
-			JsonObject mySuggestResult0 = mySuggestResults.get( 0 ).getAsJsonObject();
-			assertThat( mySuggestResult0.get( "text" ).getAsString() )
+			JsonNode mySuggestResult0 = mySuggestResults.get( 0 );
+			assertThat( mySuggestResult0.get( "text" ).asString() )
 					.isEqualTo( "robt" );
-			JsonObject mySuggestResult0Option0 = mySuggestResult0.getAsJsonArray( "options" ).get( 0 )
-					.getAsJsonObject();
-			assertThat( mySuggestResult0Option0.get( "text" ).getAsString() )
+			JsonNode mySuggestResult0Option0 = mySuggestResult0.path( "options" ).get( 0 );
+			assertThat( mySuggestResult0Option0.get( "text" ).asString() )
 					.isEqualTo( "robot" );
 
 		} );
 	}
 
 	// tag::elasticsearch-responseBody-helper[]
-	private static JsonObject jsonObject(Consumer<JsonObject> instructions) {
-		JsonObject object = new JsonObject();
+	private static ObjectNode jsonObject(Consumer<ObjectNode> instructions) {
+		ObjectNode object = JsonNodeFactory.instance.objectNode();
 		instructions.accept( object );
 		return object;
 	}

@@ -1,11 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.client.rest4.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -13,25 +8,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.JsonLogHelper;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonHttpEntityContentProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonResponseConsumerScope;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.common.util.spi.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
-import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchRequestLog;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Futures;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import org.hibernate.search.util.json.spi.JsonResponseConsumerFactory;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.entity.ContentType;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
@@ -49,32 +39,39 @@ public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplem
 	private final SimpleScheduledExecutor timeoutExecutorService;
 
 	private final Optional<Integer> requestTimeoutMs;
+
+	private final long responseBodySizeLimit;
 	private final int connectionTimeoutMs;
 
-	private final Gson gson;
-	private final JsonLogHelper jsonLogHelper;
 
 	ClientRest4ElasticsearchClient(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
-			SimpleScheduledExecutor timeoutExecutorService,
-			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
-			Gson gson, JsonLogHelper jsonLogHelper) {
+			SimpleScheduledExecutor timeoutExecutorService, Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
+			long responseBodySizeLimit) {
+		this.responseBodySizeLimit = responseBodySizeLimit;
 		this.restClientHolder = restClientHolder;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = timeoutExecutorService;
 		this.requestTimeoutMs = requestTimeoutMs;
 		this.connectionTimeoutMs = connectionTimeoutMs;
-		this.gson = gson;
-		this.jsonLogHelper = jsonLogHelper;
 	}
 
 	@Override
-	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
-		CompletableFuture<ElasticsearchResponse> result = Futures.create( () -> send( request ) )
-				.thenApply( this::convertResponse );
-		if ( ElasticsearchRequestLog.INSTANCE.isDebugEnabled() ) {
-			long startTime = System.nanoTime();
-			result.thenAccept( response -> log( request, startTime, response ) );
+	public <T> CompletableFuture<ElasticsearchResponse<T>> submit(ElasticsearchRequest request,
+			JsonResponseConsumerFactory<T> responseFactory) {
+		CompletableFuture<Response> sent;
+		try {
+			sent = send( request, responseFactory );
 		}
+		catch (RuntimeException e) {
+			return CompletableFuture.failedFuture( e );
+		}
+		CompletableFuture<ElasticsearchResponse<T>> result =
+				sent.thenApply( this::convertResponse );
+		result.whenComplete( (response, failure) -> {
+			if ( result.isCancelled() ) {
+				sent.cancel( true );
+			}
+		} );
 		return result;
 	}
 
@@ -87,20 +84,22 @@ public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplem
 		throw ElasticsearchClientLog.INSTANCE.clientUnwrappingWithUnknownType( clientClass, RestClient.class );
 	}
 
-	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
+	private <T> CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest,
+			JsonResponseConsumerFactory<T> responseFactory) {
 		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+		JsonResponseConsumerScope responseScope = new JsonResponseConsumerScope();
 
 		HttpEntity entity;
 		try {
-			entity = ClientRest4GsonHttpEntity.toEntity( gson, elasticsearchRequest );
+			entity = ClientRest4JsonHttpEntity.toEntity( elasticsearchRequest );
 		}
 		catch (IOException | RuntimeException e) {
 			completableFuture.completeExceptionally( e );
 			return completableFuture;
 		}
 
-		restClientHolder.get().performRequestAsync(
-				toRequest( elasticsearchRequest, entity ),
+		var cancellation = restClientHolder.get().performRequestAsync(
+				toRequest( elasticsearchRequest, entity, responseScope, responseFactory ),
 				new ResponseListener() {
 					@Override
 					public void onSuccess(Response response) {
@@ -124,41 +123,59 @@ public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplem
 				}
 		);
 
+		completableFuture.whenComplete( (response, failure) -> {
+			if ( failure != null ) {
+				if ( entity instanceof JsonHttpEntityContentProvider provider ) {
+					provider.cancel();
+				}
+				responseScope.cancel();
+				cancellation.cancel();
+			}
+		} );
+
 		Deadline deadline = elasticsearchRequest.deadline();
 		if ( deadline == null && !requestTimeoutMs.isPresent() ) {
 			// no need to schedule a client side timeout
 			return completableFuture;
 		}
 
-		long currentTimeoutValue =
-				deadline == null ? Long.valueOf( requestTimeoutMs.get() ) : deadline.checkRemainingTimeMillis();
+		try {
+			long currentTimeoutValue =
+					deadline == null ? Long.valueOf( requestTimeoutMs.get() ) : deadline.checkRemainingTimeMillis();
 
-		/*
-		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
-		 *  In any case, the RestClient doesn't return the Future<?> from Apache HTTP client,
-		 *  so we can't do much until this changes.
-		 */
-		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
-				() -> {
-					if ( !completableFuture.isDone() ) {
-						RuntimeException cause = ElasticsearchClientLog.INSTANCE.requestTimedOut(
-								Duration.ofNanos( TimeUnit.MILLISECONDS.toNanos( currentTimeoutValue ) ),
-								elasticsearchRequest );
-						completableFuture.completeExceptionally(
-								deadline != null ? deadline.forceTimeoutAndCreateException( cause ) : cause
-						);
-					}
-				},
-				currentTimeoutValue, TimeUnit.MILLISECONDS
-		);
-		completableFuture.thenRun( () -> timeout.cancel( false ) );
+			ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
+					() -> {
+						if ( !completableFuture.isDone() ) {
+							RuntimeException cause = ElasticsearchClientLog.INSTANCE.requestTimedOut(
+									Duration.ofNanos( TimeUnit.MILLISECONDS.toNanos( currentTimeoutValue ) ),
+									elasticsearchRequest );
+							completableFuture.completeExceptionally(
+									deadline != null ? deadline.forceTimeoutAndCreateException( cause ) : cause
+							);
+						}
+					},
+					currentTimeoutValue, TimeUnit.MILLISECONDS
+			);
+			completableFuture.whenComplete( (response, failure) -> timeout.cancel( false ) );
+		}
+		catch (RuntimeException e) {
+			// A deadline or executor failure after submission must still cancel the active transport.
+			completableFuture.completeExceptionally( e );
+		}
 
 		return completableFuture;
 	}
 
-	private Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity) {
+	private <T> Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity,
+			JsonResponseConsumerScope responseScope,
+			JsonResponseConsumerFactory<T> responseFactory) {
 		Request request = new Request( elasticsearchRequest.method(), elasticsearchRequest.path() );
 		setPerRequestSocketTimeout( elasticsearchRequest, request );
+		RequestOptions.Builder options = request.getOptions().toBuilder();
+		options.setHttpAsyncResponseConsumerFactory(
+				() -> new ClientRest4JsonResponseConsumer<T>( responseBodySizeLimit, responseScope,
+						responseFactory ) );
+		request.setOptions( options );
 
 		for ( Entry<String, String> parameter : elasticsearchRequest.parameters().entrySet() ) {
 			request.addParameter( parameter.getKey(), parameter.getValue() );
@@ -191,10 +208,10 @@ public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplem
 		request.setOptions( requestOptions );
 	}
 
-	private ElasticsearchResponse convertResponse(Response response) {
+	private <T> ElasticsearchResponse<T> convertResponse(Response response) {
 		try {
-			JsonObject body = parseBody( response );
-			return new ElasticsearchResponse(
+			T body = parseBody( response );
+			return new ElasticsearchResponse<>(
 					response.getHost().toHostString(),
 					response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(),
@@ -206,49 +223,14 @@ public class ClientRest4ElasticsearchClient implements ElasticsearchClientImplem
 		}
 	}
 
-	private JsonObject parseBody(Response response) throws IOException {
+	@SuppressWarnings("unchecked")
+	private <T> T parseBody(Response response) throws IOException {
 		HttpEntity entity = response.getEntity();
 		if ( entity == null ) {
 			return null;
 		}
 
-		Charset charset = getCharset( entity );
-		try ( InputStream inputStream = entity.getContent();
-				Reader reader = new InputStreamReader( inputStream, charset ) ) {
-			return gson.fromJson( reader, JsonObject.class );
-		}
-	}
-
-	private static Charset getCharset(HttpEntity entity) {
-		ContentType contentType = ContentType.get( entity );
-		Charset charset = contentType.getCharset();
-		return charset != null ? charset : StandardCharsets.UTF_8;
-	}
-
-	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
-		boolean successCode = ElasticsearchClientUtils.isSuccessCode( response.statusCode() );
-		if ( !ElasticsearchRequestLog.INSTANCE.isTraceEnabled() && successCode ) {
-			return;
-		}
-		long executionTimeNs = System.nanoTime() - start;
-		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
-		if ( successCode ) {
-			ElasticsearchRequestLog.INSTANCE.executedRequest( request.method(), response.hostAndPort(), request.path(),
-					request.parameters(),
-					request.bodyParts().size(), executionTimeMs,
-					response.statusCode(), response.statusMessage(),
-					jsonLogHelper.toString( request.bodyParts() ),
-					jsonLogHelper.toString( response.body() ) );
-		}
-		else {
-			ElasticsearchRequestLog.INSTANCE.executedRequestWithFailure( request.method(), response.hostAndPort(),
-					request.path(),
-					request.parameters(),
-					request.bodyParts().size(), executionTimeMs,
-					response.statusCode(), response.statusMessage(),
-					jsonLogHelper.toString( request.bodyParts() ),
-					jsonLogHelper.toString( response.body() ) );
-		}
+		return ( (ClientRest4JsonResponseConsumer.Entity<T>) entity ).body().result();
 	}
 
 	@Override

@@ -1,22 +1,24 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
 
 public final class ElasticsearchCommonQueryStringPredicateBuilderFieldState
 		implements CommonQueryStringPredicateBuilder.FieldState {
+
 	private static final String BOOST_OPERATOR = "^";
 
 	private final ElasticsearchSearchIndexValueFieldContext<?> field;
+
 	private Float boost;
 
-	private ElasticsearchCommonQueryStringPredicateBuilderFieldState(
-			ElasticsearchSearchIndexValueFieldContext<?> field) {
+	private ElasticsearchCommonQueryStringPredicateBuilderFieldState(ElasticsearchSearchIndexValueFieldContext<?> field) {
 		this.field = field;
 	}
 
@@ -34,25 +36,26 @@ public final class ElasticsearchCommonQueryStringPredicateBuilderFieldState
 		field.type().normalizerName();
 	}
 
-	public JsonPrimitive build() {
+	public JsonNode build() {
 		StringBuilder sb = new StringBuilder( field.absolutePath() );
 		if ( boost != null ) {
 			sb.append( BOOST_OPERATOR ).append( boost );
 		}
-		return new JsonPrimitive( sb.toString() );
+		return JsonScalarConversions.toNode( sb.toString() );
 	}
 
 	public static class Factory<T>
 			extends
 			AbstractElasticsearchCodecAwareSearchQueryElementFactory<ElasticsearchCommonQueryStringPredicateBuilderFieldState,
 					T> {
+
 		public Factory(ElasticsearchFieldCodec<T> codec) {
 			super( codec );
 		}
 
 		@Override
-		public ElasticsearchCommonQueryStringPredicateBuilderFieldState create(
-				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<T> field) {
+		public ElasticsearchCommonQueryStringPredicateBuilderFieldState create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<T> field) {
 			return new ElasticsearchCommonQueryStringPredicateBuilderFieldState( field );
 		}
 	}

@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+
 
 public final class LeafValidators {
 
@@ -22,7 +23,10 @@ public final class LeafValidators {
 		@Override
 		protected void doValidate(ValidationErrorCollector errorCollector, Object defaultedExpected,
 				Object defaultedActual, Object actual) {
-			if ( !Objects.equals( defaultedExpected, defaultedActual ) ) {
+			boolean equivalent = defaultedExpected instanceof JsonNode left && defaultedActual instanceof JsonNode right
+					? JsonScalarConversions.equivalent( left, right )
+					: Objects.equals( defaultedExpected, defaultedActual );
+			if ( !equivalent ) {
 				// Don't display the default for the actual value: it could confuse users.
 				errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidValue(
 						defaultedExpected, actual
@@ -99,7 +103,7 @@ public final class LeafValidators {
 		}
 	};
 
-	public static LeafValidator<? super JsonElement> jsonElement(String type) {
+	public static LeafValidator<? super JsonNode> jsonElement(String type) {
 		String defaultedType = type == null ? DataTypes.OBJECT : type;
 		switch ( defaultedType ) {
 			case DataTypes.DOUBLE:
@@ -119,13 +123,13 @@ public final class LeafValidators {
 		}
 	}
 
-	private static final LeafValidator<JsonElement> JSON_ELEMENT_AS_DOUBLE_LEAF_VALIDATOR = new LeafValidator<JsonElement>() {
+	private static final LeafValidator<JsonNode> JSON_ELEMENT_AS_DOUBLE_LEAF_VALIDATOR = new LeafValidator<JsonNode>() {
 		@Override
-		protected void doValidate(ValidationErrorCollector errorCollector, JsonElement defaultedExpected,
-				JsonElement defaultedActual, Object actual) {
+		protected void doValidate(ValidationErrorCollector errorCollector, JsonNode defaultedExpected,
+				JsonNode defaultedActual, Object actual) {
 			if ( areNumbers( defaultedExpected, defaultedActual ) ) {
 				EQUAL_DOUBLE.doValidate(
-						errorCollector, defaultedExpected.getAsDouble(), defaultedActual.getAsDouble(), actual
+						errorCollector, defaultedExpected.doubleValue(), defaultedActual.doubleValue(), actual
 				);
 			}
 			else {
@@ -136,13 +140,13 @@ public final class LeafValidators {
 		}
 	};
 
-	private static final LeafValidator<JsonElement> JSON_ELEMENT_AS_FLOAT_LEAF_VALIDATOR = new LeafValidator<JsonElement>() {
+	private static final LeafValidator<JsonNode> JSON_ELEMENT_AS_FLOAT_LEAF_VALIDATOR = new LeafValidator<JsonNode>() {
 		@Override
-		protected void doValidate(ValidationErrorCollector errorCollector, JsonElement defaultedExpected,
-				JsonElement defaultedActual, Object actual) {
+		protected void doValidate(ValidationErrorCollector errorCollector, JsonNode defaultedExpected,
+				JsonNode defaultedActual, Object actual) {
 			if ( areNumbers( defaultedExpected, defaultedActual ) ) {
 				EQUAL_FLOAT.doValidate(
-						errorCollector, defaultedExpected.getAsFloat(), defaultedActual.getAsFloat(), actual
+						errorCollector, defaultedExpected.floatValue(), defaultedActual.floatValue(), actual
 				);
 			}
 			else {
@@ -153,12 +157,12 @@ public final class LeafValidators {
 		}
 	};
 
-	private static boolean areNumbers(JsonElement expectedValue, JsonElement actualValue) {
-		if ( !( expectedValue instanceof JsonPrimitive && actualValue instanceof JsonPrimitive ) ) {
+	private static boolean areNumbers(JsonNode expectedValue, JsonNode actualValue) {
+		if ( expectedValue == null || actualValue == null ) {
 			return false;
 		}
 
-		return ( (JsonPrimitive) expectedValue ).isNumber() && ( (JsonPrimitive) actualValue ).isNumber();
+		return expectedValue.isNumber() && actualValue.isNumber();
 	}
 
 }

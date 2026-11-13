@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWork;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A work builder factory for Amazon OpenSearch Serverless.
@@ -24,8 +24,8 @@ import com.google.gson.JsonObject;
  */
 public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFactory {
 
-	public AmazonOpenSearchServerlessWorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
-		super( gsonProvider, ignoreShardFailures );
+	public AmazonOpenSearchServerlessWorkFactory(JsonProvider jsonProvider, Boolean ignoreShardFailures) {
+		super( jsonProvider, ignoreShardFailures );
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class AmazonOpenSearchServerlessWorkFactory extends Elasticsearch7WorkFac
 	}
 
 	@Override
-	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
+	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, ObjectNode payload) {
 		throw ElasticsearchMiscLog.INSTANCE.cannotExecuteOperationOnAmazonOpenSearchServerless( "deleteByQuery" );
 	}
 

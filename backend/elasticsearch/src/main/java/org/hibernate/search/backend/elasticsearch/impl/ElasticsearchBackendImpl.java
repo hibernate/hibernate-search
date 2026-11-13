@@ -2,9 +2,6 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.logging.impl.AnalysisLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchMiscLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
@@ -47,9 +45,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import org.hibernate.search.util.json.spi.JsonParseException;
 
 class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBackend {
 
@@ -85,7 +81,7 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 	private final ElasticsearchSimpleWorkOrchestrator generalPurposeOrchestrator;
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
-	private final Gson userFacingGson;
+	private final JsonCodecService userFacingCodec;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final IndexManagerBackendContext indexManagerBackendContext;
@@ -96,7 +92,7 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 			ElasticsearchLinkImpl link,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider,
-			Gson userFacingGson,
+			JsonCodecService userFacingCodec,
 			MultiTenancyStrategy multiTenancyStrategy,
 			FailureHandler failureHandler, TimingSource timingSource) {
 		this.backendName = backendName;
@@ -110,11 +106,11 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.typeFactoryProvider = typeFactoryProvider;
-		this.userFacingGson = userFacingGson;
+		this.userFacingCodec = userFacingCodec;
 
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, link,
-				userFacingGson,
+				userFacingCodec,
 				multiTenancyStrategy,
 				failureHandler, timingSource,
 				generalPurposeOrchestrator,
@@ -270,14 +266,12 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 			if ( inputStream == null ) {
 				throw MappingLog.INSTANCE.customIndexSettingsFileNotFound( filePath, indexEventContext );
 			}
-			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
-				return userFacingGson.fromJson( reader, IndexSettings.class );
-			}
+			return userFacingCodec.decode( inputStream, IndexSettings.class );
 		}
 		catch (IOException e) {
 			throw MappingLog.INSTANCE.customIndexSettingsErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
 		}
-		catch (JsonSyntaxException e) {
+		catch (JsonParseException e) {
 			throw MappingLog.INSTANCE.customIndexSettingsJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
 		}
 	}
@@ -295,14 +289,12 @@ class ElasticsearchBackendImpl implements BackendImplementor, ElasticsearchBacke
 			if ( inputStream == null ) {
 				throw MappingLog.INSTANCE.customIndexMappingFileNotFound( filePath, indexEventContext );
 			}
-			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
-				return userFacingGson.fromJson( reader, RootTypeMapping.class );
-			}
+			return userFacingCodec.decode( inputStream, RootTypeMapping.class );
 		}
 		catch (IOException e) {
 			throw MappingLog.INSTANCE.customIndexMappingErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
 		}
-		catch (JsonSyntaxException e) {
+		catch (JsonParseException e) {
 			throw MappingLog.INSTANCE.customIndexMappingJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
 		}
 	}

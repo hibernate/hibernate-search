@@ -44,7 +44,7 @@ class ElasticsearchCustomLayoutStrategyIT {
 				.setup( Book.class );
 
 		JsonHelper.assertJsonEquals(
-				"{'book-write': {}, 'book': {}}",
+				"{\"book-write\": {}, \"book\": {}}",
 				elasticsearchClient.index( primaryIndexName, null, null )
 						.aliases().get(),
 				JSONCompareMode.LENIENT

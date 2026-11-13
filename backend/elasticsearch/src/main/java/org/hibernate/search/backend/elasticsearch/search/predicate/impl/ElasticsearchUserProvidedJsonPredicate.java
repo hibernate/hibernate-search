@@ -4,15 +4,15 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredicate {
 
 	private final Set<String> indexNames;
-	private final JsonObject json;
+	private final ObjectNode json;
 
 	ElasticsearchUserProvidedJsonPredicate(ElasticsearchSearchIndexScope<?> scope,
-			JsonObject json) {
+			ObjectNode json) {
 		indexNames = scope.hibernateSearchIndexNames();
 		this.json = json;
 	}
@@ -28,7 +28,7 @@ class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredi
 	}
 
 	@Override
-	public JsonObject toJsonQuery(PredicateRequestContext context) {
+	public ObjectNode toJsonQuery(PredicateRequestContext context) {
 		return json;
 	}
 }

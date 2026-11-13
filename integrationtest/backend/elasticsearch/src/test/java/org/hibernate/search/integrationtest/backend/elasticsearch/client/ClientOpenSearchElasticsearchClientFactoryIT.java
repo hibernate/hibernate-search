@@ -38,17 +38,17 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClient;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.cfg.ClientOpenSearchElasticsearchBackendClientSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.cfg.spi.ClientOpenSearchElasticsearchBackendClientSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.opensearch.rest.impl.ClientOpenSearchElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -70,6 +70,8 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.extension.RetryExtension;
+import org.hibernate.search.util.json.internal.spi.JsonParsing;
+import org.hibernate.search.util.json.spi.JsonParseException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -81,11 +83,6 @@ import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.config.ConnectionConfig;
@@ -112,6 +109,9 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.opensearch.client.RestClient;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
@@ -168,11 +168,11 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient() ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+		try ( ElasticsearchJsonClientImplementor client = createClient() ) {
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -195,16 +195,16 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 
 		HttpResponseInterceptor responseInterceptor = spy( HttpResponseInterceptor.class );
 
-		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
+		try ( ElasticsearchJsonClientImplementor client = createClient( properties -> properties.accept(
 				ClientOpenSearchElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
 				(ElasticsearchHttpClientConfigurer) context -> context
 						.clientBuilder()
 						.addResponseInterceptorFirst( responseInterceptor )
 		) ) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -228,15 +228,15 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -258,15 +258,15 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/bla/bla/bla/myIndex/myType" ) )
@@ -288,16 +288,16 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
 					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/bla/bla/bla/myIndex/myType" ) )
@@ -319,16 +319,16 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ElasticsearchBackendSettings.PROTOCOL, "https" );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -350,15 +350,15 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -378,10 +378,10 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 								.withBody( responseBody )
 				) );
 
-		try ( ElasticsearchClientImplementor client = createClient() ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+		try ( ElasticsearchJsonClientImplementor client = createClient() ) {
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 500 );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 		}
 	}
 
@@ -396,7 +396,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				) );
 
 		assertThatThrownBy( () -> {
-			try ( ElasticsearchClientImplementor client = createClient() ) {
+			try ( ElasticsearchJsonClientImplementor client = createClient() ) {
 				doPost( client, "/myIndex/myType", payload );
 			}
 		} )
@@ -407,7 +407,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400089" )
 				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
-				.isInstanceOf( JsonSyntaxException.class );
+				.isInstanceOf( JsonParseException.class );
 	}
 
 	@RetryExtension.TestWithRetry
@@ -421,7 +421,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				) );
 
 		assertThatThrownBy( () -> {
-			try ( ElasticsearchClientImplementor client = createClient(
+			try ( ElasticsearchJsonClientImplementor client = createClient(
 					properties -> {
 						properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
 						properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "99999" );
@@ -449,7 +449,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				) );
 
 		assertThatThrownBy( () -> {
-			try ( ElasticsearchClientImplementor client = createClient(
+			try ( ElasticsearchJsonClientImplementor client = createClient(
 					properties -> {
 						properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT, "99999" );
 						properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" );
@@ -478,27 +478,26 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
 				.willReturn( elasticsearchResponse()
-						.withFixedDelay( 300 /* 300ms => should not time out, but will still clog up the client */ ) ) );
+						.withFixedDelay( 300 ) ) );
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 )
-						.withFixedDelay( 100 /* 100ms => should not time out */ ) ) );
+						.withFixedDelay( 100 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
 			// so that we're sure the next request will have to wait in the queue
 			// for more that the configured timeout before it ends up being executed.
 			for ( int i = 0; i < 10; ++i ) {
-				client.submit( buildRequest( ElasticsearchRequest.post(), "/long", payload ) );
+				client.submit( buildRequest( ElasticsearchJsonRequest.post(), "/long", payload ) );
 			}
-
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -515,24 +514,24 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
 				.willReturn( elasticsearchResponse()
-						.withFixedDelay( 300 /* 300ms => should not time out, but will still clog up the client */ ) ) );
+						.withFixedDelay( 300 ) ) );
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 )
-						.withFixedDelay( 100 /* 100ms => should not time out */ ) ) );
+						.withFixedDelay( 100 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
-					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.REQUEST_TIMEOUT, "1000" );
 				}
 		) ) {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
 			// so that we're sure the next request will have to wait in the queue
 			// for more that the configured timeout before it ends up being executed.
 			for ( int i = 0; i < 10; ++i ) {
-				client.submit( buildRequest( ElasticsearchRequest.post(), "/long", payload ) );
+				client.submit( buildRequest( ElasticsearchJsonRequest.post(), "/long", payload ) );
 			}
 
 			assertThatThrownBy( () -> {
@@ -559,13 +558,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -585,13 +584,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.URIS,
 							httpsUrisFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -612,13 +611,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 503 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -649,17 +648,17 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 		wireMockRule2.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
-				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 5_000 /* 5s => will time out */ ) ) );
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 5_000 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 					// Use a timeout much higher than 1s, because wiremock can be really slow...
-					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.READ_TIMEOUT, "1000" );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -701,13 +700,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFault( Fault.MALFORMED_RESPONSE_CHUNK ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS,
 							httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -751,13 +750,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.andMatching( httpProtocol() )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.DISCOVERY_ENABLED, "true" );
 					properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.DISCOVERY_REFRESH_INTERVAL, "1" );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			/*
@@ -768,7 +767,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 			 * (since the hosts are each targeted in turn).
 			 */
 			await().untilAsserted( () -> {
-				ElasticsearchResponse newResult = doPost( client, "/myIndex/myType", payload );
+				ElasticsearchJsonResponse newResult = doPost( client, "/myIndex/myType", payload );
 				assertThat( newResult.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 				wireMockRule2.verify(
@@ -805,7 +804,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.andMatching( httpsProtocol() )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ElasticsearchBackendSettings.PROTOCOL, "https" );
@@ -821,7 +820,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 			 * (since the hosts are each targeted in turn).
 			 */
 			await().untilAsserted( () -> {
-				ElasticsearchResponse newResult = doPost( client, "/myIndex/myType", payload );
+				ElasticsearchJsonResponse newResult = doPost( client, "/myIndex/myType", payload );
 				assertThat( newResult.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 				wireMockRule2.verify(
@@ -877,13 +876,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.USERNAME, username );
 					properties.accept( ElasticsearchBackendSettings.PASSWORD, password );
 				}
 		) ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 		}
 	}
@@ -896,12 +895,12 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
-						elasticsearchResponse().withStatus( 401 /* Unauthorized */ )
+						elasticsearchResponse().withStatus( 401 )
 								.withStatusMessage( statusMessage )
 				) );
 
-		try ( ElasticsearchClientImplementor client = createClient() ) {
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
+		try ( ElasticsearchJsonClientImplementor client = createClient() ) {
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 401 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
 		}
@@ -915,7 +914,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 
 		logged.expectEvent( Level.WARN, "The password will be sent in clear text over the network" );
 
-		try ( ElasticsearchClientImplementor client = createClient(
+		try ( ElasticsearchJsonClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.USERNAME, username );
 					properties.accept( ElasticsearchBackendSettings.PASSWORD, password );
@@ -949,13 +948,15 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
 			properties.accept( ElasticsearchBackendSettings.HOSTS, "not-called-either:234" );
 		};
-
+		// host and port are dynamic
+		// host and port are dynamic
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Invalid target hosts configuration",
+				.// host and port are dynamic
+				hasMessageContainingAll( // host and port are dynamic
+						"Invalid target hosts configuration", // host and port are dynamic
 						"both the 'uris' property and the 'hosts' property are set",
-						"Uris: '[http://is-not-called:12345]'", "Hosts: '[", // host and port are dynamic
+						"Uris: '[http://is-not-called:12345]'", "Hosts: '[",
 						"Either set the protocol and hosts simultaneously using the 'uris' property",
 						"or set them separately using the 'protocol' property and the 'hosts' property"
 				);
@@ -1017,14 +1018,14 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 							.withStatusMessage( statusMessage )
 							.withBody( responseBody ) ) );
 
-			try ( ElasticsearchClientImplementor client = createClient( properties -> {
+			try ( ElasticsearchJsonClientImplementor client = createClient( properties -> {
 				properties.accept( ClientOpenSearchElasticsearchBackendClientSpiSettings.CLIENT_INSTANCE,
 						BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
-				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+				ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 				assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 				assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-				assertJsonEquals( responseBody, result.body().toString() );
+				assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 				wireMockRule1.verify(
 						postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -1072,7 +1073,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						.withBody( responseBody ) ) );
 
 		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
-		try ( ElasticsearchClientImplementor client = createClient( properties -> {
+		try ( ElasticsearchJsonClientImplementor client = createClient( properties -> {
 			properties.accept( ClientOpenSearchElasticsearchBackendClientSettings.MAX_KEEP_ALIVE, time );
 			properties.accept(
 					ClientOpenSearchElasticsearchBackendClientSettings.CLIENT_CONFIGURER,
@@ -1082,11 +1083,10 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 					}
 			);
 		} ) ) {
-
-			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			ElasticsearchJsonResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -1098,7 +1098,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.body().toString() );
+			assertJsonEquals( responseBody, result.bodyJson().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -1110,20 +1110,19 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 	}
 
 	private AsyncClientConnectionManager createPoolManager(Set<String> connections, int maxConnTotal, int maxConnPerRoute) {
-		PoolingAsyncClientConnectionManager delegate = PoolingAsyncClientConnectionManagerBuilder.create()
-				.setMaxConnTotal( maxConnTotal )
-				.setMaxConnPerRoute( maxConnPerRoute )
-				.setTlsStrategy(
-						ClientTlsStrategyBuilder.create()
-								.setSslContext( buildAllowAnythingSSLContext() )
-								// Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
-								// (previously it was set after the parameters were copied to the engine and had no effect).
-								// Use CLIENT policy so that only the noop verifier below runs, keeping WireMock's self-signed cert accepted.
-								.setHostVerificationPolicy( HostnameVerificationPolicy.CLIENT )
-								.setHostnameVerifier( org.apache.http.conn.ssl.NoopHostnameVerifier.INSTANCE )
-								.buildAsync()
-				)
-				.build();
+		PoolingAsyncClientConnectionManager delegate = // Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
+				PoolingAsyncClientConnectionManagerBuilder.create()
+						.setMaxConnTotal( maxConnTotal )
+						.setMaxConnPerRoute( maxConnPerRoute )
+						.// Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
+						setTlsStrategy( // (previously it was set after the parameters were copied to the engine and had no effect).
+								ClientTlsStrategyBuilder.create()
+										.setSslContext( buildAllowAnythingSSLContext() ).// Use CLIENT policy so that only the noop verifier below runs, keeping WireMock's self-signed cert accepted.
+										setHostVerificationPolicy( HostnameVerificationPolicy.CLIENT )
+										.setHostnameVerifier( org.apache.http.conn.ssl.NoopHostnameVerifier.INSTANCE )
+										.buildAsync()
+						)
+						.build();
 
 		return new AsyncClientConnectionManager() {
 			private Field poolEntryRef;
@@ -1176,12 +1175,13 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 		};
 	}
 
-	@SuppressWarnings("unused") // For EJC and lambda arg
-	private ElasticsearchClientImplementor createClient() {
+	// For EJC and lambda arg
+	@SuppressWarnings("unused")
+	private ElasticsearchJsonClientImplementor createClient() {
 		return createClient( ignored -> {} );
 	}
 
-	private ElasticsearchClientImplementor createClient(Consumer<BiConsumer<String, Object>> additionalProperties) {
+	private ElasticsearchJsonClientImplementor createClient(Consumer<BiConsumer<String, Object>> additionalProperties) {
 		Map<String, ?> defaultBackendProperties =
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
 						.createBackendConfigurationProperties( testConfigurationProvider );
@@ -1215,23 +1215,24 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 				AllAwareConfigurationPropertySource.fromMap( beanResolverConfiguration )
 
 		);
-		return new ClientOpenSearchElasticsearchClientFactory().create( beanResolver, clientPropertySource,
-				threadPoolProvider.threadProvider(), "Client",
-				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
-				GsonProvider.create( GsonBuilder::new, true )
+		return new org.hibernate.search.backend.elasticsearch.client.common.impl.JsonTransportClient(
+				new ClientOpenSearchElasticsearchClientFactory().create( beanResolver, clientPropertySource,
+						threadPoolProvider.threadProvider(), "Client",
+						new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ) ),
+				JsonProviderHelper.create( true )
 		);
 	}
 
-	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
+	private ElasticsearchJsonResponse doPost(ElasticsearchJsonClient client, String path, String payload) {
 		try {
-			return client.submit( buildRequest( ElasticsearchRequest.post(), path, payload ) ).join();
+			return client.submit( buildRequest( ElasticsearchJsonRequest.post(), path, payload ) ).join();
 		}
 		catch (RuntimeException e) {
 			throw new AssertionFailure( "Unexpected exception during POST: " + e.getMessage(), e );
 		}
 	}
 
-	private ElasticsearchRequest buildRequest(ElasticsearchRequest.Builder builder, String path, String payload) {
+	private ElasticsearchJsonRequest buildRequest(ElasticsearchJsonRequest.Builder builder, String path, String payload) {
 		for ( String pathComponent : path.split( "/" ) ) {
 			if ( !pathComponent.isEmpty() ) {
 				URLEncodedString fromString = URLEncodedString.fromString( pathComponent );
@@ -1239,7 +1240,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 			}
 		}
 		if ( payload != null ) {
-			builder = builder.body( JsonParser.parseString( payload ).getAsJsonObject() );
+			builder = builder.bodyJson( ( (ObjectNode) new JsonParsing().parse( payload ) ) );
 		}
 		return builder.build();
 	}
@@ -1273,41 +1274,38 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 	}
 
 	private String dummyNodeInfoResponse(int... ports) {
-		JsonObject body = new JsonObject();
-		body.addProperty( "cluster_name", "foo-cluster.local" );
-
-		JsonObject nodes = new JsonObject();
-		body.add( "nodes", nodes );
+		ObjectNode body = new ObjectNode( JsonNodeFactory.instance );
+		body.put( "cluster_name", "foo-cluster.local" );
+		ObjectNode nodes = new ObjectNode( JsonNodeFactory.instance );
+		body.set( "nodes", nodes );
 		int index = 1;
 		for ( int port : ports ) {
-			nodes.add( "hJLXmY_NTrCytiIMbX4_" + index + "g", dummyNodeInfo( port ) );
+			nodes.set( "hJLXmY_NTrCytiIMbX4_" + index + "g", dummyNodeInfo( port ) );
 			++index;
 		}
 
 		return body.toString();
 	}
 
-	private JsonObject dummyNodeInfo(int port) {
-		JsonObject node = new JsonObject();
-		node.addProperty( "name", "nodeForPort" + port );
-		node.addProperty( "version", ElasticsearchTestDialect.getActualVersion().versionString() );
-
-		JsonObject http = new JsonObject();
-		node.add( "http", http );
-		http.addProperty( "publish_address", "127.0.0.1:" + port );
-		JsonArray boundAddresses = new JsonArray();
-		http.add( "bound_address", boundAddresses );
+	private ObjectNode dummyNodeInfo(int port) {
+		ObjectNode node = new ObjectNode( JsonNodeFactory.instance );
+		node.put( "name", "nodeForPort" + port );
+		node.put( "version", ElasticsearchTestDialect.getActualVersion().versionString() );
+		ObjectNode http = new ObjectNode( JsonNodeFactory.instance );
+		node.set( "http", http );
+		http.put( "publish_address", "127.0.0.1:" + port );
+		ArrayNode boundAddresses = new ArrayNode( JsonNodeFactory.instance );
+		http.set( "bound_address", boundAddresses );
 		boundAddresses.add( "[::]:" + port );
 		boundAddresses.add( "127.0.0.1:" + port );
-
-		JsonArray roles = new JsonArray();
-		node.add( "roles", roles );
+		ArrayNode roles = new ArrayNode( JsonNodeFactory.instance );
+		node.set( "roles", roles );
 		roles.add( "ingest" );
 		roles.add( "master" );
 		roles.add( "data" );
 		roles.add( "ml" );
 
-		node.add( "plugins", new JsonObject() );
+		node.set( "plugins", new ObjectNode( JsonNodeFactory.instance ) );
 
 		return node;
 	}
@@ -1344,7 +1342,7 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 						@Override
 						public void configure(ElasticsearchHttpClientConfigurationContext context) {
 							context.clientBuilder()
-									.setConnectionManager(
+									.setConnectionManager( // Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
 											PoolingAsyncClientConnectionManagerBuilder.create()
 													.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 													.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
@@ -1357,13 +1355,11 @@ class ClientOpenSearchElasticsearchClientFactoryIT {
 																			TimeUnit.MILLISECONDS )
 																	.build()
 													)
-													.setTlsStrategy(
+													.// Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
+													setTlsStrategy( // (previously it was set after the parameters were copied to the engine and had no effect).
 															ClientTlsStrategyBuilder.create()
-																	.setSslContext( buildAllowAnythingSSLContext() )
-																	// Since httpclient5 5.6.4, the built-in hostname verification is actually applied to the engine
-																	// (previously it was set after the parameters were copied to the engine and had no effect).
-																	// Use CLIENT policy so that only the noop verifier below runs, keeping WireMock's self-signed cert accepted.
-																	.setHostVerificationPolicy(
+																	.setSslContext( buildAllowAnythingSSLContext() ).// Use CLIENT policy so that only the noop verifier below runs, keeping WireMock's self-signed cert accepted.
+																	setHostVerificationPolicy(
 																			HostnameVerificationPolicy.CLIENT )
 																	.setHostnameVerifier( NoopHostnameVerifier.INSTANCE )
 																	.buildAsync()

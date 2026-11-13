@@ -4,9 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonUtils;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.
 
 public class LowLevelIndexMetadataBuilder {
 
-	private final GsonProvider gsonProvider;
+	private final JsonProvider jsonProvider;
 	private final ElasticsearchIndexMetadataSyntax syntax;
 	private final IndexNames indexNames;
 	private PropertyMappingIndexSettingsContributor propertyMappingIndexSettingsContributor;
@@ -26,9 +26,9 @@ public class LowLevelIndexMetadataBuilder {
 	private RootTypeMapping mapping;
 	private RootTypeMapping customMapping;
 
-	public LowLevelIndexMetadataBuilder(GsonProvider gsonProvider, ElasticsearchIndexMetadataSyntax syntax,
+	public LowLevelIndexMetadataBuilder(JsonProvider jsonProvider, ElasticsearchIndexMetadataSyntax syntax,
 			IndexNames indexNames) {
-		this.gsonProvider = gsonProvider;
+		this.jsonProvider = jsonProvider;
 		this.syntax = syntax;
 		this.indexNames = indexNames;
 	}
@@ -105,7 +105,7 @@ public class LowLevelIndexMetadataBuilder {
 		// If customIndexSettings are present, merge them with the ones created by Search.
 		// Avoid side effects: we copy the settings before modifying them.
 		IndexSettings customIndexSettingsCopy =
-				GsonUtils.deepCopy( gsonProvider.getGsonNoSerializeNulls(), IndexSettings.class, customIndexSettings );
+				JsonUtils.deepCopy( jsonProvider.getCodecNoSerializeNulls(), IndexSettings.class, customIndexSettings );
 		// The custom settings take precedence over the Hibernate Search ones.
 		customIndexSettingsCopy.merge( settings );
 		return customIndexSettingsCopy;
@@ -117,9 +117,9 @@ public class LowLevelIndexMetadataBuilder {
 		}
 		// Avoid side effects: we copy the mappings before modifying them.
 		RootTypeMapping customMappingCopy =
-				GsonUtils.deepCopy( gsonProvider.getGsonNoSerializeNulls(), RootTypeMapping.class, customMapping );
+				JsonUtils.deepCopy( jsonProvider.getCodecNoSerializeNulls(), RootTypeMapping.class, customMapping );
 		RootTypeMapping hibernateSearchMappingCopy =
-				GsonUtils.deepCopy( gsonProvider.getGsonNoSerializeNulls(), RootTypeMapping.class, mapping );
+				JsonUtils.deepCopy( jsonProvider.getCodecNoSerializeNulls(), RootTypeMapping.class, mapping );
 		// The custom mapping takes precedence over the Hibernate Search one.
 		customMappingCopy.merge( hibernateSearchMappingCopy );
 		return customMappingCopy;

@@ -106,7 +106,7 @@ class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( index.name() ).aliases()
 				.put(
 						defaultWriteAlias( index.name() ).original,
-						simpleAliasDefinition( true, "'filter': {'term': {'user_id': 12}}" )
+						simpleAliasDefinition( true, "\"filter\": {\"term\": {\"user_id\": 12}}" )
 				);
 
 		assertThatThrownBy( () -> setupAndValidate( operation ) )
@@ -167,7 +167,7 @@ class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 		elasticsearchClient.index( index.name() ).aliases()
-				.put( defaultReadAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
+				.put( defaultReadAlias( index.name() ).original, "{\"filter\": {\"term\": {\"user_id\": 12}}}" );
 
 		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )

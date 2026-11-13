@@ -16,8 +16,8 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -33,8 +33,8 @@ import javax.inject.Named;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import com.google.gson.JsonSyntaxException;
+
 import org.apache.maven.enforcer.rule.api.AbstractEnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.execution.MavenSession;
@@ -300,12 +300,13 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 					getLog().info( "Fetching from " + url );
 					HttpResponse<String> response = client.send( request, HttpResponse.BodyHandlers.ofString() );
 
-                    try {
-                        return gson.fromJson( response.body(), klass );
-                    } catch (JsonSyntaxException e) {
+					try {
+						return gson.fromJson( response.body(), klass );
+					}
+					catch (JsonSyntaxException e) {
 						throw new RuntimeException( "Received response: " + response.body(), e );
-                    }
-                }, empty
+					}
+				}, empty
 		);
 	}
 
@@ -324,7 +325,8 @@ public class DependencyManagementIncludesAllGroupIdArtifactsRule extends Abstrac
 
 					try {
 						return gson.fromJson( response.body(), klass );
-					} catch (JsonSyntaxException e) {
+					}
+					catch (JsonSyntaxException e) {
 						throw new RuntimeException( "Received response: " + response.body(), e );
 					}
 				}, empty

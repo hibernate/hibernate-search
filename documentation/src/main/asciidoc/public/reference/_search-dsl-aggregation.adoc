@@ -629,16 +629,20 @@ As their name suggests, backend-specific aggregations are not portable from one 
 === Elasticsearch: `fromJson`
 
 `.fromJson(...)` turns JSON representing an Elasticsearch aggregation into a Hibernate Search aggregation.
+Pass a <<backend-elasticsearch-json,JSON handler>> to select the result type.
+For JSON object input, the handler also determines the input type.
+The examples below use `JacksonJsonHandlers.object()` with Jackson 3 `ObjectNode` values.
 
 include::../components/_elasticsearch-json-warning.adoc[]
 
-.Defining a native Elasticsearch JSON aggregation as a `JsonObject`
+.Defining a native Elasticsearch JSON aggregation as an `ObjectNode`
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/ElasticsearchAggregationDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
-<1> The aggregation result is a `JsonObject`.
+<1> Pass a JSON handler for the aggregation input and result.
+Here, `JacksonJsonHandlers.object()` selects `ObjectNode` for both.
 ====
 
 .Defining a native Elasticsearch JSON aggregation as a JSON-formatted string
@@ -647,7 +651,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Elast
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/ElasticsearchAggregationDslIT.java[tags=elasticsearch-fromJson-string]
 ----
-<1> The aggregation result is a `JsonObject`.
+<1> Pass a JSON handler to select the aggregation result type.
+Here, `JacksonJsonHandlers.object()` selects `ObjectNode`.
 ====
 
 [[search-dsl-aggregation-common]]

@@ -1,14 +1,15 @@
 package org.hibernate.search.documentation.backend.elasticsearch.type.asnative;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.StringNode;
 
 // @formatter:off
 //tag::include[]
@@ -20,22 +21,22 @@ public class IpAddressValueBinder implements ValueBinder { // <1>
 				new IpAddressValueBridge(),
 				context.typeFactory() // <2>
 						.extension( ElasticsearchExtension.get() ) // <3>
-						.asNative() // <4>
+						.asNative( JacksonJsonHandlers.value() ) // <4>
 								.mapping( "{\"type\": \"ip\"}" ) // <5>
 		);
 	}
 
-	private static class IpAddressValueBridge implements ValueBridge<String, JsonElement> {
+	private static class IpAddressValueBridge implements ValueBridge<String, JsonNode> {
 		@Override
-		public JsonElement toIndexedValue(String value,
+		public JsonNode toIndexedValue(String value,
 				ValueBridgeToIndexedValueContext context) {
-			return value == null ? null : new JsonPrimitive( value ); // <6>
+			return value == null ? null : StringNode.valueOf( value ); // <6>
 		}
 
 		@Override
-		public String fromIndexedValue(JsonElement value,
+		public String fromIndexedValue(JsonNode value,
 				ValueBridgeFromIndexedValueContext context) {
-			return value == null ? null : value.getAsString(); // <7>
+			return value == null ? null : value.asString(); // <7>
 		}
 	}
 }

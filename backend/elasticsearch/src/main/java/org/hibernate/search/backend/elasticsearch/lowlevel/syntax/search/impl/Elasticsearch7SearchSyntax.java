@@ -1,7 +1,9 @@
 package org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl;
 
-import com.google.gson.JsonElement;
-import com.google.gson.LongSerializationPolicy;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
 /**
  * The search syntax for ES7.0 to ES8.0.
@@ -9,8 +11,8 @@ import com.google.gson.LongSerializationPolicy;
 public class Elasticsearch7SearchSyntax extends Elasticsearch81SearchSyntax {
 
 	@Override
-	public JsonElement encodeLongForAggregation(Long value) {
+	public JsonNode encodeLongForAggregation(Long value) {
 		// Workaround for https://github.com/elastic/elasticsearch/issues/81529
-		return LongSerializationPolicy.STRING.serialize( value );
+		return value == null ? NullNode.instance : JsonScalarConversions.toNode( value.toString() );
 	}
 }

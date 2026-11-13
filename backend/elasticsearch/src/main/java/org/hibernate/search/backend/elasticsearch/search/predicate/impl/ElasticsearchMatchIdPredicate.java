@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -13,9 +13,10 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Generate the JSON for queries by id for Elasticsearch.
@@ -38,8 +39,9 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicate {
 
-	private static final JsonObjectAccessor IDS_ACCESSOR = JsonAccessor.root().property( "ids" ).asObject();
-	private static final JsonAccessor<JsonElement> VALUES_ACCESSOR = JsonAccessor.root().property( "values" );
+	private static final JsonObjectAccessor IDS_ACCESSOR =
+			JsonAccessor.root().property( "ids" ).unwrapSingletonArrays().asObject();
+	private static final JsonAccessor<JsonNode> VALUES_ACCESSOR = JsonAccessor.root().property( "values" );
 
 	private final DocumentIdHelper documentIdHelper;
 	private final List<String> values;
@@ -58,9 +60,9 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context,
-			JsonObject outerObject, JsonObject innerObject) {
-		JsonArray array = toJsonArray( values, context.getTenantId() );
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context,
+			ObjectNode outerObject, ObjectNode innerObject) {
+		ArrayNode array = toJsonArray( values, context.getTenantId() );
 
 		VALUES_ACCESSOR.set( innerObject, array );
 
@@ -68,8 +70,8 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 		return outerObject;
 	}
 
-	private JsonArray toJsonArray(List<String> list, String tenantId) {
-		JsonArray jsonArray = new JsonArray( list.size() );
+	private ArrayNode toJsonArray(List<String> list, String tenantId) {
+		ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode( list.size() );
 		for ( String value : list ) {
 			jsonArray.add( documentIdHelper.toElasticsearchId( tenantId, value ) );
 		}

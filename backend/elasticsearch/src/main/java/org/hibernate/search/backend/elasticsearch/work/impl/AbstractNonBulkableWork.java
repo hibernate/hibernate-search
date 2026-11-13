@@ -3,8 +3,8 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
@@ -17,7 +17,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 
 	private static final CompletableFuture<Void> SUCCESSFUL_FUTURE = CompletableFuture.completedFuture( null );
 
-	protected final ElasticsearchRequest request;
+	protected final ElasticsearchJsonRequest request;
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 
 	protected AbstractNonBulkableWork(AbstractBuilder<?> builder) {
@@ -35,7 +35,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 				.toString();
 	}
 
-	public ElasticsearchRequest request() {
+	public ElasticsearchJsonRequest request() {
 		return request;
 	}
 
@@ -52,7 +52,10 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 
 					// otherwise, throw a more generic request failed exception
 					throw ElasticsearchClientLog.INSTANCE.elasticsearchRequestFailed(
-							request, null,
+							new org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter( request )
+									.toString(),
+							new org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter( null )
+									.toString(),
 							throwable.getMessage(),
 							Throwables.expectException( throwable )
 					);
@@ -61,14 +64,14 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 	}
 
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
-			ElasticsearchRequest request) {
+			ElasticsearchJsonRequest request) {
 		// Do nothing by default
 		return SUCCESSFUL_FUTURE;
 	}
 
-	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response);
+	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response);
 
-	private R handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {
+	private R handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchJsonResponse response) {
 		R result;
 		try {
 			resultAssessor.checkSuccess( response );
@@ -76,7 +79,12 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 			result = generateResult( executionContext, response );
 		}
 		catch (RuntimeException e) {
-			throw ElasticsearchClientLog.INSTANCE.elasticsearchRequestFailed( request, response, e.getMessage(), e );
+			throw ElasticsearchClientLog.INSTANCE.elasticsearchRequestFailed(
+					new org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter( request )
+							.toString(),
+					new org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter( response )
+							.toString(),
+					e.getMessage(), e );
 		}
 
 		return result;
@@ -86,26 +94,26 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 	protected abstract static class AbstractBuilder<B> {
 		protected ElasticsearchRequestSuccessAssessor resultAssessor;
 
-		private Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer;
+		private Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> requestTransformer;
 
 		public AbstractBuilder(ElasticsearchRequestSuccessAssessor resultAssessor) {
 			this.resultAssessor = resultAssessor;
 		}
 
-		public B requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer) {
+		public B requestTransformer(Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> requestTransformer) {
 			this.requestTransformer = requestTransformer;
 			return (B) this;
 		}
 
-		private ElasticsearchRequest buildRequestAndTransformIfNecessary() {
-			ElasticsearchRequest request = buildRequest();
+		private ElasticsearchJsonRequest buildRequestAndTransformIfNecessary() {
+			ElasticsearchJsonRequest request = buildRequest();
 			if ( requestTransformer != null ) {
 				request = requestTransformer.apply( request );
 			}
 			return request;
 		}
 
-		protected abstract ElasticsearchRequest buildRequest();
+		protected abstract ElasticsearchJsonRequest buildRequest();
 
 		public abstract AbstractNonBulkableWork<?> build();
 

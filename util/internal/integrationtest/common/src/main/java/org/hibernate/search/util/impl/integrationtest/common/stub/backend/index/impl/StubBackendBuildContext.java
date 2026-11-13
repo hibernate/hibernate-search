@@ -23,6 +23,11 @@ public class StubBackendBuildContext implements BackendBuildContext {
 	}
 
 	@Override
+	public ConfigurationPropertySource configurationPropertySource() {
+		return delegate.configurationPropertySource();
+	}
+
+	@Override
 	public ClassResolver classResolver() {
 		return delegate.classResolver();
 	}

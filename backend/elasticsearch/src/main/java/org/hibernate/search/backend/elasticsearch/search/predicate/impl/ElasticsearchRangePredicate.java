@@ -2,8 +2,8 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -14,19 +14,21 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor RANGE_ACCESSOR = JsonAccessor.root().property( "range" ).asObject();
+	private static final JsonObjectAccessor RANGE_ACCESSOR =
+			JsonAccessor.root().property( "range" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonElement> GT_ACCESSOR = JsonAccessor.root().property( "gt" );
-	private static final JsonAccessor<JsonElement> GTE_ACCESSOR = JsonAccessor.root().property( "gte" );
-	private static final JsonAccessor<JsonElement> LT_ACCESSOR = JsonAccessor.root().property( "lt" );
-	private static final JsonAccessor<JsonElement> LTE_ACCESSOR = JsonAccessor.root().property( "lte" );
+	private static final JsonAccessor<JsonNode> GT_ACCESSOR = JsonAccessor.root().property( "gt" );
+	private static final JsonAccessor<JsonNode> GTE_ACCESSOR = JsonAccessor.root().property( "gte" );
+	private static final JsonAccessor<JsonNode> LT_ACCESSOR = JsonAccessor.root().property( "lt" );
+	private static final JsonAccessor<JsonNode> LTE_ACCESSOR = JsonAccessor.root().property( "lte" );
 
-	private final Range<JsonElement> range;
+	private final Range<JsonNode> range;
 
 	private ElasticsearchRangePredicate(Builder<?> builder) {
 		super( builder );
@@ -34,22 +36,22 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
-		JsonAccessor<JsonElement> accessor;
-		Optional<JsonElement> lowerBoundValue = range.lowerBoundValue();
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject,
+			ObjectNode innerObject) {
+		JsonAccessor<JsonNode> accessor;
+		Optional<JsonNode> lowerBoundValue = range.lowerBoundValue();
 		if ( lowerBoundValue.isPresent() ) {
 			accessor = RangeBoundInclusion.EXCLUDED.equals( range.lowerBoundInclusion() ) ? GT_ACCESSOR : GTE_ACCESSOR;
 			accessor.set( innerObject, lowerBoundValue.get() );
 		}
-		Optional<JsonElement> upperBoundValue = range.upperBoundValue();
+		Optional<JsonNode> upperBoundValue = range.upperBoundValue();
 		if ( upperBoundValue.isPresent() ) {
 			accessor = RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ? LT_ACCESSOR : LTE_ACCESSOR;
 			accessor.set( innerObject, upperBoundValue.get() );
 		}
 
-		JsonObject middleObject = new JsonObject();
-		middleObject.add( absoluteFieldPath, innerObject );
+		ObjectNode middleObject = JsonNodeFactory.instance.objectNode();
+		middleObject.set( absoluteFieldPath, innerObject );
 		RANGE_ACCESSOR.set( outerObject, middleObject );
 
 		return outerObject;
@@ -73,7 +75,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private Range<JsonElement> range;
+		private Range<JsonNode> range;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
@@ -101,7 +103,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchRangePredicate( this );
 		}
 
-		private JsonElement convertToFieldValue(Optional<?> valueOptional, ValueModel valueModel) {
+		private JsonNode convertToFieldValue(Optional<?> valueOptional, ValueModel valueModel) {
 			if ( valueOptional.isEmpty() ) {
 				return null;
 			}

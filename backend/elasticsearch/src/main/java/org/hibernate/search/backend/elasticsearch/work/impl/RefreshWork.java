@@ -3,8 +3,8 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 
@@ -15,7 +15,7 @@ public class RefreshWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
 		return null;
 	}
 
@@ -33,9 +33,9 @@ public class RefreshWork extends AbstractNonBulkableWork<Void> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.post();
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder =
+					ElasticsearchJsonRequest.post();
 
 			if ( !indexNames.isEmpty() ) {
 				builder.multiValuedPathComponent( indexNames );

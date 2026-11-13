@@ -3,17 +3,20 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
-public abstract class AbstractSingleDocumentIndexingWork
-		implements BulkableWork<Void>, SingleDocumentIndexingWork {
+public abstract class AbstractSingleDocumentIndexingWork implements BulkableWork<Void>, SingleDocumentIndexingWork {
 
-	private final JsonObject bulkableActionMetadata;
-	private final JsonObject bulkableActionBody;
+	private final ObjectNode bulkableActionMetadata;
+
+	private final ObjectNode bulkableActionBody;
+
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 
 	private final String entityTypeName;
+
 	private final Object entityIdentifier;
+
 	private final String documentIdentifier;
 
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -49,42 +52,41 @@ public abstract class AbstractSingleDocumentIndexingWork
 	}
 
 	@Override
-	public JsonObject getBulkableActionMetadata() {
+	public ObjectNode getBulkableActionMetadata() {
 		return bulkableActionMetadata;
 	}
 
 	@Override
-	public JsonObject getBulkableActionBody() {
+	public ObjectNode getBulkableActionBody() {
 		return bulkableActionBody;
 	}
 
 	@Override
-	public Void handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+	public Void handleBulkResult(ElasticsearchWorkExecutionContext context, ObjectNode bulkResponseItem) {
 		try {
 			resultAssessor.checkSuccess( bulkResponseItem );
 		}
 		catch (RuntimeException e) {
-			throw ElasticsearchClientLog.INSTANCE.elasticsearchBulkedRequestFailed(
-					getBulkableActionMetadata(), bulkResponseItem,
-					e.getMessage(),
-					e
-			);
+			throw ElasticsearchClientLog.INSTANCE.elasticsearchBulkedRequestFailed( getBulkableActionMetadata(),
+					bulkResponseItem, e.getMessage(), e );
 		}
-
 		return null;
 	}
 
 	protected abstract static class AbstractBuilder<B> {
+
 		private final ElasticsearchRequestSuccessAssessor resultAssessor;
 
 		private final String entityTypeName;
+
 		private final Object entityIdentifier;
+
 		protected final String documentIdentifier;
 
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
-		public AbstractBuilder(ElasticsearchRequestSuccessAssessor resultAssessor,
-				String entityTypeName, Object entityIdentifier, String documentIdentifier) {
+		public AbstractBuilder(ElasticsearchRequestSuccessAssessor resultAssessor, String entityTypeName,
+				Object entityIdentifier, String documentIdentifier) {
 			this.resultAssessor = resultAssessor;
 			this.entityTypeName = entityTypeName;
 			this.entityIdentifier = entityIdentifier;
@@ -97,11 +99,10 @@ public abstract class AbstractSingleDocumentIndexingWork
 			return (B) this;
 		}
 
-		protected abstract JsonObject buildBulkableActionMetadata();
+		protected abstract ObjectNode buildBulkableActionMetadata();
 
-		protected abstract JsonObject buildBulkableActionBody();
+		protected abstract ObjectNode buildBulkableActionBody();
 
 		public abstract AbstractSingleDocumentIndexingWork build();
-
 	}
 }

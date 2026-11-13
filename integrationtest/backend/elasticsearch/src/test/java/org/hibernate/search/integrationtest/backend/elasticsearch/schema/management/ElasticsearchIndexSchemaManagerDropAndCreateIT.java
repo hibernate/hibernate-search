@@ -40,10 +40,10 @@ class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'text'"
 								+ "},"
-								+ "'NOTmyField': {"
+								+ "\"NOTmyField\": {"
 								+ "  'type': 'date'"
 								+ "}"
 				)
@@ -51,10 +51,10 @@ class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'text'"
 								+ "},"
-								+ "'NOTmyField': {"
+								+ "\"NOTmyField\": {"
 								+ "  'type': 'date'"
 								+ "}"
 				),
@@ -67,7 +67,7 @@ class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						// Previous index was dropped => new schema
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': false"
 								+ "}"
@@ -88,7 +88,7 @@ class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 		// Expect the index to have been created
 		assertJsonEquals(
 				simpleMappingForExpectations(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': false"
 								+ "}"

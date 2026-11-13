@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.Elasticsearch7IndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch81SearchSyntax;
@@ -26,8 +26,8 @@ public class Elasticsearch81ProtocolDialect implements ElasticsearchProtocolDial
 	}
 
 	@Override
-	public ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
-		return new Elasticsearch7WorkFactory( gsonProvider, ignoreShardFailures );
+	public ElasticsearchWorkFactory createWorkFactory(JsonProvider jsonProvider, Boolean ignoreShardFailures) {
+		return new Elasticsearch7WorkFactory( jsonProvider, ignoreShardFailures );
 	}
 
 	@Override

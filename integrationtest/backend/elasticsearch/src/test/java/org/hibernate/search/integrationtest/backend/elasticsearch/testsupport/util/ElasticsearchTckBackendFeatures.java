@@ -1,7 +1,9 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import static org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions.*;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -20,11 +22,12 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.engine.cfg.spi.FormatUtils;
@@ -49,15 +52,17 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.ZonedD
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
-@SuppressWarnings("unused") // For EJC and lambda arg
+// For EJC and lambda arg
+@SuppressWarnings("unused")
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
-	private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private JsonCodecService json =
+			JsonProviderHelper.createUserFacingCodec();
 
 	ElasticsearchTckBackendFeatures() {
 	}
@@ -193,9 +198,10 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsExtremeScaledNumericValues() {
 		// https://github.com/elastic/elasticsearch/issues/91246
 		// Hopefully this will get fixed in a future version.
-		return isActualVersion(
+		return // https://github.com/opensearch-project/OpenSearch/issues/12433
+		// https://github.com/opensearch-project/OpenSearch/issues/12433
+		isActualVersion(
 				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && esVersion.isLessThan( "8.5.0" ),
-				// https://github.com/opensearch-project/OpenSearch/issues/12433
 				osVersion -> osVersion.isLessThan( "2.12.0" )
 		);
 	}
@@ -243,11 +249,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	public static boolean supportsIndexClosingAndOpening() {
-		return isActualVersion(
-				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_10
-				es -> true,
-				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_opensearch_1.0
-				os -> true,
+		return // See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_10
+		// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_opensearch_1.0
+		isActualVersion( es -> true, os -> true,
 				aoss -> false
 		);
 	}
@@ -340,10 +344,10 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean canPerformTermsQuery(FieldTypeDescriptor<?, ?> fieldType) {
-		return isActualVersion(
-				es -> true,
-				// https://github.com/opensearch-project/OpenSearch/issues/12432
-				os -> !os.isMatching( "2.12.0" ) || !FloatFieldTypeDescriptor.INSTANCE.equals( fieldType ),
+		return // https://github.com/opensearch-project/OpenSearch/issues/12432
+		// https://github.com/opensearch-project/OpenSearch/issues/12432
+		isActualVersion(
+				es -> true, os -> !os.isMatching( "2.12.0" ) || !FloatFieldTypeDescriptor.INSTANCE.equals( fieldType ),
 				aoss -> true
 		);
 	}
@@ -397,17 +401,24 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public <F> Object toRawValue(FieldTypeDescriptor<F, ?> descriptor, F value) {
 		if ( TemporalAccessor.class.isAssignableFrom( descriptor.getJavaType() ) ) {
-			return gson.toJson( formatForQueryStringPredicate( descriptor, value ) );
+			return json.write( formatForQueryStringPredicate( descriptor, value ) );
 		}
 
 		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( descriptor ) ) {
 			// we use a linked map to preserve the order of keys so that we get a predictable string.
-			var point = new LinkedHashMap<>();
+			var point = new ObjectNode( JsonNodeFactory.instance );
 			point.put( "lat", ( (GeoPoint) value ).latitude() );
 			point.put( "lon", ( (GeoPoint) value ).longitude() );
-			return gson.toJson( point );
+			return json.write( point );
 		}
-		return gson.toJson( value );
+		if ( value != null && value.getClass().isArray() ) {
+			var array = new ArrayNode( JsonNodeFactory.instance );
+			for ( int i = 0; i < Array.getLength( value ); i++ ) {
+				array.add( json.encode( Array.get( value, i ) ) );
+			}
+			return json.write( array );
+		}
+		return json.write( value );
 	}
 
 	@Override
@@ -468,7 +479,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public Optional<Comparator<? super Object>> rawValueEqualsComparator(FieldTypeDescriptor<?, ?> fieldType) {
-		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
+		if ( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType )
+				|| Number.class.isAssignableFrom( fieldType.getJavaType() ) ) {
 			return Optional.of( (Comparator<Object>) (o1, o2) -> {
 				// we have exact string match or both are null
 				if ( Objects.equals( o1, o2 ) ) {
@@ -478,9 +490,10 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				if ( o1 == null || o2 == null ) {
 					return -1;
 				}
-				// compare parsed JSONs to address possible attribute order change:
-				return gson.fromJson( (String) o1, JsonElement.class )
-						.equals( gson.fromJson( (String) o2, JsonElement.class ) ) ? 0 : -1;
+				// Compare JSON values independently of object member order and numeric spelling.
+				return equivalent( json.decode( (String) o1, JsonNode.class ), json.decode( (String) o2, JsonNode.class ) )
+						? 0
+						: -1;
 			} );
 		}
 		return super.rawValueEqualsComparator( fieldType );
@@ -511,8 +524,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <F, T> T fromRawAggregation(FieldTypeDescriptor<F, ?> typeDescriptor, T value) {
-		JsonObject jsonObject = gson.fromJson( value.toString(), JsonObject.class );
-		return (T) ( gson.toJson( jsonObject.has( "value_as_string" )
+		ObjectNode jsonObject = json.decode( value.toString(), ObjectNode.class );
+		return (T) ( json.write( jsonObject.has( "value_as_string" )
 				? jsonObject.get( "value_as_string" )
 				: jsonObject.get( "value" ) ) );
 	}
@@ -538,7 +551,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		return collector.finish( collector.accumulateAll( collector.createInitial(), values ) );
 	}
 
-	@SuppressWarnings("unchecked") // because we ... did the equals check
+	// because we ... did the equals check
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T aggregatedSumNullValue(Class<T> clazz) {
 		if ( String.class.equals( clazz ) ) {
@@ -593,11 +607,11 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				|| FloatVectorFieldTypeDescriptor.INSTANCE.equals( fieldTypeDescriptor ) ) {
 			// https://github.com/opensearch-project/OpenSearch/issues/21184
 			// https://github.com/opensearch-project/k-NN/issues/3268
-			return isActualVersion(
+			return // TODO: CHANGE aoss as ^ are fixed
+			// TODO: CHANGE aoss as ^ are fixed
+			isActualVersion( // TODO: CHANGE aoss as ^ are fixed
 					es -> true,
-					os -> !os.isMatching( "3.6.0" ),
-					// TODO: CHANGE aoss as ^ are fixed
-					aoss -> false
+					os -> !os.isMatching( "3.6.0" ), aoss -> false
 			);
 		}
 		return super.canRetrieveVectorFieldFromNestedCamelCaseObject( fieldTypeDescriptor );

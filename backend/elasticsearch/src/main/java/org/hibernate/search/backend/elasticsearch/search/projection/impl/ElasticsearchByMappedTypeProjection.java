@@ -8,7 +8,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 final class ElasticsearchByMappedTypeProjection<P>
 		extends AbstractElasticsearchProjection<P> {
@@ -32,7 +32,7 @@ final class ElasticsearchByMappedTypeProjection<P>
 	}
 
 	@Override
-	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, P> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		Map<String, Extractor<?, ? extends P>> innerExtractors = new HashMap<>();
 		for ( Map.Entry<String, ElasticsearchSearchProjection<? extends P>> entry : inners.entrySet() ) {
 			innerExtractors.put( entry.getKey(), entry.getValue().request( requestBody, context ) );
@@ -55,8 +55,8 @@ final class ElasticsearchByMappedTypeProjection<P>
 		}
 
 		@Override
-		public DelegateAndExtractedValue<?, P> extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
-				JsonObject source, ProjectionExtractContext context) {
+		public DelegateAndExtractedValue<?, P> extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit,
+				ObjectNode source, ProjectionExtractContext context) {
 			String typeName = mappedTypeNameHelper.extract( hit, context );
 			Extractor<?, ? extends P> inner = inners.get( typeName );
 			if ( inner == null ) {
@@ -78,7 +78,7 @@ final class ElasticsearchByMappedTypeProjection<P>
 
 		private DelegateAndExtractedValue(Extractor<E, ? extends P> delegate,
 				ProjectionHitMapper<?> projectionHitMapper,
-				JsonObject hit, JsonObject source, ProjectionExtractContext context) {
+				ObjectNode hit, ObjectNode source, ProjectionExtractContext context) {
 			this.delegate = delegate;
 			this.extractedValue = delegate.extract( projectionHitMapper, hit, source, context );
 		}

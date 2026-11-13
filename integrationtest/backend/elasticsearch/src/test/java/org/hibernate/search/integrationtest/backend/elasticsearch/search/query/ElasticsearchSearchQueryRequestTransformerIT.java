@@ -6,9 +6,11 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -25,9 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test the content of generated Elasticsearch search queries when the
@@ -71,10 +71,10 @@ class ElasticsearchSearchQueryRequestTransformerIT {
 				.toQuery();
 
 		clientSpy.expectNext(
-				ElasticsearchRequest.post()
+				ElasticsearchJsonRequest.post()
 						.pathComponent( defaultReadAlias( otherIndex.name() ) )
 						.pathComponent( URLEncodedString.fromString( "_search" ) )
-						.body( new Gson().fromJson( "{}", JsonObject.class ) )
+						.bodyJson( JsonProviderHelper.create( false ).getCodec().decode( "{}", ObjectNode.class ) )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
@@ -99,10 +99,11 @@ class ElasticsearchSearchQueryRequestTransformerIT {
 				.toQuery();
 
 		clientSpy.expectNext(
-				ElasticsearchRequest.post()
+				ElasticsearchJsonRequest.post()
 						.pathComponent( defaultReadAlias( mainIndex.name() ) )
 						.pathComponent( Paths._SEARCH )
-						.body( new Gson().fromJson( "{}", JsonObject.class ) )
+						.bodyJson( JsonProviderHelper
+								.create( false ).getCodec().decode( "{}", ObjectNode.class ) )
 						.param( "search_type", "dfs_query_then_fetch" )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
@@ -117,24 +118,21 @@ class ElasticsearchSearchQueryRequestTransformerIT {
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
-				.requestTransformer( context -> {
-					assertThat( context.body() )
-							.isNotNull()
-							.extracting( body -> body.get( "min_score" ) ).isNull();
-					context.body().addProperty( "min_score", 0.5f );
-					// Changes should be visible immediately
-					assertThat( context.body() )
-							.isNotNull()
-							.extracting( body -> body.get( "min_score" ) )
-							.extracting( JsonElement::getAsFloat ).isEqualTo( 0.5f );
-				} )
+				.requestTransformer( context -> context.transformBody(
+						JacksonJsonHandlers.object(), body -> {
+							assertThat( body.get( "min_score" ) ).isNull();
+							body.put( "min_score", 0.5f );
+							assertThat( body.get( "min_score" ).floatValue() ).isEqualTo( 0.5f );
+							return body;
+						} ) )
 				.toQuery();
 
 		clientSpy.expectNext(
-				ElasticsearchRequest.post()
+				ElasticsearchJsonRequest.post()
 						.pathComponent( defaultReadAlias( mainIndex.name() ) )
 						.pathComponent( Paths._SEARCH )
-						.body( new Gson().fromJson( "{'min_score':0.5}", JsonObject.class ) )
+						.bodyJson( JsonProviderHelper.create( false )
+								.getCodec().decode( "{\"min_score\":0.5}", ObjectNode.class ) )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);

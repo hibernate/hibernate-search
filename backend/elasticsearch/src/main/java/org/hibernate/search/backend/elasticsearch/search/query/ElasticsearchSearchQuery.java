@@ -1,6 +1,8 @@
 package org.hibernate.search.backend.elasticsearch.search.query;
 
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
+import org.hibernate.search.util.json.JsonHandler;
 
 import com.google.gson.JsonObject;
 
@@ -20,7 +22,12 @@ public interface ElasticsearchSearchQuery<H>
 	 * @throws org.hibernate.search.util.common.SearchException If the query targets multiple indexes,
 	 * or if the explain request fails.
 	 */
-	JsonObject explain(Object id);
+	@Deprecated
+	default JsonObject explain(Object id) {
+		return explain( GsonJsonHandlers.object(), id );
+	}
+
+	<T> T explain(JsonHandler<T> handler, Object id);
 
 	/**
 	 * Explain score computation of this query for the document with the given id in the given mapped type.
@@ -35,6 +42,11 @@ public interface ElasticsearchSearchQuery<H>
 	 * @throws org.hibernate.search.util.common.SearchException If the given mapped type name does not refer to a mapped name targeted by this query,
 	 * or if the explain request fails.
 	 */
-	JsonObject explain(String typeName, Object id);
+	@Deprecated
+	default JsonObject explain(String typeName, Object id) {
+		return explain( GsonJsonHandlers.object(), typeName, id );
+	}
+
+	<T> T explain(JsonHandler<T> handler, String typeName, Object id);
 
 }

@@ -1,26 +1,27 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
+
+import tools.jackson.databind.JsonNode;
 
 public abstract class AbstractElasticsearchFieldCodec<T> implements ElasticsearchFieldCodec<T> {
 
-	protected final Gson gson;
+	protected final JsonCodecService json;
 
-	public AbstractElasticsearchFieldCodec(Gson gson) {
-		this.gson = gson;
+	public AbstractElasticsearchFieldCodec(JsonCodecService json) {
+		this.json = json;
 	}
 
 	@Override
-	public JsonElement fromJsonStringToElement(String value) {
-		return gson.fromJson( value, JsonElement.class );
+	public JsonNode fromJsonStringToElement(String value) {
+		return json.decode( value, JsonNode.class );
 	}
 
 	@Override
-	public String fromJsonElementToString(JsonElement value) {
-		if ( value == null || value.isJsonNull() ) {
+	public String fromJsonElementToString(JsonNode value) {
+		if ( value == null || value.isNull() ) {
 			return null;
 		}
-		return gson.toJson( value );
+		return json.write( value );
 	}
 }

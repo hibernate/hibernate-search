@@ -3,11 +3,10 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
-
-import com.google.gson.Gson;
 
 class ElasticsearchLocalDateIndexFieldTypeOptionsStep
 		extends
@@ -18,8 +17,8 @@ class ElasticsearchLocalDateIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<LocalDate> createCodec(Gson gson, DateTimeFormatter formatter) {
-		return new ElasticsearchLocalDateFieldCodec( gson, formatter );
+	protected ElasticsearchFieldCodec<LocalDate> createCodec(JsonCodecService json, DateTimeFormatter formatter) {
+		return new ElasticsearchLocalDateFieldCodec( json, formatter );
 	}
 
 	@Override

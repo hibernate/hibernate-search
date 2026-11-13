@@ -3,7 +3,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -15,8 +15,9 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueModel;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @param <F> The type of field values.
@@ -25,23 +26,23 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticsearchNestableAggregation<K> {
 
-	private static final JsonAccessor<JsonObject> SUM_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "sum" ).asObject();
+	private static final JsonAccessor<ObjectNode> SUM_PROPERTY_ACCESSOR =
+			JsonAccessor.root().property( "sum" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonObject> MIN_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "min" ).asObject();
+	private static final JsonAccessor<ObjectNode> MIN_PROPERTY_ACCESSOR =
+			JsonAccessor.root().property( "min" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonObject> MAX_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "max" ).asObject();
+	private static final JsonAccessor<ObjectNode> MAX_PROPERTY_ACCESSOR =
+			JsonAccessor.root().property( "max" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonObject> AVG_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "avg" ).asObject();
+	private static final JsonAccessor<ObjectNode> AVG_PROPERTY_ACCESSOR =
+			JsonAccessor.root().property( "avg" ).unwrapSingletonArrays().asObject();
 
 	private static final JsonAccessor<String> FIELD_PROPERTY_ACCESSOR =
-			JsonAccessor.root().property( "field" ).asString();
+			JsonAccessor.root().property( "field" ).unwrapSingletonArrays().asString();
 
 	private static final JsonAccessor<Double> VALUE_ACCESSOR =
-			JsonAccessor.root().property( "value" ).asDouble();
+			JsonAccessor.root().property( "value" ).unwrapSingletonArrays().asDouble();
 
 	public static <F> ElasticsearchMetricFieldAggregation.Factory<F> sum(ElasticsearchFieldCodec<F> codec) {
 		return new ElasticsearchMetricFieldAggregation.Factory<>( codec, SUM_PROPERTY_ACCESSOR );
@@ -61,7 +62,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 
 	private final String absoluteFieldPath;
 	private final AggregationExtractorBuilder<K> metricFieldExtractorCreator;
-	private final JsonAccessor<JsonObject> operation;
+	private final JsonAccessor<ObjectNode> operation;
 
 	private ElasticsearchMetricFieldAggregation(Builder<F, K> builder) {
 		super( builder );
@@ -71,9 +72,9 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 	}
 
 	@Override
-	protected final JsonObject doRequest(AggregationRequestBuildingContextContext context) {
-		JsonObject outerObject = new JsonObject();
-		JsonObject innerObject = new JsonObject();
+	protected final ObjectNode doRequest(AggregationRequestBuildingContextContext context) {
+		ObjectNode outerObject = JsonNodeFactory.instance.objectNode();
+		ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 
 		operation.set( outerObject, innerObject );
 		FIELD_PROPERTY_ACCESSOR.set( innerObject, absoluteFieldPath );
@@ -89,9 +90,9 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			extends
 			AbstractElasticsearchCodecAwareSearchQueryElementFactory<FieldMetricAggregationBuilder.TypeSelector, F> {
 
-		private final JsonAccessor<JsonObject> operation;
+		private final JsonAccessor<ObjectNode> operation;
 
-		private Factory(ElasticsearchFieldCodec<F> codec, JsonAccessor<JsonObject> operation) {
+		private Factory(ElasticsearchFieldCodec<F> codec, JsonAccessor<ObjectNode> operation) {
 			super( codec );
 			this.operation = operation;
 		}
@@ -107,11 +108,11 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
-		private final JsonAccessor<JsonObject> operation;
+		private final JsonAccessor<ObjectNode> operation;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
 				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field,
-				JsonAccessor<JsonObject> operation) {
+				JsonAccessor<ObjectNode> operation) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -129,7 +130,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 							T>) new DoubleMetricFieldExtractor.Builder( field.nestedPathHierarchy() );
 				}
 				else {
-					var projectionConverter = (ProjectionConverter<JsonElement, ? extends T>) field.type()
+					var projectionConverter = (ProjectionConverter<JsonNode, ? extends T>) field.type()
 							.rawProjectionConverter().withConvertedType( expectedType, field );
 					metricFieldExtractorCreator = (AggregationExtractorBuilder<T>) new RawMetricFieldExtractor.Builder<>(
 							field.nestedPathHierarchy(),
@@ -161,10 +162,10 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 		}
 
 		@Override
-		protected K doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
+		protected K doExtract(ObjectNode aggregationResult, AggregationExtractContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			Optional<Double> value = VALUE_ACCESSOR.get( aggregationResult );
-			JsonElement valueAsString = aggregationResult.get( "value_as_string" );
+			JsonNode valueAsString = aggregationResult.get( "value_as_string" );
 
 
 			return fromFieldValueConverter.fromDocumentValue(
@@ -198,7 +199,7 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 		}
 
 		@Override
-		protected Double doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
+		protected Double doExtract(ObjectNode aggregationResult, AggregationExtractContext context) {
 			Optional<Double> value = VALUE_ACCESSOR.get( aggregationResult );
 			return value.orElse( null );
 		}
@@ -218,25 +219,25 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 
 	private static class RawMetricFieldExtractor<K> extends AbstractExtractor<K> {
 
-		private final ProjectionConverter<JsonElement, K> projectionConverter;
+		private final ProjectionConverter<JsonNode, K> projectionConverter;
 
 		protected RawMetricFieldExtractor(AggregationKey<?> key, List<String> nestedPathHierarchy,
 				ElasticsearchSearchPredicate filter,
-				ProjectionConverter<JsonElement, K> projectionConverter) {
+				ProjectionConverter<JsonNode, K> projectionConverter) {
 			super( key, nestedPathHierarchy, filter );
 			this.projectionConverter = projectionConverter;
 		}
 
 		@Override
-		protected K doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
+		protected K doExtract(ObjectNode aggregationResult, AggregationExtractContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			return projectionConverter.fromDocumentValue( aggregationResult, convertContext );
 		}
 
 		private static class Builder<K> extends AggregationExtractorBuilder<K> {
-			private final ProjectionConverter<JsonElement, K> projectionConverter;
+			private final ProjectionConverter<JsonNode, K> projectionConverter;
 
-			private Builder(List<String> nestedPathHierarchy, ProjectionConverter<JsonElement, K> projectionConverter) {
+			private Builder(List<String> nestedPathHierarchy, ProjectionConverter<JsonNode, K> projectionConverter) {
 				super( nestedPathHierarchy );
 				this.projectionConverter = projectionConverter;
 			}
@@ -262,12 +263,12 @@ public class ElasticsearchMetricFieldAggregation<F, K> extends AbstractElasticse
 			implements FieldMetricAggregationBuilder<K> {
 
 		private final AggregationExtractorBuilder<K> metricFieldExtractorCreator;
-		private final JsonAccessor<JsonObject> operation;
+		private final JsonAccessor<ObjectNode> operation;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
 				AggregationExtractorBuilder<K> metricFieldExtractorCreator,
-				JsonAccessor<JsonObject> operation) {
+				JsonAccessor<ObjectNode> operation) {
 			super( scope, field );
 			this.metricFieldExtractorCreator = metricFieldExtractorCreator;
 			this.operation = operation;

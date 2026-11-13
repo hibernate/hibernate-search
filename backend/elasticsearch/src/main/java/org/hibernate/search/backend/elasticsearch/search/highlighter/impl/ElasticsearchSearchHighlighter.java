@@ -11,13 +11,13 @@ import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.projection.ProjectionCollector;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface ElasticsearchSearchHighlighter extends SearchHighlighter {
 
-	void request(JsonObject requestBody);
+	void request(ObjectNode requestBody);
 
-	void applyToField(String path, JsonObject fields);
+	void applyToField(String path, ObjectNode fields);
 
 	Set<String> indexNames();
 

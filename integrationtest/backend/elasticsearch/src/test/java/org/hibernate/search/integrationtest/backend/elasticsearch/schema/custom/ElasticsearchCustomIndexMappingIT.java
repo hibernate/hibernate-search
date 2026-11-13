@@ -46,7 +46,7 @@ class ElasticsearchCustomIndexMappingIT {
 				.hasMessageContainingAll(
 						"There are some JSON syntax errors on the given custom index mapping file",
 						"custom-index-mapping/not-parsable.json",
-						"Expected BEGIN_OBJECT but was STRING at line 1 column 1"
+						"Invalid JSON input"
 				);
 	}
 

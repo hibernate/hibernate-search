@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface DocumentMetadataContributor {
 
@@ -11,6 +11,5 @@ public interface DocumentMetadataContributor {
 	 * @param tenantId The tenant id.
 	 * @param id The document id.
 	 */
-	void contribute(JsonObject document, String tenantId, String id);
-
+	void contribute(ObjectNode document, String tenantId, String id);
 }

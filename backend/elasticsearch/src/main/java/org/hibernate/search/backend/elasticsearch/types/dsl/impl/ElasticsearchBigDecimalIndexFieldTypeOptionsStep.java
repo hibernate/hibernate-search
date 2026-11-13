@@ -35,7 +35,7 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 		int resolvedDecimalScale = resolveDecimalScale();
 
 		ElasticsearchBigDecimalFieldCodec codec =
-				new ElasticsearchBigDecimalFieldCodec( buildContext.getUserFacingGson(), resolvedDecimalScale );
+				new ElasticsearchBigDecimalFieldCodec( buildContext.getUserFacingCodec(), resolvedDecimalScale );
 		builder.mapping().setScalingFactor( codec.scalingFactor().doubleValue() );
 
 		return codec;

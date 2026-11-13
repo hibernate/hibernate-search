@@ -2,6 +2,7 @@ package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.authentication.spi.ElasticsearchRequestPreparationProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProvider;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
@@ -14,6 +15,10 @@ public class ElasticsearchAwsBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				ElasticsearchRequestInterceptorProvider.class,
+				beanResolver -> BeanHolder.of( new ElasticsearchAwsSigningInterceptorProvider() )
+		);
+		context.define(
+				ElasticsearchRequestPreparationProvider.class,
 				beanResolver -> BeanHolder.of( new ElasticsearchAwsSigningInterceptorProvider() )
 		);
 		context.define(

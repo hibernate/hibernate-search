@@ -16,24 +16,27 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 
 	private final ElasticsearchWorkFactory workFactory;
+
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
+
 	private final WorkExecutionIndexManagerContext indexManagerContext;
+
 	private final EntityReferenceFactory entityReferenceFactory;
+
 	private final String tenantId;
+
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	private final List<SingleDocumentIndexingWork> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkFactory workFactory,
-			ElasticsearchSerialWorkOrchestrator orchestrator,
-			WorkExecutionIndexManagerContext indexManagerContext,
-			BackendSessionContext sessionContext,
-			DocumentRefreshStrategy refreshStrategy) {
+			ElasticsearchSerialWorkOrchestrator orchestrator, WorkExecutionIndexManagerContext indexManagerContext,
+			BackendSessionContext sessionContext, DocumentRefreshStrategy refreshStrategy) {
 		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
@@ -43,14 +46,12 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 	}
 
 	@Override
-	public void add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
+	public void add(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
 
 	@Override
-	public void addOrUpdate(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
+	public void addOrUpdate(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
 
@@ -58,25 +59,19 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 	public void delete(DocumentReferenceProvider referenceProvider) {
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, referenceProvider.identifier() );
 		String routingKey = referenceProvider.routingKey();
-
-		collect(
-				workFactory.delete(
-						indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
-						indexManagerContext.getElasticsearchIndexWriteName(),
-						elasticsearchId, routingKey
-				)
-						.refresh( refreshStrategy )
-						.build()
-		);
+		collect( workFactory
+				.delete( indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
+						indexManagerContext.getElasticsearchIndexWriteName(), elasticsearchId, routingKey )
+				.refresh( refreshStrategy ).build() );
 	}
 
 	@Override
 	public CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter) {
 		try {
-			ElasticsearchIndexIndexingPlanExecution execution = new ElasticsearchIndexIndexingPlanExecution(
-					orchestrator, entityReferenceFactory,
-					new ArrayList<>( works ) // Copy the list, as we're going to clear it below
-			);
+			ElasticsearchIndexIndexingPlanExecution execution = new // Copy the list, as we're going to clear it below
+			ElasticsearchIndexIndexingPlanExecution( // Copy the list, as we're going to clear it below
+					orchestrator, // Copy the list, as we're going to clear it below
+					entityReferenceFactory, new ArrayList<>( works ) );
 			return execution.execute( operationSubmitter );
 		}
 		finally {
@@ -89,27 +84,18 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 		works.clear();
 	}
 
-	private void index(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
+	private void index(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor) {
 		String id = referenceProvider.identifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.routingKey();
-
-		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
-
-		collect(
-				workFactory.index(
-						indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
-						indexManagerContext.getElasticsearchIndexWriteName(),
-						elasticsearchId, routingKey, document
-				)
-						.refresh( refreshStrategy )
-						.build()
-		);
+		ObjectNode document = indexManagerContext.createDocument( tenantId, id, documentContributor );
+		collect( workFactory
+				.index( indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
+						indexManagerContext.getElasticsearchIndexWriteName(), elasticsearchId, routingKey, document )
+				.refresh( refreshStrategy ).build() );
 	}
 
 	private void collect(SingleDocumentIndexingWork work) {
 		works.add( work );
 	}
-
 }

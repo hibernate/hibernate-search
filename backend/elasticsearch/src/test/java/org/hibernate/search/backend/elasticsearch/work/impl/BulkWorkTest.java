@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClient;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -24,20 +24,21 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
-@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
+// Raw types are the only way to mock parameterized types
+@SuppressWarnings({ "unchecked", "rawtypes" })
 class BulkWorkTest {
 
 	@Mock
-	private ElasticsearchClient clientMock;
+	private ElasticsearchJsonClient clientMock;
 	@Mock(strictness = Mock.Strictness.LENIENT)
 	private ElasticsearchWorkExecutionContext contextMock;
 
@@ -57,21 +58,20 @@ class BulkWorkTest {
 		when( bulkableWork1.getBulkableActionBody() ).thenReturn( bulkableWorkBody( 1 ) );
 		BulkWork work = new BulkWork.Builder( Arrays.asList( bulkableWork0, bulkableWork1 ) ).build();
 
-		ArgumentCaptor<ElasticsearchRequest> requestCaptor = ArgumentCaptor.forClass( ElasticsearchRequest.class );
-		CompletableFuture<ElasticsearchResponse> futureFromClient = new CompletableFuture<>();
+		ArgumentCaptor<ElasticsearchJsonRequest> requestCaptor = ArgumentCaptor.forClass( ElasticsearchJsonRequest.class );
+		CompletableFuture<ElasticsearchJsonResponse> futureFromClient = new CompletableFuture<>();
 		when( clientMock.submit( requestCaptor.capture() ) ).thenReturn( futureFromClient );
 		CompletableFuture<BulkResult> returnedFuture = work.execute( contextMock );
 		verifyNoOtherClientInteractionsAndReset();
 		assertThatFuture( returnedFuture ).isPending();
 
 		assertBulkRequest( requestCaptor.getValue(), 0, 1 );
-
-		JsonObject responseBody = new JsonObject();
-		JsonArray items = new JsonArray();
-		responseBody.add( "items", items );
-		items.add( new JsonObject() );
-		items.add( new JsonObject() );
-		ElasticsearchResponse response = new ElasticsearchResponse( "mockHost:9200",
+		ObjectNode responseBody = new ObjectNode( JsonNodeFactory.instance );
+		ArrayNode items = new ArrayNode( JsonNodeFactory.instance );
+		responseBody.set( "items", items );
+		items.add( new ObjectNode( JsonNodeFactory.instance ) );
+		items.add( new ObjectNode( JsonNodeFactory.instance ) );
+		ElasticsearchJsonResponse response = ElasticsearchJsonResponse.withJsonBody( "mockHost:9200",
 				200, "OK", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();
@@ -80,12 +80,12 @@ class BulkWorkTest {
 		BulkResult result = returnedFuture.join();
 
 		Object bulkableResult = new Object();
-		when( bulkableWork0.handleBulkResult( same( contextMock ), same( items.get( 0 ).getAsJsonObject() ) ) )
+		when( bulkableWork0.handleBulkResult( same( contextMock ), same( ( (ObjectNode) items.get( 0 ) ) ) ) )
 				.thenReturn( bulkableResult );
 		assertThat( result.extract( contextMock, bulkableWork0, 0 ) ).isSameAs( bulkableResult );
 		verifyNoOtherClientInteractionsAndReset();
 
-		when( bulkableWork1.handleBulkResult( same( contextMock ), same( items.get( 1 ).getAsJsonObject() ) ) )
+		when( bulkableWork1.handleBulkResult( same( contextMock ), same( ( (ObjectNode) items.get( 1 ) ) ) ) )
 				.thenReturn( bulkableResult );
 		assertThat( result.extract( contextMock, bulkableWork1, 1 ) ).isSameAs( bulkableResult );
 		verifyNoOtherClientInteractionsAndReset();
@@ -104,19 +104,19 @@ class BulkWorkTest {
 		BulkWork work = new BulkWork.Builder( Arrays.asList( bulkableWork0, bulkableWork1 ) ).build();
 		verifyNoOtherClientInteractionsAndReset();
 
-		ArgumentCaptor<ElasticsearchRequest> requestCaptor = ArgumentCaptor.forClass( ElasticsearchRequest.class );
-		CompletableFuture<ElasticsearchResponse> futureFromClient = new CompletableFuture<>();
+		ArgumentCaptor<ElasticsearchJsonRequest> requestCaptor = ArgumentCaptor.forClass( ElasticsearchJsonRequest.class );
+		CompletableFuture<ElasticsearchJsonResponse> futureFromClient = new CompletableFuture<>();
 		when( clientMock.submit( requestCaptor.capture() ) ).thenReturn( futureFromClient );
 		CompletableFuture<BulkResult> returnedFuture = work.execute( contextMock );
 		verifyNoOtherClientInteractionsAndReset();
 		assertThatFuture( returnedFuture ).isPending();
 
 		assertBulkRequest( requestCaptor.getValue(), 0, 1 );
-
-		JsonObject responseBody = new JsonObject();
-		responseBody.addProperty( "someProperty", "someValue" );
-		ElasticsearchResponse response = new ElasticsearchResponse( "mockHost:9200",
-				500, "SomeStatus", responseBody );
+		ObjectNode responseBody = new ObjectNode( JsonNodeFactory.instance );
+		responseBody.put( "someProperty", "someValue" );
+		ElasticsearchJsonResponse response =
+				ElasticsearchJsonResponse.withJsonBody( "mockHost:9200",
+						500, "SomeStatus", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();
 
@@ -130,17 +130,17 @@ class BulkWorkTest {
 				) );
 	}
 
-	private void assertBulkRequest(ElasticsearchRequest request, int... bulkableIndices) {
+	private void assertBulkRequest(ElasticsearchJsonRequest request, int... bulkableIndices) {
 		assertThat( request ).isNotNull();
 		assertSoftly( softly -> {
 			softly.assertThat( request.method() ).isEqualTo( "POST" );
 			softly.assertThat( request.path() ).isEqualTo( "/_bulk" );
-			List<JsonObject> expectedBodyParts = new ArrayList<>();
+			List<ObjectNode> expectedBodyParts = new ArrayList<>();
 			for ( int bulkableIndex : bulkableIndices ) {
 				expectedBodyParts.add( bulkableWorkMetadata( bulkableIndex ) );
 				expectedBodyParts.add( bulkableWorkBody( bulkableIndex ) );
 			}
-			softly.assertThat( request.bodyParts() ).containsExactlyElementsOf( expectedBodyParts );
+			softly.assertThat( request.bodyPartsJson() ).containsExactlyElementsOf( expectedBodyParts );
 		} );
 	}
 
@@ -153,17 +153,17 @@ class BulkWorkTest {
 		return mock( BulkableWork.class, "bulkableWork" + index );
 	}
 
-	private static JsonObject bulkableWorkMetadata(int index) {
-		JsonObject result = new JsonObject();
-		result.addProperty( "type", "metadata" );
-		result.addProperty( "bulkableWorkIndex", index );
+	private static ObjectNode bulkableWorkMetadata(int index) {
+		ObjectNode result = new ObjectNode( JsonNodeFactory.instance );
+		result.put( "type", "metadata" );
+		result.put( "bulkableWorkIndex", index );
 		return result;
 	}
 
-	private static JsonObject bulkableWorkBody(int index) {
-		JsonObject result = new JsonObject();
-		result.addProperty( "type", "body" );
-		result.addProperty( "bulkableWorkIndex", index );
+	private static ObjectNode bulkableWorkBody(int index) {
+		ObjectNode result = new ObjectNode( JsonNodeFactory.instance );
+		result.put( "type", "body" );
+		result.put( "bulkableWorkIndex", index );
 		return result;
 	}
 

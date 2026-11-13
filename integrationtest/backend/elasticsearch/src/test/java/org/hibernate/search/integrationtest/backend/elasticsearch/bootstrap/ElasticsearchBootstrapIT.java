@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
@@ -71,7 +71,7 @@ class ElasticsearchBootstrapIT {
 		// and if possible used to check the version
 		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
 			elasticsearchClientSpy.expectNext(
-					ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.EXTENSIBLE
+					ElasticsearchJsonRequest.get().build(), ElasticsearchRequestAssertionMode.EXTENSIBLE
 			);
 		}
 		partialSetup.doSecondPhase();
@@ -357,8 +357,8 @@ class ElasticsearchBootstrapIT {
 				.isEqualTo( "\"42\"" );
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-						+ " 'properties': {"
-						+ "   'custom': {"
+						+ " \"properties\": {"
+						+ "   \"custom\": {"
 						+ "   }"
 						+ " }"
 						+ "}",

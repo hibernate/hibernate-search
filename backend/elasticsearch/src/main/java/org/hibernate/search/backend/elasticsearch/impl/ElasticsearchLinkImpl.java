@@ -4,17 +4,17 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClient;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.logging.impl.VersionLog;
@@ -36,7 +36,6 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 
-import com.google.gson.GsonBuilder;
 
 class ElasticsearchLinkImpl implements ElasticsearchLink {
 
@@ -70,16 +69,16 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
 	private final BackendThreads threads;
-	private final GsonProvider defaultGsonProvider;
+	private final JsonProvider defaultJsonProvider;
 	private final boolean logPrettyPrinting;
 	private final ElasticsearchDialectFactory dialectFactory;
 	private final Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional;
 	private final TypeNameMapping typeNameMapping;
 	private final IndexNamesRegistry indexNamesRegistry;
 
-	private ElasticsearchClientImplementor clientImplementor;
+	private ElasticsearchJsonClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
-	private GsonProvider gsonProvider;
+	private JsonProvider jsonProvider;
 	private ElasticsearchIndexMetadataSyntax indexMetadataSyntax;
 	private ElasticsearchSearchSyntax searchSyntax;
 	private ElasticsearchWorkFactory workFactory;
@@ -89,13 +88,13 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private SearchProjectionBackendContext searchProjectionBackendContext;
 
 	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
-			BackendThreads threads, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
+			BackendThreads threads, JsonProvider defaultJsonProvider, boolean logPrettyPrinting,
 			ElasticsearchDialectFactory dialectFactory,
 			Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional,
 			TypeNameMapping typeNameMapping) {
 		this.clientFactoryHolder = clientFactoryHolder;
 		this.threads = threads;
-		this.defaultGsonProvider = defaultGsonProvider;
+		this.defaultJsonProvider = defaultJsonProvider;
 		this.logPrettyPrinting = logPrettyPrinting;
 		this.dialectFactory = dialectFactory;
 		this.configuredVersionOnBackendCreationOptional = configuredVersionOnBackendCreationOptional;
@@ -104,15 +103,15 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	}
 
 	@Override
-	public ElasticsearchClient getClient() {
+	public ElasticsearchJsonClient getClient() {
 		checkStarted();
 		return clientImplementor;
 	}
 
 	@Override
-	public GsonProvider getGsonProvider() {
+	public JsonProvider getJsonProvider() {
 		checkStarted();
-		return gsonProvider;
+		return jsonProvider;
 	}
 
 	@Override
@@ -202,19 +201,21 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	void onStart(BeanResolver beanResolver, MultiTenancyStrategy multiTenancyStrategy,
 			ConfigurationPropertySource propertySource) {
 		if ( clientImplementor == null ) {
-			clientImplementor = clientFactoryHolder.get().create(
-					beanResolver, propertySource, threads.getThreadProvider(), threads.getPrefix(),
-					threads.getWorkExecutor(), defaultGsonProvider
-			);
+			clientImplementor = new org.hibernate.search.backend.elasticsearch.client.common.impl.JsonTransportClient(
+					clientFactoryHolder.get().create(
+							beanResolver, propertySource, threads.getThreadProvider(), threads.getPrefix(),
+							threads.getWorkExecutor()
+					), defaultJsonProvider );
 			clientFactoryHolder.close(); // We won't need it anymore
 
 			elasticsearchVersion = initVersion( propertySource );
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
-			gsonProvider = GsonProviderHelper.create( GsonBuilder::new, logPrettyPrinting );
+			jsonProvider = JsonProviderHelper.create( logPrettyPrinting, defaultJsonProvider.getCodec().validation(),
+					defaultJsonProvider.getCodec().parsing() );
 			indexMetadataSyntax = protocolDialect.createIndexMetadataSyntax();
 			searchSyntax = protocolDialect.createSearchSyntax();
-			workFactory = protocolDialect.createWorkFactory( gsonProvider, QUERY_SHARD_FAILURE_IGNORE.get( propertySource ) );
+			workFactory = protocolDialect.createWorkFactory( jsonProvider, QUERY_SHARD_FAILURE_IGNORE.get( propertySource ) );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
 			scrollTimeout = SCROLL_TIMEOUT.get( propertySource );
 		}
@@ -230,7 +231,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	void onStop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( BeanHolder::close, clientFactoryHolder ); // Just in case start() was not called
-			closer.push( ElasticsearchClientImplementor::close, clientImplementor );
+			closer.push( ElasticsearchJsonClientImplementor::close, clientImplementor );
 			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
 		}
 	}

@@ -7,7 +7,7 @@ import org.hibernate.search.engine.search.common.NamedValues;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 final class ElasticsearchWithParametersProjection<P>
 		extends AbstractElasticsearchProjection<P> {
@@ -31,7 +31,7 @@ final class ElasticsearchWithParametersProjection<P>
 	}
 
 	@Override
-	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, P> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		SearchProjection<P> delegate = projectionCreator.apply( context.queryParameters() )
 				.toProjection();
 		return ElasticsearchSearchProjection.from( scope, delegate ).request( requestBody, context );

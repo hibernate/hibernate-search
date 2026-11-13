@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
@@ -18,8 +18,8 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingIndexMetadata>> {
 
@@ -29,50 +29,46 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 
 	@Override
 	protected List<ExistingIndexMetadata> generateResult(ElasticsearchWorkExecutionContext context,
-			ElasticsearchResponse response) {
-		JsonObject body = response.body();
+			ElasticsearchJsonResponse response) {
+		ObjectNode body = response.bodyJson();
 		List<ExistingIndexMetadata> result = new ArrayList<>();
-		for ( Map.Entry<String, JsonElement> entry : body.entrySet() ) {
-			JsonObject indexAsObject = entry.getValue().getAsJsonObject();
-
+		for ( Map.Entry<String, JsonNode> entry : body.properties() ) {
+			ObjectNode indexAsObject = ( (ObjectNode) entry.getValue() );
 			IndexMetadata metadata = new IndexMetadata();
 			metadata.setAliases( getAliases( context, indexAsObject ) );
 			metadata.setSettings( getSettings( context, indexAsObject ) );
 			metadata.setMapping( getMapping( context, indexAsObject ) );
-
 			result.add( new ExistingIndexMetadata( entry.getKey(), metadata ) );
 		}
 		return result;
 	}
 
-	private Map<String, IndexAliasDefinition> getAliases(ElasticsearchWorkExecutionContext context, JsonObject index) {
-		JsonElement aliases = index.get( "aliases" );
-		if ( aliases == null || !aliases.isJsonObject() ) {
+	private Map<String, IndexAliasDefinition> getAliases(ElasticsearchWorkExecutionContext context, ObjectNode index) {
+		JsonNode aliases = index.get( "aliases" );
+		if ( aliases == null || !aliases.isObject() ) {
 			throw new AssertionFailure(
 					"Elasticsearch API call succeeded, but the aliases weren't mentioned in the result: " + index );
 		}
-
-		GsonProvider gsonProvider = context.getGsonProvider();
+		JsonProvider jsonProvider = context.getJsonProvider();
 		Map<String, IndexAliasDefinition> result = new LinkedHashMap<>();
-		for ( Map.Entry<String, JsonElement> entry : aliases.getAsJsonObject().entrySet() ) {
+		for ( Map.Entry<String, JsonNode> entry : ( (ObjectNode) aliases ).properties() ) {
 			IndexAliasDefinition aliasDefinition =
-					gsonProvider.getGson().fromJson( entry.getValue(), IndexAliasDefinition.class );
+					jsonProvider.getCodec().decode( entry.getValue(), IndexAliasDefinition.class );
 			result.put( entry.getKey(), aliasDefinition );
 		}
 		return result;
 	}
 
-	private IndexSettings getSettings(ElasticsearchWorkExecutionContext context, JsonObject index) {
-		JsonElement settings = index.get( "settings" );
-		if ( settings == null || !settings.isJsonObject() ) {
+	private IndexSettings getSettings(ElasticsearchWorkExecutionContext context, ObjectNode index) {
+		JsonNode settings = index.get( "settings" );
+		if ( settings == null || !settings.isObject() ) {
 			throw new AssertionFailure(
 					"Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + index );
 		}
-
-		JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
+		JsonNode indexSettings = ( (ObjectNode) settings ).get( "index" );
 		if ( indexSettings != null ) {
-			GsonProvider gsonProvider = context.getGsonProvider();
-			return gsonProvider.getGson().fromJson( indexSettings, IndexSettings.class );
+			JsonProvider jsonProvider = context.getJsonProvider();
+			return jsonProvider.getCodec().decode( indexSettings, IndexSettings.class );
 		}
 		else {
 			// Empty settings
@@ -80,12 +76,11 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 		}
 	}
 
-	private RootTypeMapping getMapping(ElasticsearchWorkExecutionContext context, JsonObject index) {
-		JsonElement mappings = index.get( "mappings" );
-
+	private RootTypeMapping getMapping(ElasticsearchWorkExecutionContext context, ObjectNode index) {
+		JsonNode mappings = index.get( "mappings" );
 		if ( mappings != null ) {
-			GsonProvider gsonProvider = context.getGsonProvider();
-			return gsonProvider.getGson().fromJson( mappings, RootTypeMapping.class );
+			JsonProvider jsonProvider = context.getJsonProvider();
+			return jsonProvider.getCodec().decode( mappings, RootTypeMapping.class );
 		}
 		else {
 			return null;
@@ -110,10 +105,8 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.get()
-							.multiValuedPathComponent( indexNames );
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.get().multiValuedPathComponent( indexNames );
 			// This prevents the request from failing if the given index name does not match anything
 			builder.param( "ignore_unavailable", true );
 			// According to the documentation, this should prevent the request from failing

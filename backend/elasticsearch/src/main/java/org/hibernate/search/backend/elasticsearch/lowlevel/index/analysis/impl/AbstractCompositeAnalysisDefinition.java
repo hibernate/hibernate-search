@@ -3,7 +3,7 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonName;
 
 /**
  * A superclass to both {@link AnalyzerDefinition} and {@link NormalizerDefinition}.
@@ -11,10 +11,10 @@ import com.google.gson.annotations.SerializedName;
  */
 public abstract class AbstractCompositeAnalysisDefinition extends AnalysisDefinition {
 
-	@SerializedName("filter")
+	@JsonName("filter")
 	private List<String> tokenFilters;
 
-	@SerializedName("char_filter")
+	@JsonName("char_filter")
 	private List<String> charFilters;
 
 	public List<String> getTokenFilters() {

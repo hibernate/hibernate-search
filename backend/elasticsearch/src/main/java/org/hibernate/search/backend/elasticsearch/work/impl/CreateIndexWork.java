@@ -2,18 +2,20 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
+import org.hibernate.search.util.json.internal.spi.JsonCodecs;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> {
 
@@ -24,7 +26,7 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 	}
 
 	@Override
-	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
 		int statusCode = response.statusCode();
 		if ( ElasticsearchClientUtils.isSuccessCode( statusCode ) ) {
 			return CreateIndexResult.CREATED;
@@ -35,19 +37,21 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 		}
 	}
 
-	public static class Builder
-			extends AbstractBuilder<Builder> {
-		private final GsonProvider gsonProvider;
-		private final URLEncodedString indexName;
-		private final JsonObject payload = new JsonObject();
+	public static class Builder extends AbstractBuilder<Builder> {
 
-		public static Builder create(GsonProvider gsonProvider, URLEncodedString indexName) {
-			return new Builder( gsonProvider, indexName );
+		private final JsonProvider jsonProvider;
+
+		private final URLEncodedString indexName;
+
+		private final ObjectNode payload = new ObjectNode( JsonNodeFactory.instance );
+
+		public static Builder create(JsonProvider jsonProvider, URLEncodedString indexName) {
+			return new Builder( jsonProvider, indexName );
 		}
 
-		private Builder(GsonProvider gsonProvider, URLEncodedString indexName) {
+		private Builder(JsonProvider jsonProvider, URLEncodedString indexName) {
 			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
-			this.gsonProvider = gsonProvider;
+			this.jsonProvider = jsonProvider;
 			this.indexName = indexName;
 		}
 
@@ -56,8 +60,9 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
 			 */
-			Gson gson = gsonProvider.getGsonNoSerializeNulls();
-			payload.add( "aliases", gson.toJsonTree( aliases ) );
+			JsonCodecService json = jsonProvider.getCodecNoSerializeNulls();
+			payload.set( "aliases", JsonCodecs
+					.map( json.codec( IndexAliasDefinition.class ) ).encode( aliases, false ) );
 			return this;
 		}
 
@@ -66,33 +71,28 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
 			 */
-			Gson gson = gsonProvider.getGsonNoSerializeNulls();
-			payload.add( "settings", gson.toJsonTree( settings ) );
+			JsonCodecService json = jsonProvider.getCodecNoSerializeNulls();
+			payload.set( "settings", json.encode( settings ) );
 			return this;
 		}
 
 		public Builder mapping(RootTypeMapping mapping) {
-			Gson gson = gsonProvider.getGsonNoSerializeNulls();
-
-			payload.add( MAPPINGS_PROPERTY, gson.toJsonTree( mapping ) );
-
+			JsonCodecService json = jsonProvider.getCodecNoSerializeNulls();
+			payload.set( MAPPINGS_PROPERTY, json.encode( mapping ) );
 			return this;
 		}
 
 		public Builder ignoreExisting() {
-			this.resultAssessor = ElasticsearchRequestSuccessAssessor.builder()
-					.ignoreErrorTypes( "index_already_exists_exception" )
-					.build();
+			this.resultAssessor =
+					ElasticsearchRequestSuccessAssessor.builder().ignoreErrorTypes( "index_already_exists_exception" ).build();
 			return this;
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.put()
-							.pathComponent( indexName );
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.put().pathComponent( indexName );
 			if ( payload.size() > 0 ) {
-				builder.body( payload );
+				builder.bodyJsonFromInternal( payload );
 			}
 			return builder.build();
 		}

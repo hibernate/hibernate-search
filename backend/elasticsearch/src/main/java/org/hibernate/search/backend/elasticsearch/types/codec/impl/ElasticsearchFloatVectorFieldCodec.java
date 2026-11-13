@@ -1,21 +1,23 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 public class ElasticsearchFloatVectorFieldCodec extends AbstractElasticsearchVectorFieldCodec<float[]> {
 
-	public ElasticsearchFloatVectorFieldCodec(Gson gson, VectorSimilarity similarity, int dimension, Integer m,
+	public ElasticsearchFloatVectorFieldCodec(JsonCodecService json, VectorSimilarity similarity, int dimension, Integer m,
 			Integer efConstruction, float[] indexNullAs) {
-		super( gson, similarity, dimension, m, efConstruction, indexNullAs );
+		super( json, similarity, dimension, m, efConstruction, indexNullAs );
 	}
 
 	@Override
-	protected JsonArray toJsonArray(float[] value) {
-		JsonArray array = new JsonArray( value.length );
+	protected ArrayNode toJsonArray(float[] value) {
+		ArrayNode array = JsonNodeFactory.instance.arrayNode( value.length );
 		for ( float element : value ) {
 			array.add( element );
 		}
@@ -23,11 +25,11 @@ public class ElasticsearchFloatVectorFieldCodec extends AbstractElasticsearchVec
 	}
 
 	@Override
-	protected float[] fromJsonArray(JsonArray jsonElements) {
+	protected float[] fromJsonArray(ArrayNode jsonElements) {
 		int size = jsonElements.size();
 		float[] result = new float[size];
 		for ( int i = 0; i < size; i++ ) {
-			result[i] = jsonElements.get( i ).getAsFloat();
+			result[i] = JsonScalarConversions.asFloat( jsonElements.get( i ) );
 		}
 		return result;
 	}

@@ -2,9 +2,9 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonArrayAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -15,23 +15,31 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor TERMS_ACCESSOR = JsonAccessor.root().property( "terms" ).asObject();
-	private static final JsonObjectAccessor TERM_ACCESSOR = JsonAccessor.root().property( "term" ).asObject();
+	private static final JsonObjectAccessor TERMS_ACCESSOR =
+			JsonAccessor.root().property( "terms" ).unwrapSingletonArrays().asObject();
+
+	private static final JsonObjectAccessor TERM_ACCESSOR =
+			JsonAccessor.root().property( "term" ).unwrapSingletonArrays().asObject();
 
 	// for boolean query:
-	private static final JsonObjectAccessor BOOL_ACCESSOR = JsonAccessor.root().property( "bool" ).asObject();
+	private static final JsonObjectAccessor BOOL_ACCESSOR =
+			JsonAccessor.root().property( "bool" ).unwrapSingletonArrays().asObject();
+
 	private static final JsonArrayAccessor MUST_ACCESSOR = JsonAccessor.root().property( "must" ).asArray();
 
-	private static final JsonAccessor<JsonElement> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
+	private static final JsonAccessor<JsonNode> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
 
-	private final JsonElement term;
-	private final JsonElement[] terms;
+	private final JsonNode term;
+
+	private final JsonNode[] terms;
+
 	private boolean allMatch;
 
 	public ElasticsearchTermsPredicate(Builder<?> builder) {
@@ -42,48 +50,41 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
-
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		// single term
 		if ( term != null ) {
 			VALUE_ACCESSOR.set( innerObject, term );
-			JsonObject middleObject = new JsonObject();
-			middleObject.add( absoluteFieldPath, innerObject );
+			ObjectNode middleObject = new ObjectNode( JsonNodeFactory.instance );
+			middleObject.set( absoluteFieldPath, innerObject );
 			TERM_ACCESSOR.set( outerObject, middleObject );
 			return outerObject;
 		}
-
 		// multiple terms in OR
 		if ( !allMatch ) {
-			JsonArray jsonArray = new JsonArray( terms.length );
-			for ( JsonElement element : terms ) {
+			ArrayNode jsonArray = new ArrayNode( JsonNodeFactory.instance, terms.length );
+			for ( JsonNode element : terms ) {
 				jsonArray.add( element );
 			}
-
-			innerObject.add( absoluteFieldPath, jsonArray );
+			innerObject.set( absoluteFieldPath, jsonArray );
 			TERMS_ACCESSOR.set( outerObject, innerObject );
 			return outerObject;
 		}
-
 		// multiple terms in AND
 		// using a boolean query here:
-		JsonArray termsArray = new JsonArray();
-		for ( JsonElement element : terms ) {
-			JsonObject innerTermObject = new JsonObject();
-			innerTermObject.add( absoluteFieldPath, element );
-			JsonObject termObject = new JsonObject();
+		ArrayNode termsArray = new ArrayNode( JsonNodeFactory.instance );
+		for ( JsonNode element : terms ) {
+			ObjectNode innerTermObject = new ObjectNode( JsonNodeFactory.instance );
+			innerTermObject.set( absoluteFieldPath, element );
+			ObjectNode termObject = new ObjectNode( JsonNodeFactory.instance );
 			TERM_ACCESSOR.set( termObject, innerTermObject );
 			termsArray.add( termObject );
 		}
-
 		MUST_ACCESSOR.set( innerObject, termsArray );
 		BOOL_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 
-	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<TermsPredicateBuilder, F> {
+	public static class Factory<F> extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<TermsPredicateBuilder, F> {
 
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
@@ -99,10 +100,13 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 	private static class Builder<F> extends AbstractBuilder implements TermsPredicateBuilder {
 
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
+
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private JsonElement term;
-		private JsonElement[] terms;
+		private JsonNode term;
+
+		private JsonNode[] terms;
+
 		private boolean allMatch;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
@@ -110,7 +114,6 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 			super( scope, field );
 			// Score is always constant for this query
 			constantScore();
-
 			this.field = field;
 			this.codec = codec;
 		}
@@ -133,28 +136,25 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		private void fillTerms(Collection<?> terms, ValueModel valueModel) {
-
 			if ( terms.size() == 1 ) {
 				this.term = encode( terms.iterator().next(), valueModel );
 				this.terms = null;
 				return;
 			}
-
 			this.term = null;
 			this.terms = encode( terms, valueModel );
 		}
 
-		private JsonElement[] encode(Collection<?> terms, ValueModel valueModel) {
-			JsonElement[] result = new JsonElement[terms.size()];
+		private JsonNode[] encode(Collection<?> terms, ValueModel valueModel) {
+			JsonNode[] result = new JsonNode[terms.size()];
 			int i = 0;
 			for ( Object term : terms ) {
 				result[i++] = encode( term, valueModel );
 			}
-
 			return result;
 		}
 
-		private JsonElement encode(Object term, ValueModel valueModel) {
+		private JsonNode encode(Object term, ValueModel valueModel) {
 			return field.encodingContext().convertAndEncode( scope, field, term, valueModel, ElasticsearchFieldCodec::encode );
 		}
 	}

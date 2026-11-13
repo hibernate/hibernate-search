@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public final class SingleTypeNameExtractionHelper implements ProjectionExtractionHelper<String> {
 
@@ -11,12 +11,12 @@ public final class SingleTypeNameExtractionHelper implements ProjectionExtractio
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public void request(ObjectNode requestBody, ProjectionRequestContext context) {
 		// Nothing to do
 	}
 
 	@Override
-	public String extract(JsonObject hit, ProjectionExtractContext context) {
+	public String extract(ObjectNode hit, ProjectionExtractContext context) {
 		return mappedTypeName;
 	}
 }

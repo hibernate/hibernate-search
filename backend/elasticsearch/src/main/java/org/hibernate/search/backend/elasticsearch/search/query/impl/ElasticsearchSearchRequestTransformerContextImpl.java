@@ -3,37 +3,66 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonHandlerBridge;
+import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformerContext;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.json.JsonHandler;
+import org.hibernate.search.util.json.internal.spi.JsonParsing;
+import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
 import com.google.gson.JsonObject;
+
+import tools.jackson.databind.node.ObjectNode;
 
 final class ElasticsearchSearchRequestTransformerContextImpl
 		implements ElasticsearchSearchRequestTransformerContext {
 
-	static Function<ElasticsearchRequest, ElasticsearchRequest> createTransformerFunction(
+	static Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> createTransformerFunction(
 			ElasticsearchSearchRequestTransformer transformer) {
+		return createTransformerFunction( transformer, JsonValidation.systemDefault() );
+	}
+
+	static Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> createTransformerFunction(
+			ElasticsearchSearchRequestTransformer transformer, JsonValidation validation) {
+		return createTransformerFunction( transformer, validation, new JsonParsing() );
+	}
+
+	static Function<ElasticsearchJsonRequest, ElasticsearchJsonRequest> createTransformerFunction(
+			ElasticsearchSearchRequestTransformer transformer, JsonValidation validation, JsonParsing parsing) {
 		if ( transformer == null ) {
 			return null;
 		}
-		return request -> new ElasticsearchSearchRequestTransformerContextImpl( request ).apply( transformer );
+		return request -> new ElasticsearchSearchRequestTransformerContextImpl( request, validation, parsing )
+				.apply( transformer );
 	}
 
-	private final ElasticsearchRequest originalRequest;
-	private final JsonObject originalBody;
+	private final ElasticsearchJsonRequest originalRequest;
+	private final ObjectNode originalBody;
+	private final JsonValidation validation;
+	private final JsonParsing parsing;
 
 	private String path;
-	private JsonObject potentiallyTransformedBody;
+	private ObjectNode potentiallyTransformedBody;
+	private JsonObject legacyBody;
+	private boolean typedBodyEditing;
 	private Map<String, String> potentiallyTransformedParametersMap;
 
-	private ElasticsearchSearchRequestTransformerContextImpl(ElasticsearchRequest originalRequest) {
+	private ElasticsearchSearchRequestTransformerContextImpl(ElasticsearchJsonRequest originalRequest,
+			JsonValidation validation, JsonParsing parsing) {
 		this.originalRequest = originalRequest;
-		List<JsonObject> originalBodyParts = originalRequest.bodyParts();
+		this.validation = validation;
+		this.parsing = parsing;
+		List<ObjectNode> originalBodyParts = originalRequest.bodyPartsJson();
 		if ( originalBodyParts.size() != 1 ) {
 			throw new AssertionFailure(
 					"Request transformation was applied to a request with no body part or more than one body parts."
@@ -64,18 +93,55 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 	}
 
 	@Override
+	@Deprecated
 	public JsonObject body() {
-		// Avoid side-effects on the original request
-		if ( potentiallyTransformedBody == null ) {
-			potentiallyTransformedBody = originalBody.deepCopy();
+		if ( typedBodyEditing ) {
+			throw QueryLog.INSTANCE.jsonHandlerOperationFailed( "request body editing",
+					new IllegalStateException( "Cannot mix body() and transformBody() in one context" ) );
 		}
-		return potentiallyTransformedBody;
+		if ( legacyBody == null ) {
+			legacyBody =
+					JsonHandlerBridge.exportObject( GsonJsonHandlers.object(), originalBody, "legacy request body editing",
+							validation );
+		}
+		return legacyBody;
 	}
 
-	public ElasticsearchRequest apply(ElasticsearchSearchRequestTransformer transformer) {
+	@Override
+	public <T> void transformBody(JsonHandler<T> handler, UnaryOperator<T> transform) {
+		if ( legacyBody != null ) {
+			throw QueryLog.INSTANCE.jsonHandlerOperationFailed( "request body editing",
+					new IllegalStateException( "Cannot mix body() and transformBody() in one context" ) );
+		}
+		typedBodyEditing = true;
+		try {
+			Objects.requireNonNull( transform );
+			ObjectNode current = potentiallyTransformedBody != null ? potentiallyTransformedBody : originalBody;
+			ObjectNode input = JsonHandlerBridge.isTrusted( handler ) ? current.deepCopy() : current;
+			T representation = JsonHandlerBridge.exportObject( handler, input, "request body transformation", validation );
+			T returned;
+			try {
+				returned = transform.apply( representation );
+			}
+			catch (RuntimeException e) {
+				throw QueryLog.INSTANCE.jsonHandlerOperationFailed( "request body transformation", e );
+			}
+			ObjectNode replacement =
+					JsonHandlerBridge.importObject( handler, returned, "request body transformation", parsing );
+			potentiallyTransformedBody = replacement;
+		}
+		catch (SearchException e) {
+			throw e;
+		}
+		catch (RuntimeException e) {
+			throw QueryLog.INSTANCE.jsonHandlerOperationFailed( "request body transformation", e );
+		}
+	}
+
+	public ElasticsearchJsonRequest apply(ElasticsearchSearchRequestTransformer transformer) {
 		transformer.transform( this );
 
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.builder( originalRequest.method() );
+		ElasticsearchJsonRequest.Builder builder = ElasticsearchJsonRequest.builder( originalRequest.method() );
 
 		builder.wholeEncodedPath( path );
 
@@ -84,11 +150,15 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 				: originalRequest.parameters();
 		parameters.forEach( builder::param );
 
-		JsonObject body = potentiallyTransformedBody != null ? potentiallyTransformedBody : originalBody;
+		ObjectNode body = legacyBody != null
+				? JsonHandlerBridge.importObject( GsonJsonHandlers.object(), legacyBody, "legacy request body editing",
+						parsing )
+				: potentiallyTransformedBody != null ? potentiallyTransformedBody
+				: originalBody;
 		if ( body != null ) {
-			builder.body( body );
+			builder.bodyJsonFromInternal( body );
 		}
 
-		return builder.build();
+		return builder.build().withValidation( validation );
 	}
 }

@@ -3,20 +3,20 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
-import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonName;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonSerializable;
+import org.hibernate.search.backend.elasticsearch.json.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 
-import com.google.gson.JsonElement;
-import com.google.gson.annotations.SerializedName;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Settings for an Elasticsearch index.
  */
-@GsonSerializable
+@JsonSerializable
 public class IndexSettings {
 
 	public static final String MAX_RESULT_WINDOW_ATTRIBUTE = "max_result_window";
@@ -25,25 +25,25 @@ public class IndexSettings {
 
 	private Analysis analysis;
 
-	@SerializedName(IndexSettings.MAX_RESULT_WINDOW_ATTRIBUTE)
+	@JsonName(IndexSettings.MAX_RESULT_WINDOW_ATTRIBUTE)
 	private Integer maxResultWindow;
 
-	@SerializedName(IndexSettings.KNN_ATTRIBUTE)
+	@JsonName(IndexSettings.KNN_ATTRIBUTE)
 	private Boolean knn;
 
 	@SerializeExtraProperties
-	private Map<String, JsonElement> extraAttributes;
+	private Map<String, JsonNode> extraAttributes;
 
 	public IndexSettings() {
 	}
 
-	public IndexSettings(Analysis analysis, Integer maxResultWindow, Map<String, JsonElement> extraAttributes) {
+	public IndexSettings(Analysis analysis, Integer maxResultWindow, Map<String, JsonNode> extraAttributes) {
 		this.analysis = analysis;
 		this.maxResultWindow = maxResultWindow;
 		this.extraAttributes = extraAttributes;
 	}
 
-	public IndexSettings(Analysis analysis, Integer maxResultWindow, Boolean knn, Map<String, JsonElement> extraAttributes) {
+	public IndexSettings(Analysis analysis, Integer maxResultWindow, Boolean knn, Map<String, JsonNode> extraAttributes) {
 		this.analysis = analysis;
 		this.maxResultWindow = maxResultWindow;
 		this.knn = knn;
@@ -74,11 +74,11 @@ public class IndexSettings {
 		this.knn = knn;
 	}
 
-	public Map<String, JsonElement> getExtraAttributes() {
+	public Map<String, JsonNode> getExtraAttributes() {
 		return extraAttributes;
 	}
 
-	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
+	public void setExtraAttributes(Map<String, JsonNode> extraAttributes) {
 		this.extraAttributes = extraAttributes;
 	}
 
@@ -121,20 +121,20 @@ public class IndexSettings {
 	 *
 	 * @param extraAttributesToRemove Other index settings extra attributes
 	 */
-	public IndexSettings diff(Map<String, JsonElement> extraAttributesToRemove) {
+	public IndexSettings diff(Map<String, JsonNode> extraAttributesToRemove) {
 		if ( extraAttributes == null || extraAttributes.isEmpty() ) {
 			// nothing to do
 			return this;
 		}
 
 		Set<String> keysToRemove = new HashSet<>();
-		for ( Map.Entry<String, JsonElement> extraAttribute : extraAttributes.entrySet() ) {
+		for ( Map.Entry<String, JsonNode> extraAttribute : extraAttributes.entrySet() ) {
 			String key = extraAttribute.getKey();
 			if ( !extraAttributesToRemove.containsKey( key ) ) {
 				continue;
 			}
 
-			if ( Objects.equals( extraAttributesToRemove.get( key ), extraAttribute.getValue() ) ) {
+			if ( JsonScalarConversions.equivalent( extraAttributesToRemove.get( key ), extraAttribute.getValue() ) ) {
 				keysToRemove.add( key );
 			}
 		}
@@ -144,7 +144,7 @@ public class IndexSettings {
 			return this;
 		}
 
-		Map<String, JsonElement> newExtraAttributes = new HashMap<>( extraAttributes );
+		Map<String, JsonNode> newExtraAttributes = new HashMap<>( extraAttributes );
 		for ( String key : keysToRemove ) {
 			newExtraAttributes.remove( key );
 		}
@@ -153,6 +153,6 @@ public class IndexSettings {
 
 	@Override
 	public String toString() {
-		return GsonProviderHelper.toPrettyJson( this );
+		return JsonProviderHelper.toPrettyJson( this );
 	}
 }

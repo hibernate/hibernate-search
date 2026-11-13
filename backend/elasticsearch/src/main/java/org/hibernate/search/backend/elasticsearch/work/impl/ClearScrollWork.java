@@ -1,10 +1,11 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 
@@ -13,12 +14,12 @@ public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
 		return null;
 	}
 
-	public static class Builder
-			extends AbstractBuilder<Builder> {
+	public static class Builder extends AbstractBuilder<Builder> {
+
 		private final String scrollId;
 
 		public Builder(String scrollId) {
@@ -27,16 +28,12 @@ public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			JsonObject body = new JsonObject();
-			body.addProperty( "scroll_id", scrollId );
-
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.delete()
-							.pathComponent( Paths._SEARCH )
-							.pathComponent( Paths.SCROLL )
-							.body( body );
-
+		protected ElasticsearchJsonRequest buildRequest() {
+			ObjectNode body = new ObjectNode( JsonNodeFactory.instance );
+			body.put( "scroll_id", scrollId );
+			ElasticsearchJsonRequest.Builder builder =
+					ElasticsearchJsonRequest.delete().pathComponent( Paths._SEARCH ).pathComponent( Paths.SCROLL )
+							.bodyJsonFromInternal( body );
 			return builder.build();
 		}
 

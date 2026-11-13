@@ -1,5 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
+import java.time.Clock;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
@@ -8,6 +9,10 @@ import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBacken
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.AwsLog;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
+import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsRequestSigning;
+import org.hibernate.search.backend.elasticsearch.client.common.authentication.spi.ElasticsearchRequestPreparation;
+import org.hibernate.search.backend.elasticsearch.client.common.authentication.spi.ElasticsearchRequestPreparationProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.authentication.spi.ElasticsearchRequestPreparationProviderContext;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorProviderContext;
@@ -21,7 +26,8 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
-public class ElasticsearchAwsSigningInterceptorProvider implements ElasticsearchRequestInterceptorProvider {
+public class ElasticsearchAwsSigningInterceptorProvider
+		implements ElasticsearchRequestInterceptorProvider, ElasticsearchRequestPreparationProvider {
 
 	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
@@ -58,8 +64,27 @@ public class ElasticsearchAwsSigningInterceptorProvider implements Elasticsearch
 
 	@Override
 	public Optional<ElasticsearchRequestInterceptor> provide(ElasticsearchRequestInterceptorProviderContext context) {
-		ConfigurationPropertySource propertySource = context.configurationPropertySource();
+		return configuration( context.beanResolver(), context.configurationPropertySource() )
+				.map( config -> new ElasticsearchAwsSigningRequestInterceptor( config.region(), config.service(),
+						config.credentials() ) );
+	}
 
+	@Override
+	public Optional<BeanHolder<ElasticsearchRequestPreparation>> provide(
+			ElasticsearchRequestPreparationProviderContext context) {
+		return configuration( context.beanResolver(), context.configurationPropertySource() ).map( config -> {
+			ElasticsearchRequestPreparation signing = new ElasticsearchAwsRequestSigning(
+					config.credentials(), config.region().id(), config.service(), Clock.systemUTC() );
+			var holder = BeanHolder.of( signing );
+			if ( config.credentials() instanceof AutoCloseable closeable ) {
+				return holder.withDependencyAutoClosing( BeanHolder.ofCloseable( closeable ) );
+			}
+			return holder;
+		} );
+	}
+
+	private Optional<SigningConfiguration> configuration(BeanResolver beanResolver,
+			ConfigurationPropertySource propertySource) {
 		if ( !SIGNING_ENABLED.get( propertySource ) ) {
 			AwsLog.INSTANCE.signingDisabled();
 			return Optional.empty();
@@ -80,14 +105,14 @@ public class ElasticsearchAwsSigningInterceptorProvider implements Elasticsearch
 			service = "es";
 		}
 
-		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
+		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( beanResolver, propertySource );
 
 		AwsLog.INSTANCE.signingEnabled( region, service, credentialsProvider );
 
-		ElasticsearchAwsSigningRequestInterceptor signingInterceptor =
-				new ElasticsearchAwsSigningRequestInterceptor( region, service, credentialsProvider );
+		return Optional.of( new SigningConfiguration( region, service, credentialsProvider ) );
+	}
 
-		return Optional.of( signingInterceptor );
+	private record SigningConfiguration(Region region, String service, AwsCredentialsProvider credentials) {
 	}
 
 	private AwsCredentialsProvider createCredentialsProvider(BeanResolver beanResolver,

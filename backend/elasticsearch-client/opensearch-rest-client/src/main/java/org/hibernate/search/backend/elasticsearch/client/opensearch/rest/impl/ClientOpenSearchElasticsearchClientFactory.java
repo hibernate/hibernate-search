@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.JsonTransportSupport;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
@@ -145,9 +145,9 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 	@Override
 	public ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
-			SimpleScheduledExecutor timeoutExecutorService,
-			GsonProvider gsonProvider) {
+			SimpleScheduledExecutor timeoutExecutorService) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
+		long responseBodySizeLimit = JsonTransportSupport.responseBodySizeLimit( propertySource );
 
 		Optional<BeanHolder<? extends RestClient>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
 				propertySource, beanResolver::resolve );
@@ -167,8 +167,7 @@ public class ClientOpenSearchElasticsearchClientFactory implements Elasticsearch
 		}
 
 		return new ClientOpenSearchElasticsearchClient(
-				restClientHolder, sniffer, timeoutExecutorService, requestTimeoutMs,
-				gsonProvider.getGson(), gsonProvider.getLogHelper()
+				restClientHolder, sniffer, timeoutExecutorService, requestTimeoutMs, responseBodySizeLimit
 		);
 	}
 

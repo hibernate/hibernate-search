@@ -3,11 +3,10 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchOffsetTimeFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
-
-import com.google.gson.Gson;
 
 class ElasticsearchOffsetTimeIndexFieldTypeOptionsStep
 		extends
@@ -18,8 +17,8 @@ class ElasticsearchOffsetTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<OffsetTime> createCodec(Gson gson, DateTimeFormatter formatter) {
-		return new ElasticsearchOffsetTimeFieldCodec( gson, formatter );
+	protected ElasticsearchFieldCodec<OffsetTime> createCodec(JsonCodecService json, DateTimeFormatter formatter) {
+		return new ElasticsearchOffsetTimeFieldCodec( json, formatter );
 	}
 
 	@Override

@@ -15,7 +15,7 @@ class ElasticsearchIntegerIndexFieldTypeOptionsStep
 
 	@Override
 	protected ElasticsearchFieldCodec<Integer> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		return new ElasticsearchIntegerFieldCodec( buildContext.getUserFacingGson() );
+		return new ElasticsearchIntegerFieldCodec( buildContext.getUserFacingCodec() );
 	}
 
 	@Override

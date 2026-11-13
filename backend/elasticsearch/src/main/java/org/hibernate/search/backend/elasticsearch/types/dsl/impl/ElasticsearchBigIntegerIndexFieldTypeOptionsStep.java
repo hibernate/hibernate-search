@@ -39,7 +39,7 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 		}
 
 		ElasticsearchBigIntegerFieldCodec codec =
-				new ElasticsearchBigIntegerFieldCodec( buildContext.getUserFacingGson(), resolvedDecimalScale );
+				new ElasticsearchBigIntegerFieldCodec( buildContext.getUserFacingCodec(), resolvedDecimalScale );
 		builder.mapping().setScalingFactor( codec.scalingFactor().doubleValue() );
 
 		return codec;

@@ -2,13 +2,13 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.engine.backend.types.VectorSimilarity;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.NullNode;
 
 public abstract class AbstractElasticsearchVectorFieldCodec<F> extends AbstractElasticsearchFieldCodec<F>
 		implements ElasticsearchVectorFieldCodec<F> {
@@ -19,9 +19,10 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> extends AbstractE
 	private final Integer efConstruction;
 	private final F indexNullAs;
 
-	protected AbstractElasticsearchVectorFieldCodec(Gson gson, VectorSimilarity similarity, int dimension, Integer m,
+	protected AbstractElasticsearchVectorFieldCodec(JsonCodecService json, VectorSimilarity similarity, int dimension,
+			Integer m,
 			Integer efConstruction, F indexNullAs) {
-		super( gson );
+		super( json );
 		this.similarity = similarity;
 		this.dimension = dimension;
 		this.m = m;
@@ -30,27 +31,27 @@ public abstract class AbstractElasticsearchVectorFieldCodec<F> extends AbstractE
 	}
 
 	@Override
-	public JsonElement encode(F value) {
+	public JsonNode encode(F value) {
 		if ( value == null ) {
 			if ( indexNullAs == null ) {
-				return JsonNull.INSTANCE;
+				return NullNode.instance;
 			}
 			value = indexNullAs;
 		}
 		return toJsonArray( value );
 	}
 
-	protected abstract JsonArray toJsonArray(F value);
+	protected abstract ArrayNode toJsonArray(F value);
 
 	@Override
-	public F decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public F decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
 		return fromJsonArray( JsonElementTypes.ARRAY.fromElement( element ) );
 	}
 
-	protected abstract F fromJsonArray(JsonArray jsonElements);
+	protected abstract F fromJsonArray(ArrayNode jsonElements);
 
 	@Override
 	public int getConfiguredDimensions() {

@@ -2,8 +2,8 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ElasticsearchClientLog;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -14,26 +14,30 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractElasticsearchNestableAggregation<A> extends AbstractElasticsearchAggregation<A> {
 
 	private static final JsonAccessor<String> REQUEST_NESTED_PATH_ACCESSOR =
-			JsonAccessor.root().property( "nested" ).property( "path" ).asString();
+			JsonAccessor.root().property( "nested" ).unwrapSingletonArrays().property( "path" ).unwrapSingletonArrays()
+					.asString();
 	private static final JsonObjectAccessor REQUEST_FILTER_ACCESSOR =
-			JsonAccessor.root().property( "filter" ).asObject();
+			JsonAccessor.root().property( "filter" ).unwrapSingletonArrays().asObject();
 
 	private static final String NESTED_NAME = "nested";
-	private static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_NESTED_ACCESSOR =
-			JsonAccessor.root().property( "aggregations" ).property( NESTED_NAME ).asObject();
-	private static final JsonAccessor<JsonObject> RESPONSE_NESTED_ACCESSOR =
-			JsonAccessor.root().property( NESTED_NAME ).asObject();
+	private static final JsonAccessor<ObjectNode> REQUEST_AGGREGATIONS_NESTED_ACCESSOR =
+			JsonAccessor.root().property( "aggregations" ).unwrapSingletonArrays().property( NESTED_NAME )
+					.unwrapSingletonArrays().asObject();
+	private static final JsonAccessor<ObjectNode> RESPONSE_NESTED_ACCESSOR =
+			JsonAccessor.root().property( NESTED_NAME ).unwrapSingletonArrays().asObject();
 
 	private static final String FILTERED_NAME = "filtered";
-	private static final JsonAccessor<JsonObject> REQUEST_AGGREGATIONS_FILTERED_ACCESSOR =
-			JsonAccessor.root().property( "aggregations" ).property( FILTERED_NAME ).asObject();
-	private static final JsonAccessor<JsonObject> RESPONSE_FILTERED_ACCESSOR =
-			JsonAccessor.root().property( FILTERED_NAME ).asObject();
+	private static final JsonAccessor<ObjectNode> REQUEST_AGGREGATIONS_FILTERED_ACCESSOR =
+			JsonAccessor.root().property( "aggregations" ).unwrapSingletonArrays().property( FILTERED_NAME )
+					.unwrapSingletonArrays().asObject();
+	private static final JsonAccessor<ObjectNode> RESPONSE_FILTERED_ACCESSOR =
+			JsonAccessor.root().property( FILTERED_NAME ).unwrapSingletonArrays().asObject();
 
 	protected final List<String> nestedPathHierarchy;
 	protected final ElasticsearchSearchPredicate filter;
@@ -45,14 +49,14 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 	}
 
 	@Override
-	public final Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, JsonObject jsonAggregations) {
+	public final Extractor<A> request(AggregationRequestContext context, AggregationKey<?> key, ObjectNode jsonAggregations) {
 		AggregationRequestBuildingContextContext buildingContext = new AggregationRequestBuildingContextContext( context );
-		jsonAggregations.add( key.name(), request( buildingContext ) );
+		jsonAggregations.set( key.name(), request( buildingContext ) );
 		return extractor( key, buildingContext );
 	}
 
-	private JsonObject request(AggregationRequestBuildingContextContext context) {
-		JsonObject result = doRequest( context );
+	private ObjectNode request(AggregationRequestBuildingContextContext context) {
+		ObjectNode result = doRequest( context );
 
 		if ( nestedPathHierarchy.isEmpty() ) {
 			// Implicit nesting is not necessary
@@ -62,9 +66,9 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		if ( filter != null ) {
 			PredicateRequestContext filterContext = context.getRootPredicateContext()
 					.withNestedPath( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
-			JsonObject jsonFilter = filter.toJsonQuery( filterContext );
+			ObjectNode jsonFilter = filter.toJsonQuery( filterContext );
 
-			JsonObject object = new JsonObject();
+			ObjectNode object = JsonNodeFactory.instance.objectNode();
 
 			REQUEST_FILTER_ACCESSOR.set( object, jsonFilter );
 			REQUEST_AGGREGATIONS_FILTERED_ACCESSOR.set( object, result );
@@ -76,7 +80,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		for ( int i = hierarchyLastIndex; i >= 0; i-- ) {
 			String path = nestedPathHierarchy.get( i );
 
-			JsonObject object = new JsonObject();
+			ObjectNode object = JsonNodeFactory.instance.objectNode();
 
 			REQUEST_NESTED_PATH_ACCESSOR.set( object, path );
 			REQUEST_AGGREGATIONS_NESTED_ACCESSOR.set( object, result );
@@ -87,7 +91,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		return result;
 	}
 
-	protected abstract JsonObject doRequest(AggregationRequestBuildingContextContext context);
+	protected abstract ObjectNode doRequest(AggregationRequestBuildingContextContext context);
 
 	protected abstract Extractor<A> extractor(AggregationKey<?> key, AggregationRequestBuildingContextContext context);
 
@@ -105,10 +109,10 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		}
 
 		@Override
-		public final T extract(JsonObject aggregationResult, AggregationExtractContext context) {
+		public final T extract(ObjectNode aggregationResult, AggregationExtractContext context) {
 			int nestedPathHierarchySize = nestedPathHierarchy.size();
 
-			JsonObject actualAggregationResult = aggregationResult.getAsJsonObject( key.name() );
+			ObjectNode actualAggregationResult = ( (ObjectNode) aggregationResult.get( key.name() ) );
 
 			for ( int i = 0; i < nestedPathHierarchySize; ++i ) {
 				actualAggregationResult = RESPONSE_NESTED_ACCESSOR.get( actualAggregationResult )
@@ -123,7 +127,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 			return doExtract( actualAggregationResult, context );
 		}
 
-		protected abstract T doExtract(JsonObject aggregationResult, AggregationExtractContext context);
+		protected abstract T doExtract(ObjectNode aggregationResult, AggregationExtractContext context);
 
 		@Override
 		public AggregationKey<?> key() {

@@ -7,7 +7,8 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -20,7 +21,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchFieldAttributesIT {
 
@@ -32,11 +34,11 @@ class ElasticsearchFieldAttributesIT {
 
 	@Test
 	void verifyNorms() {
-		JsonObject properties = new JsonObject();
-		properties.add( "keyword", fieldWithNorms( "keyword", false ) );
-		properties.add( "text", fieldWithNorms( "text", true ) );
-		properties.add( "norms", fieldWithNorms( "keyword", true ) );
-		properties.add( "omitNorms", fieldWithNorms( "text", false ) );
+		ObjectNode properties = new ObjectNode( JsonNodeFactory.instance );
+		properties.set( "keyword", fieldWithNorms( "keyword", false ) );
+		properties.set( "text", fieldWithNorms( "text", true ) );
+		properties.set( "norms", fieldWithNorms( "keyword", true ) );
+		properties.set( "omitNorms", fieldWithNorms( "text", false ) );
 
 		matchMapping( root -> {
 			root.field( "keyword", f -> f.asString() ).toReference();
@@ -48,11 +50,11 @@ class ElasticsearchFieldAttributesIT {
 
 	@Test
 	void verifyTermVector() {
-		JsonObject properties = new JsonObject();
-		properties.add( "no", fieldWithTermVector( "no" ) );
-		properties.add( "yes", fieldWithTermVector( "yes" ) );
-		properties.add( "implicit", fieldWithTermVector( "no" ) );
-		properties.add( "moreOptions", fieldWithTermVector( "with_positions_offsets_payloads" ) );
+		ObjectNode properties = new ObjectNode( JsonNodeFactory.instance );
+		properties.set( "no", fieldWithTermVector( "no" ) );
+		properties.set( "yes", fieldWithTermVector( "yes" ) );
+		properties.set( "implicit", fieldWithTermVector( "no" ) );
+		properties.set( "moreOptions", fieldWithTermVector( "with_positions_offsets_payloads" ) );
 
 		matchMapping( root -> {
 			root.field( "no", f -> f.asString().analyzer( "standard" ).termVector( TermVector.NO ) ).toReference();
@@ -66,42 +68,39 @@ class ElasticsearchFieldAttributesIT {
 
 	@Test
 	void verifyNative() {
-		JsonObject nativeField = new JsonObject();
-		nativeField.addProperty( "type", "half_float" );
-		nativeField.addProperty( "ignore_malformed", true );
-
-		JsonObject properties = new JsonObject();
-		properties.add( "native", nativeField );
+		ObjectNode nativeField = new ObjectNode( JsonNodeFactory.instance );
+		nativeField.put( "type", "half_float" );
+		nativeField.put( "ignore_malformed", true );
+		ObjectNode properties = new ObjectNode( JsonNodeFactory.instance );
+		properties.set( "native", nativeField );
 
 		matchMapping( root -> {
 			root.field(
 					"native",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative().mapping( "{\"type\": \"half_float\",\"ignore_malformed\": true}" )
+							.asNative( JacksonJsonHandlers.value() )
+							.mapping( "{\"type\": \"half_float\",\"ignore_malformed\": true}" )
 			)
 					.toReference();
 		}, properties );
 	}
 
-	private void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
+	private void matchMapping(Consumer<IndexSchemaElement> mapping, ObjectNode properties) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( mapping );
 		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
-			clientSpy.expectNext(
-					ElasticsearchRequest.get().build(),
+			clientSpy.expectNext( ElasticsearchJsonRequest.get().build(),
 					ElasticsearchRequestAssertionMode.STRICT
 			);
 		}
-		clientSpy.expectNext(
-				ElasticsearchRequest.get()
-						.multiValuedPathComponent( defaultAliases( index.name() ) )
-						.build(),
+		clientSpy.expectNext( ElasticsearchJsonRequest.get()
+				.multiValuedPathComponent( defaultAliases( index.name() ) )
+				.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		clientSpy.expectNext(
-				ElasticsearchRequest.put()
-						.pathComponent( defaultPrimaryName( index.name() ) )
-						.body( createIndex( properties ) )
-						.build(),
+		clientSpy.expectNext( ElasticsearchJsonRequest.put()
+				.pathComponent( defaultPrimaryName( index.name() ) )
+				.bodyJson( createIndex( properties ) )
+				.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
@@ -113,27 +112,26 @@ class ElasticsearchFieldAttributesIT {
 		clientSpy.verifyExpectationsMet();
 	}
 
-	private JsonObject createIndex(JsonObject properties) {
-		JsonObject payload = new JsonObject();
+	private ObjectNode createIndex(ObjectNode properties) {
+		ObjectNode payload = new ObjectNode( JsonNodeFactory.instance );
+		ObjectNode mappings = new ObjectNode( JsonNodeFactory.instance );
+		payload.set( "mappings", mappings );
 
-		JsonObject mappings = new JsonObject();
-		payload.add( "mappings", mappings );
-
-		mappings.add( "properties", properties );
+		mappings.set( "properties", properties );
 		return payload;
 	}
 
-	private static JsonObject fieldWithNorms(String type, boolean value) {
-		JsonObject field = new JsonObject();
-		field.addProperty( "type", type );
-		field.addProperty( "norms", value );
+	private static ObjectNode fieldWithNorms(String type, boolean value) {
+		ObjectNode field = new ObjectNode( JsonNodeFactory.instance );
+		field.put( "type", type );
+		field.put( "norms", value );
 		return field;
 	}
 
-	private static JsonObject fieldWithTermVector(String termVector) {
-		JsonObject field = new JsonObject();
-		field.addProperty( "type", "text" );
-		field.addProperty( "term_vector", termVector );
+	private static ObjectNode fieldWithTermVector(String termVector) {
+		ObjectNode field = new ObjectNode( JsonNodeFactory.instance );
+		field.put( "type", "text" );
+		field.put( "term_vector", termVector );
 		return field;
 	}
 }

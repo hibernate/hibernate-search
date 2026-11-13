@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi.ContentEncoder;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi.ContentProducer;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.entity.spi.HttpAsyncContentProducerInputStream;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.ContentEncoder;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.ContentProducer;
+import org.hibernate.search.backend.elasticsearch.client.common.json.entity.spi.HttpAsyncContentProducerInputStream;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptor;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequestInterceptorContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -70,7 +70,7 @@ record ClientRest5HttpRequestInterceptor(ElasticsearchRequestInterceptor elastic
 				if ( !producer.isRepeatable() ) {
 					throw new AssertionFailure( "Cannot sign AWS requests with non-repeatable entities" );
 				}
-				return new HttpAsyncContentProducerInputStream( new ClientRest5GsonContentProducer( producer ), 1024 );
+				return new HttpAsyncContentProducerInputStream( new AsyncEntityContentProducer( producer ), 1024 );
 			}
 			return null;
 		}
@@ -143,10 +143,10 @@ record ClientRest5HttpRequestInterceptor(ElasticsearchRequestInterceptor elastic
 		}
 	}
 
-	private static class GsonEncoderDataStreamChannel implements DataStreamChannel {
+	private static class EncoderDataStreamChannel implements DataStreamChannel {
 		private final ContentEncoder encoder;
 
-		public GsonEncoderDataStreamChannel(ContentEncoder encoder) {
+		public EncoderDataStreamChannel(ContentEncoder encoder) {
 			this.encoder = encoder;
 		}
 
@@ -171,16 +171,16 @@ record ClientRest5HttpRequestInterceptor(ElasticsearchRequestInterceptor elastic
 		}
 	}
 
-	private static class ClientRest5GsonContentProducer implements ContentProducer {
+	private static class AsyncEntityContentProducer implements ContentProducer {
 		private final AsyncEntityProducer producer;
 
-		public ClientRest5GsonContentProducer(AsyncEntityProducer producer) {
+		public AsyncEntityContentProducer(AsyncEntityProducer producer) {
 			this.producer = producer;
 		}
 
 		@Override
 		public void produceContent(ContentEncoder encoder) throws IOException {
-			producer.produce( new GsonEncoderDataStreamChannel( encoder ) );
+			producer.produce( new EncoderDataStreamChannel( encoder ) );
 		}
 
 		@Override

@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.spi.ResultsCompositor;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A projection that composes the result of multiple inner projections into a single value.
@@ -47,7 +47,7 @@ class ElasticsearchCompositeProjection<E, V, A, P>
 	}
 
 	@Override
-	public Extractor<A, P> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<A, P> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		Extractor<?, ?>[] innerExtractors = new Extractor[inners.length];
 		for ( int i = 0; i < inners.length; i++ ) {
 			innerExtractors[i] = inners[i].request( requestBody, context );
@@ -72,8 +72,8 @@ class ElasticsearchCompositeProjection<E, V, A, P>
 		}
 
 		@Override
-		public A extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
-				JsonObject source, ProjectionExtractContext context) {
+		public A extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit,
+				ObjectNode source, ProjectionExtractContext context) {
 			A accumulated = collector.createInitial();
 
 			E components = compositor.createInitial();

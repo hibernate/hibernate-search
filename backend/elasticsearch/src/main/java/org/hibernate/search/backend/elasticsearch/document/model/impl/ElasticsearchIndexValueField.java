@@ -17,15 +17,12 @@ import org.hibernate.search.engine.search.common.ValueModel;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 public final class ElasticsearchIndexValueField<F>
-		extends AbstractIndexValueField<
-				ElasticsearchIndexValueField<F>,
-				ElasticsearchSearchIndexScope<?>,
-				ElasticsearchIndexValueFieldType<F>,
-				ElasticsearchIndexCompositeNode,
-				F>
+		extends
+		AbstractIndexValueField<ElasticsearchIndexValueField<
+				F>, ElasticsearchSearchIndexScope<?>, ElasticsearchIndexValueFieldType<F>, ElasticsearchIndexCompositeNode, F>
 		implements ElasticsearchIndexField, ElasticsearchSearchIndexValueFieldContext<F>,
 		ElasticsearchSearchEncodingContext<F> {
 
@@ -55,20 +52,17 @@ public final class ElasticsearchIndexValueField<F>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> Function<T, JsonElement> encoder(ElasticsearchSearchIndexScope<?> scope,
-			ElasticsearchSearchIndexValueFieldContext<F> field, Class<T> expectedType,
-			ValueModel valueModel) {
+	public <T> Function<T, JsonNode> encoder(ElasticsearchSearchIndexScope<?> scope,
+			ElasticsearchSearchIndexValueFieldContext<F> field, Class<T> expectedType, ValueModel valueModel) {
 		try {
 			if ( ValueModel.RAW.equals( valueModel ) ) {
-				DslConverter<? super T, JsonElement> dslConverter =
-						( (DslConverter<?, JsonElement>) field.type().rawDslConverter() )
-								.withInputType( expectedType, field );
+				DslConverter<? super T, JsonNode> dslConverter =
+						( (DslConverter<?, JsonNode>) field.type().rawDslConverter() ).withInputType( expectedType, field );
 				return v -> dslConverter.toDocumentValue( v, scope.toDocumentValueConvertContext() );
 			}
 			else {
-				DslConverter<? super T, F> toFieldValueConverter = field.type().dslConverter( valueModel )
-						.withInputType( expectedType, field );
-
+				DslConverter<? super T, F> toFieldValueConverter =
+						field.type().dslConverter( valueModel ).withInputType( expectedType, field );
 				return v -> field.type().codec().encodeForAggregation( scope.searchSyntax(),
 						toFieldValueConverter.toDocumentValue( v, scope.toDocumentValueConvertContext() ) );
 			}
@@ -81,12 +75,10 @@ public final class ElasticsearchIndexValueField<F>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public JsonElement convertAndEncode(ElasticsearchSearchIndexScope<?> scope,
-			ElasticsearchSearchIndexValueFieldContext<F> field,
-			Object value, ValueModel valueModel,
-			BiFunction<ElasticsearchFieldCodec<F>, F, JsonElement> encodeFunction) {
+	public JsonNode convertAndEncode(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field,
+			Object value, ValueModel valueModel, BiFunction<ElasticsearchFieldCodec<F>, F, JsonNode> encodeFunction) {
 		if ( ValueModel.RAW.equals( valueModel ) ) {
-			DslConverter<?, JsonElement> dslConverter = (DslConverter<?, JsonElement>) field.type().rawDslConverter();
+			DslConverter<?, JsonNode> dslConverter = (DslConverter<?, JsonNode>) field.type().rawDslConverter();
 			try {
 				return dslConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
 			}

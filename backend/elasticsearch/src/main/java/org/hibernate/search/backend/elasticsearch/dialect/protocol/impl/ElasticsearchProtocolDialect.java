@@ -1,6 +1,6 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
@@ -31,7 +31,7 @@ public interface ElasticsearchProtocolDialect {
 
 	ElasticsearchSearchSyntax createSearchSyntax();
 
-	ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures);
+	ElasticsearchWorkFactory createWorkFactory(JsonProvider jsonProvider, Boolean ignoreShardFailures);
 
 	ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory();
 

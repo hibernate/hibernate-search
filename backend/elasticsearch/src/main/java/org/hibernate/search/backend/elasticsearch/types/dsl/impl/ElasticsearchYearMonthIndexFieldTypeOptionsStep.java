@@ -3,11 +3,10 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearMonthFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
-
-import com.google.gson.Gson;
 
 class ElasticsearchYearMonthIndexFieldTypeOptionsStep
 		extends
@@ -18,8 +17,8 @@ class ElasticsearchYearMonthIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<YearMonth> createCodec(Gson gson, DateTimeFormatter formatter) {
-		return new ElasticsearchYearMonthFieldCodec( gson, formatter );
+	protected ElasticsearchFieldCodec<YearMonth> createCodec(JsonCodecService json, DateTimeFormatter formatter) {
+		return new ElasticsearchYearMonthFieldCodec( json, formatter );
 	}
 
 	@Override

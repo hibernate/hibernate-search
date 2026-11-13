@@ -3,14 +3,13 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.util.common.impl.TimeHelper;
-
-import com.google.gson.Gson;
 
 public class ElasticsearchZonedDateTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<ZonedDateTime> {
 
-	public ElasticsearchZonedDateTimeFieldCodec(Gson gson, DateTimeFormatter delegate) {
-		super( gson, delegate );
+	public ElasticsearchZonedDateTimeFieldCodec(JsonCodecService json, DateTimeFormatter delegate) {
+		super( json, delegate );
 	}
 
 	@Override

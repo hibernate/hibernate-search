@@ -1,29 +1,29 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
 public final class ElasticsearchStringFieldCodec extends AbstractElasticsearchFieldCodec<String> {
 
-	public ElasticsearchStringFieldCodec(Gson gson) {
-		super( gson );
+	public ElasticsearchStringFieldCodec(JsonCodecService json) {
+		super( json );
 	}
 
 	@Override
-	public JsonElement encode(String value) {
+	public JsonNode encode(String value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			return NullNode.instance;
 		}
-		return new JsonPrimitive( value );
+		return JsonScalarConversions.toNode( value );
 	}
 
 	@Override
-	public String decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public String decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
 		return JsonElementTypes.STRING.fromElement( element );

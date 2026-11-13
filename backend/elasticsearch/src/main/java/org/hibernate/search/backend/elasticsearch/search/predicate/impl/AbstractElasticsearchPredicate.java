@@ -2,15 +2,17 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractElasticsearchPredicate implements ElasticsearchSearchPredicate {
 
-	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
+	private static final JsonAccessor<Float> BOOST_ACCESSOR =
+			JsonAccessor.root().property( "boost" ).unwrapSingletonArrays().asFloat();
 
 	private final Set<String> indexNames;
 	// NOTE: below modifiers (boost, constant score) are used to implement hasNoModifiers() that other predicates
@@ -31,35 +33,35 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	}
 
 	@Override
-	public JsonObject toJsonQuery(PredicateRequestContext context) {
-		JsonObject outerObject = new JsonObject();
-		JsonObject innerObject = new JsonObject();
+	public ObjectNode toJsonQuery(PredicateRequestContext context) {
+		ObjectNode outerObject = JsonNodeFactory.instance.objectNode();
+		ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 
 		// in case of withConstantScore boots is set by constant_score clause
 		if ( boost != null && !withConstantScore ) {
 			BOOST_ACCESSOR.set( innerObject, boost );
 		}
 
-		JsonObject result = doToJsonQuery( context, outerObject, innerObject );
+		ObjectNode result = doToJsonQuery( context, outerObject, innerObject );
 		return ( withConstantScore && result != null ) ? applyConstantScore( result ) : result;
 	}
 
-	protected abstract JsonObject doToJsonQuery(PredicateRequestContext context,
-			JsonObject outerObject, JsonObject innerObject);
+	protected abstract ObjectNode doToJsonQuery(PredicateRequestContext context,
+			ObjectNode outerObject, ObjectNode innerObject);
 
 	protected boolean hasNoModifiers() {
 		return !withConstantScore && boost == null;
 	}
 
-	private JsonObject applyConstantScore(JsonObject filter) {
-		JsonObject constantScore = new JsonObject();
-		constantScore.add( "filter", filter );
+	private ObjectNode applyConstantScore(ObjectNode filter) {
+		ObjectNode constantScore = JsonNodeFactory.instance.objectNode();
+		constantScore.set( "filter", filter );
 		if ( boost != null ) {
 			BOOST_ACCESSOR.set( constantScore, boost );
 		}
 
-		JsonObject result = new JsonObject();
-		result.add( "constant_score", constantScore );
+		ObjectNode result = JsonNodeFactory.instance.objectNode();
+		result.set( "constant_score", constantScore );
 
 		return result;
 	}

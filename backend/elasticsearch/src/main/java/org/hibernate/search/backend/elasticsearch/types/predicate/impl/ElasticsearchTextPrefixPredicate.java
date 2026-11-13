@@ -1,7 +1,8 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -10,17 +11,18 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PrefixPredicateBuilder;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchTextPrefixPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor PREFIX_ACCESSOR = JsonAccessor.root().property( "prefix" ).asObject();
+	private static final JsonObjectAccessor PREFIX_ACCESSOR =
+			JsonAccessor.root().property( "prefix" ).unwrapSingletonArrays().asObject();
 
-	private static final JsonAccessor<JsonElement> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
+	private static final JsonAccessor<JsonNode> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
 
-	private final JsonPrimitive prefix;
+	private final JsonNode prefix;
 
 	private ElasticsearchTextPrefixPredicate(Builder builder) {
 		super( builder );
@@ -28,18 +30,17 @@ public class ElasticsearchTextPrefixPredicate extends AbstractElasticsearchSingl
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		VALUE_ACCESSOR.set( innerObject, prefix );
-
-		JsonObject middleObject = new JsonObject();
-		middleObject.add( absoluteFieldPath, innerObject );
-
+		ObjectNode middleObject = new ObjectNode( JsonNodeFactory.instance );
+		middleObject.set( absoluteFieldPath, innerObject );
 		PREFIX_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
 	}
 
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<PrefixPredicateBuilder, String> {
+
 		@Override
 		public PrefixPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
@@ -48,7 +49,8 @@ public class ElasticsearchTextPrefixPredicate extends AbstractElasticsearchSingl
 	}
 
 	private static class Builder extends AbstractBuilder implements PrefixPredicateBuilder {
-		private JsonPrimitive prefix;
+
+		private JsonNode prefix;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
@@ -56,7 +58,7 @@ public class ElasticsearchTextPrefixPredicate extends AbstractElasticsearchSingl
 
 		@Override
 		public void prefix(String prefix) {
-			this.prefix = new JsonPrimitive( prefix );
+			this.prefix = JsonScalarConversions.toNode( prefix );
 		}
 
 		@Override

@@ -38,12 +38,12 @@ record ClientJdkHttpRequestInterceptor(ElasticsearchRequestInterceptor elasticse
 
 		@Override
 		public boolean hasContent() {
-			return !ClientJdkGsonHttpEntity.isNoBodyPublisher( bodyPublisher );
+			return !ClientJdkJsonHttpEntity.isNoBodyPublisher( bodyPublisher );
 		}
 
 		@Override
 		public InputStream content() {
-			if ( bodyPublisher instanceof ClientJdkGsonHttpEntity publisher ) {
+			if ( bodyPublisher instanceof ClientJdkJsonHttpEntity publisher ) {
 				return publisher.getContent();
 			}
 			return null;

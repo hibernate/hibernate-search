@@ -2,20 +2,18 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl;
 
 import java.util.List;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface ElasticsearchSearchSyntax {
 
 	String getTermAggregationOrderByTermToken();
 
-	void requestDocValues(JsonObject requestBody, JsonPrimitive fieldName);
+	void requestDocValues(ObjectNode requestBody, JsonNode fieldName);
 
-	void requestNestedSort(List<String> nestedPathHierarchy, JsonObject innerObject, JsonObject filterOrNull);
+	void requestNestedSort(List<String> nestedPathHierarchy, ObjectNode innerObject, ObjectNode filterOrNull);
 
-	void requestGeoDistanceSortIgnoreUnmapped(JsonObject innerObject);
+	void requestGeoDistanceSortIgnoreUnmapped(ObjectNode innerObject);
 
-	JsonElement encodeLongForAggregation(Long value);
-
+	JsonNode encodeLongForAggregation(Long value);
 }

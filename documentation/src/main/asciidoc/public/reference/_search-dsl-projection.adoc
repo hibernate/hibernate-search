@@ -1797,15 +1797,17 @@ backed by a <<binding-projection,custom projection binder>>.
 [[search-dsl-projection-extensions-elasticsearch-source]]
 === Elasticsearch: `source`
 
-The `.source()` projection returns the JSON of the document as it was indexed in Elasticsearch,
-as a `JsonObject`.
+The `.source(handler)` projection returns the JSON of the document as it was indexed in Elasticsearch.
+Pass a <<backend-elasticsearch-json,JSON handler>> to select the result type.
+For example, using `JacksonJsonHandlers.object()` yields a Jackson 3 `ObjectNode`, as shown below.
+The deprecated no-argument `.source()` returns a Gson object.
 
 include::../components/_elasticsearch-json-warning.adoc[]
 
 [[search-dsl-projection-extensions-elasticsearch-source-syntax]]
 ==== Syntax
 
-.Returning the matched document source as a `JsonObject`
+.Returning the matched document source as an `ObjectNode`
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
@@ -1840,8 +1842,10 @@ backed by a <<binding-projection,custom projection binder>>.
 [[search-dsl-projection-extensions-elasticsearch-explanation]]
 === Elasticsearch: `explanation`
 
-The `.explanation()` projection returns an <<troubleshooting-faq-search-score,explanation>>
-of the match as a `JsonObject`.
+The `.explanation(handler)` projection returns an <<troubleshooting-faq-search-score,explanation>> of the match.
+Pass a <<backend-elasticsearch-json,JSON handler>> to select the result type.
+For example, using `JacksonJsonHandlers.object()` yields a Jackson 3 `ObjectNode`, as shown below.
+The deprecated no-argument `.explanation()` returns a Gson object.
 
 include::../components/_explanation-warning.adoc[]
 
@@ -1850,7 +1854,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 [[search-dsl-projection-extensions-elasticsearch-explanation-syntax]]
 ==== Syntax
 
-.Returning the score explanation as a `JsonObject`
+.Returning the score explanation as an `ObjectNode`
 ====
 [source, java, indent=0, subs="+callouts"]
 ----
@@ -1870,7 +1874,10 @@ backed by a <<binding-projection,custom projection binder>>.
 [[search-dsl-projection-extensions-elasticsearch-jsonHit]]
 === Elasticsearch: `jsonHit`
 
-The `.jsonHit()` projection returns the exact JSON returned by Elasticsearch for the hit, as a `JsonObject`.
+The `.jsonHit(handler)` projection returns the JSON returned by Elasticsearch for the hit.
+Pass a <<backend-elasticsearch-json,JSON handler>> to select the result type.
+For example, using `JacksonJsonHandlers.object()` yields a Jackson 3 `ObjectNode`, as shown below.
+The deprecated no-argument `.jsonHit()` returns a Gson object.
 
 [NOTE]
 ====
@@ -1883,7 +1890,7 @@ include::../components/_elasticsearch-json-warning.adoc[]
 [[search-dsl-projection-extensions-elasticsearch-jsonHit-syntax]]
 ==== Syntax
 
-.Returning the Elasticsearch hit as a `JsonObject`
+.Returning the Elasticsearch hit as an `ObjectNode`
 ====
 [source, java, indent=0, subs="+callouts"]
 ----

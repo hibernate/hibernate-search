@@ -2,24 +2,24 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
-import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonName;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonSerializable;
+import org.hibernate.search.backend.elasticsearch.json.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 
-import com.google.gson.JsonElement;
-import com.google.gson.annotations.SerializedName;
+import tools.jackson.databind.JsonNode;
 
 /**
  * An object representing OpenSearch K-NN vector Method attributes.
  *
  * See https://opensearch.org/docs/latest/field-types/supported-field-types/knn-vector/
  */
-@GsonSerializable
+@JsonSerializable
 public class OpenSearchVectorTypeMethod {
 
 	private String name;
 
-	@SerializedName("space_type")
+	@JsonName("space_type")
 	private String spaceType;
 
 	private String engine;
@@ -27,7 +27,7 @@ public class OpenSearchVectorTypeMethod {
 	private Parameters parameters;
 
 	@SerializeExtraProperties
-	private Map<String, JsonElement> extraAttributes;
+	private Map<String, JsonNode> extraAttributes;
 
 	public String getName() {
 		return name;
@@ -61,28 +61,28 @@ public class OpenSearchVectorTypeMethod {
 		this.parameters = parameters;
 	}
 
-	public Map<String, JsonElement> getExtraAttributes() {
+	public Map<String, JsonNode> getExtraAttributes() {
 		return extraAttributes;
 	}
 
-	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
+	public void setExtraAttributes(Map<String, JsonNode> extraAttributes) {
 		this.extraAttributes = extraAttributes;
 	}
 
 	@Override
 	public String toString() {
-		return GsonProviderHelper.toPrettyJson( this );
+		return JsonProviderHelper.toPrettyJson( this );
 	}
 
-	@GsonSerializable
+	@JsonSerializable
 	public static class Parameters {
 
-		@SerializedName("ef_construction")
+		@JsonName("ef_construction")
 		private Integer efConstruction;
 		private Integer m;
 
 		@SerializeExtraProperties
-		private Map<String, JsonElement> extraAttributes;
+		private Map<String, JsonNode> extraAttributes;
 
 		public Integer getEfConstruction() {
 			return efConstruction;
@@ -100,17 +100,17 @@ public class OpenSearchVectorTypeMethod {
 			this.m = m;
 		}
 
-		public Map<String, JsonElement> getExtraAttributes() {
+		public Map<String, JsonNode> getExtraAttributes() {
 			return extraAttributes;
 		}
 
-		public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
+		public void setExtraAttributes(Map<String, JsonNode> extraAttributes) {
 			this.extraAttributes = extraAttributes;
 		}
 
 		@Override
 		public String toString() {
-			return GsonProviderHelper.toPrettyJson( this );
+			return JsonProviderHelper.toPrettyJson( this );
 		}
 	}
 }

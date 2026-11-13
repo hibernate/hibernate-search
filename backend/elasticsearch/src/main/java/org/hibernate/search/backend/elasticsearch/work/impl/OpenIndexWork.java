@@ -1,7 +1,7 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonRequest;
+import org.hibernate.search.backend.elasticsearch.client.common.impl.ElasticsearchJsonResponse;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 
@@ -12,7 +12,7 @@ public class OpenIndexWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchJsonResponse response) {
 		return null;
 	}
 
@@ -26,9 +26,9 @@ public class OpenIndexWork extends AbstractNonBulkableWork<Void> {
 		}
 
 		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.post()
+		protected ElasticsearchJsonRequest buildRequest() {
+			ElasticsearchJsonRequest.Builder builder =
+					ElasticsearchJsonRequest.post()
 							.pathComponent( indexName )
 							.pathComponent( Paths._OPEN );
 

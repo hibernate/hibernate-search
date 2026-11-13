@@ -2,7 +2,8 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -16,24 +17,31 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.AssertionFailure;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsearchReversibleSort {
 
-	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
-	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
-	private static final JsonPrimitive AVG_KEYWORD_JSON = new JsonPrimitive( "avg" );
-	private static final JsonPrimitive MIN_KEYWORD_JSON = new JsonPrimitive( "min" );
-	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
-	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
+	private static final JsonAccessor<JsonNode> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
+
+	private static final JsonNode SUM_KEYWORD_JSON = JsonScalarConversions.toNode( "sum" );
+
+	private static final JsonNode AVG_KEYWORD_JSON = JsonScalarConversions.toNode( "avg" );
+
+	private static final JsonNode MIN_KEYWORD_JSON = JsonScalarConversions.toNode( "min" );
+
+	private static final JsonNode MAX_KEYWORD_JSON = JsonScalarConversions.toNode( "max" );
+
+	private static final JsonNode MEDIAN_KEYWORD_JSON = JsonScalarConversions.toNode( "median" );
 
 	protected final String absoluteFieldPath;
+
 	protected final List<String> nestedPathHierarchy;
+
 	protected final ElasticsearchSearchSyntax searchSyntax;
 
-	private final JsonPrimitive mode;
+	private final JsonNode mode;
+
 	private final ElasticsearchSearchPredicate filter;
 
 	AbstractElasticsearchDocumentValueSort(AbstractBuilder<?> builder) {
@@ -46,18 +54,17 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 	}
 
 	@Override
-	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, ObjectNode innerObject) {
 		if ( !nestedPathHierarchy.isEmpty() ) {
-			JsonObject jsonFilter = getJsonFilter( collector.getRootPredicateContext() );
+			ObjectNode jsonFilter = getJsonFilter( collector.getRootPredicateContext() );
 			searchSyntax.requestNestedSort( nestedPathHierarchy, innerObject, jsonFilter );
 		}
-
 		if ( mode != null ) {
 			MODE_ACCESSOR.set( innerObject, mode );
 		}
 	}
 
-	private JsonObject getJsonFilter(PredicateRequestContext rootPredicateContext) {
+	private ObjectNode getJsonFilter(PredicateRequestContext rootPredicateContext) {
 		if ( filter == null ) {
 			return null;
 		}
@@ -67,11 +74,15 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 	}
 
 	abstract static class AbstractBuilder<F> extends AbstractElasticsearchReversibleSort.AbstractBuilder {
+
 		private final ElasticsearchSearchSyntax searchSyntax;
+
 		protected final ElasticsearchSearchIndexValueFieldContext<F> field;
+
 		protected final List<String> nestedPathHierarchy;
 
-		private JsonPrimitive mode;
+		private JsonNode mode;
+
 		private ElasticsearchSearchPredicate filter;
 
 		AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {

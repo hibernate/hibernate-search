@@ -64,7 +64,7 @@ class ElasticsearchCustomIndexSettingsIT {
 				.hasMessageContainingAll(
 						"There are some JSON syntax errors on the given custom index settings file",
 						"custom-index-settings/not-parsable.json",
-						"Expected BEGIN_OBJECT but was STRING at line 1 column 1"
+						"Invalid JSON input"
 				);
 	}
 

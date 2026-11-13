@@ -54,7 +54,10 @@ If several are available, startup fails unless you set `hibernate.search.backend
 to `elasticsearch-rest4`, `elasticsearch-rest5`, `opensearch-rest`, or `jdk-rest`.
 The value of `ElasticsearchBackendSettings.Defaults.CLIENT_FACTORY` changed from `elasticsearch-rest4` to `jdk-rest`.
 
-Other than the migration helper removal, the coordinates of Maven artifacts in Hibernate Search {hibernateSearchVersion}
+The new `org.hibernate.search:hibernate-search-util-json` artifact supplies JSON handler and streaming contracts.
+The Elasticsearch backend brings it in transitively; direct users can declare it explicitly.
+
+Other than these changes, the coordinates of Maven artifacts in Hibernate Search {hibernateSearchVersion}
 are the same as in Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[data-format]]
@@ -137,6 +140,78 @@ For the REST4 client, use the corresponding interfaces in `org.hibernate.search.
 To replace the old context's `configuredVersion()` method, read `ElasticsearchBackendSettings.VERSION`
 from `configurationPropertySource()`.
 
+[[elasticsearch-json]]
+=== Elasticsearch JSON APIs
+
+Application JSON APIs now offer typed `JsonHandler<T>` overloads.
+Pass a handler for your chosen JSON representation.
+For example, `JacksonJsonHandlers.object()` handles Jackson 3 `ObjectNode` object inputs/results,
+and `JacksonJsonHandlers.value()` handles general `JsonNode` native field values.
+`GsonJsonHandlers.object()` and `.value()` select Gson representations explicitly.
+You can also supply a custom `JsonHandler<T>` implementation.
+The handler describes JSON tree/value representations; it does not enable automatic entity or DTO mapping.
+
+Deprecated Gson conveniences retain their Gson signatures and result types:
+`responseBody()`, `explain(...)`, `source()`, `explanation()`, `jsonHit()`,
+aggregation `fromJson(...)`, schema export `bodyParts()`, and transformer `body()`.
+Predicate/sort/aggregation/mapping Gson inputs also remain as deprecated conveniences.
+Handler overloads select their indexing/result type explicitly, including the runtime metadata of native fields.
+
+* Object-valued APIs require an object root even when a general value handler is selected.
+* Typed aggregation text input uses `fromJson(jsonString, resultHandler)`.
+* Use `transformBody(handler, transformation)` for scoped editing through the selected handler.
+  The callback receives an independent, editable representation. Do not mutate the returned value afterward,
+  and do not mix this method with deprecated `body()`.
+* `asNative(valueHandler)` selects the bridge's index-side value type `T` in `ValueBridge<V, T>`.
+  Changing from Gson to another value representation requires adapting that bridge.
+  The optional handler in `mapping(mappingHandler, mappingObject)` only reads the schema definition
+  and does not change the bridge's value type. `mapping(jsonString)` needs no mapping handler.
+* Native fields split root arrays by default for both Gson and Jackson handlers, including deprecated `asNative()`.
+  Use `.mapping(...).arrayAsValue()` to preserve an array as one JSON value.
+  Missing/JSON-null fields project as Java null; nested JSON nulls in an atomic array are retained.
+
+Keep submitted trees unchanged until signing, consumption and retries finish.
+Returned JSON values are read-only; make an independent copy before editing them.
+These ownership rules apply regardless of the selected handler.
+
+Numbers retain exact integer/decimal values; original spelling and the JSON library's numeric value class are not guaranteed.
+Negative floating zero retains its sign, while integer `-0` may normalize.
+See the link:{hibernateSearchDocUrl}#backend-elasticsearch-json[JSON reference]
+for compiled examples, numeric constraints, ownership and transport limits.
+
+Custom Elasticsearch clients must recompile against the library-neutral transport SPI.
+Requests provide a replayable `JsonBody`; the generic response consumer factory
+produces `T`, which the client returns in `ElasticsearchResponse<T>`.
+Clients no longer receive JSON codecs or inspect JSON trees.
+JSON parsing and encoding implementations are not external extension points.
+
+[[elasticsearch-json-strict-parsing]]
+=== Strict Elasticsearch JSON parsing
+
+Elasticsearch JSON string inputs and the built-in JSON handlers now require one complete, strict JSON value.
+Earlier Gson-backed parsing accepted some non-standard JSON syntax.
+Comments, single-quoted strings, unquoted property names, non-finite numbers such as `NaN` or `Infinity`,
+and additional content after the JSON value are now rejected.
+This also affects JSON-formatted strings passed to existing predicate, sort, aggregation and native mapping APIs.
+
+Update embedded JSON, configuration files and test data to use double quotes for property names and strings,
+remove comments and trailing content, and use finite numeric values.
+Custom `JsonHandler` implementations must also read and write one strict JSON value as required by their contract.
+
+[[elasticsearch-json-limits]]
+=== Elasticsearch JSON parsing and response limits
+
+The built-in Elasticsearch clients no longer impose the inherited 100 MiB response-body limit by default.
+Set `hibernate.search.backend.response_body_size_limit=104857600` to retain a 100 MiB limit,
+or select another non-negative byte count; `0` means unlimited.
+The limit counts response bytes after decompression and before charset conversion consistently across clients.
+
+Backend parser constraints are configurable through `hibernate.search.backend.json.max_nesting_depth`,
+`json.max_string_length`, `json.max_name_length` and `json.max_number_length` under the same backend prefix.
+Their defaults remain 1000, 20,000,000, 50,000 and 1000 respectively.
+For a named backend, use `hibernate.search.backends.<backend-name>.` as the prefix.
+These settings configure parsing performed by Search; custom handlers retain responsibility for their own parser configuration.
+
 [[spi]]
 == SPI
 
@@ -151,12 +226,42 @@ with the following exceptions:
 
 * The `ElasticsearchBackendImplSettings` class (both `cfg.impl` and `cfg.spi` variants) has been removed.
 
+* Custom `ElasticsearchClientFactory.create(...)` implementations no longer receive JSON services.
+Implement the generic `ElasticsearchClient.submit(request, responseFactory)` operation,
+stream the supplied `JsonBody`, and feed response bytes to a fresh
+`JsonResponseConsumer<T>` supplied by the factory for each attempt.
+Return its result through `ElasticsearchResponse<T>` without inspecting the representation.
+Use the library-neutral contracts in `org.hibernate.search.util.json.spi`.
+Keep independent consumer/cursor state per attempt,
+close on terminal events, and preserve caller-buffer ownership and backpressure.
+Signing and interceptors remain synchronous; incremental JSON imposes no automatic worker hop or event-loop latency bound.
+The link:{hibernateSearchDocUrl}#backend-elasticsearch-json-custom-clients[custom-client reference]
+details lifecycle, stable content length, client-owned diagnostic/compression boundaries and cancellation limits.
+
+
 * The `HibernateOrmQueryLoader.createMultiIdentifierLoadAccess(SessionImplementor)` method has been removed.
 Use `HibernateOrmQueryLoader.findMultiple(SessionImplementor, List, FindOption...)` instead.
 
 * The `HibernateOrmLoadingSessionContext.session()` method now returns `SharedSessionContractImplementor`
 instead of `SessionImplementor`, and has been renamed to `sessionImplementor()`.
 This allows the loading context to work with both `Session` and `StatelessSession`.
+
+[[elasticsearch-json-client-spi]]
+=== Elasticsearch client SPI
+
+External client implementations use `org.hibernate.search.backend.elasticsearch.client.common.spi`.
+The factory no longer receives a Gson provider. A request carries a replayable public `JsonBody`;
+open independent cursors or streams for sending, signing and retries. The backend supplies a
+`JsonResponseConsumerFactory<T>`: feed HTTP response bytes to a fresh consumer, then return its
+opaque result in `ElasticsearchResponse<T>`. Read it through `result()`; for JSON consumer results,
+`ElasticsearchResponseBody.body(handler)` exposes JSON through a `JsonHandler<T>`.
+The backend owns parsing and native trees; clients need no parser/codec imports or privileged exports.
+
+This is a breaking redesign of the client SPI. Previous client builders, Gson methods and
+provider signatures are removed without compatibility wrappers. The neutral HTTP helper package
+is renamed from `client.common.gson.entity.spi` to `client.common.json.entity.spi`.
+Old Gson providers, JSON entity/logging/reflection helpers are removed.
+Application-facing deprecated Gson DSL overloads remain available.
 
 [[api-deprecations]]
 === Deprecations
@@ -178,3 +283,22 @@ Property getter exceptions pass through unchanged,
 while constructor invocation exceptions are propagated as provided by Hibernate Accessor.
 Higher-level indexing operations may still add their usual contextual exceptions.
 Update exception handlers and tests that rely on the previous wrapper or cause chain.
+
+[[elasticsearch-json-native-arrays]]
+=== Elasticsearch native JSON arrays
+
+Native JSON fields preserve historical root-array splitting by default, for both
+`asNative(GsonJsonHandlers.value())` and `asNative(JacksonJsonHandlers.value())`,
+as well as the deprecated no-argument `asNative()`. A value `[1,2]` projects two values;
+an empty array `[]` projects none. Selecting a handler alone does not change cardinality.
+
+Use `.asNative(handler).mapping(mapping).arrayAsValue()` when an array must round-trip
+as one value of the handler's Java type. This is necessary for array-only handlers.
+An empty array then projects as one empty-array value; a multi-valued field indexed
+with `[1,2]` and `[]` stores `[[1,2],[]]` and projects the two arrays independently.
+The mode participates in cross-index field compatibility, alongside handler identity and type.
+
+Earlier development versions of this branch made atomic arrays the typed-field default.
+For indexes created with that behavior, explicitly enable `arrayAsValue()` to retain the
+existing shape, or recreate/reindex them when selecting the splitting default.
+The explicit option makes cardinality a field mapping decision independent of the JSON library.

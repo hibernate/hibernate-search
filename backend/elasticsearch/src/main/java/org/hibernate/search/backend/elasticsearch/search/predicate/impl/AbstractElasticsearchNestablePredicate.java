@@ -5,7 +5,8 @@ import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.QueryLog;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractElasticsearchNestablePredicate extends AbstractElasticsearchPredicate {
 
@@ -26,7 +27,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 	}
 
 	@Override
-	public JsonObject toJsonQuery(PredicateRequestContext context) {
+	public ObjectNode toJsonQuery(PredicateRequestContext context) {
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
 		String expectedNestedPath = nestedPathHierarchy.isEmpty()
 				? null
@@ -43,7 +44,7 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 		PredicateRequestContext contextAfterImplicitNesting =
 				context.withNestedPath( expectedNestedPath );
 
-		JsonObject result = super.toJsonQuery( contextAfterImplicitNesting );
+		ObjectNode result = super.toJsonQuery( contextAfterImplicitNesting );
 
 		// traversing the nestedPathHierarchy in the inverted order
 		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;
@@ -54,8 +55,8 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 				break;
 			}
 
-			JsonObject outerObject = new JsonObject();
-			JsonObject innerObject = new JsonObject();
+			ObjectNode outerObject = JsonNodeFactory.instance.objectNode();
+			ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 			ElasticsearchNestedPredicate.wrap( indexNames(), path, outerObject, innerObject, result );
 			result = outerObject;
 		}

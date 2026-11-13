@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchPropertyMappingValidatorProvider;
@@ -14,8 +15,6 @@ import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaColl
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-
-import com.google.gson.Gson;
 
 public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 
@@ -32,7 +31,7 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 	private final Optional<String> backendName;
 
 	public ElasticsearchIndexSchemaManager(Optional<String> backendName,
-			Gson userFacingGson,
+			JsonCodecService userFacingCodec,
 			ElasticsearchWorkFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator workOrchestrator,
 			IndexLayoutStrategy indexLayoutStrategy,
@@ -45,7 +44,7 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 		this.schemaDropper = new ElasticsearchSchemaDropper( schemaAccessor );
 		this.schemaValidator = new ElasticsearchSchemaValidator( propertyMappingValidatorProvider );
 		this.schemaMigrator = new ElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
-		this.schemaExporter = new ElasticsearchSchemaExporter( userFacingGson, workFactory, indexLayoutStrategy );
+		this.schemaExporter = new ElasticsearchSchemaExporter( userFacingCodec, workFactory, indexLayoutStrategy );
 
 		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;

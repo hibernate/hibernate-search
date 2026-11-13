@@ -710,6 +710,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/Elasticsear
 but using the Elasticsearch extension so that the retrieved query exposes Elasticsearch-specific operations.
 <2> Retrieve a `SearchQuery` object.
 <3> Retrieve the explanation of the score of the entity with ID `1`.
+Pass a <<backend-elasticsearch-json,JSON handler>> to select the result type.
+Here, `JacksonJsonHandlers.object()` selects a Jackson 3 `ObjectNode`.
 <4> For multi-index queries, it is necessary to refer to the entity not only by its ID,
 but also by the name of its type.
 <5> If you cannot change the code building the query to use the Elasticsearch extension,
@@ -745,6 +747,10 @@ To work around such limitations, Hibernate Search provides ways to:
 * Transform the HTTP request sent to Elasticsearch for search queries.
 * Read the raw JSON of the HTTP response received from Elasticsearch for search queries.
 
+Pass a <<backend-elasticsearch-json,JSON handler>> to `transformBody(handler, transformation)`
+or `responseBody(handler)` to select the JSON representation.
+The examples below use `JacksonJsonHandlers.object()` with Jackson 3 `ObjectNode` values.
+
 include::../components/_elasticsearch-request-response-warning.adoc[]
 
 Most simple use cases will only need to change the HTTP request slightly, as shown below.
@@ -765,6 +771,11 @@ or even the request's path (not shown in this example).
 <5> Retrieve the result as usual.
 ====
 
+`transformBody` gives the callback an independent, editable JSON representation through the selected handler.
+Do not mutate the returned value or any part of it after the callback returns.
+Callback or conversion failures preserve the original request.
+The deprecated mutable Gson `body()` convenience cannot be mixed with `transformBody()` in the same context.
+
 For more complicated use cases, it is possible to access the raw JSON of the HTTP response, as shown below.
 
 .Accessing the Elasticsearch response body manually in a search query
@@ -782,14 +793,15 @@ Here we're asking Elasticsearch to apply a link:{elasticsearchDocUrl}/search-sug
 <4> Retrieve the result as usual.
 Since we used the Elasticsearch extension when building the query,
 the result is an `ElasticsearchSearchResult` instead of the usual `SearchResult`.
-<5> Get the response body as a `JsonObject`.
+<5> Pass a JSON handler to select the response body representation.
+Here, using `JacksonJsonHandlers.object()` yields an `ObjectNode`.
 <6> Extract useful information from the response body.
 Here we're extracting the result of the suggester we configured above.
 ====
 
 [NOTE]
 ====
-Gson's API for building JSON objects is quite verbose,
+The Jackson API for building JSON objects is quite verbose,
 so the example above relies on a small, custom helper method to make the code more readable:
 
 [source, java, indent=0, subs="+callouts"]

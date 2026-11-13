@@ -1,7 +1,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
@@ -13,20 +13,23 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR =
-			JsonAccessor.root().property( "geo_distance" ).asObject();
+			JsonAccessor.root().property( "geo_distance" ).unwrapSingletonArrays().asObject();
+
 	private static final JsonAccessor<Double> DISTANCE_ACCESSOR =
-			JsonAccessor.root().property( "distance" ).asDouble();
+			JsonAccessor.root().property( "distance" ).unwrapSingletonArrays().asDouble();
+
 	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
-			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
+			JsonAccessor.root().property( "ignore_unmapped" ).unwrapSingletonArrays().asBoolean();
 
 	private final double distanceInMeters;
-	private final JsonElement center;
+
+	private final JsonNode center;
 
 	private ElasticsearchGeoPointSpatialWithinCirclePredicate(Builder builder) {
 		super( builder );
@@ -35,24 +38,21 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
-			JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		DISTANCE_ACCESSOR.set( innerObject, distanceInMeters );
-		innerObject.add( absoluteFieldPath, center );
-
+		innerObject.set( absoluteFieldPath, center );
 		if ( indexNames().size() > 1 ) {
 			// There are multiple target indexes; some of them may not declare the field.
 			// Instruct ES to behave as if the field had no value in that case.
 			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
 		}
-
 		GEO_DISTANCE_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 
 	public static class Factory
-			extends
-			AbstractElasticsearchCodecAwareSearchQueryElementFactory<SpatialWithinCirclePredicateBuilder, GeoPoint> {
+			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<SpatialWithinCirclePredicateBuilder, GeoPoint> {
+
 		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
 			super( codec );
 		}
@@ -65,10 +65,12 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 	}
 
 	private static class Builder extends AbstractBuilder implements SpatialWithinCirclePredicateBuilder {
+
 		private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 		private double distanceInMeters;
-		private JsonElement center;
+
+		private JsonNode center;
 
 		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {

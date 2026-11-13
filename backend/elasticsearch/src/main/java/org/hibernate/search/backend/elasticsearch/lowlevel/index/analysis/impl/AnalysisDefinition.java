@@ -2,10 +2,10 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.impl.SerializeExtraProperties;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 /**
  * An abstract base class for analysis-related definitions.
@@ -16,7 +16,7 @@ public abstract class AnalysisDefinition {
 	private String type;
 
 	@SerializeExtraProperties
-	private Map<String, JsonElement> parameters;
+	private Map<String, JsonNode> parameters;
 
 	public String getType() {
 		return type;
@@ -26,16 +26,16 @@ public abstract class AnalysisDefinition {
 		this.type = type;
 	}
 
-	public Map<String, JsonElement> getParameters() {
+	public Map<String, JsonNode> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, JsonElement> parameters) {
+	public void setParameters(Map<String, JsonNode> parameters) {
 		this.parameters = parameters;
 	}
 
 	@Override
 	public String toString() {
-		return GsonProviderHelper.toPrettyJson( this );
+		return JsonProviderHelper.toPrettyJson( this );
 	}
 }

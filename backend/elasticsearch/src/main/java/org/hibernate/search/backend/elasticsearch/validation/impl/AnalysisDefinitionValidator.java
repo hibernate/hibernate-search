@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinition;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
-import com.google.gson.JsonElement;
+import tools.jackson.databind.JsonNode;
 
 class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Validator<T> {
 
@@ -28,7 +28,7 @@ class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Valid
 		}
 
 		String typeName = expectedDefinition.getType();
-		Validator<JsonElement> parameterValidator = new JsonElementValidator(
+		Validator<JsonNode> parameterValidator = new JsonElementValidator(
 				name -> equivalences.get( typeName, name )
 		);
 

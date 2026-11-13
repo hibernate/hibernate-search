@@ -8,12 +8,13 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.common.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.client.common.json.internal.spi.JsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.common.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.impl.ClientJdkElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProviderHelper;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonProviderHelper;
 import org.hibernate.search.backend.elasticsearch.logging.spi.ConfigurationLog;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
@@ -30,6 +31,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -38,9 +40,9 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.hibernate.search.util.json.internal.spi.JsonParsing;
+import org.hibernate.search.util.json.internal.spi.JsonParsingOptions;
+import org.hibernate.search.util.json.internal.spi.JsonValidation;
 
 public class ElasticsearchBackendFactory implements BackendFactory {
 
@@ -66,16 +68,42 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.MAPPING_TYPE_NAME_STRATEGY )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> JSON_INTERNAL_VALIDATION =
+			ConfigurationProperty.forKey( "json.internal_validation" )
+					.asBoolean().withDefault( () -> JsonValidation.systemDefault().enabled() ).build();
+
+	static JsonValidation resolveJsonValidation(ConfigurationPropertySource searchPropertySource) {
+		return JsonValidation.of( JSON_INTERNAL_VALIDATION.get( searchPropertySource.withFallback(
+				AllAwareConfigurationPropertySource.system().withMask( "hibernate.search" ) ) ) );
+	}
+
+	private static final ConfigurationProperty<Integer> JSON_MAX_NESTING_DEPTH =
+			parserLimit( ElasticsearchBackendSettings.JSON_MAX_NESTING_DEPTH, JsonParsingOptions.DEFAULT.maxDepth() );
+	private static final ConfigurationProperty<Integer> JSON_MAX_STRING_LENGTH =
+			parserLimit( ElasticsearchBackendSettings.JSON_MAX_STRING_LENGTH, JsonParsingOptions.DEFAULT.maxStringLength() );
+	private static final ConfigurationProperty<Integer> JSON_MAX_NAME_LENGTH =
+			parserLimit( ElasticsearchBackendSettings.JSON_MAX_NAME_LENGTH, JsonParsingOptions.DEFAULT.maxNameLength() );
+	private static final ConfigurationProperty<Integer> JSON_MAX_NUMBER_LENGTH =
+			parserLimit( ElasticsearchBackendSettings.JSON_MAX_NUMBER_LENGTH, JsonParsingOptions.DEFAULT.maxNumberLength() );
+
+	private static ConfigurationProperty<Integer> parserLimit(String key, int defaultValue) {
+		return ConfigurationProperty.forKey( key ).asIntegerStrictlyPositive().withDefault( defaultValue ).build();
+	}
+
+	static JsonParsingOptions resolveJsonParsingOptions(ConfigurationPropertySource backendPropertySource) {
+		return new JsonParsingOptions( JSON_MAX_NESTING_DEPTH.get( backendPropertySource ),
+				JSON_MAX_STRING_LENGTH.get( backendPropertySource ), JSON_MAX_NAME_LENGTH.get( backendPropertySource ),
+				JSON_MAX_NUMBER_LENGTH.get( backendPropertySource ), JsonParsingOptions.DEFAULT.maxInputChunkSize(), 0 );
+	}
+
 	@Override
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
-		/*
-		 * The Elasticsearch client only converts JsonObjects to String and
-		 * vice-versa, it doesn't need a Gson instance that was specially
-		 * configured for a particular Elasticsearch version.
-		 */
-		GsonProvider defaultGsonProvider = GsonProviderHelper.create( GsonBuilder::new, logPrettyPrinting );
+		// All backend parsing shares immutable constraints, including version discovery and response consumers.
+		JsonValidation validation = resolveJsonValidation( buildContext.configurationPropertySource() );
+		JsonParsing parsing = new JsonParsing( resolveJsonParsingOptions( propertySource ) );
+		JsonProvider defaultJsonProvider = JsonProviderHelper.create( logPrettyPrinting, validation, parsing );
 
 		Optional<ElasticsearchVersion> configuredVersion = ElasticsearchLinkImpl.VERSION.get( propertySource );
 
@@ -91,7 +119,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
-					clientFactoryHolder, threads, defaultGsonProvider, logPrettyPrinting,
+					clientFactoryHolder, threads, defaultJsonProvider, logPrettyPrinting,
 					dialectFactory, configuredVersion, createTypeNameMapping( propertySource )
 			);
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource, buildContext );
@@ -112,10 +140,10 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			dialect = dialectFactory.createModelDialect( version );
 
-			Gson userFacingGson = GsonProviderHelper.createUserFacingGson();
+			JsonCodecService userFacingCodec = JsonProviderHelper.createUserFacingCodec( validation, parsing );
 
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider =
-					dialect.createIndexTypeFieldFactoryProvider( userFacingGson );
+					dialect.createIndexTypeFieldFactoryProvider( userFacingCodec );
 			ElasticsearchPropertyMappingValidatorProvider propertyMappingValidatorProvider =
 					dialect.createElasticsearchPropertyMappingValidatorProvider();
 
@@ -125,7 +153,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					threads, link,
 					typeFactoryProvider,
 					propertyMappingValidatorProvider,
-					userFacingGson,
+					userFacingCodec,
 					multiTenancyStrategy,
 					buildContext.failureHandler(), buildContext.timingSource()
 			);

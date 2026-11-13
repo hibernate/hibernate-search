@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -20,9 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.JsonObject;
-
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchProjectionDslIT {
 
@@ -49,9 +49,9 @@ class ElasticsearchProjectionDslIT {
 	void source() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-source[]
-			List<JsonObject> hits = searchSession.search( Book.class )
+			List<ObjectNode> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.select( f -> f.source() )
+					.select( f -> f.source( JacksonJsonHandlers.object() ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-source[]
@@ -63,9 +63,9 @@ class ElasticsearchProjectionDslIT {
 	void explanation() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-explanation[]
-			List<JsonObject> hits = searchSession.search( Book.class )
+			List<ObjectNode> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.select( f -> f.explanation() )
+					.select( f -> f.explanation( JacksonJsonHandlers.object() ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-explanation[]
@@ -77,9 +77,9 @@ class ElasticsearchProjectionDslIT {
 	void jsonHit() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-jsonHit[]
-			List<JsonObject> hits = searchSession.search( Book.class )
+			List<ObjectNode> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.select( f -> f.jsonHit() )
+					.select( f -> f.jsonHit( JacksonJsonHandlers.object() ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-jsonHit[]

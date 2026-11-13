@@ -14,7 +14,7 @@ class ElasticsearchDoubleIndexFieldTypeOptionsStep
 
 	@Override
 	protected ElasticsearchFieldCodec<Double> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		return new ElasticsearchDoubleFieldCodec( buildContext.getUserFacingGson() );
+		return new ElasticsearchDoubleFieldCodec( buildContext.getUserFacingCodec() );
 	}
 
 	@Override

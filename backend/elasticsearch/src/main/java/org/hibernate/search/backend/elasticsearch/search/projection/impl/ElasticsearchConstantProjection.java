@@ -4,7 +4,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchConstantProjection<T> extends AbstractElasticsearchProjection<T>
 		implements ElasticsearchSearchProjection.Extractor<T, T> {
@@ -16,13 +16,13 @@ public class ElasticsearchConstantProjection<T> extends AbstractElasticsearchPro
 	}
 
 	@Override
-	public Extractor<?, T> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, T> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		return this;
 	}
 
 
 	@Override
-	public T extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
+	public T extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit, ObjectNode source,
 			ProjectionExtractContext context) {
 		return value;
 	}

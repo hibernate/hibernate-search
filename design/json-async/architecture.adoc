@@ -1,0 +1,384 @@
+= Asynchronous JSON architecture
+:sectnums:
+
+== Status, scope and conventions
+
+This document specifies the intended architecture of JSON handling in the Hibernate Search Elasticsearch backend.
+It consolidates the design of library-neutral JSON integration, internal model processing, incremental transport input/output, and asynchronous request preparation.
+It is a contributor specification, rather than an implementation plan or a record of completed tasks.
+
+Sections titled _Requirements_ are normative.
+MUST and MUST NOT identify mandatory constraints; SHOULD identifies the preferred design where a justified alternative remains possible; MAY identifies a permitted choice.
+Sections titled _Rationale and examples_ explain those constraints without adding requirements.
+The final section separates current implementation limitations and deferred integration work from the architecture itself.
+
+The architecture supports independently implemented HTTP clients, including a client maintained outside Hibernate Search and using Vert.x.
+It does not specify a complete Vert.x or Quarkus client, a new public JSON tree model, general Java object binding, or a transport scheduling policy.
+
+== Goals and architectural boundaries
+
+=== Requirements
+
+The backend MUST own Elasticsearch JSON interpretation, query/document/schema construction, and known-model codec selection.
+HTTP clients MUST operate through the same supported public SPI whether shipped with Search or implemented in another project.
+An external client MUST NOT need Search internal packages, privileged module exports, or knowledge of the backend's JSON representation.
+
+The responsibilities are divided as follows:
+
+[cols="1,2,2",options="header"]
+|===
+|Component |Responsibility |Boundary
+|Application JSON integration
+|Supply and receive a chosen JSON library's values
+|`JsonHandler<T>` and application-facing handler overloads
+|Elasticsearch backend
+|Interpret Elasticsearch JSON and construct requests, response results, field values and metadata
+|Public client contracts outward; JSON internals inward
+|JSON utility
+|Implement parsing, tree validation, replayable output and direct known-type codecs
+|Neutral public API/SPI; separate internal SPI for backend integration
+|HTTP client
+|HTTP configuration, destination selection, status/retry policy, content encodings, byte transfer and attempt lifecycle
+|Requests, replayable bodies, supplied response consumers and opaque results
+|Request preparation provider
+|Produce prepared headers, including authentication/signatures when enabled
+|Immutable attempt snapshot and integration-supplied execution capability
+|===
+
+`org.hibernate.search.util.json.JsonHandler` is the public JSON representation contract.
+`org.hibernate.search.util.json.spi` contains library-neutral transfer contracts such as `JsonBody`, `JsonWriteCursor` and response consumers.
+`org.hibernate.search.util.json.internal.spi` is an implementation integration surface for the Elasticsearch backend, not a third-party client extension point.
+The utility's own implementation and generated/backend codecs may use its internal contracts as needed to implement these responsibilities.
+
+Client and factory contracts MUST remain public under `org.hibernate.search.backend.elasticsearch.client.common.spi`.
+Reusable library-neutral HTTP helpers may be public under `client.common.json.entity.spi`.
+Backend-native request/response helpers and JSON navigation MUST remain implementation details.
+Publication of an artifact MUST NOT make its internal packages part of the supported external SPI.
+Java module declarations MUST preserve the same boundary: built-in clients MUST NOT receive privileged access to JSON internals unavailable to external clients.
+
+General application API and client SPI signatures MUST NOT require concrete Jackson types.
+The explicit `JacksonJsonHandlers` and `GsonJsonHandlers` adapter factories are exceptions: their signatures may identify their library's types.
+Retained, deprecated application-facing Gson conveniences are compatibility surfaces, not the pattern for new APIs.
+The client SPI is a clean library-neutral contract; it does not retain the removed Gson request/response/provider infrastructure.
+
+=== Rationale and examples
+
+The backend can change its internal JSON implementation without requiring every transport to change.
+The utility and backend currently use Jackson 3 trees internally; clients neither select this implementation nor receive its parser or codec registry.
+Library-specific factories help applications obtain handlers without making a particular library mandatory at every application extension point.
+
+Conceptually, the data flow is:
+
+[source,text]
+----
+application JSON value <-> JsonHandler<T> <-> backend-owned JSON processing
+                                              |
+                     JsonBody + response consumer factory
+                                              |
+                              independently implemented HTTP client
+                                              |
+                                         HTTP bytes
+----
+
+== JSON representations and application integration
+
+=== Requirements
+
+`JsonHandler<T>` MUST describe a JSON library's tree/value representation, not an entity or arbitrary application DTO.
+Its contract consists of a stable, non-null `Class<T>` token, serialization of a non-null value to non-null strict JSON text, and parsing of that text to an independent non-null value.
+Conversions MUST preserve arbitrary JSON members and nested nulls.
+Handlers MUST have stable configuration and support concurrent invocation; Search supplies no synchronization or per-hit handler instance.
+Search MUST NOT infer a handler from a value's runtime class or use reflective DTO mapping as a fallback.
+
+The standard fallback imports by calling `toJson` and parsing its result, and exports by rendering JSON and calling `fromJson`.
+The fallback MAY materialize complete text at that explicit boundary.
+It MUST NOT become an intermediate route for ordinary query construction, model codecs, network parsing or transport output.
+Runtime type tokens and returned value types MUST be checked at applicable boundaries.
+Unknown representations remain subject to the handler's fidelity contract; a type token alone cannot prove preservation of JSON structure.
+
+Only the exact supplied Jackson handler singleton instances may use the internal direct-value optimization.
+A custom handler MUST have its conversion methods invoked, even when it declares the same Java JSON type as a supplied adapter.
+Runtime class, `equals`, or a user-implementable marker MUST NOT grant trusted direct access.
+
+Object endpoints, including predicates, sorts, aggregation definitions/results, source/explanation/hit projections, raw responses, schema body parts and native mapping definitions, MUST require an object root when present.
+A general-value handler MUST NOT relax an endpoint's root constraint.
+Missing optional results MUST follow the endpoint's existing Java-null contract without invoking a handler.
+A present value of the wrong shape MUST fail rather than becoming an absent value.
+Aggregation result handlers MUST remain associated with their aggregation until result extraction.
+Conversions SHOULD occur at the requested result boundary, rather than eagerly converting every response to every supported representation.
+
+=== Rationale and examples
+
+A handler selects how an application expresses JSON; it does not select the backend's implementation or an Elasticsearch mapping.
+Applications may use a supplied library adapter or their own handler.
+Fallback conversion deliberately favors a small, understandable contract over a second public tree or token API.
+
+== Native fields
+
+=== Requirements
+
+`asNative(JsonHandler<T>)` MUST bind the Java representation of indexed field values and projected field values to `T`.
+The resulting field type, reference, runtime Java type metadata and default converters MUST preserve that type.
+An application's bridge MUST produce or consume that representation, or explicitly convert its domain value to or from it.
+
+`mapping(String)` and `mapping(JsonHandler<M>, M)` MUST define how the mapping-definition JSON is supplied.
+The mapping handler MUST NOT replace the field-value handler selected by `asNative`.
+Mapping definitions MUST have an object root; field values may have the JSON shapes supported by the selected value handler and Elasticsearch field mapping.
+Supporting a JSON shape does not imply every Elasticsearch mapping accepts that shape.
+
+Native fields MUST split root arrays into field values by default, for both explicit handlers and the deprecated no-argument Gson entry point.
+The explicit `arrayAsValue()` option MUST treat a root array, including an empty array, as one value.
+This choice MUST govern both indexing and projection cardinality and participate in field compatibility.
+Handlers restricted to array roots require the atomic-array option to support round trips.
+
+Java null MUST encode as JSON null without invoking the value handler.
+Missing and explicit root JSON null MUST project as Java null without invoking the value handler.
+Nested JSON nulls MUST remain part of a non-null JSON value.
+
+Compatible native fields across indexes MUST share the identical handler instance and stable Java type token, as well as compatible array mode and other field configuration.
+Equivalent-looking handler classes or equal handler objects MUST NOT establish compatibility.
+
+=== Rationale and examples
+
+The value representation and the mapping-definition representation serve different purposes.
+For example, a field can use a handler for JSON values while its mapping is supplied as plain JSON text:
+
+[source,java]
+----
+factory.asNative(valueHandler)
+        .mapping("{\"type\":\"ip\"}");
+----
+
+A bridge converting an address to a JSON string value uses the representation expected by `valueHandler`.
+The `String` accepted by `mapping` is instead a complete mapping definition; it does not make the indexed field's Java type `String`.
+A second handler supplied to `mapping(mappingHandler, definition)` only reads that definition.
+
+Root-array splitting preserves historical behavior independently of the chosen JSON library.
+Atomic arrays are an explicit semantic choice because a handler expecting an array cannot reconstruct that array when projection supplies its individual elements.
+
+== Ownership and request transformations
+
+=== Requirements
+
+Applications MUST keep submitted JSON values and shared subtrees stable while Search uses them, including deferred execution and retries.
+Returned JSON representations MUST be treated as borrowed and read-only, even when a particular conversion happens to create an independent value.
+Search MUST NOT promise defensive copying at every handler boundary.
+
+`transformBody` MUST provide an independently editable representation of the current staged request body.
+The direct path MUST copy the body once before invoking the callback, retain a successfully returned valid object without a second copy, and leave the prior staged body intact on callback/conversion/validation failure.
+Fallback conversion supplies isolation through its independent representation and MUST NOT require an additional preliminary tree copy.
+The callback may return its input or another valid object; the returned object and any shared mutable subtree MUST NOT be mutated afterward.
+Chained transformations MUST see prior successful staged changes.
+
+Replacement of the actual request MUST occur only after the outer request transformer completes successfully.
+An outer failure MUST leave the original request unchanged.
+Path-only or parameter-only edits MUST NOT require body conversion or copying.
+The deprecated mutable Gson `body()` convenience MUST NOT be mixed with `transformBody()` in one transformation context.
+
+=== Rationale and examples
+
+The copy protects the original request from an unsuccessful callback.
+Retaining the returned value avoids an unnecessary second full-tree copy, while the ownership rule prevents subsequent mutations from changing transmission or replay.
+
+== Internal values, codecs and JSON semantics
+
+=== Requirements
+
+Normal backend processing MUST use one internal JSON representation without persistent dual-tree storage or serialization/parsing round trips between internal operations.
+Known model conversion MUST use explicit handwritten or generated codecs with registered types and direct field/accessor calls.
+Unknown model classes MUST fail; reflective Databind/POJO fallback MUST NOT be introduced.
+Codecs MUST preserve extra attributes, ordering and existing field-specific behavior.
+Recursive omission of null object members, where required by codec policy, MUST preserve null array slots.
+
+External direct trees and transformer replacements MUST be validated as ordinary, acyclic JSON values before retention.
+Shared subtrees are permitted when acyclic and stable.
+Missing sentinels, raw/POJO/binary values, arbitrary custom node implementations, nonfinite numbers and cycles MUST NOT become wire data.
+Internal paths may rely on an established ordinary-value/stability contract rather than repeat external validation at every operation.
+Validation MUST NOT invoke reflective mapping or unknown serializers, and MUST NOT cache a permanent validity flag on mutable values.
+
+String parsing and incremental byte parsing MUST accept one strict JSON root with consistent numeric semantics.
+Blank input, truncation, trailing roots/garbage, malformed encoding and nonstandard JSON syntax MUST fail.
+Duplicate object members use the last value.
+Numeric values MUST NOT pass through `double` merely to store or compare exact integers or decimals.
+Integers use an exact integral representation and decimal tokens use an exact decimal representation within supported bounds.
+Finite floating values supplied by a JSON library retain the precision already present; Search cannot restore discarded precision.
+Floating negative mathematical zero MUST retain its observable sign; integer `-0` may normalize to zero.
+
+Supported decimal exponent, decimal scale and normalized exponent (`precision - scale - 1`) are bounded to `[-2147483647,2147483647]`.
+Unsupported bounds and invalid narrowing/overflow MUST fail explicitly rather than silently round or expand a huge decimal into an unbounded integer.
+Mathematical numeric comparison MUST NOT depend on original exponent spelling, decimal scale or numeric node subclass.
+Whitespace, original escaping and numeric lexeme spelling are not round-trip guarantees.
+
+Parsing limits MUST distinguish nesting, string/name length, numeric token length, per-feed input and cumulative input.
+Each backend MUST resolve immutable parser constraints from its backend configuration through `json.max_nesting_depth`, `json.max_string_length`, `json.max_name_length` and `json.max_number_length`.
+Values MUST be strictly positive integers; defaults are depth 1000, decoded string length 20,000,000 UTF-16 code units, decoded name length 50,000 UTF-8 bytes and numeric token length 1000 characters.
+Configuration MUST apply consistently to backend-owned string/stream parsing, response parsing and text imported through handlers, without changing other backends' policies.
+Client implementations MUST receive configured response consumers rather than parser implementation objects.
+Parser settings MUST NOT reconfigure custom handlers or the standalone supplied handler singletons.
+Already constructed values on a direct handler path are not text parsing.
+The per-feed input size remains an implementation choice, currently at most 8192 bytes; it MUST NOT be confused with a total document limit.
+No cumulative parser-byte setting is defined by this design; total response size is governed by the separate client policy.
+The numeric token limit constrains parsed text, not already constructed exact numeric values.
+Consequently, a direct value accepted in memory can fail explicitly if a textual fallback exceeds a parser limit.
+
+=== Rationale and examples
+
+Generated codecs provide controlled model conversion without turning JSON integration into general object mapping.
+The initial parser constraints follow Jackson's stream-read constraint model and retain Jackson-derived defaults.
+These are explicit Search defaults, which may differ from the bundled Jackson version's defaults and do not automatically change when Jackson is upgraded.
+Parser strictness is separate from explicit backend accessor coercion: accepting a numeric-string conversion in an accessor does not make numeric strings JSON numbers.
+Backend navigation and coercion remain internal responsibilities, rather than another public JSON model.
+
+== Incremental input and response handling
+
+=== Requirements
+
+Input routes MUST follow the source already available.
+Caller-supplied JSON strings may use a character parser.
+Network bytes and configuration streams MUST be consumed incrementally rather than collected into a complete String to enter a parser.
+Existing trees MUST be decoded directly by codecs instead of rendered and reparsed.
+
+An internal parser session MUST be a single-consumer state machine with explicit end-of-input and no owned executor or unbounded input queue.
+Each feed MUST accept at most the configured slice, advance the caller's position for accepted bytes on success, and drain available tokens before returning.
+Callers MUST feed again while bytes remain and MUST NOT mutate storage during a feed.
+Caller storage MUST NOT remain retained after the call, including on failure; position on failure is unspecified.
+The parser MUST publish a root only after end-of-input has rejected empty, truncated and trailing input.
+Closing a session MUST release partial tree, token and buffer state.
+When a response charset requires transcoding, it MUST be incremental, with cumulative byte accounting before transcoding.
+Content encoding and charset decoding are distinct layers.
+
+The backend MUST supply a `JsonResponseConsumerFactory<T>` to each client submission.
+The client MUST create a fresh consumer for each response attempt with its effective charset and decoded-byte limit.
+Built-in clients MUST expose `response_body_size_limit` as a backend-scoped client setting in bytes, with a default of zero meaning unlimited and negative values rejected.
+The limit MUST count cumulative bytes after content decoding, including gzip decompression, and before charset conversion.
+The supplied consumer MUST enforce this policy consistently across clients, including unknown-length/chunked input and draining after deferred syntax failure.
+Exceeding the size limit MUST terminate consumption rather than becoming a deferred parsing failure or being masked by an earlier syntax error.
+It MUST feed available decoded bytes, call `complete()` at EOF, and return the exact `result()` in `ElasticsearchResponse<T>` without inspecting or converting `T`.
+The consumer's public feed consumes its supplied buffer synchronously without retaining caller storage.
+Absent HTTP bodies MUST be distinguished from a present JSON null or malformed empty JSON document.
+
+Consumer parsing failures may be deferred so that HTTP status-based retry decisions remain possible.
+Deferral MUST NOT disable cumulative input limits while the remaining response is drained.
+Consumers MUST be closed on success, failure, cancellation and abandoned attempts.
+Completion and close MUST be idempotent; closing a completed consumer releases active parsing state while retaining its completed result and diagnostic replay.
+Generic response/result types MUST stay connected throughout client execution.
+When JSON inspection is requested through the public SPI, it MUST use `ElasticsearchResponseBody.body(JsonHandler<T>)`, not a concrete internal tree getter.
+
+=== Rationale and examples
+
+The client manages HTTP and the backend interprets JSON.
+A malformed body on a retriable HTTP response must not automatically prevent the client's status retry policy.
+An external client can carry an opaque result without installing a JSON library of its own.
+
+== Replayable output, framing and backpressure
+
+=== Requirements
+
+`JsonBody` MUST be a stable replayable UTF-8 output source.
+A null request body means no HTTP entity; a body emitting `null` is present JSON null.
+Each signing read, transmission attempt or subscription MUST use an independent cursor or stream over the same stable content.
+Replay MUST reproduce the bytes used for signing, including escaping, numeric rendering, member order and framing.
+NDJSON MUST terminate every retained part with one newline; ordinary JSON output MUST NOT add NDJSON or HTTP framing.
+
+`JsonWriteCursor` MUST be single-consumer state with independent traversal for each cursor.
+Writing MUST fill only the destination's remaining region, advance its position by the returned byte count and leave its limit unchanged.
+Zero capacity MUST make no progress, and read-only destinations MUST be rejected before changing traversal state.
+Cursors MUST support suspension within names, strings, escapes and numbers, rather than buffering an entire scalar or body part to satisfy a write.
+The cursor MUST NOT retain the destination.
+The caller owns emitted storage and MUST retain an unread suffix or wait for its sink to consume the bytes before reusing that storage.
+
+Async clients MUST connect production to downstream demand or write completion, with bounded adapter queues and no unbounded scheduled output production.
+They MUST NOT collect an entire encoded body solely to adapt a streaming HTTP API.
+Blocking `writeTo` MUST NOT flush or close the caller-owned destination.
+Cursor-backed streams MUST use bounded encoded storage and close their cursor when closed.
+Completion MUST release traversal state; close/cancel MUST be idempotent and release unfinished state.
+
+`contentLength()` MUST return a stable known length or `-1` for unknown length.
+A bounded initial probe may determine a small body's length without retaining its encoded bytes.
+Later signing or successful transmission MUST NOT change an initially unknown length to a known length.
+Retries MUST use fresh traversal state rather than continuing a partly consumed cursor.
+
+=== Rationale and examples
+
+Backpressure is a contract between the cursor and its adapter, not a thread managed by the JSON utility.
+An adapter may fill an 8 KiB scratch buffer, transfer ownership of the written bytes to its HTTP library, and produce another chunk only after the previous write is consumed.
+The adapter must account for whether its HTTP library copies or retains submitted storage.
+
+== Asynchronous request preparation and signing
+
+=== Requirements
+
+Preparation MUST run after destination selection and user configuration, before the first bytes are sent.
+The integration MUST capture the effective absolute HTTP(S) URI, encoded path/query, method, complete multi-value headers and stable body in an immutable snapshot.
+URI user information and fragments are not permitted.
+Header maps and value lists MUST be copied; the body is retained under its stability contract.
+A worker MUST NOT receive mutable transport state through this snapshot.
+
+`ElasticsearchRequestPreparation` MUST be shareable, return promptly and express completion through a stage.
+Its result MUST be a complete immutable header replacement, not a delta, and MUST NOT replace the destination, method or body.
+Composition MUST pass each preparation's complete headers to the next preparation in explicit order.
+Header-changing preparation MUST precede final signing.
+After signing, no mutation may change signed headers, authority, method, encoded path/query or body bytes.
+
+The integration MUST supply the execution capability for blocking work, including scheduling, admission and rejection policy.
+Search MUST NOT add an implicit executor, worker pool or automatic offload to the JSON contracts.
+Preparation completion may occur on any thread; only the integration may apply it to a live request on the request's owning context.
+Before applying headers or sending, the integration MUST reject completion for a cancelled, expired or superseded attempt.
+Cancelling the stage alone MUST NOT be treated as a complete cancellation protocol.
+
+Signing MUST use the effective destination and precisely the body that transmission will send.
+The AWS preparation adapter MUST execute its synchronous credential lookup and signing through the supplied blocking capability.
+Signing streams MUST have independent bounded traversal and MUST be closed by the action/thread that opened them, including after failure or cancellation.
+Preparation failure or scheduling rejection MUST NOT trigger an unsigned fallback.
+Destination/status retries, where allowed, MUST capture and prepare a fresh attempt with a fresh signature and sending cursor under the original operation deadline.
+Credential failures MUST NOT automatically be treated as evidence that a destination is unhealthy.
+
+Configured preparation resources MUST be acquired for client lifetime, released on setup failure, and closed after active preparation work has stopped or drained.
+Directly supplied signing credentials are borrowed unless their surrounding owner explicitly transfers responsibility.
+Existing synchronous interceptor-based clients MUST retain their existing execution model; the async SPI MUST NOT implicitly run an additional signing path for those clients.
+
+=== Rationale and examples
+
+An event-loop integration can invoke preparation, return control while blocking work runs on its chosen facility, resume on its owning context, recheck activity, replace headers and stream the body.
+An operation may be cancelled while a blocking credentials provider remains blocked.
+Its HTTP result can terminate promptly, but resource owners must still track the worker before closing credentials it may be using.
+
+== Failure, cancellation and resource ownership
+
+=== Requirements
+
+Every attempt MUST have one terminal outcome and release its active input/output state on EOF/completion, failure, cancellation or abandonment.
+Cancellation from another thread MUST signal activity safely; cleanup MUST respect the callback or worker currently owning a parser, cursor, stream or transport request.
+Integration-owned state MUST reject late callbacks from old attempts and preserve the original deadline across retries.
+Transport socket cleanup and release of Search parser/cursor state MUST be treated as separate responsibilities.
+
+Handler, callback, parser and validation failures MUST retain contextual operation information and original causes where wrapped.
+Diagnostic rendering MUST NOT become a normal data-processing route or expose unrestricted payloads accidentally.
+Successful-operation diagnostic formatting SHOULD remain conditional on logging actually being enabled.
+Limits MUST apply to unknown-length/chunked input as well as declared-length input.
+Implementations MUST document which encoded or decoded bytes their transport layer counts; a bounded feed size is not a response-size limit.
+
+== Implementation limitations and deferred integration
+
+This section is descriptive, not an expansion of the normative requirements.
+
+* Complete JSON trees, decoded scalar strings and exact numbers remain materialized.
+  Bounded encoded buffers do not imply bounded total memory, fixed event-loop latency or constant-time callbacks.
+  Parsing, validation, output, existing interceptors and signing still perform synchronous work.
+* Custom and alternative-library handler boundaries currently materialize complete JSON text.
+  Their conversion and numeric-limit costs differ from the supplied direct adapter.
+* Unlimited response size does not imply bounded total memory; the parsed response tree still grows with its content.
+  A configured response limit counts decoded bytes consistently across clients, before charset transcoding.
+  Gzip is decoded incrementally where not already handled by the HTTP library.
+* REST error diagnostics may materialize a complete valid response.
+  Malformed-input diagnostics retain only an 8192-byte prefix from the original-charset bytes delivered to their diagnostic layer, with a truncation marker when needed.
+  Diagnostic text may normalize JSON, encoding and whitespace; a partial character at the prefix boundary may be replaced.
+* Optional REST request compression can buffer a complete compressed body, and underlying clients own background sniffer requests.
+  These exceptions must not be mistaken for the ordinary bounded JSON output route.
+* In the underlying HC5 clients, cancellation racing with header delivery can leave a stalled socket open after cancellation and release of Search state.
+  Search does not promise prompt socket closure in that client race.
+* The Vert.x examples demonstrate applicability of the public contracts; a complete external Quarkus client and dispatcher integration remain separate work.
+  Automatic worker selection, request-compression/signing ordering and redirect re-signing policy are not established by this design.
+  Integrations must define those policies before supporting the corresponding behavior.
+
+Deferred integration policies above remain explicit decisions for the integrations that implement them.

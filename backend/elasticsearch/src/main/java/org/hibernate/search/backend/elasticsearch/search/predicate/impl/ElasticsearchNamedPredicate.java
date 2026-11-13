@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedPredicateDefinitionContext;
 import org.hibernate.search.engine.search.predicate.spi.NamedValuesBasedTypedPredicateDefinitionContext;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
@@ -37,8 +37,8 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context,
-			JsonObject outerObject, JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context,
+			ObjectNode outerObject, ObjectNode innerObject) {
 		return providedPredicate.toJsonQuery( context );
 	}
 

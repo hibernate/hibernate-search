@@ -14,7 +14,7 @@ class ElasticsearchShortIndexFieldTypeOptionsStep
 
 	@Override
 	protected ElasticsearchFieldCodec<Short> completeCodec(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		return new ElasticsearchShortFieldCodec( buildContext.getUserFacingGson() );
+		return new ElasticsearchShortFieldCodec( buildContext.getUserFacingCodec() );
 	}
 
 	@Override

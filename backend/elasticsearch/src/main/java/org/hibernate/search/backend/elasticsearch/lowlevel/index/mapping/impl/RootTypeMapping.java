@@ -4,22 +4,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonSerializable;
-
-import com.google.gson.annotations.SerializedName;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonName;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonSerializable;
 
 /**
  * An object representing Elasticsearch type mappings.
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  */
-@GsonSerializable
+@JsonSerializable
 public class RootTypeMapping extends AbstractTypeMapping {
 
-	@SerializedName("_routing")
+	@JsonName("_routing")
 	private RoutingType routing;
 
-	@SerializedName("dynamic_templates")
+	@JsonName("dynamic_templates")
 	private List<NamedDynamicTemplate> dynamicTemplates;
 
 	public RoutingType getRouting() {

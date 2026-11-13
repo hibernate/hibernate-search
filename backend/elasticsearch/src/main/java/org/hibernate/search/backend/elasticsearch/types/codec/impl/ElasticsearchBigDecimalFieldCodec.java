@@ -4,15 +4,15 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.logging.impl.IndexingLog;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.engine.cfg.spi.NumberUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
 public class ElasticsearchBigDecimalFieldCodec extends AbstractElasticsearchFieldCodec<BigDecimal> {
 
@@ -21,8 +21,8 @@ public class ElasticsearchBigDecimalFieldCodec extends AbstractElasticsearchFiel
 	private final BigDecimal minScaledValue;
 	private final BigDecimal maxScaledValue;
 
-	public ElasticsearchBigDecimalFieldCodec(Gson gson, int decimalScale) {
-		super( gson );
+	public ElasticsearchBigDecimalFieldCodec(JsonCodecService json, int decimalScale) {
+		super( json );
 		this.decimalScale = decimalScale;
 		scalingFactor = BigDecimal.TEN.pow( decimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
 		minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
@@ -37,21 +37,21 @@ public class ElasticsearchBigDecimalFieldCodec extends AbstractElasticsearchFiel
 	}
 
 	@Override
-	public JsonElement encode(BigDecimal value) {
+	public JsonNode encode(BigDecimal value) {
 		if ( value == null ) {
-			return JsonNull.INSTANCE;
+			return NullNode.instance;
 		}
 
 		if ( value.compareTo( minScaledValue ) < 0 || value.compareTo( maxScaledValue ) > 0 ) {
 			throw IndexingLog.INSTANCE.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
 		}
 
-		return new JsonPrimitive( value );
+		return JsonScalarConversions.toNode( value );
 	}
 
 	@Override
-	public BigDecimal decode(JsonElement element) {
-		if ( element == null || element.isJsonNull() ) {
+	public BigDecimal decode(JsonNode element) {
+		if ( element == null || element.isNull() ) {
 			return null;
 		}
 

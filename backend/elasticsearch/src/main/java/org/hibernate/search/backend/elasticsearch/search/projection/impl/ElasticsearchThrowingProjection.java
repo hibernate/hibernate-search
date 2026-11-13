@@ -7,7 +7,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.SearchException;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchThrowingProjection<T> extends AbstractElasticsearchProjection<T>
 		implements ElasticsearchSearchProjection.Extractor<Object, T> {
@@ -20,12 +20,12 @@ public class ElasticsearchThrowingProjection<T> extends AbstractElasticsearchPro
 	}
 
 	@Override
-	public Extractor<?, T> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, T> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		return this;
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit, ObjectNode source,
 			ProjectionExtractContext context) {
 		throw exceptionSupplier.get();
 	}

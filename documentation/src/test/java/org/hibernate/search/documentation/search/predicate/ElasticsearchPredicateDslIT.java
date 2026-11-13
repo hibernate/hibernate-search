@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.gson.GsonJsonHandlers;
+import org.hibernate.search.backend.elasticsearch.json.jackson.JacksonJsonHandlers;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -18,8 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchPredicateDslIT {
 
@@ -46,21 +49,19 @@ class ElasticsearchPredicateDslIT {
 	void fromJson() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-fromJson-jsonObject[]
-			JsonObject jsonObject =
+			ObjectNode jsonObject =
 					// end::elasticsearch-fromJson-jsonObject[]
-					new Gson().fromJson(
+					JacksonJsonHandlers.object().fromJson(
 							"{"
 									+ "    \"regexp\": {"
 									+ "        \"description\": \"neighbor|neighbour\""
 									+ "    }"
-									+ "}",
-							JsonObject.class
-					)
+									+ "}" )
 			// tag::elasticsearch-fromJson-jsonObject[]
 			/* ... */; // <1>
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <2>
-					.where( f -> f.fromJson( jsonObject ) ) // <3>
+					.where( f -> f.fromJson( JacksonJsonHandlers.object(), jsonObject ) ) // <3>
 					.fetchHits( 20 );
 			// end::elasticsearch-fromJson-jsonObject[]
 			assertThat( hits )
@@ -82,6 +83,22 @@ class ElasticsearchPredicateDslIT {
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK4_ID );
+		} );
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	void deprecatedGsonInput() {
+		withinSearchSession( searchSession -> {
+			// tag::elasticsearch-fromJson-gson[]
+			JsonObject json = GsonJsonHandlers.object()
+					.fromJson( "{\"regexp\":{\"description\":\"neighbor|neighbour\"}}" );
+			List<Book> hits = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() )
+					.where( f -> f.fromJson( json ) )
+					.fetchHits( 20 );
+			// end::elasticsearch-fromJson-gson[]
+			assertThat( hits ).extracting( Book::getId ).containsExactly( BOOK4_ID );
 		} );
 	}
 

@@ -2,10 +2,9 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import org.hibernate.search.engine.common.timing.Deadline;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface ElasticsearchSearchResultExtractor<R> {
 
-	R extract(JsonObject responseBody, Deadline deadline);
-
+	R extract(ObjectNode responseBody, Deadline deadline);
 }

@@ -8,7 +8,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.WithParametersPredicateBuilder;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ElasticsearchWithParametersPredicate extends AbstractElasticsearchPredicate {
 
@@ -22,7 +22,7 @@ public class ElasticsearchWithParametersPredicate extends AbstractElasticsearchP
 	}
 
 	@Override
-	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+	protected ObjectNode doToJsonQuery(PredicateRequestContext context, ObjectNode outerObject, ObjectNode innerObject) {
 		ElasticsearchSearchPredicate providedPredicate =
 				ElasticsearchSearchPredicate.from( scope, predicateCreator.apply( context.queryParameters() ).toPredicate() );
 

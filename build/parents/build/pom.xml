@@ -94,6 +94,8 @@
         <version.software.amazon.awssdk>2.57.4</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
         <version.com.fasterxml.jackson>2.22.4</version.com.fasterxml.jackson>
+        <!-- Jackson 3: Search JSON utilities and the OpenSearch sniffer. -->
+        <version.tools.jackson>3.2.2</version.tools.jackson>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
@@ -292,6 +294,11 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-json</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -604,6 +611,14 @@
                 <type>pom</type>
                 <scope>import</scope>
                 <version>${version.com.fasterxml.jackson}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${version.tools.jackson}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- We only need it for build purposes. -->

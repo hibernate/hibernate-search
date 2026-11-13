@@ -5,6 +5,7 @@ import static org.hibernate.search.backend.elasticsearch.logging.impl.Elasticsea
 import static org.jboss.logging.Logger.Level.DEBUG;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.util.common.SearchException;
@@ -13,6 +14,7 @@ import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.json.spi.JsonParseException;
 
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -77,5 +79,30 @@ public interface ElasticsearchMiscLog {
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 191, value = "Normalizing index name from '%1$s' to '%2$s'")
 	void normalizeIndexName(String indexName, String esIndexName);
+
+
+	@Message(id = ID_OFFSET + 215, value = "Cannot decode JSON as %1$s: %2$s")
+	JsonParseException cannotDecodeJson(String typeName, String message, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET + 216, value = "Cannot write JSON to a String")
+	IllegalStateException cannotWriteJsonToString(@Cause IOException cause);
+
+	@Message(id = ID_OFFSET + 217, value = "Expected a JSON object root")
+	IllegalArgumentException expectedJsonObjectRoot();
+
+	@Message(id = ID_OFFSET + 218, value = "Cannot write JSON")
+	UncheckedIOException cannotWriteJson(@Cause IOException cause);
+
+	@Message(id = ID_OFFSET + 219, value = "Unsupported JSON scalar type: %s")
+	IllegalArgumentException unsupportedJsonScalarType(String typeName);
+
+	@Message(id = ID_OFFSET + 220, value = "Expected JSON scalar")
+	IllegalStateException expectedJsonScalar();
+
+	@Message(id = ID_OFFSET + 221, value = "Expected singleton scalar array")
+	IllegalStateException expectedSingletonJsonScalarArray();
+
+	@Message(id = ID_OFFSET + 222, value = "JSON boolean is not a number")
+	UnsupportedOperationException jsonBooleanIsNotNumber();
 
 }

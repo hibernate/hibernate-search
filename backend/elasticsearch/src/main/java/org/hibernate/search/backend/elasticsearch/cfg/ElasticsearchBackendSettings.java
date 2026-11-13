@@ -34,6 +34,26 @@ public final class ElasticsearchBackendSettings {
 	 */
 	public static final String TYPE_NAME = "elasticsearch";
 
+	/** Maximum decoded response bytes before charset conversion. A non-negative Long; zero means unlimited (the default). */
+	@Incubating
+	public static final String RESPONSE_BODY_SIZE_LIMIT = "response_body_size_limit";
+
+	/** Maximum JSON container nesting depth. A strictly positive Integer; defaults to 1000. */
+	@Incubating
+	public static final String JSON_MAX_NESTING_DEPTH = "json.max_nesting_depth";
+
+	/** Maximum decoded JSON string length in UTF-16 code units. A strictly positive Integer; defaults to 20,000,000. */
+	@Incubating
+	public static final String JSON_MAX_STRING_LENGTH = "json.max_string_length";
+
+	/** Maximum decoded JSON field-name length in UTF-8 bytes. A strictly positive Integer; defaults to 50,000. */
+	@Incubating
+	public static final String JSON_MAX_NAME_LENGTH = "json.max_name_length";
+
+	/** Maximum JSON number-token length. A strictly positive Integer; defaults to 1000. */
+	@Incubating
+	public static final String JSON_MAX_NUMBER_LENGTH = "json.max_number_length";
+
 	/**
 	 * The hostname and ports of the Elasticsearch servers to connect to.
 	 * <p>

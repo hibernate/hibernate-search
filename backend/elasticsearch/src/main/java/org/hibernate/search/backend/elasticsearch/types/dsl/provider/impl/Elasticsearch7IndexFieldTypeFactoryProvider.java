@@ -1,11 +1,10 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 
+import org.hibernate.search.backend.elasticsearch.json.internal.spi.JsonCodecService;
 import org.hibernate.search.backend.elasticsearch.logging.impl.VersionLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.backend.elasticsearch.types.mapping.impl.ElasticsearchVectorFieldTypeMappingContributor;
-
-import com.google.gson.Gson;
 
 /**
  * The index field type factory provider for ES7.x.
@@ -26,8 +25,8 @@ public class Elasticsearch7IndexFieldTypeFactoryProvider extends AbstractIndexFi
 				}
 			};
 
-	public Elasticsearch7IndexFieldTypeFactoryProvider(Gson userFacingGson) {
-		super( userFacingGson );
+	public Elasticsearch7IndexFieldTypeFactoryProvider(JsonCodecService userFacingCodec) {
+		super( userFacingCodec );
 	}
 
 	@Override

@@ -1,18 +1,19 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.json.impl.JsonScalarConversions;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractElasticsearchReversibleSort extends AbstractElasticsearchSort {
 
-	private static final JsonAccessor<JsonElement> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
-	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
-	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
+	private static final JsonAccessor<JsonNode> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
+	private static final JsonNode ASC_KEYWORD_JSON = JsonScalarConversions.toNode( "asc" );
+	private static final JsonNode DESC_KEYWORD_JSON = JsonScalarConversions.toNode( "desc" );
 
 	private final SortOrder order;
 
@@ -23,7 +24,7 @@ public abstract class AbstractElasticsearchReversibleSort extends AbstractElasti
 
 	@Override
 	public final void toJsonSorts(ElasticsearchSearchSortCollector collector) {
-		JsonObject innerObject = new JsonObject();
+		ObjectNode innerObject = JsonNodeFactory.instance.objectNode();
 
 		if ( order != null ) {
 			switch ( order ) {
@@ -39,10 +40,10 @@ public abstract class AbstractElasticsearchReversibleSort extends AbstractElasti
 		doToJsonSorts( collector, innerObject );
 	}
 
-	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, ObjectNode innerObject) {
 	}
 
-	protected abstract void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject);
+	protected abstract void doToJsonSorts(ElasticsearchSearchSortCollector collector, ObjectNode innerObject);
 
 	public abstract static class AbstractBuilder extends AbstractElasticsearchSort.AbstractBuilder {
 

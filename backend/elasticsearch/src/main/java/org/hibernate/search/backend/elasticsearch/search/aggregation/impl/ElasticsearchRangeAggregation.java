@@ -23,9 +23,10 @@ import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @param <F> The type of field values.
@@ -39,7 +40,7 @@ public class ElasticsearchRangeAggregation<F, K, V>
 	private final String absoluteFieldPath;
 
 	private final List<Range<K>> rangesInOrder;
-	private final JsonArray rangesJson;
+	private final ArrayNode rangesJson;
 
 	private final ElasticsearchSearchAggregation<V> aggregation;
 
@@ -52,12 +53,12 @@ public class ElasticsearchRangeAggregation<F, K, V>
 	}
 
 	@Override
-	protected void doRequest(JsonObject outerObject, JsonObject innerObject, AggregationRequestBuildingContextContext context) {
-		JsonObject rangeDefinition = new JsonObject();
-		outerObject.add( "range", rangeDefinition );
-		rangeDefinition.addProperty( "field", absoluteFieldPath );
-		rangeDefinition.addProperty( "keyed", true );
-		rangeDefinition.add( "ranges", rangesJson );
+	protected void doRequest(ObjectNode outerObject, ObjectNode innerObject, AggregationRequestBuildingContextContext context) {
+		ObjectNode rangeDefinition = JsonNodeFactory.instance.objectNode();
+		outerObject.set( "range", rangeDefinition );
+		rangeDefinition.put( "field", absoluteFieldPath );
+		rangeDefinition.put( "keyed", true );
+		rangeDefinition.set( "ranges", rangesJson );
 
 		context.add( buildingContextKey( INNER_EXTRACTOR ),
 				aggregation.request( context, compositeKeyFor( isNested() ), innerObject ) );
@@ -112,11 +113,11 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 
 		@Override
-		protected Map<Range<K>, V> doExtract(AggregationExtractContext context, JsonElement buckets) {
-			JsonObject bucketMap = buckets.getAsJsonObject();
+		protected Map<Range<K>, V> doExtract(AggregationExtractContext context, JsonNode buckets) {
+			ObjectNode bucketMap = ( (ObjectNode) buckets );
 			Map<Range<K>, V> result = CollectionHelper.newLinkedHashMap( rangesInOrder.size() );
 			for ( int i = 0; i < rangesInOrder.size(); i++ ) {
-				JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
+				ObjectNode bucket = ( (ObjectNode) bucketMap.get( String.valueOf( i ) ) );
 				Range<K> range = rangesInOrder.get( i );
 				result.put( range, innerExtractor.extract( bucket, context ) );
 			}
@@ -128,8 +129,8 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 		protected CountBuilder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<?> field,
-				Function<? super K, JsonElement> encoder) {
-			super( scope, field, encoder, new ArrayList<>(), new JsonArray(),
+				Function<? super K, JsonNode> encoder) {
+			super( scope, field, encoder, new ArrayList<>(), JsonNodeFactory.instance.arrayNode(),
 					ElasticsearchSearchAggregation.from( scope,
 							ElasticsearchCountDocumentAggregation.factory().create( scope, field ).builder().build() ) );
 		}
@@ -138,17 +139,17 @@ public class ElasticsearchRangeAggregation<F, K, V>
 	private static class Builder<F, K, T> extends AbstractBuilder<Range<K>, T>
 			implements RangeAggregationBuilder<K, T> {
 
-		private final Function<? super K, JsonElement> encoder;
+		private final Function<? super K, JsonNode> encoder;
 
 		private final List<Range<K>> rangesInOrder;
-		private final JsonArray rangesJson;
+		private final ArrayNode rangesJson;
 		private final ElasticsearchSearchAggregation<T> aggregation;
 
 		protected Builder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<?> field,
-				Function<? super K, JsonElement> encoder,
+				Function<? super K, JsonNode> encoder,
 				List<Range<K>> rangesInOrder,
-				JsonArray rangesJson,
+				ArrayNode rangesJson,
 				ElasticsearchSearchAggregation<T> aggregation) {
 			super( scope, field );
 			this.encoder = encoder;
@@ -159,24 +160,24 @@ public class ElasticsearchRangeAggregation<F, K, V>
 
 		@Override
 		public void range(Range<? extends K> range) {
-			JsonObject rangeJson = new JsonObject();
+			ObjectNode rangeJson = JsonNodeFactory.instance.objectNode();
 			Optional<? extends K> lowerBoundValue = range.lowerBoundValue();
 			if ( lowerBoundValue.isPresent() ) {
 				if ( !RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() ) ) {
 					throw QueryLog.INSTANCE.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
-				rangeJson.add( "from", encoder.apply( lowerBoundValue.get() ) );
+				rangeJson.set( "from", encoder.apply( lowerBoundValue.get() ) );
 			}
 			Optional<? extends K> upperBoundValue = range.upperBoundValue();
 			if ( upperBoundValue.isPresent() ) {
 				if ( !RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ) {
 					throw QueryLog.INSTANCE.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
-				rangeJson.add( "to", encoder.apply( upperBoundValue.get() ) );
+				rangeJson.set( "to", encoder.apply( upperBoundValue.get() ) );
 			}
 			// We need to request a keyed response,
 			// because ranges are not always returned in the order they are submitted
-			rangeJson.addProperty( "key", String.valueOf( rangesJson.size() ) );
+			rangeJson.put( "key", String.valueOf( rangesJson.size() ) );
 			rangesInOrder.add( range.map( Function.identity() ) );
 			rangesJson.add( rangeJson );
 		}

@@ -48,6 +48,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-json</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -251,6 +256,7 @@
                             <sourcepath>
                                 ${basedir}/../engine/src/main/java;
                                 ${basedir}/../util/common/src/main/java;
+                                ${basedir}/../util/json/src/main/java;
                                 ${basedir}/../mapper/pojo-base/src/main/java;
                                 ${basedir}/../mapper/orm/src/main/java;
                                 ${basedir}/../mapper/pojo-standalone/src/main/java;
@@ -268,6 +274,7 @@
                                 ${basedir}/../metamodel/metamodel-processor/src/main/java;
                                 ${basedir}/../engine/target/generated-sources/annotations;
                                 ${basedir}/../util/common/target/generated-sources/annotations;
+                                ${basedir}/../util/json/target/generated-sources/annotations;
                                 ${basedir}/../mapper/pojo-base/target/generated-sources/annotations;
                                 ${basedir}/../mapper/orm/target/generated-sources/annotations;
                                 ${basedir}/../mapper/pojo-standalone/target/generated-sources/annotations;

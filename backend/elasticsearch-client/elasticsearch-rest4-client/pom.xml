@@ -60,10 +60,6 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
 
         <!-- We only depend on Jackson indirectly through the Elasticsearch client sniffer,
              but Dependabot apparently ignores dependency management,
@@ -76,6 +72,14 @@
         <!-- Test -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-common</artifactId>
             <scope>test</scope>
         </dependency>
@@ -84,8 +88,55 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-no-json-databind</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+                                    </excludes>
+                                    <searchTransitive>true</searchTransitive>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <exports combine.self="override">
+                                        org.hibernate.search.*.logging.impl to org.jboss.logging;
+                                        org.hibernate.search.*.impl to org.hibernate.search.engine;
+                                        *;
+                                    </exports>
+                                    <requires combine.self="override">
+                                        org.hibernate.*.impl;
+                                        org.hibernate.*.internal;
+                                        org.hibernate.*.impl.*;
+                                        org.hibernate.*.internal.*;
+                                        transitive org.hibernate.*;
+                                        *;
+                                    </requires>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

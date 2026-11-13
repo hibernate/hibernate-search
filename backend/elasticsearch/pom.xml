@@ -26,6 +26,10 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
@@ -41,6 +45,11 @@
             <artifactId>gson</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -52,6 +61,46 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>transport-test-fixtures</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>org/hibernate/search/backend/elasticsearch/testsupport/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-no-json-databind</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+                                    </excludes>
+                                    <searchTransitive>true</searchTransitive>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
@@ -61,7 +110,7 @@
                             <annotationProcessorPaths combine.children="append">
                                 <path>
                                     <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-build-gson-processor</artifactId>
+                                    <artifactId>hibernate-search-build-json-processor</artifactId>
                                     <version>${project.version}</version>
                                 </path>
                             </annotationProcessorPaths>
@@ -72,7 +121,64 @@
             <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <exports combine.self="override">
+                                        !org.hibernate.search.backend.elasticsearch.*.internal.*;
+                                        org.hibernate.search.*.impl to org.hibernate.search.engine;
+                                        *;
+                                    </exports>
+                                    <requires combine.self="override">
+                                        transitive tools.jackson.databind;
+                                        transitive com.google.gson;
+                                        org.hibernate.*.impl;
+                                        org.hibernate.*.internal;
+                                        org.hibernate.*.impl.*;
+                                        org.hibernate.*.internal.*;
+                                        transitive org.hibernate.*;
+                                        *;
+                                    </requires>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dist</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-javadoc</id>
+                                <!-- Compilation generates the codecs referenced by backend sources. -->
+                                <phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>collect-configuration-properties</id>
+                                <!-- Configuration-property collection reads the generated Javadocs. -->
+                                <phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

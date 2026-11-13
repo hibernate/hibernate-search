@@ -8,4 +8,6 @@ The syntax of this JSON may change:
 * when you upgrade Hibernate Search to the next version, even for a bugfix (micro) release.
 
 If this happens, you will need to change application code to deal with the changes.
+
+JSON objects and native field values use a selected <<backend-elasticsearch-json,JSON handler>>.
 ====

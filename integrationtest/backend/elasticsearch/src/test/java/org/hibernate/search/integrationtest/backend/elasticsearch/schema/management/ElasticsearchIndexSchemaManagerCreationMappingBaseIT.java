@@ -53,7 +53,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'date',"
 								+ "  'format': '"
 								+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "',"
@@ -78,7 +78,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'boolean',"
 								+ "  'doc_values': false"
 								+ "}"
@@ -101,7 +101,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': false"
 								+ "}"
@@ -125,7 +125,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'standard'"
 								+ "}"
@@ -149,7 +149,7 @@ class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
-						"'myField': {"
+						"\"myField\": {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'standard',"
 								+ "  'norms': false"

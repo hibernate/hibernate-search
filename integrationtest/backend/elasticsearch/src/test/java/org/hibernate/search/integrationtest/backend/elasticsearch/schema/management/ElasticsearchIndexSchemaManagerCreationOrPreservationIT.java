@@ -54,10 +54,10 @@ class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'keyword'"
 								+ "},"
-								+ "'NOTmyField': {" // Ignored during validation
+								+ "\"NOTmyField\": {" // Ignored during validation
 								+ "  'type': 'date'"
 								+ "}"
 				)
@@ -65,10 +65,10 @@ class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'keyword'"
 								+ "},"
-								+ "'NOTmyField': {" // Ignored during validation
+								+ "\"NOTmyField\": {" // Ignored during validation
 								+ "  'type': 'date'"
 								+ "}"
 				),
@@ -80,10 +80,10 @@ class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		// The mapping should be unchanged
 		assertJsonEquals(
 				simpleMappingForExpectations(
-						"'field': {"
+						"\"field\": {"
 								+ "  'type': 'keyword'"
 								+ "},"
-								+ "'NOTmyField': {" // Ignored during validation
+								+ "\"NOTmyField\": {" // Ignored during validation
 								+ "  'type': 'date'"
 								+ "}"
 				),
@@ -103,7 +103,7 @@ class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		// Just check that *something* changed
 		// Other test classes check that the changes actually make sense
 		assertJsonEqualsIgnoringUnknownFields(
-				"{ 'properties': { 'field': { } } }",
+				"{ \"properties\": { \"field\": { } } }",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}

@@ -7,7 +7,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 class ElasticsearchDocumentReferenceProjection
 		extends AbstractElasticsearchProjection<DocumentReference>
@@ -27,7 +27,7 @@ class ElasticsearchDocumentReferenceProjection
 	}
 
 	@Override
-	public Extractor<?, DocumentReference> request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, DocumentReference> request(ObjectNode requestBody, ProjectionRequestContext context) {
 		context.checkNotNested(
 				ProjectionTypeKeys.DOCUMENT_REFERENCE,
 				ElasticsearchSearchHints.INSTANCE.documentReferenceProjectionNestingNotSupportedHint()
@@ -37,8 +37,8 @@ class ElasticsearchDocumentReferenceProjection
 	}
 
 	@Override
-	public DocumentReference extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
-			JsonObject source, ProjectionExtractContext context) {
+	public DocumentReference extract(ProjectionHitMapper<?> projectionHitMapper, ObjectNode hit,
+			ObjectNode source, ProjectionExtractContext context) {
 		return helper.extract( hit, context );
 	}
 

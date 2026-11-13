@@ -3,7 +3,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import org.hibernate.search.backend.elasticsearch.client.common.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 
-import com.google.gson.JsonObject;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * An interface with knowledge of the index manager internals,
@@ -24,7 +24,5 @@ public interface WorkExecutionIndexManagerContext {
 
 	String toElasticsearchId(String tenantId, String id);
 
-	JsonObject createDocument(String tenantId, String id,
-			DocumentContributor documentContributor);
-
+	ObjectNode createDocument(String tenantId, String id, DocumentContributor documentContributor);
 }
