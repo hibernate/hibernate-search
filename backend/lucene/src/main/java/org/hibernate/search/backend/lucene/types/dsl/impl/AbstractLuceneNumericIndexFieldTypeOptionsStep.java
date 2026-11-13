@@ -17,26 +17,36 @@ import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneCommonQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldValueFactorFunction;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRangePredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericTermsPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.FieldMetricAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.ScoreFunctionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends AbstractLuceneNumericIndexFieldTypeOptionsStep<S, F>, F>
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<S, F> {
 
+	private Scorable scorable = Scorable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
 	AbstractLuceneNumericIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
 			DefaultStringConverters.Converter<F> defaultConverter) {
 		super( buildContext, fieldType, defaultConverter );
+	}
+
+	@Override
+	public S scorable(Scorable scorable) {
+		this.scorable = scorable;
+		return thisAsS();
 	}
 
 	@Override
@@ -51,9 +61,12 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
+		boolean resolvedScorable = resolveDefault( scorable );
 
 		Indexing indexing = resolvedSearchable ? Indexing.ENABLED : Indexing.DISABLED;
-		DocValues docValues = resolvedSortable || resolvedAggregable ? DocValues.ENABLED : DocValues.DISABLED;
+		DocValues docValues = resolvedSortable || resolvedAggregable || resolvedScorable
+				? DocValues.ENABLED
+				: DocValues.DISABLED;
 		Storage storage = resolvedProjectable ? Storage.ENABLED : Storage.DISABLED;
 
 		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec( indexing, docValues, storage, indexNullAsValue );
@@ -72,6 +85,12 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 			builder.queryElementFactory( LucenePredicateTypeKeys.QUERY_STRING,
 					new LuceneCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
+		}
+
+		if ( resolvedScorable ) {
+			builder.scorable( true );
+			builder.queryElementFactory( ScoreFunctionTypeKeys.FIELD_VALUE_FACTOR,
+					new LuceneFieldValueFactorFunction.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {

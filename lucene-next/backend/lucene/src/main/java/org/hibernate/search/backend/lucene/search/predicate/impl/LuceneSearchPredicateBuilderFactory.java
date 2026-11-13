@@ -3,6 +3,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.DisjunctionMaxPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.FunctionScorePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilder;
@@ -59,6 +60,11 @@ public class LuceneSearchPredicateBuilderFactory implements SearchPredicateBuild
 	@Override
 	public WithParametersPredicateBuilder withParameters() {
 		return new LuceneWithParametersPredicate.Builder( scope );
+	}
+
+	@Override
+	public FunctionScorePredicateBuilder functionScore() {
+		return new LuceneFunctionScorePredicate.Builder( scope );
 	}
 
 	public LuceneSearchPredicate fromLuceneQuery(Query query) {
