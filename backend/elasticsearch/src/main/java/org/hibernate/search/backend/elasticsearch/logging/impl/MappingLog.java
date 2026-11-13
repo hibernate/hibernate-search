@@ -146,4 +146,8 @@ public interface MappingLog {
 					+ " Try using a different similarity type and refer to the OpenSearch documentation for more details.")
 	SearchException vectorSimilarityNotSupportedByOpenSearchBackend(VectorSimilarity vectorSimilarity);
 
+
+	@Message(id = ID_OFFSET + 197,
+			value = "Scorable.YES is not supported for this field type. Only numeric fields can be used in score functions.")
+	SearchException unsupportedScorableFieldType(@Param EventContext context);
 }

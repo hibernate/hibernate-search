@@ -333,4 +333,11 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 193, value = "Current factory cannot be resocped to '%1$s' as it is scoped to '%2$s'.")
 	SearchException incompatibleScopeRootType(@FormatWith(ClassFormatter.class) Class<?> requested,
 			@FormatWith(ClassFormatter.class) Class<?> actual);
+
+	@Message(id = ID_OFFSET + 196,
+			value = "Cannot use function score predicate with functions targeting fields at different nested paths: "
+					+ "previously resolved nested path hierarchy %1$s, but field '%2$s' has nested path hierarchy %3$s. "
+					+ "Split into separate functionScore predicates, each inside its own nested() predicate, combined via bool().")
+	SearchException incompatibleFunctionScoreNestedPaths(List<String> resolvedNestedPathHierarchy, String fieldPath,
+			List<String> fieldNestedPathHierarchy, @Param EventContext context);
 }
