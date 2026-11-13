@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.dsl.DisjunctionMaxPredicateC
 import org.hibernate.search.engine.search.predicate.dsl.DisjunctionMaxPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.FunctionScoreClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.KnnPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
@@ -36,10 +37,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateOp
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.BooleanPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DisjunctionMaxPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.ExistsPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.FunctionScoreClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.KnnPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchAllPredicateOptionsStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchIdPredicateMatchingStepImpl;
@@ -260,6 +263,31 @@ public abstract class AbstractSearchPredicateFactory<
 	public KnnPredicateFieldStep<SR> knn(int k) {
 		Contracts.assertStrictlyPositive( k, "k" );
 		return new KnnPredicateFieldStepImpl<>( this, dslContext, k );
+	}
+
+	@Override
+	public FunctionScoreClausesStep<SR, ?> functionScore() {
+		return new FunctionScoreClausesStepImpl<>( dslContext, this );
+	}
+
+	@Override
+	public FunctionScoreClausesStep<SR, ?> functionScore(PredicateFinalStep innerPredicate) {
+		FunctionScoreClausesStepImpl<SR> step = new FunctionScoreClausesStepImpl<>( dslContext, this );
+		step.innerPredicate( innerPredicate );
+		return step;
+	}
+
+	@Override
+	public FunctionScoreClausesStep<SR, ?> functionScore(SearchPredicate innerPredicate) {
+		FunctionScoreClausesStepImpl<SR> step = new FunctionScoreClausesStepImpl<>( dslContext, this );
+		step.innerPredicate( innerPredicate );
+		return step;
+	}
+
+	@Override
+	public FunctionScoreClausesStep<SR, ?> functionScore(
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> innerPredicateContributor) {
+		return functionScore( innerPredicateContributor.apply( this ) );
 	}
 
 	@Override

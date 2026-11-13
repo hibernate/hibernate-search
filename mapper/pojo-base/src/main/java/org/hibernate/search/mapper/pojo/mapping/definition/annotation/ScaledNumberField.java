@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
@@ -18,6 +19,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.ScaledNumberFieldProcessor;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Maps a property to a scaled number field in the index,
@@ -68,6 +70,13 @@ public @interface ScaledNumberField {
 	 * @see Sortable
 	 */
 	Sortable sortable() default Sortable.DEFAULT;
+
+	/**
+	 * @return Whether this field's numeric value can be used in score functions.
+	 * @see Scorable
+	 */
+	@Incubating
+	Scorable scorable() default Scorable.DEFAULT;
 
 	/**
 	 * @return Whether this field should be searchable.

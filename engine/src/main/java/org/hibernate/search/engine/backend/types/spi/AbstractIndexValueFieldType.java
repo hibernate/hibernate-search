@@ -31,6 +31,7 @@ public abstract class AbstractIndexValueFieldType<
 
 	private final boolean searchable;
 	private final boolean sortable;
+	private final boolean scorable;
 	private final boolean projectable;
 	private final boolean aggregable;
 	private final boolean multivaluable;
@@ -52,6 +53,7 @@ public abstract class AbstractIndexValueFieldType<
 		this.formatConverter = builder.formatter != null ? builder.formatter : indexProjectionConverter;
 		this.searchable = builder.searchable;
 		this.sortable = builder.sortable;
+		this.scorable = builder.scorable;
 		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
 		this.multivaluable = builder.multivaluable;
@@ -85,6 +87,11 @@ public abstract class AbstractIndexValueFieldType<
 	@Override
 	public final boolean sortable() {
 		return sortable;
+	}
+
+	@Override
+	public final boolean scorable() {
+		return scorable;
 	}
 
 	@Override
@@ -179,6 +186,7 @@ public abstract class AbstractIndexValueFieldType<
 
 		private boolean searchable;
 		private boolean sortable;
+		private boolean scorable;
 		private boolean projectable;
 		private boolean aggregable;
 		private boolean multivaluable = true;
@@ -221,6 +229,10 @@ public abstract class AbstractIndexValueFieldType<
 
 		public final void sortable(boolean sortable) {
 			this.sortable = sortable;
+		}
+
+		public final void scorable(boolean scorable) {
+			this.scorable = scorable;
 		}
 
 		public final void projectable(boolean projectable) {
