@@ -339,6 +339,34 @@ public interface SearchPredicateFactory {
 	KnnPredicateFieldStep<?> knn(int k);
 
 	/**
+	 * Modify the relevance score of documents matched by an inner predicate using scoring functions.
+	 * <p>
+	 * The inner predicate defaults to {@code matchAll}.
+	 *
+	 * @return The initial step of a DSL where function score functions can be added.
+	 * @see FunctionScoreClausesStep
+	 */
+	FunctionScoreClausesStep<?, ?> functionScore();
+
+	/**
+	 * Modify the relevance score of documents matched by the given inner predicate using scoring functions.
+	 *
+	 * @param innerPredicate The inner predicate whose matched documents will have their scores modified.
+	 * @return The initial step of a DSL where function score functions can be added.
+	 * @see FunctionScoreClausesStep
+	 */
+	FunctionScoreClausesStep<?, ?> functionScore(PredicateFinalStep innerPredicate);
+
+	/**
+	 * Modify the relevance score of documents matched by the given inner predicate using scoring functions.
+	 *
+	 * @param innerPredicate The inner predicate whose matched documents will have their scores modified.
+	 * @return The initial step of a DSL where function score functions can be added.
+	 * @see FunctionScoreClausesStep
+	 */
+	FunctionScoreClausesStep<?, ?> functionScore(SearchPredicate innerPredicate);
+
+	/**
 	 * Delegating predicate that creates the actual predicate at query create time and provides access to query parameters.
 	 * <p>
 	 * Which predicate exactly to create is defined by a function passed to the arguments of this predicate.

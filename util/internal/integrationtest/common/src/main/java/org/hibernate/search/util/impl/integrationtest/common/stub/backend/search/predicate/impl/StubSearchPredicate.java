@@ -17,6 +17,8 @@ import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.CommonQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.DisjunctionMaxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.FieldValueFactorFunctionBuilder;
+import org.hibernate.search.engine.search.predicate.spi.FunctionScorePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilder;
@@ -159,7 +161,8 @@ public class StubSearchPredicate implements SearchPredicate {
 			SpatialWithinPolygonPredicateBuilder,
 			SpatialWithinBoundingBoxPredicateBuilder,
 			NamedPredicateBuilder,
-			PrefixPredicateBuilder {
+			PrefixPredicateBuilder,
+			FunctionScorePredicateBuilder {
 		private boolean hasClause = false;
 
 		@Override
@@ -317,6 +320,82 @@ public class StubSearchPredicate implements SearchPredicate {
 
 		@Override
 		public void prefix(String prefix) {
+			// No-op
+		}
+
+		@Override
+		public void innerPredicate(SearchPredicate predicate) {
+			// No-op
+		}
+
+		@Override
+		public void addFieldValueFactorFunction(FieldValueFactorFunctionBuilder functionBuilder,
+				float weight, SearchPredicate filter) {
+			// No-op
+		}
+
+		@Override
+		public void addWeightFunction(float weight, SearchPredicate filter) {
+			// No-op
+		}
+
+		@Override
+		public void scoreModeMultiply() {
+			// No-op
+		}
+
+		@Override
+		public void scoreModeSum() {
+			// No-op
+		}
+
+		@Override
+		public void scoreModeAvg() {
+			// No-op
+		}
+
+		@Override
+		public void scoreModeFirst() {
+			// No-op
+		}
+
+		@Override
+		public void scoreModeMax() {
+			// No-op
+		}
+
+		@Override
+		public void scoreModeMin() {
+			// No-op
+		}
+
+		@Override
+		public void boostModeMultiply() {
+			// No-op
+		}
+
+		@Override
+		public void boostModeReplace() {
+			// No-op
+		}
+
+		@Override
+		public void boostModeSum() {
+			// No-op
+		}
+
+		@Override
+		public void boostModeAvg() {
+			// No-op
+		}
+
+		@Override
+		public void boostModeMax() {
+			// No-op
+		}
+
+		@Override
+		public void boostModeMin() {
 			// No-op
 		}
 	}

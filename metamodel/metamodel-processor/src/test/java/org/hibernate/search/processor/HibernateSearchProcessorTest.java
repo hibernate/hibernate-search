@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.fail;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +23,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.hibernate.search.engine.search.reference.scorefunction.FieldValueFactorFieldReference;
 import org.hibernate.search.processor.model.FieldTypesEntity;
 import org.hibernate.search.processor.model.ISBN;
 import org.hibernate.search.processor.model.MyContainedEntity;
@@ -38,6 +41,7 @@ import org.hibernate.search.processor.model.MyIdBinderIndexedEntity;
 import org.hibernate.search.processor.model.MyIdBridgeIndexedEntity;
 import org.hibernate.search.processor.model.MyIndexedEntity;
 import org.hibernate.search.processor.model.MyIndexedGetterEntity;
+import org.hibernate.search.processor.model.ScorableEntity;
 import org.hibernate.search.processor.model.SomeGenerics;
 import org.hibernate.search.processor.model.SomeRandomType;
 import org.hibernate.search.processor.model.SomeRandomTypeBinder;
@@ -99,6 +103,39 @@ class HibernateSearchProcessorTest {
 
 		assertThat( diagnostics.getDiagnostics().stream().map( Diagnostic::getKind ) )
 				.doesNotContain( Diagnostic.Kind.ERROR );
+	}
+
+	@Test
+	void scorableFields() throws Exception {
+		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+		Path consumer = TARGET_DIR.resolve( "ScorableConsumer.java" );
+		Files.writeString( consumer, """
+				package org.hibernate.search.processor.model;
+				import org.hibernate.search.engine.search.predicate.dsl.TypedSearchPredicateFactory;
+				class ScorableConsumer {
+					void query(TypedSearchPredicateFactory<ScorableEntity__> factory, ScorableEntity__ fields) {
+						factory.functionScore().fieldValueFactor(fields.enabled).missing(1);
+						factory.functionScore().fieldValueFactor(fields.scaledEnabled)
+							.missing(java.math.BigDecimal.ONE);
+					}
+				}
+				""" );
+		assertThat( compile( new HibernateSearchProcessor(), diagnostics,
+				getSourceFile( ScorableEntity.class ), consumer.toFile() ) )
+				.as( "Compilation diagnostics: %s", diagnostics.getDiagnostics() ).isTrue();
+
+		try ( URLClassLoader loader = new URLClassLoader( new URL[] { PROCESSOR_OUT_DIR.toUri().toURL() },
+				getClass().getClassLoader() ) ) {
+			Class<?> metamodel = loader.loadClass( ScorableEntity.class.getName() + "__" );
+			for ( String field : List.of( "enabled", "scaledEnabled" ) ) {
+				assertThat( FieldValueFactorFieldReference.class.isAssignableFrom( metamodel.getField( field ).getType() ) )
+						.as( field ).isTrue();
+			}
+			for ( String field : List.of( "disabled", "useDefault", "scaledDisabled", "scaledDefault" ) ) {
+				assertThat( FieldValueFactorFieldReference.class.isAssignableFrom( metamodel.getField( field ).getType() ) )
+						.as( field ).isFalse();
+			}
+		}
 	}
 
 	@Test

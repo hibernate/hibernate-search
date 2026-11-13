@@ -63,4 +63,8 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 	public Double sortedDocValueToDouble(Long value) {
 		return getDomain().sortedDocValueToDouble( value );
 	}
+
+	public double encodedValueToDouble(E value) {
+		return value.doubleValue();
+	}
 }

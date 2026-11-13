@@ -1,9 +1,11 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.logging.impl.MappingLog;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
@@ -56,6 +58,14 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<
 	}
 
 	@Override
+	public S scorable(Scorable scorable) {
+		if ( resolveDefault( scorable ) ) {
+			throw MappingLog.INSTANCE.unsupportedScorableFieldType( buildContext.getEventContext() );
+		}
+		return thisAsS();
+	}
+
+	@Override
 	public abstract LuceneIndexValueFieldType<F> toIndexFieldType();
 
 	protected static boolean resolveDefault(Projectable projectable) {
@@ -103,6 +113,18 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<
 				return true;
 			default:
 				throw new AssertionFailure( "Unexpected value for Aggregable: " + aggregable );
+		}
+	}
+
+	protected static boolean resolveDefault(Scorable scorable) {
+		switch ( scorable ) {
+			case DEFAULT:
+			case NO:
+				return false;
+			case YES:
+				return true;
+			default:
+				throw new AssertionFailure( "Unexpected value for Scorable: " + scorable );
 		}
 	}
 }

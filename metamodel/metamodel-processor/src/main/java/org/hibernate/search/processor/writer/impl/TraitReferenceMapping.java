@@ -29,6 +29,7 @@ import org.hibernate.search.engine.search.reference.projection.DistanceProjectio
 import org.hibernate.search.engine.search.reference.projection.FieldProjectionFieldReference;
 import org.hibernate.search.engine.search.reference.projection.HighlightProjectionFieldReference;
 import org.hibernate.search.engine.search.reference.projection.ObjectProjectionFieldReference;
+import org.hibernate.search.engine.search.reference.scorefunction.FieldValueFactorFieldReference;
 import org.hibernate.search.engine.search.reference.sort.DistanceSortFieldReference;
 import org.hibernate.search.engine.search.reference.sort.FieldSortFieldReference;
 
@@ -37,6 +38,7 @@ class TraitReferenceMapping {
 	private static final String EXTRA_PROPERTY_AGGREGATION_TYPE = "aggregationType";
 	private static final String EXTRA_PROPERTY_PROJECTION_TYPE = "projectionType";
 	private static final String EXTRA_PROPERTY_SORT_TYPE = "sortType";
+	private static final String EXTRA_PROPERTY_SCORE_FUNCTION_TYPE = "scoreFunctionType";
 	private final Map<String, TraitReferenceDetails> traits;
 
 	private TraitReferenceMapping() {
@@ -116,6 +118,10 @@ class TraitReferenceMapping {
 		traits.put( IndexFieldTraits.Aggregations.AVG, new TraitReferenceDetails( AvgAggregationFieldReference.class, "A7",
 				TraitKind.TYPED_OUTPUT, EXTRA_PROPERTY_AGGREGATION_TYPE
 		) );
+
+		traits.put( IndexFieldTraits.ScoreFunctions.FIELD_VALUE_FACTOR,
+				new TraitReferenceDetails( FieldValueFactorFieldReference.class, "SF0", TraitKind.TYPED_INPUT,
+						EXTRA_PROPERTY_SCORE_FUNCTION_TYPE ) );
 
 		this.traits = Collections.unmodifiableMap( traits );
 	}

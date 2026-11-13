@@ -21,7 +21,7 @@ public interface EngineHints {
 	String defaultBackendUnavailable();
 
 	@Message(
-			value = "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)."
+			value = "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant)."
 					+ " If it already is, then '%1$s' is not available for fields of this type.")
 	String missingSupportHintForValueField(SearchQueryElementTypeKey<?> key);
 
@@ -30,7 +30,7 @@ public interface EngineHints {
 			+ " If you are trying to use another feature, it probably isn't available for this field.")
 	String missingSupportHintForCompositeNode();
 
-	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable"
+	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable"
 			+ " (whichever is relevant) in all indexes,"
 			+ " and that the field has the same type in all indexes.")
 	String partialSupportHintForValueField();

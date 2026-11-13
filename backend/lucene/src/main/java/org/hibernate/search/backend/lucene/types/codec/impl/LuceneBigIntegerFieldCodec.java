@@ -101,4 +101,9 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	public Double sortedDocValueToDouble(Long value) {
 		return scale( value ).doubleValue();
 	}
+
+	@Override
+	public double encodedValueToDouble(Long value) {
+		return scale( value ).doubleValue();
+	}
 }

@@ -2,6 +2,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
@@ -16,7 +17,11 @@ public class GenericFieldProcessor extends AbstractNonFullTextFieldAnnotationPro
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 			GenericField annotation, String fieldName) {
-		return mappingContext.genericField( fieldName );
+		var fieldContext = mappingContext.genericField( fieldName );
+		if ( !Scorable.DEFAULT.equals( annotation.scorable() ) ) {
+			fieldContext.scorable( annotation.scorable() );
+		}
+		return fieldContext;
 	}
 
 	@Override

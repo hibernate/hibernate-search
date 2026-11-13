@@ -42,6 +42,7 @@ class TraitReferenceMappingTest {
 		traitNames.addAll( traitNames( IndexFieldTraits.Projections.class ) );
 		traitNames.addAll( traitNames( IndexFieldTraits.Sorts.class ) );
 		traitNames.addAll( traitNames( IndexFieldTraits.Aggregations.class ) );
+		traitNames.addAll( traitNames( IndexFieldTraits.ScoreFunctions.class ) );
 
 		// this is a redundant-to-be-removed type and does not require the field reference:
 		traitNames.remove( IndexFieldTraits.Aggregations.COUNT_DISTINCT );
