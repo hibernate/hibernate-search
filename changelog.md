@@ -1,5 +1,43 @@
 # Hibernate Search Changelog
 
+## 9.0.0.CR1 (2026-11-24)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39892)
+
+
+### Bug
+* [HSEARCH-5715](https://hibernate.atlassian.net/browse/HSEARCH-5715) - Static metamodel processor fails in Quarkus dev mode due to TCCL bootstrap
+
+### Improvement
+* [HSEARCH-5727](https://hibernate.atlassian.net/browse/HSEARCH-5727) - 
+
+### Update to Jackson 2.23.0
+* [](https://hibernate.atlassian.net/browse/) - 
+
+### Improvement
+* [HSEARCH-5726](https://hibernate.atlassian.net/browse/HSEARCH-5726) - Update Apache HTTP Core client components to 5.5
+* [HSEARCH-5725](https://hibernate.atlassian.net/browse/HSEARCH-5725) - Update AWS SDK to 2.59.8
+* [HSEARCH-5724](https://hibernate.atlassian.net/browse/HSEARCH-5724) - Update Elasticsearch rest client (opensearch-rest-client) to 3.10.0
+* [HSEARCH-5723](https://hibernate.atlassian.net/browse/HSEARCH-5723) - Add compatibility with OpenSearch 3.10
+* [HSEARCH-5719](https://hibernate.atlassian.net/browse/HSEARCH-5719) - Update to Hibernate Accessor 0.1.0.CR1
+* [HSEARCH-5716](https://hibernate.atlassian.net/browse/HSEARCH-5716) - Update to Apache Lucene 10.6.0
+* [HSEARCH-5714](https://hibernate.atlassian.net/browse/HSEARCH-5714) - Update to Hibernate ORM 8.0.0.Beta4
+* [HSEARCH-5713](https://hibernate.atlassian.net/browse/HSEARCH-5713) - Update to commons-codec to 1.23.0
+* [HSEARCH-5712](https://hibernate.atlassian.net/browse/HSEARCH-5712) - Update to Jackson 2.22.4
+* [HSEARCH-5711](https://hibernate.atlassian.net/browse/HSEARCH-5711) - Upgrade to GSON 2.15.0
+* [HSEARCH-5710](https://hibernate.atlassian.net/browse/HSEARCH-5710) - Update AWS SDK to 2.57.4
+* [HSEARCH-5709](https://hibernate.atlassian.net/browse/HSEARCH-5709) - Update Apache HTTP Client components to 5.6.5
+* [HSEARCH-5708](https://hibernate.atlassian.net/browse/HSEARCH-5708) - Update Elasticsearch client (elasticsearch-rest5-client) to 9.5.5
+* [HSEARCH-5707](https://hibernate.atlassian.net/browse/HSEARCH-5707) - Update Elasticsearch client (elasticsearch-rest-client) to 9.5.5
+* [HSEARCH-5705](https://hibernate.atlassian.net/browse/HSEARCH-5705) - Update Elasticsearch rest client (opensearch-rest-client) to 3.9.0
+* [HSEARCH-5704](https://hibernate.atlassian.net/browse/HSEARCH-5704) - Add compatibility with OpenSearch 3.9
+* [HSEARCH-5703](https://hibernate.atlassian.net/browse/HSEARCH-5703) - Update to Apache Lucene 10.5.2
+* [HSEARCH-5702](https://hibernate.atlassian.net/browse/HSEARCH-5702) - Elasticsearch JDK REST client hardening
+* [HSEARCH-5338](https://hibernate.atlassian.net/browse/HSEARCH-5338) - Add Disjunction max predicate
+
+### Remove Feature
+* [HSEARCH-5655](https://hibernate.atlassian.net/browse/HSEARCH-5655) - Remove the direct dependency on the `hibernate-search-backend-elasticsearch-client-rest4` from the Elasticsearch backend
+
 ## 9.0.0.Beta1 (2026-09-28)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HSEARCH/versions/39073)
