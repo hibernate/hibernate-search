@@ -79,7 +79,7 @@ jobs:
           { "name": "PostgreSQL", "db-profile": "ci-postgresql" },
           { "name": "Oracle", "db-profile": "ci-oracle",
             "runs-on": "runs-on/fleet=linux-standard/env=ibm" },
-          { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "3.7.0",
+          { "name": "OpenSearch", "es-distribution": "opensearch", "es-version": "3.10.0",
             "runs-on": "runs-on/fleet=linux-standard/env=commonhaus" },
           { "name": "Windows", "full-build": true, "coverage": false,
             "maven-args": "-Dtest.elasticsearch.skip=true",
