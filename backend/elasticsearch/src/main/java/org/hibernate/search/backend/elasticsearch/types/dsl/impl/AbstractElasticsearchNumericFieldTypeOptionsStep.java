@@ -10,12 +10,15 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchCommonQueryStringPredicateBuilderFieldState;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldValueFactorFunction;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTermsPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.converter.spi.DefaultStringConverters;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.ScoreFunctionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
@@ -23,10 +26,17 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 		S extends AbstractElasticsearchNumericFieldTypeOptionsStep<?, F>,
 		F>
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
+	private Scorable scorable = Scorable.DEFAULT;
 
 	AbstractElasticsearchNumericFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			Class<F> fieldType, String dataType, DefaultStringConverters.Converter<F> defaultConverter) {
 		super( buildContext, fieldType, dataType, defaultConverter );
+	}
+
+	@Override
+	public S scorable(Scorable scorable) {
+		this.scorable = scorable;
+		return thisAsS();
 	}
 
 	@Override
@@ -45,6 +55,13 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
 					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
 			builder.queryElementFactory( ElasticsearchPredicateTypeKeys.QUERY_STRING,
 					new ElasticsearchCommonQueryStringPredicateBuilderFieldState.Factory<>( codec ) );
+		}
+
+		if ( resolveDefault( scorable ) ) {
+			builder.mapping().setDocValues( true );
+			builder.scorable( true );
+			builder.queryElementFactory( ScoreFunctionTypeKeys.FIELD_VALUE_FACTOR,
+					new ElasticsearchFieldValueFactorFunction.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {

@@ -1,6 +1,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 
@@ -21,6 +22,12 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 	@Override
 	public S aggregable(Aggregable aggregable) {
 		builder.modifier( b -> b.aggregable( aggregable ) );
+		return thisAsS();
+	}
+
+	@Override
+	public S scorable(Scorable scorable) {
+		builder.modifier( b -> b.scorable( scorable ) );
 		return thisAsS();
 	}
 

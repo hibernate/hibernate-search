@@ -75,7 +75,7 @@ public abstract class AbstractPredicateSearchableIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use '" + predicateTrait() + "' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant)"
 				);
 	}
 

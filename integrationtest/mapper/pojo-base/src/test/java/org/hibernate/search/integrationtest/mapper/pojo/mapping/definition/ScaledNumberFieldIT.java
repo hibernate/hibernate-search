@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -227,6 +228,53 @@ class ScaledNumberFieldIT {
 				.field( "implicitDefault", BigDecimal.class )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void scorable() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@ScaledNumberField(scorable = Scorable.YES)
+			BigDecimal enabled;
+			@ScaledNumberField(scorable = Scorable.NO)
+			BigDecimal disabled;
+			@ScaledNumberField(scorable = Scorable.DEFAULT)
+			BigDecimal explicitDefault;
+			@ScaledNumberField
+			BigDecimal implicitDefault;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", BigDecimal.class, f -> f.scorable( Scorable.YES ) )
+				.field( "disabled", BigDecimal.class, f -> f.scorable( Scorable.NO ) )
+				.field( "explicitDefault", BigDecimal.class )
+				.field( "implicitDefault", BigDecimal.class ) );
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void scorable_programmatic() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			BigDecimal value;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", BigDecimal.class, f -> f.scorable( Scorable.YES ) )
+				.field( "disabled", BigDecimal.class, f -> f.scorable( Scorable.NO ) )
+				.field( "explicitDefault", BigDecimal.class, f -> f.scorable( Scorable.DEFAULT ) ) );
+		setupHelper.start().withConfiguration( builder -> {
+			var property = builder.programmaticMapping().type( IndexedEntity.class ).property( "value" );
+			property.scaledNumberField( "enabled" ).scorable( Scorable.YES );
+			property.scaledNumberField( "disabled" ).scorable( Scorable.NO );
+			property.scaledNumberField( "explicitDefault" ).scorable( Scorable.DEFAULT );
+		} ).setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 

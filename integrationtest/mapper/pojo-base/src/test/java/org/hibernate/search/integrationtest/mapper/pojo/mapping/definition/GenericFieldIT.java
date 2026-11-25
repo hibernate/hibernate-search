@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -150,6 +151,53 @@ class GenericFieldIT {
 				.field( "implicitDefault", String.class )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void scorable() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(scorable = Scorable.YES)
+			Long enabled;
+			@GenericField(scorable = Scorable.NO)
+			Long disabled;
+			@GenericField(scorable = Scorable.DEFAULT)
+			Long explicitDefault;
+			@GenericField
+			Long implicitDefault;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", Long.class, f -> f.scorable( Scorable.YES ) )
+				.field( "disabled", Long.class, f -> f.scorable( Scorable.NO ) )
+				.field( "explicitDefault", Long.class )
+				.field( "implicitDefault", Long.class ) );
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	void scorable_programmatic() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			Long value;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", Long.class, f -> f.scorable( Scorable.YES ) )
+				.field( "disabled", Long.class, f -> f.scorable( Scorable.NO ) )
+				.field( "explicitDefault", Long.class, f -> f.scorable( Scorable.DEFAULT ) ) );
+		setupHelper.start().withConfiguration( builder -> {
+			var property = builder.programmaticMapping().type( IndexedEntity.class ).property( "value" );
+			property.genericField( "enabled" ).scorable( Scorable.YES );
+			property.genericField( "disabled" ).scorable( Scorable.NO );
+			property.genericField( "explicitDefault" ).scorable( Scorable.DEFAULT );
+		} ).setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 

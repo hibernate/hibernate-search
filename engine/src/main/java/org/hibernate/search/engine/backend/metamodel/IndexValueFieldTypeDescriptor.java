@@ -27,6 +27,12 @@ public interface IndexValueFieldTypeDescriptor extends IndexFieldTypeDescriptor 
 	boolean sortable();
 
 	/**
+	 * @return {@code true} if field values can be used in score functions.
+	 */
+	@Incubating
+	boolean scorable();
+
+	/**
 	 * @return {@code true} if projections are supported on fields of this type.
 	 * Some projections may still be unsupported because they don't make sense
 	 * (e.g. a distance projection aggregation on a string field).

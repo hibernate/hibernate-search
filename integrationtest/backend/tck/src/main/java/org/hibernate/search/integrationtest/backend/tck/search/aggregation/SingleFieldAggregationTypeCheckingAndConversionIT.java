@@ -484,7 +484,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant)"
 				);
 	}
 
@@ -504,7 +504,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant)"
 				);
 	}
 

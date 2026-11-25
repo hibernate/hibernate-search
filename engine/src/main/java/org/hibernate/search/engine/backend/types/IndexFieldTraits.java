@@ -13,6 +13,7 @@ package org.hibernate.search.engine.backend.types;
  * @see Sorts
  * @see Projections
  * @see Aggregations
+ * @see ScoreFunctions
  */
 public final class IndexFieldTraits {
 
@@ -110,5 +111,18 @@ public final class IndexFieldTraits {
 
 	}
 
+	/**
+	 * Constants for the names of score-function-related traits that can be exposed by index fields.
+	 *
+	 * @see IndexFieldTraits
+	 */
+	public static class ScoreFunctions {
+
+		private ScoreFunctions() {
+		}
+
+		public static final String FIELD_VALUE_FACTOR = "score-function:field-value-factor";
+
+	}
 
 }

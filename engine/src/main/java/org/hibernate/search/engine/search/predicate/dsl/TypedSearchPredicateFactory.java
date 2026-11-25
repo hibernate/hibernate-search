@@ -1,8 +1,11 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.reference.predicate.NestedPredicateFieldReference;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -259,6 +262,25 @@ public interface TypedSearchPredicateFactory<SR> extends SearchPredicateFactory 
 	 */
 	@Override
 	KnnPredicateFieldStep<SR> knn(int k);
+
+	@Override
+	FunctionScoreClausesStep<SR, ?> functionScore();
+
+	@Override
+	FunctionScoreClausesStep<SR, ?> functionScore(PredicateFinalStep innerPredicate);
+
+	@Override
+	FunctionScoreClausesStep<SR, ?> functionScore(SearchPredicate innerPredicate);
+
+	/**
+	 * Modify the relevance score of documents matched by the given inner predicate using scoring functions.
+	 *
+	 * @param innerPredicateContributor A function that will define the inner predicate.
+	 * @return The initial step of a DSL where function score functions can be added.
+	 * @see FunctionScoreClausesStep
+	 */
+	FunctionScoreClausesStep<SR, ?> functionScore(
+			Function<? super TypedSearchPredicateFactory<SR>, ? extends PredicateFinalStep> innerPredicateContributor);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,

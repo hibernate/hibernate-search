@@ -330,4 +330,20 @@ public interface QueryLog {
 	@Message(id = ID_OFFSET + 195, value = "Configured query cache policy is ineffective as query cache is not enabled. "
 			+ "Set the cache explicitly through the QueryCachingConfigurer.")
 	void ineffectiveQueryCachingPolicy();
+
+	@Message(id = ID_OFFSET + 196,
+			value = "Invalid function score '%1$s' produced by %2$s. Scores must be finite, non-negative values representable as floats.")
+	SearchException invalidFunctionScore(double score, String source);
+
+	@Message(id = ID_OFFSET + 197,
+			value = "Cannot use function score predicate with functions targeting fields at different nested paths: "
+					+ "previously resolved nested path hierarchy %1$s, but field '%2$s' has nested path hierarchy %3$s. "
+					+ "Split into separate functionScore predicates, each inside its own nested() predicate, combined via bool().")
+	SearchException incompatibleFunctionScoreNestedPaths(List<String> resolvedNestedPathHierarchy, String fieldPath,
+			List<String> fieldNestedPathHierarchy, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 198,
+			value = "Missing value for field '%1$s' used by a field value factor score function. "
+					+ "Provide a fallback with missing() or filter the function to documents containing the field.")
+	SearchException missingFieldValueForScoreFunction(String fieldPath, @Param EventContext context);
 }

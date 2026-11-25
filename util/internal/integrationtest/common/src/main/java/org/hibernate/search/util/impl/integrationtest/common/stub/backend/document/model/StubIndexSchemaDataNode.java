@@ -9,6 +9,7 @@ import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -225,6 +226,11 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 
 		public Builder aggregable(Aggregable aggregable) {
 			attribute( "aggregable", aggregable );
+			return this;
+		}
+
+		public Builder scorable(Scorable scorable) {
+			attribute( "scorable", scorable );
 			return this;
 		}
 

@@ -1,9 +1,11 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.MappingLog;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchStandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -17,6 +19,14 @@ abstract class AbstractElasticsearchStandardIndexFieldTypeOptionsStep<
 	AbstractElasticsearchStandardIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			Class<F> fieldType) {
 		super( buildContext, fieldType, new PropertyMapping() );
+	}
+
+	@Override
+	public S scorable(Scorable scorable) {
+		if ( resolveDefault( scorable ) ) {
+			throw MappingLog.INSTANCE.unsupportedScorableFieldType( buildContext.getEventContext() );
+		}
+		return thisAsS();
 	}
 
 	protected static boolean resolveDefault(Projectable projectable) {
@@ -64,6 +74,18 @@ abstract class AbstractElasticsearchStandardIndexFieldTypeOptionsStep<
 				return true;
 			default:
 				throw new AssertionFailure( "Unexpected value for Aggregable: " + aggregable );
+		}
+	}
+
+	protected static boolean resolveDefault(Scorable scorable) {
+		switch ( scorable ) {
+			case DEFAULT:
+			case NO:
+				return false;
+			case YES:
+				return true;
+			default:
+				throw new AssertionFailure( "Unexpected value for Scorable: " + scorable );
 		}
 	}
 }

@@ -277,7 +277,7 @@ class HighlightProjectionTypeIndependentIT {
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'projection:highlight' on field 'notAnalyzedString':",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant).",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant).",
 						"If it already is, then 'projection:highlight' is not available for fields of this type."
 				);
 	}
@@ -293,7 +293,7 @@ class HighlightProjectionTypeIndependentIT {
 				.hasMessageContainingAll(
 						"Inconsistent support for 'projection:highlight'",
 						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant) in all indexes, and that the field has the same type in all indexes"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant) in all indexes, and that the field has the same type in all indexes"
 				);
 	}
 
@@ -308,7 +308,7 @@ class HighlightProjectionTypeIndependentIT {
 				.hasMessageContainingAll(
 						"Inconsistent support for 'projection:highlight'",
 						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant) in all indexes, and that the field has the same type in all indexes."
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable/scorable (whichever is relevant) in all indexes, and that the field has the same type in all indexes."
 				);
 	}
 

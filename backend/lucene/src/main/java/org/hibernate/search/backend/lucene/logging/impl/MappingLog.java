@@ -108,4 +108,8 @@ public interface MappingLog {
 	@Message(id = ID_OFFSET + 179, value = "Invalid index field type: missing vector dimension."
 			+ " Define the vector dimension explicitly. %1$s")
 	SearchException nullVectorDimension(String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 199,
+			value = "Scorable.YES is not supported for this field type. Only numeric fields can be used in score functions.")
+	SearchException unsupportedScorableFieldType(@Param EventContext context);
 }

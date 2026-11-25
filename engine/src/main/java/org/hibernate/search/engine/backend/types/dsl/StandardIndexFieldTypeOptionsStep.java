@@ -1,7 +1,9 @@
 package org.hibernate.search.engine.backend.types.dsl;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Scorable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The initial and final step in a "standard" index field type definition, where optional parameters can be set.
@@ -28,5 +30,14 @@ public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldT
 	 * @see Aggregable
 	 */
 	S aggregable(Aggregable aggregable);
+
+	/**
+	 * @param scorable Whether this field's value can be used in score functions.
+	 * @return {@code this}, for method chaining.
+	 * @throws org.hibernate.search.util.common.SearchException if scoring is enabled on an unsupported field type.
+	 * @see Scorable
+	 */
+	@Incubating
+	S scorable(Scorable scorable);
 
 }

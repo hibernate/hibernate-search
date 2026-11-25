@@ -23,4 +23,6 @@ public interface SearchPredicateBuilderFactory {
 	QueryStringPredicateBuilder queryString();
 
 	WithParametersPredicateBuilder withParameters();
+
+	FunctionScorePredicateBuilder functionScore();
 }
