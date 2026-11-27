@@ -5,4 +5,4 @@
 #  * update `version.org.elasticsearch.latest` property in a POM file.
 #  * update the tags for 'elasticsearch-current' and 'elasticsearch-next' builds in ci/dependency-update/Jenkinsfile
 #
-FROM docker.io/elastic/elasticsearch:9.5.6@sha256:79b4f1de4c15e6eca824723086a51e5934406d614d410cc11be77748cafac537
+FROM docker.io/elastic/elasticsearch:9.5.7@sha256:8aa3b18f6a26880f4c2fa1ffb37a48213e201b0b6a1a47412c66b1f5d533de91
